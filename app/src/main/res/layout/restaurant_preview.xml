@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:id="@+id/imageView2"
+        android:src="@drawable/restaurant"
+        android:layout_gravity="center_horizontal"
+        android:layout_alignParentEnd="true" />
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignBottom="@+id/imageView2"
+        android:background="@color/colorAccentOpaque"
+        android:layout_alignParentStart="true">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:paddingLeft="4dp"
+                android:text="Name"
+                android:layout_weight="1"
+                android:id="@+id/textView2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:paddingRight="4dp"
+                android:text="% reserved"
+                android:gravity="right"
+                android:layout_weight="1"
+                android:id="@+id/textView3" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:paddingLeft="4dp"
+                android:text="# of reservations"
+                android:layout_weight="1"
+                android:id="@+id/textView4" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:paddingRight="4dp"
+                android:text="Rating"
+                android:gravity="right"
+                android:layout_weight="1"
+                android:id="@+id/textView5" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>
