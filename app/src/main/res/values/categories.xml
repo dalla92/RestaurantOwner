@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="categories_array">
+        <item>Italian Restaurant</item>
+        <item>Cafè</item>
+        <item>Japanese Restaurant</item>
+        <item>Kebab</item>
+        <item>Fast food</item>
+        <item>Pub</item>
+        <item>Hamburger</item>
+        <item>Greek Restaurant</item>
+    </string-array>
+</resources>

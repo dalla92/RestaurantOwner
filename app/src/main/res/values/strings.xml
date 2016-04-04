@@ -9,4 +9,11 @@
     <string name="title_activity_restaurant_list">My Restaurants</string>
     <string name="title_activity_add_restaurant">Add Restaurant</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="addres_section1">Info</string>
+    <string name="addres_section2">Services</string>
+    <string name="addres_section3">Extras</string>
+    <string name="name">Name</string>
+    <string name="address">Address</string>
+    <string name="phone">Phone</string>
+    <string name="category">Category</string>
 </resources>
