@@ -22,12 +22,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class AddRestaurantActivity extends AppCompatActivity {
@@ -162,6 +162,14 @@ public class AddRestaurantActivity extends AppCompatActivity {
         Button buttonLunchClose;
         Button buttonDinnerOpen;
         Button buttonDinnerClose;
+        ArrayList<String> lunchOpenTime = new ArrayList<String>();
+        ArrayList<String> lunchCloseTime = new ArrayList<String>();
+        ArrayList<String> dinnerOpenTime = new ArrayList<String>();
+        ArrayList<String> dinnerCloseTime = new ArrayList<String>();
+        ArrayList<Boolean> listLunchClose = new ArrayList<Boolean>();
+        ArrayList<Boolean> listDinnerClose = new ArrayList<Boolean>();
+        boolean allDays=false;
+        int selectedDay = 0;
 
 
         public FragmentServices() {
@@ -184,6 +192,18 @@ public class AddRestaurantActivity extends AppCompatActivity {
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_add_restaurant_services, container, false);
 
+            for(int i=0;i<8;i++){
+                lunchOpenTime.add(i,"SET");
+                lunchCloseTime.add(i,"SET");
+                dinnerOpenTime.add(i,"SET");
+                dinnerCloseTime.add(i,"SET");
+                listLunchClose.add(i, false);
+                listDinnerClose.add(i, false);
+            }
+
+            final CheckBox cbLunchClosed = (CheckBox) rootView.findViewById(R.id.checkBoxLunchClose);
+            final CheckBox cbDinnerClosed = (CheckBox) rootView.findViewById(R.id.checkBoxDinnerClose);
+
             buttonLunchOpen = (Button) rootView.findViewById(R.id.buttonLunchOpen);
             buttonLunchOpen.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -192,7 +212,13 @@ public class AddRestaurantActivity extends AppCompatActivity {
                     DialogFragment newFragment = new TimePickerFragment() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            buttonLunchOpen.setText("" + hourOfDay + ":" + minute);
+                            String time = hourOfDay + ":" + minute;
+                            if(allDays)
+                                for(int i=0;i<8;i++)
+                                    lunchOpenTime.set(i,time);
+                            else
+                                lunchOpenTime.set(selectedDay,time);
+                            buttonLunchOpen.setText(time);
                         }
                     };
                     newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
@@ -207,7 +233,13 @@ public class AddRestaurantActivity extends AppCompatActivity {
                     DialogFragment newFragment = new TimePickerFragment() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            buttonLunchClose.setText("" + hourOfDay + ":" + minute);
+                            String time = hourOfDay + ":" + minute;
+                            if(allDays)
+                                for(int i=0;i<8;i++)
+                                    lunchCloseTime.set(i,time);
+                            else
+                                lunchCloseTime.set(selectedDay,time);
+                            buttonLunchClose.setText(time);
                         }
                     };
                     newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
@@ -222,7 +254,15 @@ public class AddRestaurantActivity extends AppCompatActivity {
                     DialogFragment newFragment = new TimePickerFragment() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            buttonDinnerOpen.setText("" + hourOfDay + ":" + minute);
+
+                            String time = hourOfDay + ":" + minute;
+                            if(allDays)
+                                for(int i=0;i<8;i++)
+                                    dinnerOpenTime.set(i,time);
+                            else
+                                dinnerOpenTime.set(selectedDay,time);
+                            buttonDinnerOpen.setText(time);
+
                         }
                     };
                     newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
@@ -237,10 +277,110 @@ public class AddRestaurantActivity extends AppCompatActivity {
                     DialogFragment newFragment = new TimePickerFragment() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            buttonDinnerClose.setText("" + hourOfDay + ":" + minute);
+                            String time = hourOfDay + ":" + minute;
+                            if(allDays)
+                                for(int i=0;i<8;i++)
+                                    dinnerCloseTime.set(i,time);
+                            else
+                                dinnerCloseTime.set(selectedDay,time);
+                            buttonDinnerClose.setText(time);
                         }
                     };
                     newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
+                }
+            });
+
+
+            cbLunchClosed.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (((CheckBox) v).isChecked()) {
+                        lunchOpenTime.set(selectedDay,"CLOSED");
+                        lunchCloseTime.set(selectedDay,"CLOSED");
+                        buttonLunchOpen.setText("CLOSED");
+                        buttonLunchOpen.setEnabled(false);
+                        buttonLunchClose.setText("CLOSED");
+                        buttonLunchClose.setEnabled(false);
+                        listLunchClose.set(selectedDay, true);
+                    }
+                    else{
+                        lunchOpenTime.set(selectedDay,"SET");
+                        lunchCloseTime.set(selectedDay,"SET");
+                        buttonLunchOpen.setText("SET");
+                        buttonLunchOpen.setEnabled(true);
+                        buttonLunchClose.setText("SET");
+                        buttonLunchClose.setEnabled(true);
+                        listLunchClose.set(selectedDay, false);
+                    }
+                }
+            });
+
+            cbDinnerClosed.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (((CheckBox) v).isChecked()) {
+                        dinnerOpenTime.set(selectedDay,"CLOSED");
+                        dinnerCloseTime.set(selectedDay,"CLOSED");
+                        buttonDinnerOpen.setText("CLOSED");
+                        buttonDinnerOpen.setEnabled(false);
+                        buttonDinnerClose.setText("CLOSED");
+                        buttonDinnerClose.setEnabled(false);
+                        listDinnerClose.set(selectedDay, true);
+                    }
+                    else{
+                        dinnerOpenTime.set(selectedDay,"SET");
+                        dinnerCloseTime.set(selectedDay,"SET");
+                        buttonDinnerOpen.setText("SET");
+                        buttonDinnerOpen.setEnabled(true);
+                        buttonDinnerClose.setText("SET");
+                        buttonDinnerClose.setEnabled(true);
+                        listDinnerClose.set(selectedDay, false);
+                    }
+                }
+            });
+
+
+            final Spinner day = (Spinner) rootView.findViewById(R.id.spinnerDays);
+
+            // Create an ArrayAdapter using the string array and a default spinner layout
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),
+                    R.array.week_days_array, android.R.layout.simple_spinner_item);
+            // Specify the layout to use when the list of choices appears
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // Apply the adapter to the spinner
+            day.setAdapter(adapter);
+            selectedDay = day.getSelectedItemPosition();
+
+            day.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    if(position==7){
+                        allDays=true;
+                        cbLunchClosed.setVisibility(CheckBox.INVISIBLE);
+                        cbDinnerClosed.setVisibility(CheckBox.INVISIBLE);
+                    }
+                    else {
+                        allDays = false;
+                        cbLunchClosed.setVisibility(CheckBox.VISIBLE);
+                        cbLunchClosed.setChecked(listLunchClose.get(position));
+                        cbDinnerClosed.setVisibility(CheckBox.VISIBLE);
+                        cbDinnerClosed.setChecked(listDinnerClose.get(position));
+
+                    }
+                    selectedDay = position;
+                    buttonLunchOpen.setEnabled(!listLunchClose.get(position));
+                    buttonLunchClose.setEnabled(!listLunchClose.get(position));
+                    buttonDinnerOpen.setEnabled(!listDinnerClose.get(position));
+                    buttonDinnerClose.setEnabled(!listDinnerClose.get(position));
+                    buttonLunchOpen.setText(lunchOpenTime.get(selectedDay));
+                    buttonLunchClose.setText(lunchCloseTime.get(selectedDay));
+                    buttonDinnerOpen.setText(dinnerOpenTime.get(selectedDay));
+                    buttonDinnerClose.setText(dinnerCloseTime.get(selectedDay));
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
                 }
             });
 
