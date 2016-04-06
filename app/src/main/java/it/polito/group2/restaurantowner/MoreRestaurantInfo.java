@@ -34,6 +34,11 @@ public class MoreRestaurantInfo extends ActionBarActivity implements AdapterView
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
+        //spinner edit yes/no
+        spinner.setEnabled(false);
+        spinner.setClickable(false);
+        spinner.setFocusableInTouchMode(false);
+        spinner.setFocusableInTouchMode(false);
         spinner.setAdapter(adapter);
         spinner.setOnItemSelectedListener(this);
 
@@ -113,6 +118,13 @@ public class MoreRestaurantInfo extends ActionBarActivity implements AdapterView
                 booking_via_telephone.setClickable(true);
                 wi_fi.setClickable(true);
                 outside.setClickable(true);
+                //spinner edit yes/no
+                Spinner spinner1 = (Spinner) findViewById(R.id.spinner_restaurant_type);
+                spinner1.setEnabled(true);
+                spinner1.setClickable(true);
+                spinner1.setFocusable(true);
+                spinner1.setFocusableInTouchMode(true);
+
 
                 return true;
 
@@ -130,18 +142,18 @@ public class MoreRestaurantInfo extends ActionBarActivity implements AdapterView
                 EditText edit_squared_metres2 = (EditText) findViewById(R.id.edit_squared_metres);
                 EditText edit_closest_metro2 = (EditText) findViewById(R.id.edit_closest_metro);
                 EditText edit_closest_bus2 = (EditText) findViewById(R.id.edit_closest_bus);
-                edit_seating_capacity2.setFocusableInTouchMode(true);
-                edit_seating_capacity2.setFocusable(true);
-                edit_seating_capacity2.setAlpha(1);
-                edit_squared_metres2.setFocusableInTouchMode(true);
-                edit_squared_metres2.setFocusable(true);
-                edit_squared_metres2.setAlpha(1);
-                edit_closest_metro2.setFocusableInTouchMode(true);
-                edit_closest_metro2.setFocusable(true);
-                edit_closest_metro2.setAlpha(1);
-                edit_closest_bus2.setFocusableInTouchMode(true);
-                edit_closest_bus2.setFocusable(true);
-                edit_closest_bus2.setAlpha(1);
+                edit_seating_capacity2.setFocusableInTouchMode(false);
+                edit_seating_capacity2.setFocusable(false);
+                edit_seating_capacity2.setAlpha(0);
+                edit_squared_metres2.setFocusableInTouchMode(false);
+                edit_squared_metres2.setFocusable(false);
+                edit_squared_metres2.setAlpha(0);
+                edit_closest_metro2.setFocusableInTouchMode(false);
+                edit_closest_metro2.setFocusable(false);
+                edit_closest_metro2.setAlpha(0);
+                edit_closest_bus2.setFocusableInTouchMode(false);
+                edit_closest_bus2.setFocusable(false);
+                edit_closest_bus2.setAlpha(0);
                 //edit checkbox clickable
                 CheckBox check_inside2 = (CheckBox) findViewById(R.id.inside);
                 CheckBox check_celiac2 = (CheckBox) findViewById(R.id.check_celiac);
@@ -152,15 +164,21 @@ public class MoreRestaurantInfo extends ActionBarActivity implements AdapterView
                 CheckBox booking_via_telephone2 = (CheckBox) findViewById(R.id.booking_via_telephone);
                 CheckBox wi_fi2 = (CheckBox) findViewById(R.id.wi_fi);
                 CheckBox outside2 = (CheckBox) findViewById(R.id.outside);
-                check_inside2.setClickable(true);
-                check_celiac2.setClickable(true);
-                check_vegan2.setClickable(true);
-                check_vegetarian2.setClickable(true);
-                credit_card2.setClickable(true);
-                take_away2.setClickable(true);
-                booking_via_telephone2.setClickable(true);
-                wi_fi2.setClickable(true);
-                outside2.setClickable(true);
+                check_inside2.setClickable(false);
+                check_celiac2.setClickable(false);
+                check_vegan2.setClickable(false);
+                check_vegetarian2.setClickable(false);
+                credit_card2.setClickable(false);
+                take_away2.setClickable(false);
+                booking_via_telephone2.setClickable(false);
+                wi_fi2.setClickable(false);
+                outside2.setClickable(false);
+                //spinner edit yes/no
+                Spinner spinner2 = (Spinner) findViewById(R.id.spinner_restaurant_type);
+                spinner2.setEnabled(false);
+                spinner2.setClickable(false);
+                spinner2.setFocusable(false);
+                spinner2.setFocusableInTouchMode(false);
 
                 return true;
 

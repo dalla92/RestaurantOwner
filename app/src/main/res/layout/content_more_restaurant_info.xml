@@ -34,7 +34,7 @@
             android:background="@android:color/transparent"
             style="@style/EditTextCustomHolo"
             android:focusable="false"
-            />
+            android:minWidth="100dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -58,7 +58,7 @@
             android:maxLength="5"
             style="@style/EditTextCustomHolo"
             android:focusable="false"
-            />
+            android:minWidth="100dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -82,7 +82,7 @@
             android:maxLength="15"
             style="@style/EditTextCustomHolo"
             android:focusable="false"
-            />
+            android:minWidth="100dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -106,7 +106,7 @@
             android:maxLength="15"
             style="@style/EditTextCustomHolo"
             android:focusable="false"
-            />
+            android:minWidth="100dp" />
     </LinearLayout>
 
 
@@ -127,6 +127,9 @@
             android:padding="6dp"
             android:paddingTop="15dp"
             android:clickable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:editable="false"
             />
 
     </LinearLayout>
