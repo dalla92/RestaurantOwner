@@ -36,6 +36,8 @@
         <activity
             android:name=".MoreRestaurantInfo"
             android:label="@string/restaurant_page_name"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             ></activity>
     </application>
 

@@ -27,7 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:src="@mipmap/image_preview_black"
-                android:id="@+id/imageView3" />
+                android:id="@+id/image_to_enlarge" />
 
         <LinearLayout
                 android:orientation="horizontal"
@@ -78,7 +78,8 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
+                    android:inputType="text|textMultiLine|textCapSentences"
+                    android:maxLength="40"
                     android:text="@string/edit_restaurant_name"
                     android:ems="10"
                     android:focusable="false"
@@ -104,7 +105,8 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="textPostalAddress"
+                    android:inputType="text|textMultiLine|textCapSentences"
+                    android:maxLength="40"
                     android:text="@string/edit_restaurant_address"
                     android:ems="10"
                     android:focusable="false"
@@ -131,7 +133,8 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="phone"
+                    android:inputType="text|textMultiLine|textCapSentences"
+                    android:maxLength="40"
                     android:text="@string/edit_restaurant_telephone_number"
                     android:ems="10"
                     android:focusable="false"

@@ -10,20 +10,22 @@
     <string name="restaurant_page_name">NOME DEL RISTORANTE</string>
     <string name="button_take_photo">SCATTA FOTO ORA</string>
     <string name="button_choose_photo">SCEGLI DA GALLERIA</string>
-    <string name="restaurant_name">Nome:</string>
-    <string name="restaurant_address">Indirizzo:</string>
-    <string name="restaurant_telephone_number">Numero di telefono:</string>
+    <string name="restaurant_name">Nome: </string>
+    <string name="restaurant_address">Indirizzo: </string>
+    <string name="restaurant_telephone_number">Numero di telefono: </string>
     <string name="edit_restaurant_name"> Inserisci nome</string>
     <string name="edit_restaurant_address"> Inserisci indirizzo</string>
     <string name="edit_restaurant_telephone_number"> Inserisci numero</string>
     <string name="last_comments">Ultimi commenti</string>
     <string name="action_confirm">CONFERMA</string>
     <string name="action_more">ALTRO</string>
+    <string name="action_edit">MODIFICA</string>
 
-    <string name="seating_capacity">POSTI A SEDERE:</string>
-    <string name="squared_metres">METRI QUADRATI:</string>
-    <string name="closest_metro_stop">FERMATA METRO VICINA:</string>
-    <string name="closest_bus_stop">FERMATA BUS VICINA:</string>
+
+    <string name="seating_capacity">POSTI A SEDERE: </string>
+    <string name="squared_metres">METRI QUADRATI: </string>
+    <string name="closest_metro_stop">FERMATA METRO VICINA: </string>
+    <string name="closest_bus_stop">FERMATA BUS VICINA: </string>
     <string name="credit_card">CARTA DI CREDITO</string>
     <string name="wifi">WI-FI</string>
     <string name="inside">INTERNO</string>

@@ -43,7 +43,7 @@ public class Restaurant_page extends AppCompatActivity
         imageview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent fullScreenIntent = new Intent(v.getContext(),Enlarged_image.class);
+                Intent fullScreenIntent = new Intent(getApplicationContext(), Enlarged_image.class);
                 fullScreenIntent.putExtra(Enlarged_image.class.getName(), R.id.image_to_enlarge);
                 startActivity(fullScreenIntent);
             }

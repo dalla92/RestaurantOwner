@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="it.polito.group2.restaurantowner.MainActivity"
+    tools:context="it.polito.group2.restaurantowner.Restaurant_page"
     tools:showIn="@layout/app_bar_restaurant_page">
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -69,7 +69,8 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
+                    android:inputType="text|textMultiLine|textCapSentences"
+                    android:maxLength="40"
                     android:text="@string/edit_restaurant_name"
                     android:ems="10"
                     android:id="@+id/edit_restaurant_name"
@@ -96,7 +97,8 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="textPostalAddress"
+                    android:inputType="text|textMultiLine|textCapSentences"
+                    android:maxLength="40"
                     android:text="@string/edit_restaurant_address"
                     android:ems="10"
                     android:focusable="false"
@@ -123,7 +125,8 @@
                 <EditText
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:inputType="phone"
+                    android:inputType="text|textMultiLine|textCapSentences"
+                    android:maxLength="20"
                     android:text="@string/edit_restaurant_telephone_number"
                     android:ems="10"
                     android:focusable="false"

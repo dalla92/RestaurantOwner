@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -8,11 +9,14 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="it.polito.group2.restaurantowner.MoreRestaurantInfo">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="it.polito.group2.restaurantowner.MoreRestaurantInfo"
+    tools:showIn="@layout/app_bar_restaurant_info">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -25,12 +29,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/edit_seating_capacity"
+            android:inputType="text|textMultiLine|textCapSentences"
+            android:maxLength="5"
+            android:background="@android:color/transparent"
+            style="@style/EditTextCustomHolo"
+            android:focusable="false"
             />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -42,12 +52,19 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/editText2" />
+            android:id="@+id/edit_squared_metres"
+            android:background="@android:color/transparent"
+            android:inputType="text|textMultiLine|textCapSentences"
+            android:maxLength="5"
+            style="@style/EditTextCustomHolo"
+            android:focusable="false"
+            />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="5dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -59,12 +76,19 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/editText3" />
+            android:id="@+id/edit_closest_metro"
+            android:background="@android:color/transparent"
+            android:inputType="text|textMultiLine|textCapSentences"
+            android:maxLength="15"
+            style="@style/EditTextCustomHolo"
+            android:focusable="false"
+            />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="20dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -76,7 +100,13 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/editText4" />
+            android:id="@+id/edit_closest_bus"
+            android:background="@android:color/transparent"
+            android:inputType="text|textMultiLine|textCapSentences"
+            android:maxLength="15"
+            style="@style/EditTextCustomHolo"
+            android:focusable="false"
+            />
     </LinearLayout>
 
 
@@ -84,9 +114,7 @@
         android:layout_width="match_parent"
         android:layout_height="15dp"
         android:background="?android:attr/listDivider"
-        android:paddingLeft="5dp"
-        android:paddingTop="5dp"
-        android:paddingRight="5dp" />
+        android:padding="0dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -96,7 +124,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/spinner_restaurant_type"
-            android:padding="6dp" />
+            android:padding="6dp"
+            android:paddingTop="15dp"
+            android:clickable="false"
+            />
 
     </LinearLayout>
 
@@ -109,19 +140,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/inside"
-            android:id="@+id/checkBox11" />
+            android:clickable="false"
+            android:id="@+id/inside" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/outside"
-            android:id="@+id/checkBox10" />
+            android:clickable="false"
+            android:id="@+id/outside" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/wifi"
-            android:id="@+id/checkBox9" />
+            android:clickable="false"
+            android:id="@+id/wi_fi" />
 
     </LinearLayout>
 
@@ -134,26 +168,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/mandatory_booking_via_telephone"
-            android:id="@+id/checkBox13" />
+            android:clickable="false"
+            android:id="@+id/booking_via_telephone" />
 
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingBottom="15dp">
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/take_away"
-            android:id="@+id/checkBox12" />
+            android:clickable="false"
+            android:id="@+id/take_away" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/credit_card"
-            android:id="@+id/checkBox14" />
+            android:clickable="false"
+            android:id="@+id/credit_card" />
 
     </LinearLayout>
 
@@ -161,30 +199,34 @@
         android:layout_width="match_parent"
         android:layout_height="15dp"
         android:background="?android:attr/listDivider"
-        android:padding="5dp" />
+        android:padding="45dp" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingTop="15dp">
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/vegetarian"
-            android:id="@+id/checkBox17" />
+            android:clickable="false"
+            android:id="@+id/check_vegetarian" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/vegan"
-            android:id="@+id/checkBox16" />
+            android:clickable="false"
+            android:id="@+id/check_vegan" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/celiac"
-            android:id="@+id/checkBox15" />
+            android:clickable="false"
+            android:id="@+id/check_celiac" />
 
     </LinearLayout>
 
