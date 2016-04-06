@@ -5,17 +5,41 @@
     <string name="restaurant_page_name">RESTAURANT NAME</string>
     <string name="button_take_photo">TAKE PHOTO NOW</string>
     <string name="button_choose_photo">CHOOSE FROM GALLERY</string>
-    <string name="restaurant_name">Restaurant name:</string>
-    <string name="restaurant_address">Restaurant address:</string>
-    <string name="restaurant_telephone_number">Restaurant telephone number:</string>
-    <string name="edit_restaurant_name">Insert Restaurant name</string>
-    <string name="edit_restaurant_address">Insert Restaurant address</string>
-    <string name="edit_restaurant_telephone_number">Insert Restaurant telephone number:</string>
+    <string name="restaurant_name">Name:</string>
+    <string name="restaurant_address">Address:</string>
+    <string name="restaurant_telephone_number">Telephone:</string>
+    <string name="edit_restaurant_name"> Insert name</string>
+    <string name="edit_restaurant_address"> Insert address</string>
+    <string name="edit_restaurant_telephone_number"> Insert tel</string>
     <string name="last_comments">Last comments</string>
+    <string name="action_confirm">CONFIRM</string>
+    <string name="action_more">MORE</string>
 
-    <!--Alessio's strings begin-->
+    <string name="seating_capacity">SEATING CAPACITY:</string>
+    <string name="squared_metres">SQUARED METRES:</string>
+    <string name="closest_metro_stop">CLOSEST METRO STOP:</string>
+    <string name="closest_bus_stop">CLOSEST BUS STOP:</string>
+    <string name="credit_card">CREDIT CARD</string>
+    <string name="wifi">WI-FI</string>
+    <string name="inside">INSIDE</string>
+    <string name="outside">OUTSIDE</string>
+    <string name="take_away">TAKE-AWAY</string>
+    <string name="mandatory_booking_via_telephone">BOOKING ONLY VIA TELEPHONE</string>
+    <string name="celiac">CELIAC</string>
+    <string name="vegan">VEGAN</string>
+    <string name="vegetarian">VEGETARIAN</string>
+    <string name="bar">BAR</string>
+    <string name="canteen">CANTEEN</string>
+    <string name="fastfood">FAST-FOOD</string>
+    <string name="restaurant">RESTAURANT</string>
 
 
+
+
+
+
+
+    <!--Alessio's strings end-->
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
