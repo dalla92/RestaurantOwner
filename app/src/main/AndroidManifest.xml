@@ -27,7 +27,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.polito.group2.restaurantowner.MainActivity" />
         </activity>
-        <activity android:name=".Restaurant_page"></activity>
+        <activity android:name=".Restaurant_page"
+            android:label="@string/restaurant_page_name" >
+
+        </activity>
     </application>
 
 </manifest>

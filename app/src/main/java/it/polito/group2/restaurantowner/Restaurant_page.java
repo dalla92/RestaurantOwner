@@ -9,5 +9,8 @@ public class Restaurant_page extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_page);
+
+
+        //fill with mock info
     }
 }

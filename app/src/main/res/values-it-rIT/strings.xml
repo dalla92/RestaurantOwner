@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <string name="app_name">RestaurantOwner</string>
+
+        <string name="navigation_drawer_open">Open navigation drawer</string>
+        <string name="navigation_drawer_close">Close navigation drawer</string>
+
+        <!--Alessio's strings begin-->
+    <string name="restaurant_page_name">NOME DEL RISTORANTE</string>
+    <string name="button_take_photo">SCATTA FOTO ORA</string>
+    <string name="button_choose_photo">SCEGLI DA GALLERIA</string>
+    <string name="restaurant_name">Nome del Ristorante</string>
+    <string name="restaurant_address">Indirizzo del Ristorante</string>
+    <string name="restaurant_telephone_number">Numero di telefono del Ristorante</string>
+    <string name="last_comments">Ultimi commenti</string>
+
+    <!--Alessio's strings begin-->
+
+
+
+    </resources>
