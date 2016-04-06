@@ -1,46 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
+
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:weightSum="2">
 
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
         <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@mipmap/image_preview_black"
-            android:id="@+id/imageView3" />
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/image_preview_black"
+                android:id="@+id/imageView3" />
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:paddingTop="5dp">
-
-            <Button
-                android:layout_width="wrap_content"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/button_take_photo"
-                android:id="@+id/button_take_photo"
                 android:layout_weight="1"
-                android:visibility="gone" />
+                android:paddingTop="5dp">
 
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/button_choose_photo"
-                android:id="@+id/button_choose_photo"
-                android:layout_weight="1"
-                android:visibility="gone" />
-        </LinearLayout>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/button_take_photo"
+                    android:id="@+id/button_take_photo"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
 
-        <RelativeLayout
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/button_choose_photo"
+                    android:id="@+id/button_choose_photo"
+                    android:layout_weight="1"
+                    android:visibility="gone" />
+            </LinearLayout>
+    </LinearLayout>
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -114,16 +124,17 @@
                     android:id="@+id/edit_restaurant_telephone_number" />
             </LinearLayout>
 
-        </RelativeLayout>
-
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/last_comments"
             android:id="@+id/last_comments"
-            android:paddingTop="20dp" />
+            android:paddingTop="20dp"
+            android:layout_below="@id/linear_layout_restaurant_telephone_number"
+            />
 
-    </LinearLayout>
+    </RelativeLayout>
+    </ScrollView>
 
-</ScrollView>
+</LinearLayout>
