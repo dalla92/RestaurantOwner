@@ -10,9 +10,12 @@
     <string name="restaurant_page_name">NOME DEL RISTORANTE</string>
     <string name="button_take_photo">SCATTA FOTO ORA</string>
     <string name="button_choose_photo">SCEGLI DA GALLERIA</string>
-    <string name="restaurant_name">Nome del Ristorante</string>
-    <string name="restaurant_address">Indirizzo del Ristorante</string>
-    <string name="restaurant_telephone_number">Numero di telefono del Ristorante</string>
+    <string name="restaurant_name">Nome del Ristorante:</string>
+    <string name="restaurant_address">Indirizzo del Ristorante:</string>
+    <string name="restaurant_telephone_number">Numero di telefono del Ristorante:</string>
+    <string name="edit_restaurant_name">Inserisci nome del Ristorante</string>
+    <string name="edit_restaurant_address">Inserisci indirizzo del Ristorante</string>
+    <string name="edit_restaurant_telephone_number">Inserisci numero di telefono del Ristorante</string>
     <string name="last_comments">Ultimi commenti</string>
 
     <!--Alessio's strings begin-->

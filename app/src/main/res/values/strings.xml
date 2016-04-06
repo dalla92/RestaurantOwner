@@ -5,9 +5,12 @@
     <string name="restaurant_page_name">RESTAURANT NAME</string>
     <string name="button_take_photo">TAKE PHOTO NOW</string>
     <string name="button_choose_photo">CHOOSE FROM GALLERY</string>
-    <string name="restaurant_name">Restaurant name</string>
-    <string name="restaurant_address">Restaurant address</string>
-    <string name="restaurant_telephone_number">Restaurant telephone number</string>
+    <string name="restaurant_name">Restaurant name:</string>
+    <string name="restaurant_address">Restaurant address:</string>
+    <string name="restaurant_telephone_number">Restaurant telephone number:</string>
+    <string name="edit_restaurant_name">Insert Restaurant name</string>
+    <string name="edit_restaurant_address">Insert Restaurant address</string>
+    <string name="edit_restaurant_telephone_number">Insert Restaurant telephone number:</string>
     <string name="last_comments">Last comments</string>
 
     <!--Alessio's strings begin-->

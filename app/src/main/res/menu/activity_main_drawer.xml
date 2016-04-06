@@ -2,10 +2,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/one_restaurant"
+            android:icon="@drawable/ic_menu_share"
+            android:title="one_restaurant" />
+
         <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_menu_share"
             android:title="Logout" />
+
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
