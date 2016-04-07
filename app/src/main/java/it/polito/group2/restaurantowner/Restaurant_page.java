@@ -79,11 +79,19 @@ public class Restaurant_page extends AppCompatActivity
 
         switch (item.getItemId()) {
 
+            case R.id.action_menu:
+                Intent intent1 = new Intent(
+                        getApplicationContext(),
+                        MenuRestaurant_page.class);
+                startActivity(intent1);
+
+                return true;
+
             case R.id.action_more:
-                Intent intent = new Intent(
+                Intent intent2 = new Intent(
                         getApplicationContext(),
                         MoreRestaurantInfo.class);
-                startActivity(intent);
+                startActivity(intent2);
 
                 return true;
 

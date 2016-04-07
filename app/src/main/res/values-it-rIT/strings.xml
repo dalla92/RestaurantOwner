@@ -20,6 +20,7 @@
     <string name="action_confirm">CONFERMA</string>
     <string name="action_more">ALTRO</string>
     <string name="action_edit">MODIFICA</string>
+    <string name="action_menu">MENU</string>
 
 
     <string name="seating_capacity">POSTI A SEDERE: </string>
@@ -39,6 +40,10 @@
     <string name="canteen">MENSA</string>
     <string name="fastfood">FAST-FOOD</string>
     <string name="restaurant">RISTORANTE</string>
+
+    <string name="title_activity_menu_restaurant_page">MENU</string>
+    <string name="add_meal">AGGIUNGI UN PIATTO</string>
+    <string name="availability">PRESENTE</string>
 
     <!--Alessio's strings begin-->
 
