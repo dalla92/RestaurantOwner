@@ -19,8 +19,11 @@ import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +40,8 @@ public class Restaurant_page extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
 
     private List<Comment> comments;
+
+    private boolean card_view_clicked=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +77,27 @@ public class Restaurant_page extends AppCompatActivity
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
+        /*
+        rv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("something", "happened");
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, 300, 1f);
+                TextView comment = (TextView) v.findViewById(R.id.comment);
+                comment.setLayoutParams(lp);
+            }
+        });
+        rv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Log.d("something", "happened");
+                LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, 300, 1f);
+                TextView comment = (TextView) v.findViewById(R.id.comment);
+                comment.setLayoutParams(lp);
+                return false;
+            }
+        });
+        */
         initializeData();
         initializeAdapter();
         final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
@@ -233,11 +259,36 @@ public class Restaurant_page extends AppCompatActivity
         comments.add(new Comment("Tano Sghei", "22/05/2000", 3.4, R.mipmap.image_preview_black, "M'uccullassi n'autra vota. Turi ci emu?"));
     }
 
-
-
     private void initializeAdapter(){
         RVAdapter adapter = new RVAdapter(comments);
         rv.setAdapter(adapter);
+    }
+
+    public void myClickHandler_expand(View v){
+        Log.d("something", "happened");
+
+        //android.widget.LinearLayout.LayoutParams default_params
+        //        = v.getLayoutParams().;
+
+        final View default_view = v;
+
+        TextView comment = (TextView) v.findViewById(R.id.comment);
+        final int original_comment_height=comment.getMeasuredHeight();
+
+        if(!card_view_clicked) {
+            card_view_clicked=true;
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, 300, 1f);
+            comment.setMaxLines(Integer.MAX_VALUE);
+            comment.setLayoutParams(lp);
+        }
+        else {
+            card_view_clicked=false;
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, v.getLayoutParams().height, 1f);
+            comment.setMaxLines(2);
+            comment.setLayoutParams(lp);
+        }
+
+        v.requestLayout();
     }
 
 }
