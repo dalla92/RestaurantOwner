@@ -41,6 +41,20 @@
     <string name="add_meal">ADD A MEAL</string>
     <string name="availability">ON SALE</string>
 
+    <string name="meal_name">MEAL NAME: </string>
+    <string name="meal_price">MEAL PRICE: </string>
+    <string name="meal_image">MEAL PHOTO: </string>
+    <string name="meal_description">MEAL DESCRIPTION: </string>
+    <string name="meal_possible_additions">MEAL POSSIBLE ADDITIONS: </string>
+    <string name="meal_possible_categories">MEAL POSSIBLE CATEGORIES: </string>
+    <string name="meal_time_for_cooking">TIME FOR COOKING: </string>
+    <string name="meal_add_new_category">Add category</string>
+    <string name="meal_add_new_addition">Add addition</string>
+    <string name="title_activity_menu_restaurant_edit">EDIT MEAL</string>
+    <string name="addition_meal_price">addition price</string>
+
+    <string name="addres_section_main_info">MAIN INFO</string>
+    <string name="addres_section_other_info">MORE INFO</string>
 
     <!--Alessio's strings end-->
 

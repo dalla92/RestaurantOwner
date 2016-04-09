@@ -167,6 +167,11 @@ public class MenuRestaurant_page extends AppCompatActivity
         TextView child = (TextView) vwParentRow.getChildAt(2);
         String meal_name = child.getText().toString();
         Log.d("myClickHandler", "You want to modify " + meal_name);
+
+        Intent intent = new Intent(
+                getApplicationContext(),
+                MenuRestaurant_edit.class);
+        startActivity(intent);
     }
 
     public void myClickHandler_remove(View v) {

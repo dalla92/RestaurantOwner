@@ -22,7 +22,6 @@
     <string name="action_edit">MODIFICA</string>
     <string name="action_menu">MENU</string>
 
-
     <string name="seating_capacity">POSTI A SEDERE: </string>
     <string name="squared_metres">METRI QUADRATI: </string>
     <string name="closest_metro_stop">FERMATA METRO VICINA: </string>
@@ -44,6 +43,23 @@
     <string name="title_activity_menu_restaurant_page">MENU</string>
     <string name="add_meal">AGGIUNGI UN PIATTO</string>
     <string name="availability">PRESENTE</string>
+
+    <string name="meal_name">NOME PIATTO: </string>
+    <string name="meal_price">PREZZO PIATTO: </string>
+    <string name="meal_image">FOTO DEL PIATTO: </string>
+    <string name="meal_description">DESCRIZIONE PIATTO: </string>
+    <string name="meal_possible_additions">POSSIBILI SUPPLEMENTI: </string>
+    <string name="meal_possible_categories">POSSIBILI CATEGORIE: </string>
+    <string name="meal_time_for_cooking">TEMPO DI PREPARAZIONE: </string>
+    <string name="meal_add_new_category">Aggiungi categoria</string>
+    <string name="meal_add_new_addition">Aggiungi supplemento</string>
+    <string name="title_activity_menu_restaurant_edit">MODIFICA PIATTO</string>
+    <string name="addition_meal_price">prezzo supplemento</string>
+
+    <string name="addres_section_main_info">INFO PRIMARIE</string>
+    <string name="addres_section_other_info">ALTRE INFO</string>
+
+
 
     <!--Alessio's strings begin-->
 

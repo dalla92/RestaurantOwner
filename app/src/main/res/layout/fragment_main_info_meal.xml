@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/layout_meal_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/meal_name"
+            android:id="@+id/textView21"
+            android:paddingRight="5dp" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="text|textMultiLine|textCapSentences"
+            android:maxLength="40"
+            style="@style/EditTextCustomHolo"
+            android:id="@+id/edit_meal_name" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_below="@id/layout_meal_name"
+        android:id="@+id/layout_meal_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/meal_price"
+            android:id="@+id/textView22"
+            android:paddingRight="5dp" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="text|textMultiLine|textCapSentences"
+            android:maxLength="40"
+            style="@style/EditTextCustomHolo"
+            android:ems="10"
+            android:id="@+id/edit_meal_price" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/meal_image"
+        android:layout_below="@id/layout_meal_price"
+        android:id="@+id/textView23"
+        android:paddingLeft="15dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:id="@+id/layout_meal_image"
+        android:layout_below="@id/textView23"
+        android:layout_height="wrap_content"
+        android:paddingLeft="35dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_take_photo"
+            android:id="@+id/button_take_photo2" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_choose_photo"
+            android:id="@+id/button_choose_photo2" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_meal_image"
+        android:paddingLeft="15dp">
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner3" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/take_away"
+            android:id="@+id/check_take_away" />
+    </LinearLayout>
+
+</RelativeLayout>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="meal_types_array">
+        <item>Celiac</item>
+        <item>Vegan</item>
+        <item>Vegetarian</item>
+    </string-array>
+</resources>

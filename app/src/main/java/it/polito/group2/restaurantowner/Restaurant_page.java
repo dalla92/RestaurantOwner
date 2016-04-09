@@ -8,18 +8,34 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Restaurant_page extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Menu menu;
+
+    private RecyclerView rv;
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    private List<Person> persons;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +64,15 @@ public class Restaurant_page extends AppCompatActivity
                 startActivity(fullScreenIntent);
             }
         });
+
+
+        //cardview implementation
+        rv=(RecyclerView)findViewById(R.id.rv);
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        rv.setLayoutManager(llm);
+        rv.setHasFixedSize(true);
+        initializeData();
+        initializeAdapter();
     }
 
     @Override
@@ -184,5 +209,22 @@ public class Restaurant_page extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    // This method creates an ArrayList that has three Person objects
+    // Checkout the project associated with this tutorial on Github if
+    // you want to use the same images.
+    private void initializeData(){
+        persons = new ArrayList<>();
+        persons.add(new Person("Emma Wilson", "23 years old", R.mipmap.ic_launcher));
+        persons.add(new Person("Lavery Maiss", "25 years old", R.mipmap.money_icon));
+        persons.add(new Person("Lillie Watts", "35 years old", R.mipmap.image_preview_black));
+    }
+
+
+
+    private void initializeAdapter(){
+        RVAdapter adapter = new RVAdapter(persons);
+        rv.setAdapter(adapter);
     }
 }

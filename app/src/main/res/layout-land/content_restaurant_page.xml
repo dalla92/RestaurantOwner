@@ -17,43 +17,6 @@
     android:weightSum="2">
 
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1">
-
-        <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/image_preview_black"
-                android:id="@+id/image_to_enlarge" />
-
-        <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingTop="5dp">
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/button_take_photo"
-                    android:id="@+id/button_take_photo"
-                    android:layout_weight="1"
-                    android:visibility="gone" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/button_choose_photo"
-                    android:id="@+id/button_choose_photo"
-                    android:layout_weight="1"
-                    android:visibility="gone" />
-            </LinearLayout>
-    </LinearLayout>
-
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent" android:layout_height="match_parent">
 
@@ -152,6 +115,7 @@
             android:paddingTop="20dp"
             android:layout_below="@id/linear_layout_restaurant_telephone_number"
             />
+
 
     </RelativeLayout>
     </ScrollView>
