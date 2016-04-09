@@ -1,6 +1,7 @@
 package it.polito.group2.restaurantowner;
 
 import android.content.Intent;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -10,12 +11,16 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
+import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +74,17 @@ public class Restaurant_page extends AppCompatActivity
         rv.setHasFixedSize(true);
         initializeData();
         initializeAdapter();
+        final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
+        ScrollView scroll = (ScrollView) findViewById(R.id.parent_scroll);
+        scroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                appbar.setExpanded(false);
+            }
+        });
+
     }
+
 
     @Override
     public void onBackPressed() {
@@ -224,4 +239,5 @@ public class Restaurant_page extends AppCompatActivity
         RVAdapter adapter = new RVAdapter(comments);
         rv.setAdapter(adapter);
     }
+
 }
