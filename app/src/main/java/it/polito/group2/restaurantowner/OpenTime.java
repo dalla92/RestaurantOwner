@@ -1,0 +1,62 @@
+package it.polito.group2.restaurantowner;
+
+/**
+ * Created by Daniele on 07/04/2016.
+ */
+public class OpenTime {
+    private String restaurantName;
+    private String type;
+    private String dayOfWeek;
+    private boolean isOpen;
+    private String openHour;
+    private String closeHour;
+
+    public String getRestaurantName() {
+        return restaurantName;
+    }
+
+    public void setRestaurantName(String restaurantName) {
+        this.restaurantName = restaurantName;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getDayOfWeek() {
+        return dayOfWeek;
+    }
+
+    public void setDayOfWeek(String dayOfWeek) {
+        this.dayOfWeek = dayOfWeek;
+    }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    public void setIsOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+    }
+
+    public String getOpenHour() {
+        return openHour;
+    }
+
+    public void setOpenHour(String openHour) {
+        this.openHour = openHour;
+    }
+
+    public String getCloseHour() {
+        return closeHour;
+    }
+
+    public void setCloseHour(String closeHour) {
+        this.closeHour = closeHour;
+    }
+
+}

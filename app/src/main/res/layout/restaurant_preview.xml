@@ -5,7 +5,7 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:contentPaddingTop="4dp"
+    android:layout_marginTop="4dp"
     card_view:cardCornerRadius="5dp">
 
 <RelativeLayout
@@ -34,11 +34,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingLeft="4dp"
-            android:text="Name"
+            android:paddingStart="4dp"
+            android:text="@string/name"
+            android:textColor="#FFFFFF"
             android:id="@+id/textViewName"
             android:textStyle="bold"
-            android:autoText="true"
             android:layout_above="@+id/textViewReservationNumber"
             android:layout_alignParentStart="true"
             android:layout_toStartOf="@+id/textViewReservedPercentage" />
@@ -47,9 +47,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingRight="4dp"
-            android:text="% reserved"
-            android:gravity="right"
+            android:paddingEnd="4dp"
+            android:text="@string/reserved_percentage"
+            android:gravity="end"
+            android:textColor="#FFFFFF"
             android:id="@+id/textViewReservedPercentage"
             android:layout_above="@+id/textViewRating"
             android:layout_alignEnd="@+id/textViewRating" />
@@ -58,9 +59,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingRight="4dp"
-            android:text="Rating"
-            android:gravity="right"
+            android:paddingEnd="4dp"
+            android:text="@string/rating"
+            android:gravity="end"
+            android:textColor="#FFFFFF"
             android:id="@+id/textViewRating"
             android:layout_alignParentBottom="true"
             android:layout_toStartOf="@+id/imageView2" />
@@ -69,8 +71,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:paddingLeft="4dp"
-            android:text="# of reservations"
+            android:paddingStart="4dp"
+            android:text="@string/number_reservations"
+            android:textColor="#FFFFFF"
             android:id="@+id/textViewReservationNumber"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true" />

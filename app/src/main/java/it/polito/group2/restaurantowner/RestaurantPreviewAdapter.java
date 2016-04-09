@@ -78,4 +78,14 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
     public int getItemCount() {
         return mDataset.size();
     }
+    public void addItem(int position, Restaurant res){
+        mDataset.add(position,res);
+        notifyItemInserted(position);
+        notifyItemRangeChanged(position,mDataset.size());
+    }
+    public void removeItem(int position){
+        mDataset.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position,mDataset.size());
+    }
 }

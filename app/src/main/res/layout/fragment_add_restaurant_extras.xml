@@ -20,15 +20,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Animals"
-                android:id="@+id/checkBox8"
-                android:layout_column="0" />
+                android:id="@+id/cbAnimals"
+                android:layout_column="0"
+                android:checked="false" />
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vegans"
-                android:id="@+id/checkBox7"
-                android:layout_column="1" />
+                android:id="@+id/cbVegan"
+                android:layout_column="1"
+                android:checked="false" />
         </TableRow>
 
         <TableRow
@@ -39,15 +41,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Vegetarian"
-                android:id="@+id/checkBox6"
-                android:layout_column="0" />
+                android:id="@+id/cbVegetarian"
+                android:layout_column="0"
+                android:checked="false" />
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Gluten free"
-                android:id="@+id/checkBox5"
-                android:layout_column="1" />
+                android:id="@+id/cbGlutenFree"
+                android:layout_column="1"
+                android:checked="false" />
         </TableRow>
 
         <TableRow
@@ -58,15 +62,38 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="TV"
-                android:id="@+id/checkBox4"
-                android:layout_column="0" />
+                android:id="@+id/cbTV"
+                android:layout_column="0"
+                android:checked="false" />
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Patio"
-                android:id="@+id/checkBox3"
-                android:layout_column="1" />
+                android:id="@+id/cbPatio"
+                android:layout_column="1"
+                android:checked="false" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Wi-Fi"
+                android:id="@+id/cbWifi"
+                android:layout_column="0"
+                android:checked="false" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Credit card"
+                android:id="@+id/cbCreditCard"
+                android:layout_column="1"
+                android:checked="false" />
         </TableRow>
 
         <TableRow
@@ -77,16 +104,86 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Baby space"
-                android:id="@+id/checkBox2"
-                android:layout_column="0" />
+                android:id="@+id/cbBabySpace"
+                android:layout_column="0"
+                android:checked="false" />
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="A/C"
-                android:id="@+id/checkBox"
-                android:layout_column="1" />
+                android:id="@+id/cbAC"
+                android:layout_column="1"
+                android:checked="false" />
         </TableRow>
+
     </TableLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Squared meters"
+            android:id="@+id/textView2" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:ems="10"
+            android:id="@+id/etSquaredMeters"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Closest metro stop"
+            android:id="@+id/textView3" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:ems="10"
+            android:id="@+id/etClosestMetro"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Closest bus stop"
+            android:id="@+id/textView4" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:ems="10"
+            android:id="@+id/etClosestBus"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
 
 </LinearLayout>

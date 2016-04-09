@@ -16,4 +16,8 @@
     <string name="address">Address</string>
     <string name="phone">Phone</string>
     <string name="category">Category</string>
+    <string name="rating">Rating</string>
+    <string name="reserved_percentage">% reserved</string>
+    <string name="number_reservations"># of reservations</string>
+    <string name="action_save">Save</string>
 </resources>
