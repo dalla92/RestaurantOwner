@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:id="@+id/layout_description"
         android:layout_height="wrap_content"
-        android:paddingLeft="15dp">
+        android:padding="15dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -25,7 +25,7 @@
             android:id="@+id/textView24" />
 
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text|textMultiLine|textCapSentences"
             android:maxLength="200"
@@ -38,7 +38,7 @@
         android:id="@+id/layout_possible_additions"
         android:layout_below="@id/layout_description"
         android:layout_height="wrap_content"
-        android:paddingLeft="15dp">
+        android:padding="15dp">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -47,8 +47,8 @@
             android:id="@+id/layoutx">
 
             <ImageView
-                android:layout_width="35dp"
-                android:layout_height="25dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@mipmap/icon_plus_expand"
                 android:id="@+id/expand_or_collapse_additions"
                 android:layout_gravity="top" />
@@ -58,7 +58,8 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/meal_possible_additions"
-                android:id="@+id/textView25" />
+                android:id="@+id/textView25"
+                android:paddingLeft="10dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -66,14 +67,8 @@
             android:layout_width="match_parent"
             android:layout_below="@id/layoutx"
             android:layout_height="wrap_content"
-            android:paddingLeft="40dp">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_action_add"
-                android:id="@+id/imageView5"
-                android:background="#000000" />
+            android:paddingLeft="40dp"
+            android:id="@+id/layout_additions">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -82,18 +77,28 @@
                 android:text="@string/meal_add_new_addition"
                 android:id="@+id/textView29"
                 android:paddingTop="7dp"
-                android:paddingLeft="5dp" />
+                android:paddingLeft="5dp"
+                android:minLines="2" />
 
-            <ListView
-                android:id="@+id/additions_list"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:layout_gravity="bottom"
-                android:paddingTop="30dp">
-            </ListView>
+            <ImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_action_add"
+                android:id="@+id/imageView5"
+                android:background="#000000" />
+
         </LinearLayout>
-    </RelativeLayout>
 
+
+    <ListView
+        android:id="@+id/additions_list"
+        android:layout_below="@id/layout_additions"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:paddingTop="30dp">
+    </ListView>
+    </RelativeLayout>
 
     <RelativeLayout
         android:orientation="horizontal"
@@ -101,7 +106,7 @@
         android:id="@+id/layout_possible_categories"
         android:layout_below="@id/layout_possible_additions"
         android:layout_height="wrap_content"
-        android:paddingLeft="15dp">
+        android:padding="15dp">
 
         <LinearLayout
             android:orientation="horizontal"
@@ -130,14 +135,8 @@
             android:layout_below="@id/layouty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="40dp">
-
-            <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:src="@drawable/ic_action_add"
-                android:id="@+id/imageView6"
-                android:background="#000000" />
+            android:paddingLeft="40dp"
+            android:id="@+id/layout_categories">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -148,15 +147,23 @@
                 android:paddingLeft="5dp"
                 android:paddingTop="7dp" />
 
-            <ListView
-                android:id="@+id/categories_list"
-                android:layout_height="wrap_content"
-                android:layout_width="match_parent"
-                android:layout_gravity="bottom"
-                android:paddingTop="30dp">
-            </ListView>
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/ic_action_add"
+                android:id="@+id/imageView6"
+                android:background="#000000" />
 
         </LinearLayout>
+
+    <ListView
+        android:id="@+id/categories_list"
+        android:layout_below="@id/layout_categories"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:paddingTop="30dp">
+    </ListView>
     </RelativeLayout>
 
     <LinearLayout
@@ -174,10 +181,10 @@
             android:id="@+id/textView27" />
 
         <Chronometer
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:id="@+id/chronometer"
-            android:paddingLeft="20dp" />
+            android:paddingLeft="30dp" />
 
     </LinearLayout>
 

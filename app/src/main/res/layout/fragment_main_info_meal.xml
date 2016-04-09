@@ -8,7 +8,7 @@
         android:id="@+id/layout_meal_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="15dp">
+        android:padding="15dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -34,7 +34,7 @@
         android:id="@+id/layout_meal_price"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="15dp">
+        android:padding="15dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -61,7 +61,9 @@
         android:text="@string/meal_image"
         android:layout_below="@id/layout_meal_price"
         android:id="@+id/textView23"
-        android:paddingLeft="15dp" />
+        android:paddingLeft="15dp"
+        android:paddingTop="15dp"
+        android:paddingRight="15dp" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -69,19 +71,21 @@
         android:id="@+id/layout_meal_image"
         android:layout_below="@id/textView23"
         android:layout_height="wrap_content"
-        android:paddingLeft="35dp">
+        android:paddingLeft="25dp">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/button_take_photo"
-            android:id="@+id/button_take_photo2" />
+            android:id="@+id/button_take_photo2"
+            android:layout_gravity="left" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/button_choose_photo"
-            android:id="@+id/button_choose_photo2" />
+            android:id="@+id/button_choose_photo2"
+            android:layout_gravity="right" />
     </LinearLayout>
 
     <LinearLayout
@@ -89,18 +93,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/layout_meal_image"
-        android:paddingLeft="15dp">
+        android:padding="15dp">
 
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/spinner3" />
+            android:id="@+id/spinner3"
+            android:layout_gravity="left" />
 
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/take_away"
-            android:id="@+id/check_take_away" />
+            android:id="@+id/check_take_away"
+            android:layout_gravity="right"
+            android:paddingLeft="20dp" />
     </LinearLayout>
 
 </RelativeLayout>

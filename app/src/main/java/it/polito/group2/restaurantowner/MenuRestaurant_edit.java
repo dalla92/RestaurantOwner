@@ -193,19 +193,19 @@ public class MenuRestaurant_edit extends AppCompatActivity{
             // Define a new Adapter: Context, Layout for the row, ID of the TextView to which the data is written, Array of data
             additions_adapter = new MyCustomAdapter(rootView.getContext(),
                     R.layout.fragment_other_info_meal, additionList);
-            ListView listadditionView = (ListView) rootView.findViewById(R.id.additions_list);
+            final ListView listadditionView = (ListView) rootView.findViewById(R.id.additions_list);
             // Assign adapter to ListView
             listadditionView.setAdapter(
                     additions_adapter);
             // ListView Item Click Listener
-            additions_list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            listadditionView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
                     // ListView Clicked item index
                     int itemPosition = position;
                     // ListView Clicked item value
-                    String itemValue = (String) additions_list_view.getItemAtPosition(position);
+                    String itemValue = (String) listadditionView.getItemAtPosition(position);
                     String meal_addition = itemValue;
                     //TextView textview = (TextView) view.findViewById(R.id.meal_name);
                     Log.d("debug_onclick", "You clicked " + meal_addition);
@@ -232,18 +232,18 @@ public class MenuRestaurant_edit extends AppCompatActivity{
             // Define a new Adapter: Context, Layout for the row, ID of the TextView to which the data is written, Array of data
             categories_adapter = new MyCustomAdapter(rootView.getContext(),
                     R.layout.fragment_other_info_meal, categoryList);
-            ListView listcategoryView = (ListView) rootView.findViewById(R.id.categories_list);
+            final ListView listcategoryView = (ListView) rootView.findViewById(R.id.categories_list);
             // Assign adapter to ListView
             listcategoryView.setAdapter(categories_adapter);
             // ListView Item Click Listener
-            categories_list_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            listcategoryView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view,
                                         int position, long id) {
                     // ListView Clicked item index
                     int itemPosition = position;
                     // ListView Clicked item value
-                    String itemValue = (String) categories_list_view.getItemAtPosition(position);
+                    String itemValue = (String) listcategoryView.getItemAtPosition(position);
                     //TextView textview = (TextView) view.findViewById(R.id.meal_name);
                     String meal_category = itemValue;
                     Log.d("debug_onclick", "You clicked " + meal_category);

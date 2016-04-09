@@ -45,8 +45,8 @@
     <string name="meal_price">MEAL PRICE: </string>
     <string name="meal_image">MEAL PHOTO: </string>
     <string name="meal_description">MEAL DESCRIPTION: </string>
-    <string name="meal_possible_additions">MEAL POSSIBLE ADDITIONS: </string>
-    <string name="meal_possible_categories">MEAL POSSIBLE CATEGORIES: </string>
+    <string name="meal_possible_additions">MEAL ADDITIONS: </string>
+    <string name="meal_possible_categories">MEAL CATEGORIES: </string>
     <string name="meal_time_for_cooking">TIME FOR COOKING: </string>
     <string name="meal_add_new_category">Add category</string>
     <string name="meal_add_new_addition">Add addition</string>

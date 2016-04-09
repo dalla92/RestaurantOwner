@@ -48,8 +48,8 @@
     <string name="meal_price">PREZZO PIATTO: </string>
     <string name="meal_image">FOTO DEL PIATTO: </string>
     <string name="meal_description">DESCRIZIONE PIATTO: </string>
-    <string name="meal_possible_additions">POSSIBILI SUPPLEMENTI: </string>
-    <string name="meal_possible_categories">POSSIBILI CATEGORIE: </string>
+    <string name="meal_possible_additions">SUPPLEMENTI: </string>
+    <string name="meal_possible_categories">CATEGORIE CIBO: </string>
     <string name="meal_time_for_cooking">TEMPO DI PREPARAZIONE: </string>
     <string name="meal_add_new_category">Aggiungi categoria</string>
     <string name="meal_add_new_addition">Aggiungi supplemento</string>
