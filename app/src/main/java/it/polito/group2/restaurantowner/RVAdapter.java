@@ -1,5 +1,8 @@
 package it.polito.group2.restaurantowner;
 
+import android.content.Context;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,16 +20,18 @@ import java.util.List;
 /**
  * Created by Alessio on 09/04/2016.
  */
-public class RVAdapter extends RecyclerView.Adapter<RVAdapter.CommentViewHolder>{
+public class RVAdapter extends RecyclerView.Adapter<RVAdapter.CommentViewHolder> {
 
     List<Comment> comments;
+    Context context;
 
-    RVAdapter(List<Comment> comments){
+    RVAdapter(List<Comment> comments, Context context) {
         this.comments = comments;
+        this.context = context;
     }
 
     //public static class CommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
-    public static class CommentViewHolder extends RecyclerView.ViewHolder{
+    public static class CommentViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
         TextView CommentUsername;
         TextView CommentDate;
@@ -83,7 +88,12 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.CommentViewHolder>
         CommentViewHolder.CommentDate.setText(comments.get(i).date);
         CommentViewHolder.CommentStars.setRating((float) comments.get(i).stars_number);
         CommentViewHolder.CommentPhoto.setImageResource(comments.get(i).photoId);
-        CommentViewHolder.Comment.setText(comments.get(i).comment);
+
+        //CommentViewHolder.Comment.setText(comments.get(i).comment);
+        String comment_ell = comments.get(i).comment.substring(0, 7);
+        //comment_ell.concat(this.context.getResources().getString(R.string.show_more));
+        comment_ell = comment_ell + this.context.getResources().getString(R.string.show_more);
+        CommentViewHolder.Comment.setText(comment_ell);
 
     }
 
@@ -91,4 +101,5 @@ public class RVAdapter extends RecyclerView.Adapter<RVAdapter.CommentViewHolder>
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
     }
+
 }

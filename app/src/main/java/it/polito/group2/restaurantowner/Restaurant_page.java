@@ -1,6 +1,8 @@
 package it.polito.group2.restaurantowner;
 
 import android.content.Intent;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -108,6 +110,7 @@ public class Restaurant_page extends AppCompatActivity
                 appbar.setExpanded(false);
             }
         });
+
 
     }
 
@@ -260,7 +263,7 @@ public class Restaurant_page extends AppCompatActivity
     }
 
     private void initializeAdapter(){
-        RVAdapter adapter = new RVAdapter(comments);
+        RVAdapter adapter = new RVAdapter(comments, this.getApplicationContext());
         rv.setAdapter(adapter);
     }
 
@@ -273,22 +276,36 @@ public class Restaurant_page extends AppCompatActivity
         final View default_view = v;
 
         TextView comment = (TextView) v.findViewById(R.id.comment);
+
         final int original_comment_height=comment.getMeasuredHeight();
+
+        int i;
+        String comment_start = comment.getText().toString().substring(0, 7);
+        for(i=0; i<comments.size(); i++){
+            if(comment_start.equals(comments.get(i).comment.substring(0, 7)))
+                break;
+        }
 
         if(!card_view_clicked) {
             card_view_clicked=true;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, 300, 1f);
             comment.setMaxLines(Integer.MAX_VALUE);
+            comment.setText(comments.get(i).comment);
             comment.setLayoutParams(lp);
         }
         else {
             card_view_clicked=false;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, v.getLayoutParams().height, 1f);
+            //CommentViewHolder.Comment.setText(comments.get(i).comment);
+            String comment_ell = comments.get(i).comment.substring(0, 7);
+            comment_ell = comment_ell + getResources().getString(R.string.show_more);
+            comment.setText(comment_ell);
             comment.setMaxLines(2);
             comment.setLayoutParams(lp);
         }
 
         v.requestLayout();
     }
+
 
 }
