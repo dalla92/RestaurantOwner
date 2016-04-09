@@ -66,7 +66,6 @@ public class MenuRestaurant_page extends AppCompatActivity
                 "Nenti c'è"
         };
         ArrayList<String> lst = new ArrayList<String>(Arrays.asList(values));
-
         // Define a new Adapter: Context, Layout for the row, ID of the TextView to which the data is written, Array of data
         adapter = new ArrayAdapter<String>(this,
                 R.layout.meal_layout, R.id.meal_name, lst);

@@ -191,9 +191,9 @@ public class MenuRestaurant_edit extends AppCompatActivity{
             additionList.add(a);
             //ArrayList<Addition> additions_lst = new ArrayList<Addition>(Arrays.asList(additionList));
             // Define a new Adapter: Context, Layout for the row, ID of the TextView to which the data is written, Array of data
-            additions_adapter = new MyCustomAdapter(getActivity().getApplicationContext(),
+            additions_adapter = new MyCustomAdapter(rootView.getContext(),
                     R.layout.fragment_other_info_meal, additionList);
-            ListView listadditionView = (ListView) getActivity().findViewById(R.id.additions_list);
+            ListView listadditionView = (ListView) rootView.findViewById(R.id.additions_list);
             // Assign adapter to ListView
             listadditionView.setAdapter(
                     additions_adapter);
@@ -230,9 +230,9 @@ public class MenuRestaurant_edit extends AppCompatActivity{
             categoryList.add(b);
             //ArrayList<Addition> categories_lst = new ArrayList<Addition>(Arrays.asList(categoryList));
             // Define a new Adapter: Context, Layout for the row, ID of the TextView to which the data is written, Array of data
-            categories_adapter = new MyCustomAdapter(getActivity().getApplicationContext(),
+            categories_adapter = new MyCustomAdapter(rootView.getContext(),
                     R.layout.fragment_other_info_meal, categoryList);
-            ListView listcategoryView = (ListView) getActivity().findViewById(R.id.categories_list);
+            ListView listcategoryView = (ListView) rootView.findViewById(R.id.categories_list);
             // Assign adapter to ListView
             listcategoryView.setAdapter(categories_adapter);
             // ListView Item Click Listener

@@ -11,7 +11,7 @@
     <string name="edit_restaurant_name"> Insert name</string>
     <string name="edit_restaurant_address"> Insert address</string>
     <string name="edit_restaurant_telephone_number"> Insert tel</string>
-    <string name="last_comments">Last comments</string>
+    <string name="last_comments">Last comments preview</string>
     <string name="action_confirm">CONFIRM</string>
     <string name="action_more">MORE</string>
     <string name="action_edit">EDIT</string>

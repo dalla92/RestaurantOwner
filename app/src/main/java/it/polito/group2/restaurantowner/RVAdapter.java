@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import java.util.List;
@@ -13,49 +14,56 @@ import java.util.List;
 /**
  * Created by Alessio on 09/04/2016.
  */
-public class RVAdapter extends RecyclerView.Adapter<RVAdapter.PersonViewHolder>{
+public class RVAdapter extends RecyclerView.Adapter<RVAdapter.CommentViewHolder>{
 
-    List<Person> persons;
+    List<Comment> comments;
 
-    RVAdapter(List<Person> persons){
-        this.persons = persons;
+    RVAdapter(List<Comment> comments){
+        this.comments = comments;
     }
 
-    public static class PersonViewHolder extends RecyclerView.ViewHolder {
+    public static class CommentViewHolder extends RecyclerView.ViewHolder {
 
         CardView cv;
-        TextView personName;
-        TextView personAge;
-        ImageView personPhoto;
+        TextView CommentUsername;
+        TextView CommentDate;
+        ImageView CommentPhoto;
+        RatingBar CommentStars;
+        TextView Comment;
 
-        PersonViewHolder(View itemView) {
+
+        CommentViewHolder(View itemView) {
             super(itemView);
             cv = (CardView)itemView.findViewById(R.id.cv);
-            personName = (TextView)itemView.findViewById(R.id.person_name);
-            personAge = (TextView)itemView.findViewById(R.id.person_age);
-            personPhoto = (ImageView)itemView.findViewById(R.id.person_photo);
+            CommentUsername = (TextView)itemView.findViewById(R.id.comment_username);
+            CommentDate = (TextView)itemView.findViewById(R.id.comment_date);
+            CommentPhoto = (ImageView)itemView.findViewById(R.id.comment_photo);
+            CommentStars = (RatingBar)itemView.findViewById(R.id.comment_stars);
+            Comment = (TextView)itemView.findViewById(R.id.comment);
         }
     }
 
 
-
     @Override
     public int getItemCount() {
-        return persons.size();
+        return comments.size();
     }
 
     @Override
-    public PersonViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public CommentViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.comment_card_view, viewGroup, false);
-        PersonViewHolder pvh = new PersonViewHolder(v);
+        CommentViewHolder pvh = new CommentViewHolder(v);
         return pvh;
     }
 
     @Override
-    public void onBindViewHolder(PersonViewHolder personViewHolder, int i) {
-        personViewHolder.personName.setText(persons.get(i).name);
-        personViewHolder.personAge.setText(persons.get(i).age);
-        personViewHolder.personPhoto.setImageResource(persons.get(i).photoId);
+    public void onBindViewHolder(CommentViewHolder CommentViewHolder, int i) {
+        CommentViewHolder.CommentUsername.setText(comments.get(i).username);
+        CommentViewHolder.CommentDate.setText(comments.get(i).date);
+        CommentViewHolder.CommentStars.setRating((float) comments.get(i).stars_number);
+        CommentViewHolder.CommentPhoto.setImageResource(comments.get(i).photoId);
+        CommentViewHolder.Comment.setText(comments.get(i).comment);
+
     }
 
     @Override

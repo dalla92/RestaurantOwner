@@ -1,7 +1,6 @@
 package it.polito.group2.restaurantowner;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -11,15 +10,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +31,7 @@ public class Restaurant_page extends AppCompatActivity
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
-    private List<Person> persons;
+    private List<Comment> comments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -211,20 +207,21 @@ public class Restaurant_page extends AppCompatActivity
         return true;
     }
 
-    // This method creates an ArrayList that has three Person objects
+    // This method creates an ArrayList that has three Comment objects
     // Checkout the project associated with this tutorial on Github if
     // you want to use the same images.
     private void initializeData(){
-        persons = new ArrayList<>();
-        persons.add(new Person("Emma Wilson", "23 years old", R.mipmap.ic_launcher));
-        persons.add(new Person("Lavery Maiss", "25 years old", R.mipmap.money_icon));
-        persons.add(new Person("Lillie Watts", "35 years old", R.mipmap.image_preview_black));
+        comments = new ArrayList<>();
+        comments.add(new Comment("Turi Lecce", "01/02/2003", 1, R.mipmap.ic_launcher, "Ah chi ni sacciu mba"));
+        comments.add(new Comment("Iaffiu u cuttu", "11/06/2002", 2.7, R.mipmap.money_icon, "Cosa assai"));
+        comments.add(new Comment("Iano Papale", "21/12/2001", 5, R.mipmap.image_preview_black, "Fussi pi mia ci tunnassi, ma appi problemi cu me soggira ca ogni bota si lassa curriri de scali, iu no sacciu va."));
+        comments.add(new Comment("Tano Sghei", "22/05/2000", 3.4, R.mipmap.image_preview_black, "M'uccullassi n'autra vota. Turi ci emu?"));
     }
 
 
 
     private void initializeAdapter(){
-        RVAdapter adapter = new RVAdapter(persons);
+        RVAdapter adapter = new RVAdapter(comments);
         rv.setAdapter(adapter);
     }
 }
