@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/meal_possible_additions"
-                android:id="@+id/textView25"
+                android:id="@+id/textView2"
                 android:paddingLeft="10dp" />
         </LinearLayout>
 
@@ -75,16 +75,17 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="@string/meal_add_new_addition"
-                android:id="@+id/textView29"
+                android:id="@+id/textView3"
                 android:paddingTop="7dp"
                 android:paddingLeft="5dp"
-                android:minLines="2" />
+                android:minLines="2"
+                android:paddingRight="9dp" />
 
             <ImageView
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:src="@drawable/ic_action_add"
-                android:id="@+id/imageView5"
+                android:id="@+id/imageView4"
                 android:background="#000000" />
 
         </LinearLayout>
@@ -93,7 +94,7 @@
     <ListView
         android:id="@+id/additions_list"
         android:layout_below="@id/layout_additions"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
         android:layout_gravity="bottom"
         android:paddingTop="30dp">
@@ -111,12 +112,12 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/layouty">
 
             <ImageView
-                android:layout_width="35dp"
-                android:layout_height="25dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@mipmap/icon_plus_expand"
                 android:id="@+id/expand_or_collapse_categories"
                 android:layout_gravity="top" />
@@ -126,14 +127,14 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="@string/meal_possible_categories"
-                android:id="@+id/textView26" />
-
+                android:id="@+id/textView25"
+                android:paddingLeft="10dp" />
         </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_below="@id/layouty"
             android:layout_width="match_parent"
+            android:layout_below="@id/layouty"
             android:layout_height="wrap_content"
             android:paddingLeft="40dp"
             android:id="@+id/layout_categories">
@@ -142,29 +143,33 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/meal_add_new_category"
-                android:id="@+id/textView30"
+                android:text="@string/meal_add_new_addition"
+                android:id="@+id/textView29"
+                android:paddingTop="7dp"
                 android:paddingLeft="5dp"
-                android:paddingTop="7dp" />
+                android:minLines="2"
+                android:paddingRight="9dp" />
 
             <ImageView
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:src="@drawable/ic_action_add"
-                android:id="@+id/imageView6"
+                android:id="@+id/imageView5"
                 android:background="#000000" />
 
         </LinearLayout>
 
-    <ListView
-        android:id="@+id/categories_list"
-        android:layout_below="@id/layout_categories"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:layout_gravity="bottom"
-        android:paddingTop="30dp">
-    </ListView>
+
+        <ListView
+            android:id="@+id/categories_list"
+            android:layout_below="@id/layout_categories"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_gravity="bottom"
+            android:paddingTop="30dp">
+        </ListView>
     </RelativeLayout>
+
 
     <LinearLayout
         android:orientation="horizontal"
@@ -181,10 +186,10 @@
             android:id="@+id/textView27" />
 
         <Chronometer
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/chronometer"
-            android:paddingLeft="30dp" />
+            android:paddingLeft="10dp" />
 
     </LinearLayout>
 

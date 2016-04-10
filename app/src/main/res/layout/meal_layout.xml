@@ -52,33 +52,6 @@
         android:layout_height="wrap_content"
         android:weightSum="1">
 
-        <Switch
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="@string/availability"
-            android:id="@+id/meal_availability"
-            android:showText="false"
-            android:singleLine="false"
-            android:splitTrack="false"
-            android:textStyle="bold"
-            android:paddingLeft="70dp"
-            android:checked="false"
-            android:layout_weight="1" />
-
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/meal_type1"
-            android:layout_gravity="center"
-            android:paddingRight="7dp" />
-
-        <ImageView
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/meal_type2"
-            android:layout_gravity="center"
-            android:paddingRight="10dp" />
-
         <ImageView
             android:layout_width="40dp"
             android:layout_height="wrap_content"
@@ -94,6 +67,34 @@
             android:id="@+id/meal_price"
             android:paddingTop="15dp"
             android:layout_gravity="right" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/meal_type1"
+            android:layout_gravity="center"
+            android:paddingRight="7dp" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/meal_type2"
+            android:layout_gravity="center"
+            android:paddingRight="10dp" />
+
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textOn="@string/availability"
+            android:textOff="NO"
+            android:id="@+id/meal_availability"
+            android:showText="false"
+            android:singleLine="false"
+            android:splitTrack="false"
+            android:textStyle="bold"
+            android:paddingLeft="70dp"
+            android:checked="false"
+            android:layout_weight="1" />
 
     </LinearLayout>
 
