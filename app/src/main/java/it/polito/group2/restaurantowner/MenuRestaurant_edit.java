@@ -294,9 +294,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
 
             parentAddition = "Meal additions";
             //setChildData(childAdditions);
-            childAdditions.add(new Addition("equino", false));
-            childAdditions.add(new Addition("bovino", false));
-            childAdditions.add(new Addition("suino", false));
+            childAdditions.add(new Addition("rucola", false));
+            childAdditions.add(new Addition("parmigiano", false));
+            childAdditions.add(new Addition("tonno", false));
             additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
             addition_adapter = new MyExpandableAdapter(parentAddition, childAdditions);
             additions.setAdapter(addition_adapter);
@@ -308,9 +308,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             //setGroupParents(parentAddition);
             parentCategory = "Meal categories";
             //setChildData(childAdditions);
-            childCategories.add(new Addition("rucola", false));
-            childCategories.add(new Addition("parmigiano", false));
-            childCategories.add(new Addition("tonno", false));
+            childCategories.add(new Addition("suino", false));
+            childCategories.add(new Addition("bovino", false));
+            childCategories.add(new Addition("equino", false));
             categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
             category_adapter = new MyExpandableAdapter(parentCategory, childCategories);
             categories.setAdapter(category_adapter);
@@ -371,6 +371,11 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 if (convertView == null) {
                     convertView = inflater.inflate(R.layout.possible_additions_layout, null);
                 }
+                 if(parentItem.equals("Meal categories")){
+                     convertView.findViewById(R.id.edit_addition_price).setVisibility(View.INVISIBLE);
+                 }
+
+
                 checkbox_text = (CheckBox) convertView.findViewById(R.id.meal_addition);
                 checkbox_text.setText(childItems.get(childPosition).getName());
                 //CheckBox parent_node = (CheckBox) parent.findViewById(R.id.meal_addition);
