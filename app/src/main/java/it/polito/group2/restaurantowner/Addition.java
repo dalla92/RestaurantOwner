@@ -8,12 +8,14 @@ public class Addition {
     //String code = null;
     String name = null;
     boolean selected = false;
+    double price = 0.0;
 
-    public Addition(String name, boolean selected) {
+    public Addition(String name, double price, boolean selected) {
         super();
         //this.code = code;
         this.name = name;
         this.selected = selected;
+        this.price = price;
     }
 
     //public String getCode() {
@@ -27,6 +29,13 @@ public class Addition {
     }
     public void setName(String name) {
         this.name = name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public boolean isSelected() {

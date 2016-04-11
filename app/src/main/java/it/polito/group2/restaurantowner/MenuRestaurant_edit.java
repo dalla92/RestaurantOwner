@@ -294,9 +294,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
 
             parentAddition = "Meal additions";
             //setChildData(childAdditions);
-            childAdditions.add(new Addition("rucola", false));
-            childAdditions.add(new Addition("parmigiano", false));
-            childAdditions.add(new Addition("tonno", false));
+            childAdditions.add(new Addition("rucola", 0, false));
+            childAdditions.add(new Addition("parmigiano", 0, false));
+            childAdditions.add(new Addition("tonno", 0, false));
             additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
             addition_adapter = new MyExpandableAdapter(parentAddition, childAdditions);
             additions.setAdapter(addition_adapter);
@@ -308,9 +308,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             //setGroupParents(parentAddition);
             parentCategory = "Meal categories";
             //setChildData(childAdditions);
-            childCategories.add(new Addition("suino", false));
-            childCategories.add(new Addition("bovino", false));
-            childCategories.add(new Addition("equino", false));
+            childCategories.add(new Addition("suino", 0, false));
+            childCategories.add(new Addition("bovino", 0, false));
+            childCategories.add(new Addition("equino", 0, false));
             categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
             category_adapter = new MyExpandableAdapter(parentCategory, childCategories);
             categories.setAdapter(category_adapter);
@@ -323,7 +323,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     childAdditions = addition_adapter.getChildItems();
-                    childAdditions.add(new Addition("New addition", false));
+                    childAdditions.add(new Addition("New addition", 0, false));
                     addition_adapter.setChildItems(childAdditions);
                 }
             });
@@ -332,7 +332,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     childCategories = category_adapter.getChildItems();
-                    childCategories.add(new Addition("New category", false));
+                    childCategories.add(new Addition("New category", 0, false));
                     category_adapter.setChildItems(childCategories);
                 }
             });
@@ -347,8 +347,10 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             private LayoutInflater inflater;
             private String parentItem;
             //private ArrayList<String> child;
+            EditText userInput_price;
+            View promptsView;
 
-            public MyExpandableAdapter(String parent, ArrayList<Addition> children) {
+             public MyExpandableAdapter(String parent, ArrayList<Addition> children) {
                 this.parentItem = parent;
                 this.childItems = children;
                 inflater = LayoutInflater.from(getActivity());
@@ -368,6 +370,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
                 //child = (ArrayList<String>) childItems.get(groupPosition);
                 CheckBox checkbox_text = null;
+                EditText edittex_text = null;
                 if (convertView == null) {
                     convertView = inflater.inflate(R.layout.possible_additions_layout, null);
                 }
@@ -378,6 +381,10 @@ public class MenuRestaurant_edit extends AppCompatActivity {
 
                 checkbox_text = (CheckBox) convertView.findViewById(R.id.meal_addition);
                 checkbox_text.setText(childItems.get(childPosition).getName());
+                 if(parentItem.equals("Meal additions")) {
+                     edittex_text = (EditText) convertView.findViewById(R.id.edit_addition_price);
+                     edittex_text.setText( String.valueOf(childItems.get(childPosition).getPrice()));
+                 }
                 //CheckBox parent_node = (CheckBox) parent.findViewById(R.id.meal_addition);
                 //String parent_node_text = parent_node.getText().toString();
                 //Log.d("parent_node", parent_node_text);
@@ -397,7 +404,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                      @Override
                      public void onClick(View v) {
                          LayoutInflater li = LayoutInflater.from(context);
-                         View promptsView = null;
+                         promptsView = null;
                          if (parentItem.equals("Meal additions")) {
                              promptsView = li.inflate(R.layout.addition_prompt, null);
                          } else {
@@ -409,10 +416,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                          alertDialogBuilder.setView(promptsView);
                          final EditText userInput_name = (EditText) promptsView
                                  .findViewById(R.id.new_name);
-                         if (parentItem.equals("Meal additions")) {
-                             final EditText userInput_price = (EditText) promptsView
-                                     .findViewById(R.id.new_price);
-                         }
                          // set dialog message
                          alertDialogBuilder
                                  .setCancelable(false)
@@ -420,6 +423,14 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                                          new DialogInterface.OnClickListener() {
                                              public void onClick(DialogInterface dialog, int id) {
                                                  childItems.get(childPosition).setName(userInput_name.getText().toString());
+                                                 if (parentItem.equals("Meal additions")) {
+                                                     userInput_price = (EditText) promptsView
+                                                             .findViewById(R.id.new_price);
+                                                     if(!userInput_price.getText().toString().trim().equals(""))
+                                                         //childItems.get(childPosition).setPrice(0.0);
+                                                         //else
+                                                         childItems.get(childPosition).setPrice(Double.parseDouble(userInput_price.getText().toString()));
+                                                 }
                                                  notifyDataSetChanged();
                                                  notifyDataSetInvalidated();
                                              }
