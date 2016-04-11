@@ -92,7 +92,6 @@
             android:singleLine="false"
             android:splitTrack="false"
             android:textStyle="bold"
-            android:paddingLeft="70dp"
             android:checked="false"
             android:layout_weight="1" />
 

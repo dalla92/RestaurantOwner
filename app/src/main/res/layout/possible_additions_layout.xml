@@ -2,20 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:descendantFocusability="blocksDescendants"
-    android:layout_height="wrap_content"
-    android:paddingLeft="30dp"
-    android:weightSum="1"
-    android:paddingRight="10dp">
+    android:layout_height="match_parent"
+    android:weightSum="1">
 
     <ImageButton
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/ic_edit"
-        android:id="@+id/meal_edit"
-        android:onClick="myClickHandler_edit" />
+        android:id="@+id/addition_edit" />
 
     <CheckBox
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="addition"
         android:focusable="false"
@@ -23,10 +20,10 @@
         android:id="@+id/meal_addition"
         android:layout_weight="0.7"
         android:minWidth="400dp"
-        android:paddingLeft="5dp" />
+        android:paddingLeft="10dp" />
 
     <EditText
-        android:layout_width="wrap_content"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:inputType="numberSigned"
         android:ems="10"
@@ -39,7 +36,6 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/icon_remove"
-        android:id="@+id/meal_addition_delete"
-        android:onClick="myClickHandler_remove" />
+        android:id="@+id/addition_delete" />
 
 </LinearLayout>

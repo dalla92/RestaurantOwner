@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
     android:descendantFocusability="blocksDescendants"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:paddingLeft="30dp"
     android:weightSum="1"
     android:paddingRight="10dp">
@@ -11,8 +11,7 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/ic_edit"
-        android:id="@+id/meal_edit"
-        android:onClick="myClickHandler_edit" />
+        android:id="@+id/category_edit" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -20,7 +19,7 @@
         android:text="addition"
         android:focusable="false"
         android:focusableInTouchMode="false"
-        android:id="@+id/meal_category"
+        android:id="@+id/category"
         android:layout_weight="1"
         android:minWidth="400dp"
         android:paddingLeft="5dp" />
@@ -29,7 +28,6 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:src="@mipmap/icon_remove"
-        android:id="@+id/meal_category_delete"
-        android:onClick="myClickHandler_remove" />
+        android:id="@+id/category_delete" />
 
 </LinearLayout>
