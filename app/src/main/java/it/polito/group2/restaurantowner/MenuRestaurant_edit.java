@@ -70,8 +70,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
 
     static AppBarLayout appbar;
 
-    private ArrayList<String> parentItems = new ArrayList<String>();
-    private ArrayList<Object> childItems = new ArrayList<Object>();
+    private ArrayList<String> parentItem = new ArrayList<String>();
+    private ArrayList<Addition> childItems = new ArrayList<Addition>();
 
 
     @Override
@@ -84,7 +84,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-       appbar = (AppBarLayout) findViewById(R.id.appbar);
+        appbar = (AppBarLayout) findViewById(R.id.appbar);
 
         //swipe views
         // Create the adapter that will return a fragment for each of the three
@@ -171,24 +171,27 @@ public class MenuRestaurant_edit extends AppCompatActivity {
 ////////////////////////FragmentMainInfo///////////////////////////////////////////
 
 
-////////////////////////FragmentOtherInfo//////////////////////////////////////////
+    ////////////////////////FragmentOtherInfo//////////////////////////////////////////
     public static class FragmentOtherInfo extends Fragment{
         private ListView additions_list_view;
         private ListView categories_list_view;
         ArrayList<Addition> additionList;
         ArrayList<Addition> categoryList;
-        private MyCustomAdapterAddition additions_adapter;
-        private MyCustomAdapterCategory categories_adapter;
         private Context context;
         int index_addition;
         int index_category;
         View rootView;
-        private ArrayList<String> parentItems = new ArrayList<String>();
-        private ArrayList<Object> childItems = new ArrayList<Object>();
-        private static final String ARG_SECTION_NUMBER = "section_number";
-        ExpandableListView lv;
+        private String parentAddition;
+        private String parentCategory;
+        private ArrayList<Addition> childAdditions = new ArrayList<Addition>();
+        private ArrayList<Addition> childCategories = new ArrayList<Addition>();
 
-    public FragmentOtherInfo() {
+        private static final String ARG_SECTION_NUMBER = "section_number";
+        ExpandableListView additions;
+        ExpandableListView categories;
+
+
+        public FragmentOtherInfo() {
         }
         public static FragmentOtherInfo newInstance(int sectionNumber) {
             FragmentOtherInfo fragment = new FragmentOtherInfo();
@@ -272,8 +275,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             expandableList.setClickable(true);
             setGroupParents();
             setChildData();
-            expandableList.setAdapter(new MyExpandableAdapter(parentItems, childItems));
-            MyExpandableAdapter adapter = new MyExpandableAdapter(parentItems, childItems);
+            expandableList.setAdapter(new MyExpandableAdapter(parentItem, childItems));
+            MyExpandableAdapter adapter = new MyExpandableAdapter(parentItem, childItems);
             adapter.setInflater((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE), rootView.appl); //second parameter was this
             //adapter.setInflater((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE), getActivity()); //second parameter was this
             //adapter.setInflater((LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE), getActivity()); //second parameter was this
@@ -282,191 +285,75 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             //expandableList.setOnChildClickListener(this);
             */
 
-            setGroupParents();
-            setChildData();
-            lv = (ExpandableListView) rootView.findViewById(R.id.additions_and_categories_list);
-            lv.setAdapter(new MyExpandableAdapter(parentItems, childItems));
-            lv.setDividerHeight(2);
-            lv.setGroupIndicator(null);
-            lv.setClickable(true);
+            //expandable additions
+            //setGroupParents(parentAddition);
 
+            parentAddition = "Meal additions";
+            //setChildData(childAdditions);
+            childAdditions.add(new Addition("equino", false));
+            childAdditions.add(new Addition("bovino", false));
+            childAdditions.add(new Addition("suino", false));
+            additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
+            additions.setAdapter(new MyExpandableAdapter(parentAddition, childAdditions));
+            additions.setDividerHeight(5);
+            additions.setGroupIndicator(null);
+            additions.setClickable(true);
+
+            //expandable categories
+            //setGroupParents(parentAddition);
+            parentCategory = "Meal categories";
+            //setChildData(childAdditions);
+            childCategories.add(new Addition("rucola", false));
+            childCategories.add(new Addition("parmigiano", false));
+            childCategories.add(new Addition("tonno", false));
+            categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
+            categories.setAdapter(new MyExpandableAdapter(parentCategory, childCategories));
+            //categories.setDividerHeight(2);
+            categories.setGroupIndicator(null);
+            categories.setClickable(true);
 
             return rootView;
         }
 
-        /*
-        @Override
-        public void onViewCreated(View view, Bundle savedInstanceState) {
-            super.onViewCreated(view, savedInstanceState);
+         public class MyExpandableAdapter extends BaseExpandableListAdapter {
 
-            lv = (ExpandableListView) view.findViewById(R.id.additions_and_categories_list);
-            lv.setAdapter(new MyExpandableAdapter(parentItems, childItems));
-            lv.setDividerHeight(2);
-            lv.setGroupIndicator(null);
-            lv.setClickable(true);
-        }
-        */
+            private Activity activity;
+            private ArrayList<Addition> childItems;
+            private LayoutInflater inflater;
+            private String parentItem;
+            //private ArrayList<String> child;
 
-    public void setGroupParents() {
-        parentItems.add("Meal additions");
-        parentItems.add("Meal categories");
-    }
-
-    public void setChildData() {
-
-        // Meal additions
-        ArrayList<String> child = new ArrayList<String>();
-        child.add("equino");
-        child.add("bovino");
-        child.add("suino");
-        childItems.add(child);
-
-        // Meal categories"
-        child = new ArrayList<String>();
-        child.add("tonno");
-        child.add("parmigiano");
-        child.add("rucola");
-        child.add("origano");
-        child.add("patatine");
-        childItems.add(child);
-    }
-
-    public class MyExpandableAdapter extends BaseExpandableListAdapter {
-
-        private Activity activity;
-        private ArrayList<Object> childtems;
-        private LayoutInflater inflater;
-        private ArrayList<String> parentItems, child;
-
-        public MyExpandableAdapter(ArrayList<String> parents, ArrayList<Object> childern) {
-            this.parentItems = parents;
-            this.childtems = childern;
-            inflater = LayoutInflater.from(getActivity());
-        }
-
-        @Override
-        public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-
-            child = (ArrayList<String>) childtems.get(groupPosition);
-
-            CheckBox checkbox_text = null;
-
-            if (convertView == null) {
-                convertView = inflater.inflate(R.layout.possible_additions_layout, null);
+            public MyExpandableAdapter(String parent, ArrayList<Addition> children) {
+                this.parentItem = parent;
+                this.childItems = children;
+                inflater = LayoutInflater.from(getActivity());
             }
 
-            checkbox_text = (CheckBox) convertView.findViewById(R.id.meal_addition);
-            checkbox_text.
-                    setText(child.get(childPosition));
-
-            convertView.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    Toast.makeText(activity, child.get(childPosition),
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            return convertView;
-        }
-
-        @Override
-        public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-
-            if (convertView == null) {
-                convertView = inflater.inflate
-                        (R.layout.row, null);
-            }
-
-            ((CheckedTextView) convertView).setText(parentItems.get(groupPosition));
-            ((CheckedTextView) convertView).setChecked(isExpanded);
-
-            return convertView;
-        }
-
-        @Override
-        public Object getChild(int groupPosition, int childPosition) {
-            return null;
-        }
-
-        @Override
-        public long getChildId(int groupPosition, int childPosition) {
-            return 0;
-        }
-
-        @Override
-        public int getChildrenCount(int groupPosition) {
-            return ((ArrayList<String>) childtems.get(groupPosition)).size();
-        }
-
-        @Override
-        public Object getGroup(int groupPosition) {
-            return null;
-        }
-
-        @Override
-        public int getGroupCount() {
-            return parentItems.size();
-        }
-
-        @Override
-        public void onGroupCollapsed(int groupPosition) {
-            super.onGroupCollapsed(groupPosition);
-        }
-
-        @Override
-        public void onGroupExpanded(int groupPosition) {
-            super.onGroupExpanded(groupPosition);
-        }
-
-        @Override
-        public long getGroupId(int groupPosition) {
-            return 0;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-
-        @Override
-        public boolean isChildSelectable(int groupPosition, int childPosition) {
-            return false;
-        }
-
-    }
-
-        private class MyCustomAdapterAddition extends ArrayAdapter<Addition> {
-            private ArrayList<Addition> additionList;
-            public MyCustomAdapterAddition(Context context, int textViewResourceId,
-                                   ArrayList<Addition> additionList) {
-                super(context, textViewResourceId, additionList);
-                this.additionList = new ArrayList<Addition>();
-                this.additionList.addAll(additionList);
-            }
-            private class ViewHolder {
-                CheckBox name;
-            }
             @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                ViewHolder holder = null;
-                Log.v("ConvertView", String.valueOf(position));
+            public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+                //child = (ArrayList<String>) childItems.get(groupPosition);
+                CheckBox checkbox_text = null;
                 if (convertView == null) {
-                    LayoutInflater vi = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    convertView = vi.inflate(R.layout.possible_additions_layout, null);
-                    holder = new ViewHolder();
-                    holder.name = (CheckBox) convertView.findViewById(R.id.meal_addition);
-                    convertView.setTag(holder);
-                } else {
-                    holder = (ViewHolder) convertView.getTag();
+                    convertView = inflater.inflate(R.layout.possible_additions_layout, null);
                 }
-                Addition addition = additionList.get(position);
-                //holder.code.setText(" (" +  Addition.getCode() + ")");
-                holder.name.setText(addition.getName());
-                holder.name.setChecked(addition.isSelected());
-                holder.name.setTag(addition);
-
+                checkbox_text = (CheckBox) convertView.findViewById(R.id.meal_addition);
+                checkbox_text.setText(childItems.get(childPosition).getName());
+                //CheckBox parent_node = (CheckBox) parent.findViewById(R.id.meal_addition);
+                //String parent_node_text = parent_node.getText().toString();
+                //Log.d("parent_node", parent_node_text);
+                convertView.findViewById(R.id.addition_delete).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //get the row the clicked button is in
+                        //getParent().getParentChildren().get(0).
+                        childItems.remove(childPosition);
+                        notifyDataSetChanged();
+                        notifyDataSetInvalidated();
+                        Log.d("myClickHandlerDelete", "You want to delete");
+                    }
+                });
+            /*
+            if(parent_node_text.equals("Meal additions")) {
                 convertView.findViewById(R.id.addition_edit).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -479,8 +366,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                                 rootView.getContext(),
                                 MenuRestaurant_edit.class);
                         startActivity(intent);
-                                                }
-                        });
+                    }
+                });
                 convertView.findViewById(R.id.addition_delete).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -499,11 +386,12 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 switch (which) {
                                     case DialogInterface.BUTTON_POSITIVE:
-                                        /*View parentRow = (View) v.getParent();
-                                        ListView listView = (ListView) parentRow.getParent();
-                                        int position = listView.getPositionForView(parentRow);
-                                        Object toRemove = adapter.getItem(position);*/
+                                                /*View parentRow = (View) v.getParent();
+                                                ListView listView = (ListView) parentRow.getParent();
+                                                int position = listView.getPositionForView(parentRow);
+                                                Addition toRemove = adapter.getItem(position);
                                         Log.d("myClickHandlerAddition", "You are removing " + additionList.get(index_addition).getName());
+                                        ( (MyExpandableAdapter)lv.getParent().get(0) ).getParentChildren().add(childre.get(index_addition));
                                         additions_adapter.remove(additionList.get(index_addition));
                                         additions_adapter.notifyDataSetChanged();
                                         break;
@@ -518,96 +406,135 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                                 .setNegativeButton("No", dialogClickListener).show();
                     }
                 });
-                return convertView;
             }
-        }
-
-    private class MyCustomAdapterCategory extends ArrayAdapter<Addition> {
-        private ArrayList<Addition> categoryList;
-        public MyCustomAdapterCategory(Context context, int textViewResourceId,
-                                       ArrayList<Addition> categoryList) {
-            super(context, textViewResourceId, categoryList);
-            this.categoryList = new ArrayList<Addition>();
-            this.categoryList.addAll(additionList);
-        }
-        private class ViewHolder {
-            CheckBox name;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder = null;
-            Log.v("ConvertView", String.valueOf(position));
-            if (convertView == null) {
-                LayoutInflater vi = (LayoutInflater) getActivity().getSystemService(
-                        Context.LAYOUT_INFLATER_SERVICE);
-                convertView = vi.inflate(R.layout.possible_categories_layout, null);
-                holder = new ViewHolder();
-                holder.name = (CheckBox) convertView.findViewById(R.id.category);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-            Addition category = categoryList.get(position);
-            holder.name.setText(category.getName());
-            holder.name.setChecked(category.isSelected());
-            holder.name.setTag(category);
-            convertView.findViewById(R.id.category_edit).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //get the row the clicked button is in
-                    LinearLayout vwParentRow = (LinearLayout) v.getParent();
-                    CheckBox child = (CheckBox) vwParentRow.getChildAt(2);
-                    String category_name = child.getText().toString();
-                    Log.d("myClickHandlerCategory", "You want to modify " + category_name);
-                    Intent intent = new Intent(
-                            rootView.getContext(),
-                            MenuRestaurant_edit.class);
-                    startActivity(intent);
-                }
-            });
-            convertView.findViewById(R.id.category_delete).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //get the row the clicked button is in
-                    LinearLayout vwParentRow = (LinearLayout) v.getParent();
-                    CheckBox child = (CheckBox) vwParentRow.getChildAt(1);
-                    final String category_name = child.getText().toString();
-                    Log.d("myClickHandlerCategory", "You want to delete " + category_name);
-                    for (index_category = 0; index_category < categoryList.size(); index_category++) {
-                        if (categoryList.get(index_category).getName().equals(category_name))
-                            break;
-                    }
-                    //dialog box
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        else if(parent_node_text.equals("Meal categories")){{
+                    convertView.findViewById(R.id.category_edit).setOnClickListener(new View.OnClickListener() {
                         @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case DialogInterface.BUTTON_POSITIVE:
+                        public void onClick(View v) {
+                            //get the row the clicked button is in
+                            LinearLayout vwParentRow = (LinearLayout) v.getParent();
+                            CheckBox child = (CheckBox) vwParentRow.getChildAt(2);
+                            String category_name = child.getText().toString();
+                            Log.d("myClickHandlerCategory", "You want to modify " + category_name);
+                            Intent intent = new Intent(
+                                    rootView.getContext(),
+                                    MenuRestaurant_edit.class);
+                            startActivity(intent);
+                        }
+                    });
+                    convertView.findViewById(R.id.category_delete).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            //get the row the clicked button is in
+                            LinearLayout vwParentRow = (LinearLayout) v.getParent();
+                            CheckBox child = (CheckBox) vwParentRow.getChildAt(1);
+                            final String category_name = child.getText().toString();
+                            Log.d("myClickHandlerCategory", "You want to delete " + category_name);
+                            for (index_category = 0; index_category < categoryList.size(); index_category++) {
+                                if (categoryList.get(index_category).getName().equals(category_name))
+                                    break;
+                            }
+                            //dialog box
+                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    switch (which) {
+                                        case DialogInterface.BUTTON_POSITIVE:
                         /*View parentRow = (View) v.getParent();
                         ListView listView = (ListView) parentRow.getParent();
                         int position = listView.getPositionForView(parentRow);
-                        Object toRemove = adapter.getItem(position);*/
-                                    Log.d("myClickHandlerCategory", "You are removing " + categoryList.get(index_category).getName());
-                                    categories_adapter.remove(categoryList.get(index_category));
-                                    categories_adapter.notifyDataSetChanged();
-                                    break;
+                        Addition toRemove = adapter.getItem(position);
+                                            Log.d("myClickHandlerCategory", "You are removing " + categoryList.get(index_category).getName());
+                                            categories_adapter.remove(categoryList.get(index_category));
+                                            categories_adapter.notifyDataSetChanged();
+                                            break;
 
-                                case DialogInterface.BUTTON_NEGATIVE:
-                                    break;
-                            }
+                                        case DialogInterface.BUTTON_NEGATIVE:
+                                            break;
+                                    }
+                                }
+                            };
+                            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                            builder.setMessage("Are you sure that you want to delete " + category_name + "?").setPositiveButton("Yes, sure", dialogClickListener)
+                                    .setNegativeButton("No", dialogClickListener).show();
                         }
-                    };
-                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                    builder.setMessage("Are you sure that you want to delete " + category_name + "?").setPositiveButton("Yes, sure", dialogClickListener)
-                            .setNegativeButton("No", dialogClickListener).show();
-                }
-            });
+                    });
 
-            return convertView;
+                }
+                }
+                */
+
+                return convertView;
+            }
+
+            @Override
+            public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+
+                if (convertView == null) {
+                    convertView = inflater.inflate
+                            (R.layout.row, null);
+                }
+
+                ((CheckedTextView) convertView).setText(parentItem);
+                ((CheckedTextView) convertView).setChecked(isExpanded);
+
+                return convertView;
+            }
+
+            @Override
+            public Addition getChild(int groupPosition, int childPosition) {
+                return null;
+            }
+
+            @Override
+            public long getChildId(int groupPosition, int childPosition) {
+                return 0;
+            }
+
+            @Override
+            public int getChildrenCount(int groupPosition) {
+                //return ((ArrayList<Addition>) childItems.get(groupPosition)).size();
+                return childItems.size();
+            }
+
+            @Override
+            public Addition getGroup(int groupPosition) {
+                return null;
+            }
+
+            @Override
+            public int getGroupCount() {
+                return 1;
+            }
+
+            @Override
+            public void onGroupCollapsed(int groupPosition) {
+                super.onGroupCollapsed(groupPosition);
+            }
+
+            @Override
+            public void onGroupExpanded(int groupPosition) {
+                super.onGroupExpanded(groupPosition);
+            }
+
+            @Override
+            public long getGroupId(int groupPosition) {
+                return 0;
+            }
+
+            @Override
+            public boolean hasStableIds() {
+                return false;
+            }
+
+            @Override
+            public boolean isChildSelectable(int groupPosition, int childPosition) {
+                return false;
+            }
+
         }
+
     }
-}
 
 
         /*

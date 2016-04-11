@@ -42,7 +42,7 @@
 
     <string name="title_activity_menu_restaurant_page">MENU</string>
     <string name="add_meal">AGGIUNGI UN PIATTO</string>
-    <string name="availability">PRESENTE</string>
+    <string name="availability">VENDI</string>
 
     <string name="meal_name">NOME PIATTO: </string>
     <string name="meal_price">PREZZO PIATTO: </string>
@@ -50,9 +50,9 @@
     <string name="meal_description">DESCRIZIONE PIATTO: </string>
     <string name="meal_possible_additions">SUPPLEMENTI: </string>
     <string name="meal_possible_categories">CATEGORIE CIBO: </string>
-    <string name="meal_time_for_cooking">MINUTI DI COTTURA: </string>
-    <string name="meal_add_new_category">Aggiungi categoria</string>
-    <string name="meal_add_new_addition">Aggiungi supplemento</string>
+    <string name="meal_time_for_cooking">cottura</string>
+    <string name="meal_add_new_category">categoria</string>
+    <string name="meal_add_new_addition">supplemento</string>
     <string name="title_activity_menu_restaurant_edit">MODIFICA PIATTO</string>
     <string name="addition_meal_price">prezzo</string>
 

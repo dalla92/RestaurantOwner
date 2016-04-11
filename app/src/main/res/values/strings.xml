@@ -39,7 +39,7 @@
 
     <string name="title_activity_menu_restaurant_page">MENU</string>
     <string name="add_meal">ADD A MEAL</string>
-    <string name="availability">ON SALE</string>
+    <string name="availability">SALE</string>
 
     <string name="meal_name">MEAL NAME: </string>
     <string name="meal_price">MEAL PRICE: </string>
@@ -47,9 +47,9 @@
     <string name="meal_description">MEAL DESCRIPTION: </string>
     <string name="meal_possible_additions">MEAL ADDITIONS: </string>
     <string name="meal_possible_categories">MEAL CATEGORIES: </string>
-    <string name="meal_time_for_cooking">MINUTES FOR COOKING: </string>
-    <string name="meal_add_new_category">Add category</string>
-    <string name="meal_add_new_addition">Add addition</string>
+    <string name="meal_time_for_cooking">cooking</string>
+    <string name="meal_add_new_category">category</string>
+    <string name="meal_add_new_addition">addition</string>
     <string name="title_activity_menu_restaurant_edit">EDIT MEAL</string>
     <string name="addition_meal_price">price</string>
 

@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/imageView4"
             android:src="@mipmap/money_icon"
-            android:layout_gravity="right" />
+            android:layout_gravity="bottom|left" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -66,20 +66,20 @@
             android:text="Small Text"
             android:id="@+id/meal_price"
             android:paddingTop="15dp"
-            android:layout_gravity="right" />
+            android:layout_gravity="bottom|left" />
 
         <ImageView
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:id="@+id/meal_type1"
-            android:layout_gravity="center"
+            android:layout_gravity="center|top"
             android:paddingRight="7dp" />
 
         <ImageView
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:id="@+id/meal_type2"
-            android:layout_gravity="center"
+            android:layout_gravity="center|top"
             android:paddingRight="10dp" />
 
         <Switch
@@ -93,7 +93,8 @@
             android:splitTrack="false"
             android:textStyle="bold"
             android:checked="false"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:layout_gravity="bottom" />
 
     </LinearLayout>
 
