@@ -61,6 +61,9 @@
 
     <string name="show_more"> (leggi tutto...)</string>
 
+    <string name="addition_name">Nome supplemento</string>
+    <string name="new_data_insertion">Inserisci nuovi dati:</string>
+    <string name="category_name">Nome categoria</string>
 
     <!--Alessio's strings begin-->
 

@@ -387,120 +387,56 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                         Log.d("myClickHandlerDelete", "You want to delete");
                     }
                 });
-            /*
-            if(parent_node_text.equals("Meal additions")) {
-                convertView.findViewById(R.id.addition_edit).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //get the row the clicked button is in
-                        LinearLayout vwParentRow = (LinearLayout) v.getParent();
-                        TextView child = (TextView) vwParentRow.getChildAt(2);
-                        String addition_name = child.getText().toString();
-                        Log.d("myClickHandlerAddition", "You want to modify " + addition_name);
-                        Intent intent = new Intent(
-                                rootView.getContext(),
-                                MenuRestaurant_edit.class);
-                        startActivity(intent);
-                    }
-                });
-                convertView.findViewById(R.id.addition_delete).setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //get the row the clicked button is in
-                        LinearLayout vwParentRow = (LinearLayout) v.getParent();
-                        CheckBox child = (CheckBox) vwParentRow.getChildAt(1);
-                        final String addition_name = child.getText().toString();
-                        Log.d("myClickHandlerAddition", "You want to delete " + addition_name);
-                        for (index_addition = 0; index_addition < additionList.size(); index_addition++) {
-                            if (additionList.get(index_addition).getName().equals(addition_name))
-                                break;
-                        }
-                        //dialog box
-                        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                switch (which) {
-                                    case DialogInterface.BUTTON_POSITIVE:
-                                                /*View parentRow = (View) v.getParent();
-                                                ListView listView = (ListView) parentRow.getParent();
-                                                int position = listView.getPositionForView(parentRow);
-                                                Addition toRemove = adapter.getItem(position);
-                                        Log.d("myClickHandlerAddition", "You are removing " + additionList.get(index_addition).getName());
-                                        ( (MyExpandableAdapter)lv.getParent().get(0) ).getParentChildren().add(childre.get(index_addition));
-                                        additions_adapter.remove(additionList.get(index_addition));
-                                        additions_adapter.notifyDataSetChanged();
-                                        break;
 
-                                    case DialogInterface.BUTTON_NEGATIVE:
-                                        break;
-                                }
-                            }
-                        };
-                        AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                        builder.setMessage("Are you sure that you want to delete " + addition_name + "?").setPositiveButton("Yes, sure", dialogClickListener)
-                                .setNegativeButton("No", dialogClickListener).show();
-                    }
-                });
-            }
-        else if(parent_node_text.equals("Meal categories")){{
-                    convertView.findViewById(R.id.category_edit).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            //get the row the clicked button is in
-                            LinearLayout vwParentRow = (LinearLayout) v.getParent();
-                            CheckBox child = (CheckBox) vwParentRow.getChildAt(2);
-                            String category_name = child.getText().toString();
-                            Log.d("myClickHandlerCategory", "You want to modify " + category_name);
-                            Intent intent = new Intent(
-                                    rootView.getContext(),
-                                    MenuRestaurant_edit.class);
-                            startActivity(intent);
-                        }
-                    });
-                    convertView.findViewById(R.id.category_delete).setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            //get the row the clicked button is in
-                            LinearLayout vwParentRow = (LinearLayout) v.getParent();
-                            CheckBox child = (CheckBox) vwParentRow.getChildAt(1);
-                            final String category_name = child.getText().toString();
-                            Log.d("myClickHandlerCategory", "You want to delete " + category_name);
-                            for (index_category = 0; index_category < categoryList.size(); index_category++) {
-                                if (categoryList.get(index_category).getName().equals(category_name))
-                                    break;
-                            }
-                            //dialog box
-                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    switch (which) {
-                                        case DialogInterface.BUTTON_POSITIVE:
-                        /*View parentRow = (View) v.getParent();
-                        ListView listView = (ListView) parentRow.getParent();
-                        int position = listView.getPositionForView(parentRow);
-                        Addition toRemove = adapter.getItem(position);
-                                            Log.d("myClickHandlerCategory", "You are removing " + categoryList.get(index_category).getName());
-                                            categories_adapter.remove(categoryList.get(index_category));
-                                            categories_adapter.notifyDataSetChanged();
-                                            break;
+                 convertView.findViewById(R.id.addition_edit).setOnClickListener(new View.OnClickListener() {
+                     @Override
+                     public void onClick(View v) {
+                         LayoutInflater li = LayoutInflater.from(context);
+                         View promptsView = null;
+                         if (parentItem.equals("Meal additions")) {
+                             promptsView = li.inflate(R.layout.addition_prompt, null);
+                         } else {
+                             promptsView = li.inflate(R.layout.category_prompt, null);
+                         }
+                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                                 context);
+                         // set prompts.xml to alertdialog builder
+                         alertDialogBuilder.setView(promptsView);
+                         final EditText userInput_name = (EditText) promptsView
+                                 .findViewById(R.id.new_name);
+                         if (parentItem.equals("Meal additions")) {
+                             final EditText userInput_price = (EditText) promptsView
+                                     .findViewById(R.id.new_price);
+                         }
+                         // set dialog message
+                         alertDialogBuilder
+                                 .setCancelable(false)
+                                 .setPositiveButton("OK",
+                                         new DialogInterface.OnClickListener() {
+                                             public void onClick(DialogInterface dialog, int id) {
+                                                 childItems.get(childPosition).setName(userInput_name.getText().toString());
+                                                 notifyDataSetChanged();
+                                                 notifyDataSetInvalidated();
+                                             }
+                                         })
+                                 .setNegativeButton("Cancel",
+                                         new DialogInterface.OnClickListener() {
+                                             public void onClick(DialogInterface dialog, int id) {
+                                                 dialog.cancel();
+                                             }
+                                         });
+                         // create alert dialog
+                         AlertDialog alertDialog = alertDialogBuilder.create();
+                         // show it
+                         alertDialog.show();
+                     }
+                 });
 
-                                        case DialogInterface.BUTTON_NEGATIVE:
-                                            break;
-                                    }
-                                }
-                            };
-                            AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
-                            builder.setMessage("Are you sure that you want to delete " + category_name + "?").setPositiveButton("Yes, sure", dialogClickListener)
-                                    .setNegativeButton("No", dialogClickListener).show();
-                        }
-                    });
+                 return convertView;
+             }
 
-                }
-                }
-                */
 
-                return convertView;
-            }
+
 
             @Override
             public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {

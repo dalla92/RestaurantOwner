@@ -58,6 +58,9 @@
 
     <string name="show_more"> (read all...)</string>
 
+    <string name="addition_name">Addition name</string>
+    <string name="new_data_insertion">Insert new data:</string>
+    <string name="category_name">Category name</string>
 
     <!--Alessio's strings end-->
 
