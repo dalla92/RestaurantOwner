@@ -38,6 +38,7 @@ import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
@@ -47,6 +48,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -189,6 +191,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
         ExpandableListView additions;
         ExpandableListView categories;
+        MyExpandableAdapter addition_adapter;
+        MyExpandableAdapter category_adapter;
 
 
         public FragmentOtherInfo() {
@@ -294,7 +298,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             childAdditions.add(new Addition("bovino", false));
             childAdditions.add(new Addition("suino", false));
             additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
-            additions.setAdapter(new MyExpandableAdapter(parentAddition, childAdditions));
+            addition_adapter = new MyExpandableAdapter(parentAddition, childAdditions);
+            additions.setAdapter(addition_adapter);
             additions.setDividerHeight(5);
             additions.setGroupIndicator(null);
             additions.setClickable(true);
@@ -307,10 +312,30 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             childCategories.add(new Addition("parmigiano", false));
             childCategories.add(new Addition("tonno", false));
             categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
-            categories.setAdapter(new MyExpandableAdapter(parentCategory, childCategories));
+            category_adapter = new MyExpandableAdapter(parentCategory, childCategories);
+            categories.setAdapter(category_adapter);
             //categories.setDividerHeight(2);
             categories.setGroupIndicator(null);
             categories.setClickable(true);
+
+            final ImageView addition_add_button = (ImageView) rootView.findViewById(R.id.addition_add);
+            addition_add_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    childAdditions = addition_adapter.getChildItems();
+                    childAdditions.add(new Addition("New addition", false));
+                    addition_adapter.setChildItems(childAdditions);
+                }
+            });
+            final ImageView category_add_button = (ImageView) rootView.findViewById(R.id.category_add);
+            category_add_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    childCategories = category_adapter.getChildItems();
+                    childCategories.add(new Addition("New category", false));
+                    category_adapter.setChildItems(childCategories);
+                }
+            });
 
             return rootView;
         }
@@ -329,7 +354,17 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 inflater = LayoutInflater.from(getActivity());
             }
 
-            @Override
+             public ArrayList<Addition> getChildItems(){
+                 return this.childItems;
+             }
+
+             public void setChildItems(ArrayList<Addition> new_list){
+                 this.childItems = new_list;
+                 notifyDataSetChanged();
+                 notifyDataSetInvalidated();
+             }
+
+             @Override
             public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
                 //child = (ArrayList<String>) childItems.get(groupPosition);
                 CheckBox checkbox_text = null;

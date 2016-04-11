@@ -58,7 +58,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_action_add"
-            android:id="@+id/imageView4"
+            android:id="@+id/addition_add"
             android:background="#000000"
             android:onClick="myClickHandler_add_addition"
             android:layout_gravity="right" />
@@ -78,7 +78,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/ic_action_add"
-            android:id="@+id/imageView5"
+            android:id="@+id/category_add"
             android:background="#000000"
             android:onClick="myClickHandler_add_category" />
 
