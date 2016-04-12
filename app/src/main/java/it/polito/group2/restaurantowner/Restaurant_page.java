@@ -423,43 +423,6 @@ public class Restaurant_page extends AppCompatActivity
         button_choose_photo2.setVisibility(View.GONE);
     }
 
-    public void saveJSONResList(ArrayList<Restaurant> resList) throws JSONException {
-        String FILENAME = "restaurantList.json";
-        JSONArray jarray = new JSONArray();
-        for(Restaurant res : resList){
-            JSONObject jres = new JSONObject();
-            jres.put("Address",res.getAddress());
-            jres.put("Category",res.getCategory());
-            jres.put("ClosestBus",res.getClosestBus());
-            jres.put("ClosestMetro",res.getClosestMetro());
-            jres.put("Fidelity",res.isFidelity());
-            jres.put("Name",res.getName());
-            jres.put("OrdersPerHour",res.getOrdersPerHour());
-            jres.put("PhoneNum",res.getPhoneNum());
-            jres.put("Rating",res.getRating());
-            jres.put("ReservationNumber",res.getReservationNumber());
-            jres.put("ReservationPercentage",res.getReservedPercentage());
-            jres.put("SquaredMeters",res.getSquaredMeters());
-            jres.put("TableReservation",res.isTableReservation());
-            jres.put("TableNum",res.getTableNum());
-            jres.put("TakeAway",res.isTakeAway());
-            jres.put("UserId",res.getUserId());
-            jarray.put(jres);
-        }
-        JSONObject resObj = new JSONObject();
-        resObj.put("Restaurants", jarray);
-        FileOutputStream fos = null;
-        try {
-            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            fos.write(resObj.toString().getBytes());
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public ArrayList<Restaurant> readJSONResList() throws JSONException {
         String json = null;
         ArrayList<Restaurant> resList = new ArrayList<>();
@@ -484,6 +447,8 @@ public class Restaurant_page extends AppCompatActivity
         for(int i=0; i < jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             Restaurant res = new Restaurant();
+            res.setRestaurantId(jsonObject.optInt("RestaurantId"));
+            res.setPhotoUri(jsonObject.optString("Photo"));
             res.setAddress(jsonObject.optString("Address"));
             res.setCategory(jsonObject.optString("Category"));
             res.setClosestBus(jsonObject.optString("ClosestBus"));
@@ -539,6 +504,45 @@ public class Restaurant_page extends AppCompatActivity
             }
         }
         return comments;
+    }
+
+    public void saveJSONResList(ArrayList<Restaurant> resList) throws JSONException {
+        String FILENAME = "restaurantList.json";
+        JSONArray jarray = new JSONArray();
+        for(Restaurant res : resList){
+            JSONObject jres = new JSONObject();
+            jres.put("RestaurantId",res.getRestaurantId());
+            jres.put("Photo",res.getPhotoUri());
+            jres.put("Address",res.getAddress());
+            jres.put("Category",res.getCategory());
+            jres.put("ClosestBus",res.getClosestBus());
+            jres.put("ClosestMetro",res.getClosestMetro());
+            jres.put("Fidelity",res.isFidelity());
+            jres.put("Name",res.getName());
+            jres.put("OrdersPerHour",res.getOrdersPerHour());
+            jres.put("PhoneNum",res.getPhoneNum());
+            jres.put("Rating",res.getRating());
+            jres.put("ReservationNumber",res.getReservationNumber());
+            jres.put("ReservationPercentage",res.getReservedPercentage());
+            jres.put("SquaredMeters",res.getSquaredMeters());
+            jres.put("TableReservation",res.isTableReservation());
+            jres.put("TableNum",res.getTableNum());
+            jres.put("TakeAway",res.isTakeAway());
+            jres.put("UserId",res.getUserId());
+            jarray.put(jres);
+        }
+        JSONObject resObj = new JSONObject();
+        resObj.put("Restaurants", jarray);
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(resObj.toString().getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private File createImageFile() throws IOException {

@@ -18,13 +18,14 @@ import android.widget.Toast;
 public class MyExpandableAdapter extends BaseExpandableListAdapter {
 
     private Activity activity;
-    private ArrayList<Object> childtems;
+    private ArrayList<Addition> childtems;
     private LayoutInflater inflater;
-    private ArrayList<String> parentItems, child;
+    private String parentItem;
+    private ArrayList<Addition> child;
 
-    public MyExpandableAdapter(ArrayList<String> parents, ArrayList<Object> childern) {
+    public MyExpandableAdapter(ArrayList<String> parents, ArrayList<Addition> children) {
         this.parentItems = parents;
-        this.childtems = childern;
+        this.childtems = children;
     }
 
     public void setInflater(LayoutInflater inflater, Activity activity) {
@@ -35,7 +36,7 @@ public class MyExpandableAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
 
-        child = (ArrayList<String>) childtems.get(groupPosition);
+        child = (ArrayList<Addition>) childtems.get(groupPosition);
 
         TextView textView = null;
 
@@ -74,7 +75,7 @@ public class MyExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public Object getChild(int groupPosition, int childPosition) {
+    public Addition getChild(int groupPosition, int childPosition) {
         return null;
     }
 
@@ -85,11 +86,12 @@ public class MyExpandableAdapter extends BaseExpandableListAdapter {
 
     @Override
     public int getChildrenCount(int groupPosition) {
-        return ((ArrayList<String>) childtems.get(groupPosition)).size();
+        return childtems.size();
+        //return ((ArrayList<Addition>) childtems.get(groupPosition)).size();
     }
 
     @Override
-    public Object getGroup(int groupPosition) {
+    public Addition getGroup(int groupPosition) {
         return null;
     }
 

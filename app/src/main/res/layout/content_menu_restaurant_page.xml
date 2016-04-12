@@ -35,10 +35,11 @@
             android:paddingTop="23dp" />
     </LinearLayout>
 
-    <ListView
-        android:id="@+id/list"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent">
-    </ListView>
+    <android.support.v7.widget.RecyclerView
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:id="@+id/rv_meals"
+        >
+    </android.support.v7.widget.RecyclerView>
 
 </LinearLayout>

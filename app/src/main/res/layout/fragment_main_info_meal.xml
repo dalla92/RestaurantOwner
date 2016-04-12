@@ -100,7 +100,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/layout_meal_image"
         android:padding="15dp"
-        android:paddingTop="15dp">
+        android:paddingTop="15dp"
+        android:id="@+id/layoutz">
 
         <Spinner
             android:layout_width="wrap_content"
@@ -117,6 +118,22 @@
             android:button="@null"
             android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
             android:paddingLeft="30dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_below="@id/layoutz"
+        android:layout_width="match_parent"
+        android:padding="15dp"
+        android:paddingTop="15dp"
+        android:layout_height="wrap_content">
+
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner4"
+            android:layout_gravity="center" />
     </LinearLayout>
 
 </RelativeLayout>
