@@ -19,10 +19,10 @@ public class Enlarged_image extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        int imageId1 = intent.getIntExtra(Enlarged_image.class.getName(), 0);
-        if(imageId1!=0) {
+        String imagepathuri = intent.getStringExtra(Enlarged_image.class.getName());
+        if(imagepathuri!=null) {
             //Uri uri=Uri.parse("R.drawable.image");
-            Uri image_uri = Uri.parse(String.valueOf(imageId1));
+            Uri image_uri = Uri.parse(String.valueOf(imagepathuri));
             Bitmap bitmap = null;
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), image_uri);
@@ -38,9 +38,6 @@ public class Enlarged_image extends AppCompatActivity {
         }
         else
             Log.e("ENLARGED_IMAGE", "There is no image to enlarge");
-
-
         setContentView(R.layout.enlarged_image);
-
     }
 }
