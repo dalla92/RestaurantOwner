@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
@@ -164,6 +165,30 @@ public class Restaurant_page extends AppCompatActivity
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
+        EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
+        EditText edit_restaurant_telephone_number = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
+        state.putString("restaurant_name", edit_restaurant_name.getText().toString());
+        state.putString("restaurant_address", edit_restaurant_address.getText().toString());
+        state.putString("restaurant_telephone_number", edit_restaurant_telephone_number.getText().toString());
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        if(state!=null) {
+            EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
+            EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
+            EditText edit_restaurant_telephone_number = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
+            edit_restaurant_name.setText(state.getString("restaurant_name"));
+            edit_restaurant_address.setText(state.getString("restaurant_address"));
+            edit_restaurant_telephone_number.setText(state.getString("restaurant_telephone_number"));
+        }
     }
 
     @Override

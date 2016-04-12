@@ -92,8 +92,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
     public static final String ARG_SECTION_NUMBER = "section_number";
     public static ExpandableListView additions;
     public static ExpandableListView categories;
-    public static MyExpandableAdapter addition_adapter;
-    public static MyExpandableAdapter category_adapter;
+    public static it.polito.group2.restaurantowner.MenuRestaurant_edit.FragmentOtherInfo.MyExpandableAdapter additions_adapter;
+    public static it.polito.group2.restaurantowner.MenuRestaurant_edit.FragmentOtherInfo.MyExpandableAdapter categories_adapter;
     public static int restaurant_id = 0;
     public static int meal_id = 0;
     public static String photouri = null;
@@ -106,28 +106,36 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_restaurant_edit);
 
-        //retrieve data
-        Bundle b = getIntent().getExtras();
-        meal_id = b.getInt("meal_id");
-        restaurant_id = b.getInt("restaurant_id");
-        try {
-            meals = readJSONMeList();
+        if (false){ //savedInstanceState != null) {
+            //Restore the fragment's instance
+            /*
+            mSectionsPagerAdapter = getSupportFragmentManager().getFragment(savedInstanceState, "main_fragment");
+            mSectionsPagerAdapter.setItem(1) = getSupportFragmentManager().getFragment(savedInstanceState, "other_fragment");
+            */
         }
-        catch(JSONException e){
-            e.printStackTrace();
-        }
-        //toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        appbar = (AppBarLayout) findViewById(R.id.appbar);
+        else {
+            //retrieve data
+            Bundle b = getIntent().getExtras();
+            meal_id = b.getInt("meal_id");
+            restaurant_id = b.getInt("restaurant_id");
+            try {
+                meals = readJSONMeList();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            //toolbar
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            appbar = (AppBarLayout) findViewById(R.id.appbar);
 
-        //swipe views
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+            //swipe views
+            mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+            mViewPager = (ViewPager) findViewById(R.id.container);
+            mViewPager.setAdapter(mSectionsPagerAdapter);
+            TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+            tabLayout.setupWithViewPager(mViewPager);
+        }
     }
 
     @Override
@@ -143,6 +151,34 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //Save the fragment's instance
+        getSupportFragmentManager().putFragment(outState, "main_fragment", mSectionsPagerAdapter.getItem(0));
+        getSupportFragmentManager().putFragment(outState, "other_fragment", mSectionsPagerAdapter.getItem(1));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        try {
+            saveJSONMeList(meals);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            readJSONMeList();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -179,6 +215,14 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     }
                 }
             }
+            meals.get(restaurant_id).setMeal_photo(photouri);
+            try{
+                saveJSONMeList(meals);
+            }
+            catch(JSONException e){
+                e.printStackTrace();
+            }
+        }
     }
 
     private void setPic(ImageView mImageView) {
@@ -202,6 +246,13 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         bmOptions.inPurgeable = true;
         Bitmap bitmap = BitmapFactory.decodeFile(photouri, bmOptions);
         mImageView.setImageBitmap(bitmap);
+        meals.get(restaurant_id).setMeal_photo(photouri);
+        try{
+            saveJSONMeList(meals);
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
     }
 
     public ArrayList<Meal> readJSONMeList() throws JSONException {
@@ -437,6 +488,12 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                     meals.get(restaurant_id).setType1(spinner3.getSelectedItem().toString());
+                    try {
+                        saveJSONMeList(meals);
+                    }
+                    catch(JSONException e){
+                        e.printStackTrace();
+                    }
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parentView) {
@@ -453,6 +510,12 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                     meals.get(restaurant_id).setType1(spinner4.getSelectedItem().toString());
+                    try {
+                        saveJSONMeList(meals);
+                    }
+                    catch(JSONException e){
+                        e.printStackTrace();
+                    }
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parentView) {
@@ -525,8 +588,69 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             return rootView;
         }
 
+        @Override
+        public void onSaveInstanceState(Bundle state) {
+            super.onSaveInstanceState(state);
+            EditText edit_meal_name = (EditText) rootView.findViewById(R.id.edit_meal_name);
+            EditText edit_meal_price = (EditText) rootView.findViewById(R.id.edit_meal_price);
+            CheckBox check_take_away = (CheckBox) rootView.findViewById(R.id.check_take_away);
+            Spinner spinner3 = (Spinner) rootView.findViewById(R.id.spinner3);
+            Spinner spinner4 = (Spinner) rootView.findViewById(R.id.spinner4);
+            state.putString("meal_name", edit_meal_name.getText().toString());
+            state.putString("meal_price", edit_meal_price.getText().toString());
+            state.putBoolean("meal_take_away", check_take_away.isSelected());
+            state.putString("meal_type1", spinner3.getSelectedItem().toString());
+            state.putString("meal_type2", spinner4.getSelectedItem().toString());
+        }
+
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            if(savedInstanceState!=null) {
+                EditText edit_meal_name = (EditText) rootView.findViewById(R.id.edit_meal_name);
+                EditText edit_meal_price = (EditText) rootView.findViewById(R.id.edit_meal_price);
+                CheckBox check_take_away = (CheckBox) rootView.findViewById(R.id.check_take_away);
+                Spinner spinner3 = (Spinner) rootView.findViewById(R.id.spinner3);
+                Spinner spinner4 = (Spinner) rootView.findViewById(R.id.spinner4);
+                edit_meal_name.setText(savedInstanceState.getString("meal_name"));
+                edit_meal_price.setText(savedInstanceState.getString("meal_price"));
+                check_take_away.setSelected(savedInstanceState.getBoolean("meal_take_away"));
+                if(savedInstanceState.getString("meal_type1").equals("Celiac"))
+                    spinner3.setSelection(0);
+                if(savedInstanceState.getString("meal_type1").equals("Vegan"))
+                    spinner3.setSelection(1);
+                if(savedInstanceState.getString("meal_type1").equals("Vegetarian"))
+                    spinner3.setSelection(2);
+                if(savedInstanceState.getString("meal_type2").equals("Celiac"))
+                    spinner4.setSelection(0);
+                if(savedInstanceState.getString("meal_type2").equals("Vegan"))
+                    spinner4.setSelection(1);
+                if(savedInstanceState.getString("meal_type2").equals("Vegetarian"))
+                    spinner4.setSelection(2);
+            }
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            try {
+                saveJSONMeList(meals);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            try {
+                readJSONMeList();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
         private File createImageFile() throws IOException {
-            // Create an image file name
             String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); //util or sql import?
             String imageFileName = "JPEG_" + timeStamp + "_";
             File storageDir = Environment.getExternalStoragePublicDirectory(
@@ -536,24 +660,25 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     ".jpg",         /* suffix */
                     storageDir      /* directory */
             );
-
-            // Save a file: path for use with ACTION_VIEW intents
             photouri = "file:" + image.getAbsolutePath();
+            meals.get(restaurant_id).setMeal_photo(photouri);
+            try{
+                saveJSONMeList(meals);
+            }
+            catch(JSONException e){
+                e.printStackTrace();
+            }
             return image;
         }
+
         private void dispatchTakePictureIntent() {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            // Ensure that there's a camera activity to handle the intent
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                // Create the File where the photo should go
+            if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
                 File photoFile = null;
                 try {
                     photoFile = createImageFile();
                 } catch (IOException ex) {
-                    // Error occurred while creating the File
-                    //nothing
                 }
-                // Continue only if the File was successfully created
                 if (photoFile != null) {
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                             Uri.fromFile(photoFile));
@@ -755,7 +880,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 }
             }
         }
-
     }
     ////////////////////////FragmentMainInfo///////////////////////////////////////////
 
@@ -771,10 +895,13 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             fragment.setArguments(args);
             return fragment;
         }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             rootView = inflater.inflate(R.layout.fragment_other_info_meal, container, false);
 
+            EditText description = (EditText) rootView.findViewById(R.id.edit_meal_description);
+            description.setText(meals.get(restaurant_id).getDescription());
             //numberPicker implementation
             NumberPicker np = (NumberPicker) rootView.findViewById(R.id.numberPicker);
             np.setMinValue(1);
@@ -783,89 +910,25 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                 @Override
                 public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-
+                    meals.get(restaurant_id).setCooking_time(newVal);
+                    try {
+                        saveJSONMeList(meals);
+                    }
+                    catch(JSONException e){
+                        e.printStackTrace();
+                    }
                 }
             });
-            /*
-            //scroll behaviour
-            ScrollView scroll = (ScrollView) rootView.findViewById(R.id.parent_scroll);
-            scroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
-                @Override
-                public void onScrollChanged() {
-                    appbar.setExpanded(false);
-                }
-            });
-            */
-            /*
-            //list view of additions
-            // Defined Array values to show in ListView
-            additionList = new ArrayList<Addition>();
-            Addition a = new Addition("carne", true);
-            additionList.add(a);
-            a = new Addition("equino", false);
-            additionList.add(a);
-            a = new Addition("bovino", true);
-            additionList.add(a);
-            a = new Addition("suino", true);
-            additionList.add(a);
-            //ArrayList<Addition> additions_lst = new ArrayList<Addition>(Arrays.asList(additionList));
-            // Define a new Adapter: Context, Layout for the row, ID of the TextView to which the data is written, Array of data
-            additions_adapter = new MyCustomAdapterAddition(rootView.getContext(),
-                    R.layout.fragment_other_info_meal, additionList);
-            final ListView listadditionView = (ListView) rootView.findViewById(R.id.additions_list);
-            // Assign adapter to ListView
-            listadditionView.setAdapter(additions_adapter);
-             //list view of categories
-            // Defined Array values to show in ListView
-            final ArrayList<Addition> categoryList = new ArrayList<Addition>();
-            Addition b = new Addition("tonno", true);
-            categoryList.add(b);
-            b = new Addition("parmigiano", false);
-            categoryList.add(b);
-            b = new Addition("rucola", true);
-            categoryList.add(b);
-            b = new Addition("origano", true);
-            categoryList.add(b);
-            b = new Addition("patatine", false);
-            categoryList.add(b);
-            //ArrayList<Addition> categories_lst = new ArrayList<Addition>(Arrays.asList(categoryList));
-            // Define a new Adapter: Context, Layout for the row, ID of the TextView to which the data is written, Array of data
-            categories_adapter = new MyCustomAdapterCategory(rootView.getContext(),
-                    R.layout.fragment_other_info_meal, categoryList);
-            final ListView listcategoryView = (ListView) rootView.findViewById(R.id.categories_list);
-            // Assign adapter to ListView
-            listcategoryView.setAdapter(categories_adapter);
-            */
-
-            /*
-            //one expandable addition list for both lists implementation
-            ExpandableListView expandableList = (ExpandableListView) rootView.findViewById(R.id.additions_and_categories_list); // you can use (ExpandableListView) findViewById(R.id.list)
-            expandableList.setDividerHeight(2);
-            expandableList.setGroupIndicator(null);
-            expandableList.setClickable(true);
-            setGroupParents();
-            setChildData();
-            expandableList.setAdapter(new MyExpandableAdapter(parentItem, childItems));
-            MyExpandableAdapter adapter = new MyExpandableAdapter(parentItem, childItems);
-            adapter.setInflater((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE), rootView.appl); //second parameter was this
-            //adapter.setInflater((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE), getActivity()); //second parameter was this
-            //adapter.setInflater((LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE), getActivity()); //second parameter was this
-            //adapter.setInflater((LayoutInflater) rootView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE), getActivity()); //second parameter was this
-            expandableList.setAdapter(adapter);
-            //expandableList.setOnChildClickListener(this);
-            */
 
             //expandable additions
-            //setGroupParents(parentAddition);
-
             parentAddition = "Meal additions";
             //setChildData(childAdditions);
             childAdditions.add(new Addition(0,0,"rucola", 0, false));
             childAdditions.add(new Addition(0,0,"parmigiano", 0, false));
             childAdditions.add(new Addition(0,0,"tonno", 0, false));
             additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
-            addition_adapter = new MyExpandableAdapter(parentAddition, childAdditions);
-            additions.setAdapter(addition_adapter);
+            additions_adapter = new MyExpandableAdapter(parentAddition, childAdditions);
+            additions.setAdapter(additions_adapter);
             additions.setDividerHeight(5);
             additions.setGroupIndicator(null);
             additions.setClickable(true);
@@ -878,9 +941,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             childCategories.add(new Addition(0,0,"bovino", 0, false));
             childCategories.add(new Addition(0,0,"equino", 0, false));
             categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
-            category_adapter = new MyExpandableAdapter(parentCategory, childCategories);
-            categories.setAdapter(category_adapter);
-            //categories.setDividerHeight(2);
+            categories_adapter = new MyExpandableAdapter(parentCategory, childCategories);
+            categories.setAdapter(categories_adapter);
             categories.setGroupIndicator(null);
             categories.setClickable(true);
 
@@ -888,26 +950,79 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             addition_add_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    childAdditions = addition_adapter.getChildItems();
-                    childAdditions.add(new Addition(0,0,"New addition", 0, false));
-                    addition_adapter.setChildItems(childAdditions);
+                    childAdditions = additions_adapter.getChildItems();
+                    childAdditions.add(new Addition(0, 0, "New addition", 0, false));
+                    additions_adapter.setChildItems(childAdditions);
+                    meals.get(restaurant_id).setMeal_additions(childAdditions);
+                    try {
+                        saveJSONMeList(meals);
+                    }
+                    catch(JSONException e){
+                        e.printStackTrace();
+                    }
                 }
             });
             final ImageView category_add_button = (ImageView) rootView.findViewById(R.id.category_add);
             category_add_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    childCategories = category_adapter.getChildItems();
+                    childCategories = categories_adapter.getChildItems();
                     childCategories.add(new Addition(0,0,"New category", 0, false));
-                    category_adapter.setChildItems(childCategories);
+                    categories_adapter.setChildItems(childCategories);
+                    meals.get(restaurant_id).setMeal_additions(childCategories);
+                    try {
+                        saveJSONMeList(meals);
+                    }
+                    catch(JSONException e){
+                        e.printStackTrace();
+                    }
                 }
             });
 
             return rootView;
         }
 
-         public class MyExpandableAdapter extends BaseExpandableListAdapter {
+        @Override
+        public void onSaveInstanceState(Bundle state) {
+            super.onSaveInstanceState(state);
+            NumberPicker np = (NumberPicker) rootView.findViewById(R.id.numberPicker);
+            EditText description = (EditText) rootView.findViewById(R.id.edit_meal_description);
+            state.putString("meal_description", description.getText().toString());
+            state.putInt("meal_cooking_time", np.getValue());
+        }
 
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+            if(savedInstanceState!=null) {
+                NumberPicker np = (NumberPicker) rootView.findViewById(R.id.numberPicker);
+                EditText description = (EditText) rootView.findViewById(R.id.edit_meal_description);
+                np.setValue(savedInstanceState.getInt("meal_cooking_time"));
+                description.setText(savedInstanceState.getString("meal_description"));
+            }
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            try {
+                saveJSONMeList(meals);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            try {
+                readJSONMeList();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+         public class MyExpandableAdapter extends BaseExpandableListAdapter {
             private Activity activity;
             private ArrayList<Addition> childItems;
             private LayoutInflater inflater;
@@ -943,17 +1058,12 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                  if(parentItem.equals("Meal categories")){
                      convertView.findViewById(R.id.edit_addition_price).setVisibility(View.INVISIBLE);
                  }
-
-
                 checkbox_text = (CheckBox) convertView.findViewById(R.id.meal_addition);
                 checkbox_text.setText(childItems.get(childPosition).getName());
                  if(parentItem.equals("Meal additions")) {
                      edittex_text = (EditText) convertView.findViewById(R.id.edit_addition_price);
                      edittex_text.setText( String.valueOf(childItems.get(childPosition).getPrice()));
                  }
-                //CheckBox parent_node = (CheckBox) parent.findViewById(R.id.meal_addition);
-                //String parent_node_text = parent_node.getText().toString();
-                //Log.d("parent_node", parent_node_text);
                 convertView.findViewById(R.id.addition_delete).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -962,7 +1072,16 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                         childItems.remove(childPosition);
                         notifyDataSetChanged();
                         notifyDataSetInvalidated();
-                        Log.d("myClickHandlerDelete", "You want to delete");
+                        if(parentItem.equals("Meal additions"))
+                            meals.get(restaurant_id).setMeal_additions(childItems);
+                        else
+                            meals.get(restaurant_id).setMeal_categories(childItems);
+                        try {
+                            saveJSONMeList(meals);
+                        }
+                        catch(JSONException e){
+                            e.printStackTrace();
+                        }
                     }
                 });
 
@@ -993,11 +1112,19 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                                                      userInput_price = (EditText) promptsView
                                                              .findViewById(R.id.new_price);
                                                      if(!userInput_price.getText().toString().trim().equals(""))
-                                                         //childItems.get(childPosition).setPrice(0.0);
-                                                         //else
                                                          childItems.get(childPosition).setPrice(Double.parseDouble(userInput_price.getText().toString()));
                                                  }
-                                                 notifyDataSetChanged();
+                                                 if(parentItem.equals("Meal additions"))
+                                                     meals.get(restaurant_id).setMeal_additions(childItems);
+                                                 else
+                                                     meals.get(restaurant_id).setMeal_categories(childItems);
+                                                 try {
+                                                     saveJSONMeList(meals);
+                                                 }
+                                                 catch(JSONException e){
+                                                     e.printStackTrace();
+                                                 }
+                                                     notifyDataSetChanged();
                                                  notifyDataSetInvalidated();
                                              }
                                          })
@@ -1017,20 +1144,14 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                  return convertView;
              }
 
-
-
-
             @Override
             public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-
                 if (convertView == null) {
                     convertView = inflater.inflate
                             (R.layout.row, null);
                 }
-
                 ((CheckedTextView) convertView).setText(parentItem);
                 ((CheckedTextView) convertView).setChecked(isExpanded);
-
                 return convertView;
             }
 
@@ -1311,8 +1432,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             }
             return null;
         }
-
-
     }
 
 }

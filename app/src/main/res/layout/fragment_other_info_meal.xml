@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:inputType="text|textMultiLine|textCapSentences"
             android:maxLength="200"
+            android:freezeText="true"
             android:id="@+id/edit_meal_description" />
     </LinearLayout>
 
