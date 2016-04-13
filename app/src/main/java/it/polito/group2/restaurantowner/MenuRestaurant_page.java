@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -41,8 +42,8 @@ public class MenuRestaurant_page extends AppCompatActivity
     private Adapter_Meals adapter;
     private String restaurant_id = "0";
     private ArrayList<Meal> meals;
-    private ArrayList<Addition> meals_additions;
-    private ArrayList<Addition> meals_categories;
+    private ArrayList<Addition> meals_additions = new ArrayList<>();
+    private ArrayList<Addition> meals_categories = new ArrayList<>();
     public RecyclerView rv;
     public int index_position;
 
@@ -52,9 +53,14 @@ public class MenuRestaurant_page extends AppCompatActivity
         setContentView(R.layout.activity_menu_restaurant_page);
 
         meals = new ArrayList<>();
-        addMeal();
-        addAddition("0");
-        addCategory("0");
+        //get the right restaurant
+        Bundle b = getIntent().getExtras();
+        if(b!=null)
+            restaurant_id = b.getString("restaurant_id");
+        addMeal(restaurant_id);
+        addAddition(restaurant_id);
+        addCategory(restaurant_id);
+
 
         try {
             saveJSONMeList();
@@ -81,8 +87,8 @@ public class MenuRestaurant_page extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         //take the right restaurant
-        Bundle b = getIntent().getExtras();
-        restaurant_id = b.getString("restaurant_id");
+        Bundle b1 = getIntent().getExtras();
+        restaurant_id = b1.getString("restaurant_id");
         //retrieve data
         try {
             meals = readJSONMeList();
@@ -97,6 +103,23 @@ public class MenuRestaurant_page extends AppCompatActivity
         rv.setHasFixedSize(true);
         Adapter_Meals adapter = new Adapter_Meals(meals, this.getApplicationContext());
         rv.setAdapter(adapter);
+        /*
+        rv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent1 = new Intent(
+                        getApplicationContext(),
+                        MenuRestaurant_edit.class);
+                Bundle b = new Bundle();
+                TextView meal_name = (TextView) v.findViewById(R.id.meal_name);
+                b.putString("restaurant_id", restaurant_id);
+                b.putString("meal_name", meal_name.getText().toString());
+                intent1.putExtras(b);
+                startActivity(intent1);
+            }
+        });
+        */
+
         //or
         /*
         String[] values = new String[]{"Pasta ca sassa",
@@ -175,14 +198,6 @@ public class MenuRestaurant_page extends AppCompatActivity
             // TODO Handle the logout action
         } else if (id == R.id.nav_manage) {
             // TODO Handle the manage action
-        } else if (id == R.id.one_restaurant) {
-            Intent intent = new Intent(
-                    getApplicationContext(),
-                    Restaurant_page.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurant_id);
-            intent.putExtras(b);
-            startActivity(intent);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -198,10 +213,12 @@ public class MenuRestaurant_page extends AppCompatActivity
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        ((CardView)findViewById(R.id.cv_meal)).getAdapter().notifyDataSetChanged();
         adapter.notifyDataSetChanged();
     }
 
     public void myClickHandler_edit(View v) {
+        /*
         LinearLayout vwParentRow = (LinearLayout) v.getParent();
         TextView child = (TextView) vwParentRow.getChildAt(2);
         String meal_name = child.getText().toString();
@@ -222,13 +239,27 @@ public class MenuRestaurant_page extends AppCompatActivity
         b.putString("restaurant_id", restaurant_id);
         intent.putExtras(b);
         startActivity(intent);
+        */
+        Intent intent1 = new Intent(
+                getApplicationContext(),
+                MenuRestaurant_edit.class);
+        Bundle b = new Bundle();
+        TextView meal_name = (TextView) v.findViewById(R.id.meal_name);
+        b.putString("restaurant_id", restaurant_id);
+        b.putString("meal_id", meal_name.getText().toString());
+        intent1.putExtras(b);
+        startActivity(intent1);
     }
 
     public void myClickHandler_remove(View v) {
         LinearLayout vwParentRow = (LinearLayout) v.getParent();
+        /*
         TextView child = (TextView) vwParentRow.getChildAt(2);
         final String meal_name = child.getText().toString();
         Log.d("myClickHandler", "You want to remove " + meal_name);
+        */
+        TextView meal_name_text_view = (TextView) vwParentRow.findViewById(R.id.meal_name);
+        String meal_name = meal_name_text_view.getText().toString();
         int i = 0;
         for (; i < meals.size(); i++) {
             if (meals.get(i).getMeal_name().equals(meal_name))
@@ -450,7 +481,7 @@ public class MenuRestaurant_page extends AppCompatActivity
                 jarray3.put(jres3);
             }
             JSONObject resObj3 = new JSONObject();
-            resObj.put("MealsCategories", jarray);
+            resObj3.put("MealsCategories", jarray3);
             FileOutputStream fos3 = null;
             try {
                 fos3 = openFileOutput(FILENAME3, Context.MODE_PRIVATE);
@@ -464,14 +495,14 @@ public class MenuRestaurant_page extends AppCompatActivity
         }
     }
 
-    public void addMeal(){
+    public void addMeal(String restaurant_id){
         Meal m = new Meal();
         m.setMeal_name("Pasta ca sassa");
         m.setMeal_price(5.0);
         m.setAvailable(true);
         m.setCooking_time(10);
         m.setMealId("0");
-        m.setRestaurantId("0");
+        m.setRestaurantId(restaurant_id);
         m.setDescription("Pasta salta con salsa di pomodoro");
         m.setType1("Vegetarian");
         m.setTake_away(false);
@@ -507,15 +538,15 @@ public class MenuRestaurant_page extends AppCompatActivity
     public void addCategory(String meal_id){
         Addition a1 = new Addition();
         a1.setName("Pasta");
-        a1.setMeal_id("0");
+        a1.setMeal_id(meal_id);
         a1.setSelected(true);
-        a1.setRestaurant_id("0");
+        a1.setRestaurant_id(restaurant_id);
 
         Addition a2 = new Addition();
         a2.setName("Piccante");
-        a2.setMeal_id("0");
+        a2.setMeal_id(meal_id);
         a2.setSelected(true);
-        a2.setRestaurant_id("0");
+        a2.setRestaurant_id(restaurant_id);
 
         Meal current_meal = null;
         for(Meal m : meals) {

@@ -72,8 +72,12 @@ public static class MealViewHolder extends RecyclerView.ViewHolder {
         MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_photo()));
         MealViewHolder.MealName.setText(meals.get(i).getMeal_name());
         MealViewHolder.MealPrice.setText(String.valueOf(meals.get(i).getMeal_price()));
-        MealViewHolder.Type1.setImageURI(Uri.parse(meals.get(i).getType1()));
-        MealViewHolder.Type2.setImageURI(Uri.parse(meals.get(i).getType2()));
+        /*
+        if(meals.get(i).getType1()!=null)
+            MealViewHolder.Type1.setImageResource(Integer.parseInt(meals.get(i).getType1()));
+        if(meals.get(i).getType2()!=null)
+            MealViewHolder.Type2.setImageResource(Integer.parseInt(meals.get(i).getType2()));
+        */
         MealViewHolder.availability.setEnabled(meals.get(i).isAvailable());
         meal_name = MealViewHolder.MealName.getText().toString();
         MealViewHolder.availability.setOnClickListener(new View.OnClickListener() {

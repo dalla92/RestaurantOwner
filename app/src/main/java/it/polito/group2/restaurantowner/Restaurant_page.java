@@ -96,7 +96,7 @@ public class Restaurant_page extends AppCompatActivity
         //get the right restaurant
         Bundle b = getIntent().getExtras();
         if(b!=null)
-            restaurant_id = b.getString("restaurant_id");
+            restaurant_id = b.getString("RestaurantId");
         //fill its data
         Log.d("ccc", "Given "+restaurant_id);
         for (Restaurant r : resList) {
@@ -212,6 +212,9 @@ public class Restaurant_page extends AppCompatActivity
             edit_restaurant_name.setText(state.getString("restaurant_name"));
             edit_restaurant_address.setText(state.getString("restaurant_address"));
             edit_restaurant_telephone_number.setText(state.getString("restaurant_telephone_number"));
+            ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
+            if(photouri!=null)
+                image.setImageURI(Uri.parse(photouri));
         }
     }
 
@@ -309,7 +312,7 @@ public class Restaurant_page extends AppCompatActivity
             case R.id.action_more:
                 Intent intent6 = new Intent(
                         getApplicationContext(),
-                        MoreRestaurantInfo.class); //actually this should redirect to Daniel's activity
+                        AddRestaurantActivity.class);
                 Bundle b6 = new Bundle();
                 b6.putString("restaurant_id", restaurant_id);
                 intent6.putExtras(b6);
@@ -349,14 +352,6 @@ public class Restaurant_page extends AppCompatActivity
             // TODO Handle the logout action
         } else if (id == R.id.nav_manage) {
             // TODO Handle the manage action
-        } else if (id == R.id.one_restaurant) {
-            Intent intent = new Intent(
-                    getApplicationContext(),
-                    Restaurant_page.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurant_id);
-            intent.putExtras(b);
-            startActivity(intent);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
