@@ -9,7 +9,7 @@
         android:orderInCategory="100"
         android:title="@string/action_add"
         android:icon="@drawable/ic_action_add"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
     android:id="@+id/action_settings"
     android:orderInCategory="100"
