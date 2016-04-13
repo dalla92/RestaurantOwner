@@ -69,15 +69,18 @@ public class Restaurant_page extends AppCompatActivity
 
         resList = new ArrayList<>();
         comments = new ArrayList<>();
-        //addRestaurants();
+
         addComments();
 
         //read all data and fill resList
+        /*
+        addRestaurants();
         try {
             saveJSONResList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        */
         try {
             resList = readJSONResList();
         } catch (JSONException e) {
@@ -89,6 +92,7 @@ public class Restaurant_page extends AppCompatActivity
             e.printStackTrace();
         }
         //or initializeComments();
+
         //get the right restaurant
         Bundle b = getIntent().getExtras();
         if(b!=null)
@@ -103,6 +107,7 @@ public class Restaurant_page extends AppCompatActivity
                 break;
             }
         }
+        setTitle(my_restaurant.getName());
         EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
         ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
         EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
@@ -261,14 +266,54 @@ public class Restaurant_page extends AppCompatActivity
                 startActivity(intent1);
                 return true;
 
-            case R.id.action_more:
+            case R.id.action_offers:
                 Intent intent2 = new Intent(
                         getApplicationContext(),
-                        MoreRestaurantInfo.class); //actually this should redirect to Daniel's activity
+                        OfferList.class);
                 Bundle b2 = new Bundle();
                 b2.putString("restaurant_id", restaurant_id);
                 intent2.putExtras(b2);
                 startActivity(intent2);
+                return true;
+
+            case R.id.action_reservations:
+                Intent intent3 = new Intent(
+                        getApplicationContext(),
+                        Reservation.class);
+                Bundle b3 = new Bundle();
+                b3.putString("restaurant_id", restaurant_id);
+                intent3.putExtras(b3);
+                startActivity(intent3);
+                return true;
+
+            case R.id.action_reviews:
+                Intent intent4 = new Intent(
+                        getApplicationContext(),
+                        Restaurant_page.class); //here Filippo must insert his class name
+                Bundle b4 = new Bundle();
+                b4.putString("restaurant_id", restaurant_id);
+                intent4.putExtras(b4);
+                startActivity(intent4);
+                return true;
+
+            case R.id.action_statistics:
+                Intent intent5 = new Intent(
+                        getApplicationContext(),
+                        Restaurant_page.class); //here Filippo must insert his class name
+                Bundle b5 = new Bundle();
+                b5.putString("restaurant_id", restaurant_id);
+                intent5.putExtras(b5);
+                startActivity(intent5);
+                return true;
+
+            case R.id.action_more:
+                Intent intent6 = new Intent(
+                        getApplicationContext(),
+                        MoreRestaurantInfo.class); //actually this should redirect to Daniel's activity
+                Bundle b6 = new Bundle();
+                b6.putString("restaurant_id", restaurant_id);
+                intent6.putExtras(b6);
+                startActivity(intent6);
                 return true;
 
             case R.id.action_edit:

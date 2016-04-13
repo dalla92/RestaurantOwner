@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">RestaurantOwner</string>
 
-    <!--Alessio's strings begin-->
+    <string name="action_reservations">RESERVATIONS</string>
+    <string name="action_offers">OFFERS</string>
+    <string name="action_reviews">REVIEWS</string>
+    <string name="action_statistics">STATISTICS</string>
+
     <string name="restaurant_page_name">RESTAURANT NAME</string>
     <string name="button_take_photo">TAKE PHOTO NOW</string>
     <string name="button_choose_photo">CHOOSE FROM GALLERY</string>
@@ -63,7 +67,6 @@
     <string name="new_data_insertion">Insert new data:</string>
     <string name="category_name">Category name</string>
 
-    <!--Alessio's strings end-->
 
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
