@@ -44,6 +44,7 @@
                     android:layout_width="35dp"
                     android:layout_height="35dp"
                     android:id="@+id/comment_photo"
+                    android:src="@mipmap/ic_launcher"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:layout_marginRight="16dp"

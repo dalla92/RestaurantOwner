@@ -46,6 +46,7 @@ public class MenuRestaurant_page extends AppCompatActivity
     private ArrayList<Addition> meals_categories = new ArrayList<>();
     public RecyclerView rv;
     public int index_position;
+    Meal meal_to_delete;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +61,6 @@ public class MenuRestaurant_page extends AppCompatActivity
         addMeal(restaurant_id);
         addAddition(restaurant_id);
         addCategory(restaurant_id);
-
 
         try {
             saveJSONMeList();
@@ -96,14 +96,20 @@ public class MenuRestaurant_page extends AppCompatActivity
             e.printStackTrace();
         }
 
+        // Get ListView object from xml
+        listView = (ListView) findViewById(R.id.list);
+        Adapter_Meals adapter = new Adapter_Meals(this, 0, meals);
+        listView.setAdapter(adapter);
+
+        //or
         //meals card view implementation
+        /*
         rv = (RecyclerView) findViewById(R.id.rv_meals);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
         Adapter_Meals adapter = new Adapter_Meals(meals, this.getApplicationContext());
         rv.setAdapter(adapter);
-        /*
         rv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,27 +126,6 @@ public class MenuRestaurant_page extends AppCompatActivity
         });
         */
 
-        //or
-        /*
-        String[] values = new String[]{"Pasta ca sassa",
-                "Tuma",
-                "Vino",
-                "Maccu",
-                "Sasizza",
-                "Canni cavaddu",
-                "Stummu",
-                "Pasta con la carbonara",
-                "Pisci stoccu e baccalaru di to soru",
-                "Nenti c'è"
-        };
-        // Get ListView object from xml
-        listView = (ListView) findViewById(R.id.list);
-        // Defined Array values to show in ListView
-        ArrayList<String> lst = new ArrayList<String>(Arrays.asList(values)); //or values
-        // Define a new Adapter: Context, Layout for the row, ID of the TextView to which the data is written, Array of data
-        adapter = new ArrayAdapter<String>(this,
-                R.layout.meal_card_view, R.id.meal_name, lst);
-        */
     }
 
     @Override
@@ -208,13 +193,14 @@ public class MenuRestaurant_page extends AppCompatActivity
         Log.d("myClickHandler", "You want to add a new meal");
         //adapter.insert("New empty meal", 0);
         meals.add(0, new Meal());  //insert at the top
+        adapter.insert(new Meal(), 0); //insert at the top
         try {
             saveJSONMeList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        ((CardView)findViewById(R.id.cv_meal)).getAdapter().notifyDataSetChanged();
         adapter.notifyDataSetChanged();
+        adapter.notifyDataSetInvalidated();
     }
 
     public void myClickHandler_edit(View v) {
@@ -253,33 +239,33 @@ public class MenuRestaurant_page extends AppCompatActivity
 
     public void myClickHandler_remove(View v) {
         LinearLayout vwParentRow = (LinearLayout) v.getParent();
-        /*
         TextView child = (TextView) vwParentRow.getChildAt(2);
         final String meal_name = child.getText().toString();
         Log.d("myClickHandler", "You want to remove " + meal_name);
-        */
-        TextView meal_name_text_view = (TextView) vwParentRow.findViewById(R.id.meal_name);
-        String meal_name = meal_name_text_view.getText().toString();
-        int i = 0;
-        for (; i < meals.size(); i++) {
-            if (meals.get(i).getMeal_name().equals(meal_name))
+        //TextView meal_name_text_view = (TextView) vwParentRow.findViewById(R.id.meal_name);
+        //String meal_name = meal_name_text_view.getText().toString();
+        meal_to_delete = null;
+        for(Meal m : meals){
+            if(m.getMeal_name().equals(meal_name)){
+                meal_to_delete = m;
                 break;
+            }
         }
-        index_position = i;
         //dialog box
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        //adapter.remove(meal_name);
-                        meals.remove(index_position);
+                        meals.remove(meal_to_delete);
+                        adapter.remove(meal_to_delete);
                         try {
                             saveJSONMeList();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         adapter.notifyDataSetChanged();
+                        adapter.notifyDataSetInvalidated();
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
