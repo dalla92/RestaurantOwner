@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="it.polito.group2.restaurantowner.MainActivity">
+
+    <item
+        android:id="@+id/action_edit"
+        android:orderInCategory="100"
+        android:title="@string/action_edit"
+        android:icon="@mipmap/ic_edit"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_more"
+        android:orderInCategory="100"
+        android:title="@string/action_more"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_menu"
+        android:orderInCategory="100"
+        android:title="@string/action_menu"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_confirm"
+        android:orderInCategory="100"
+        android:title="@string/action_confirm"
+        android:visible="false"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+
+</menu>

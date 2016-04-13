@@ -2,12 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="it.polito.group2.restaurantowner">
 
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="true" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme">id.permission.WRITE_EXTERNAL_STORAGE"
+            android:maxSdkVersion="18" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -27,6 +34,24 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.polito.group2.restaurantowner.MainActivity" />
         </activity>
+        <activity
+            android:name=".Restaurant_page"
+            android:label="@string/restaurant_page_name"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Enlarged_image" />
+        <activity
+            android:name=".MoreRestaurantInfo"
+            android:label="@string/restaurant_page_name"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".MenuRestaurant_page"
+            android:label="@string/title_activity_menu_restaurant_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".MenuRestaurant_edit"
+            android:label="@string/title_activity_menu_restaurant_edit"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

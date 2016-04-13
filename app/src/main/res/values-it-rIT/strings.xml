@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+        <string name="app_name">RestaurantOwner</string>
+
+        <string name="navigation_drawer_open">Open navigation drawer</string>
+        <string name="navigation_drawer_close">Close navigation drawer</string>
+
+        <!--Alessio's strings begin-->
+    <string name="restaurant_page_name">NOME DEL RISTORANTE</string>
+    <string name="button_take_photo">SCATTA FOTO ORA</string>
+    <string name="button_choose_photo">SCEGLI DA GALLERIA</string>
+    <string name="restaurant_name">Nome: </string>
+    <string name="restaurant_address">Indirizzo: </string>
+    <string name="restaurant_telephone_number">Numero di telefono: </string>
+    <string name="edit_restaurant_name"> Inserisci nome</string>
+    <string name="edit_restaurant_address"> Inserisci indirizzo</string>
+    <string name="edit_restaurant_telephone_number"> Inserisci numero</string>
+    <string name="last_comments">Anteprima ultimi commenti</string>
+    <string name="action_confirm">CONFERMA</string>
+    <string name="action_more">ALTRO</string>
+    <string name="action_edit">MODIFICA</string>
+    <string name="action_menu">MENU</string>
+
+    <string name="seating_capacity">POSTI A SEDERE: </string>
+    <string name="squared_metres">METRI QUADRATI: </string>
+    <string name="closest_metro_stop">FERMATA METRO VICINA: </string>
+    <string name="closest_bus_stop">FERMATA BUS VICINA: </string>
+    <string name="credit_card">CARTA DI CREDITO</string>
+    <string name="wifi">WI-FI</string>
+    <string name="inside">INTERNO</string>
+    <string name="outside">ESTERNO</string>
+    <string name="take_away">TAKE-AWAY</string>
+    <string name="mandatory_booking_via_telephone">PRENOTAZIONE SOLO TRAMITE TELEFONO</string>
+    <string name="celiac">CELIACO</string>
+    <string name="vegan">VEGANO</string>
+    <string name="vegetarian">VEGETARIANO</string>
+    <string name="bar">BAR</string>
+    <string name="canteen">MENSA</string>
+    <string name="fastfood">FAST-FOOD</string>
+    <string name="restaurant">RISTORANTE</string>
+
+    <string name="title_activity_menu_restaurant_page">MENU</string>
+    <string name="add_meal">AGGIUNGI UN PIATTO</string>
+    <string name="availability">VENDI</string>
+
+    <string name="meal_name">NOME PIATTO: </string>
+    <string name="meal_price">PREZZO PIATTO: </string>
+    <string name="meal_image">FOTO DEL PIATTO: </string>
+    <string name="meal_description">DESCRIZIONE PIATTO: </string>
+    <string name="meal_possible_additions">SUPPLEMENTI: </string>
+    <string name="meal_possible_categories">CATEGORIE CIBO: </string>
+    <string name="meal_time_for_cooking">cottura</string>
+    <string name="meal_add_new_category">categoria</string>
+    <string name="meal_add_new_addition">supplemento</string>
+    <string name="title_activity_menu_restaurant_edit">MODIFICA PIATTO</string>
+    <string name="addition_meal_price">prezzo</string>
+
+    <string name="addres_section_main_info">INFO PRIMARIE</string>
+    <string name="addres_section_other_info">ALTRE INFO</string>
+
+    <string name="show_more"> (leggi tutto...)</string>
+
+    <string name="addition_name">Nome supplemento</string>
+    <string name="new_data_insertion">Inserisci nuovi dati:</string>
+    <string name="category_name">Nome categoria</string>
+
+    <!--Alessio's strings begin-->
+
+
+
+    </resources>

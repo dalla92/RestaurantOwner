@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="restaurant_type_array">
+        <item>@string/bar</item>
+        <item>@string/fastfood</item>
+        <item>@string/canteen</item>
+        <item>@string/restaurant</item>
+    </string-array>
+</resources>

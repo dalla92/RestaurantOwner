@@ -1,0 +1,152 @@
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parent_scroll"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="it.polito.group2.restaurantowner.Restaurant_page"
+    tools:showIn="@layout/app_bar_restaurant_page"
+    android:orientation="vertical">
+
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        >
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_take_photo"
+            android:id="@+id/button_take_photo"
+            android:visibility="gone" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_choose_photo"
+            android:id="@+id/button_choose_photo"
+            android:layout_toRightOf="@id/button_take_photo"
+            android:visibility="gone" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/linear_layout_restaurant_name"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/restaurant_name"
+                android:id="@+id/restaurant_name" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="text|textMultiLine|textCapSentences"
+                android:maxLength="40"
+                android:text="@string/edit_restaurant_name"
+                android:ems="10"
+                android:id="@+id/edit_restaurant_name"
+                android:background="@android:color/transparent"
+                style="@style/EditTextCustomHolo"
+                android:focusable="false"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linear_layout_restaurant_name"
+            android:id="@+id/linear_layout_restaurant_address">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/restaurant_address"
+                android:id="@+id/restaurant_address" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="text|textMultiLine|textCapSentences"
+                android:maxLength="40"
+                android:text="@string/edit_restaurant_address"
+                android:ems="10"
+                android:focusable="false"
+                style="@style/EditTextCustomHolo"
+                android:background="@android:color/transparent"
+                android:id="@+id/edit_restaurant_address" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/linear_layout_restaurant_address"
+            android:id="@+id/linear_layout_restaurant_telephone_number">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/restaurant_telephone_number"
+                android:layout_below="@id/linear_layout_restaurant_telephone_number"
+                android:id="@+id/restaurant_telephone_number" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:inputType="text|textMultiLine|textCapSentences"
+                android:maxLength="20"
+                android:text="@string/edit_restaurant_telephone_number"
+                android:ems="10"
+                android:focusable="false"
+                android:background="@android:color/transparent"
+                style="@style/EditTextCustomHolo"
+                android:id="@+id/edit_restaurant_telephone_number" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/last_comments"
+        android:id="@+id/last_comments"
+        android:paddingTop="20dp" />
+
+
+    <android.support.v7.widget.RecyclerView
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:id="@+id/rv"
+        >
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>
+
+</ScrollView>
