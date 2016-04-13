@@ -71,10 +71,10 @@ public class MainActivity extends AppCompatActivity
                 new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        //TODO uncomment when merged
-                        //Intent mIntent = new Intent(this,Restaurant_page.class);
-                        //mIntent.getExtras().putString("RestaurantId", resList.get(position).getRestaurantId());
-                        //startActivity(intent);
+                        Intent mIntent = new Intent(MainActivity.this,Restaurant_page.class);
+                        String id = resList.get(position).getRestaurantId();
+                        mIntent.putExtra("RestaurantId", id);
+                        startActivity(mIntent);
                     }
                 })
         );
