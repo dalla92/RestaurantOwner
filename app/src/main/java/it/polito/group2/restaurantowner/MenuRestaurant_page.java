@@ -427,7 +427,7 @@ public class MenuRestaurant_page extends AppCompatActivity
         resObj2.put("MealsAdditions", jarray2);
         FileOutputStream fos2 = null;
         try {
-            fos2 = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos2 = openFileOutput(FILENAME2, Context.MODE_PRIVATE);
             fos2.write(resObj2.toString().getBytes());
             fos2.close();
         } catch (FileNotFoundException e) {
@@ -453,7 +453,7 @@ public class MenuRestaurant_page extends AppCompatActivity
             resObj.put("MealsCategories", jarray);
             FileOutputStream fos3 = null;
             try {
-                fos3 = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                fos3 = openFileOutput(FILENAME3, Context.MODE_PRIVATE);
                 fos3.write(resObj3.toString().getBytes());
                 fos3.close();
             } catch (FileNotFoundException e) {
