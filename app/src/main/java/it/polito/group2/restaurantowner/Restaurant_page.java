@@ -53,13 +53,13 @@ public class Restaurant_page extends AppCompatActivity
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private List<Comment> comments;
     private boolean card_view_clicked=false;
     public ArrayList<Restaurant> resList = new ArrayList<>(); //to be consistent with Daniel's code
     public int restaurant_id = 0; //if not passed by the previous activity
     public int PICK_IMAGE = 0;
     public int REQUEST_TAKE_PHOTO = 1;
     public String photouri;
+    public ArrayList<Comment> comments;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -356,10 +356,10 @@ public class Restaurant_page extends AppCompatActivity
     // you want to use the same images.
     private void initializeComments(){
         comments = new ArrayList<>();
-        comments.add(new Comment(0, "Turi Lecce", "01/02/2003", 1, "@mipmap/ic_launcher", "Ah chi ni sacciu mba")); //or int photoId R.mipmap.ic_launcher
-        comments.add(new Comment(0, "Iaffiu u cuttu", "11/06/2002", 2.7, "@mipmap/money_icon", "Cosa assai"));
-        comments.add(new Comment(0, "Iano Papale", "21/12/2001", 5, "@mipmap/image_preview_black", "Fussi pi mia ci tunnassi, ma appi problemi cu me soggira ca ogni bota si lassa curriri de scali, iu no sacciu va."));
-        comments.add(new Comment(0, "Tano Sghei", "22/05/2000", 3.4, "@mipmap/image_preview_black", "M'uccullassi n'autra vota. Turi ci emu?"));
+        comments.add(new Comment("0", "Turi Lecce", "01/02/2003", 1, "@mipmap/ic_launcher", "Ah chi ni sacciu mba")); //or int photoId R.mipmap.ic_launcher
+        comments.add(new Comment("0", "Iaffiu u cuttu", "11/06/2002", 2.7, "@mipmap/money_icon", "Cosa assai"));
+        comments.add(new Comment("0", "Iano Papale", "21/12/2001", 5, "@mipmap/image_preview_black", "Fussi pi mia ci tunnassi, ma appi problemi cu me soggira ca ogni bota si lassa curriri de scali, iu no sacciu va."));
+        comments.add(new Comment("0", "Tano Sghei", "22/05/2000", 3.4, "@mipmap/image_preview_black", "M'uccullassi n'autra vota. Turi ci emu?"));
     }
 
     private void initializeAdapterComments(){
@@ -450,7 +450,8 @@ public class Restaurant_page extends AppCompatActivity
 
     public ArrayList<Restaurant> readJSONResList() throws JSONException {
         String json = null;
-        ArrayList<Restaurant> resList = new ArrayList<>();
+        resList = new ArrayList<>();
+        addRestaurants(resList);
         FileInputStream fis = null;
         String FILENAME = "restaurantList.json";
         try {
@@ -472,7 +473,7 @@ public class Restaurant_page extends AppCompatActivity
         for(int i=0; i < jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             Restaurant res = new Restaurant();
-            res.setRestaurantId(jsonObject.optInt("RestaurantId"));
+            res.setRestaurantId(jsonObject.optString("RestaurantId"));
             res.setPhotoUri(jsonObject.optString("Photo"));
             res.setAddress(jsonObject.optString("Address"));
             res.setCategory(jsonObject.optString("Category"));
@@ -497,7 +498,8 @@ public class Restaurant_page extends AppCompatActivity
 
     public ArrayList<Comment> readJSONComList() throws JSONException {
         String json = null;
-        ArrayList<Comment> comments = new ArrayList<>();
+        comments = new ArrayList<>();
+        addComments(comments);
         FileInputStream fis = null;
         String FILENAME = "commentList.json";
         try {
@@ -520,7 +522,7 @@ public class Restaurant_page extends AppCompatActivity
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             Comment com = new Comment();
             if(jsonObject.optInt("RestaurantId")==restaurant_id){ //I read only the comments of my restaurant
-                com.setRestaurantId(jsonObject.optInt("RestaurantId")); //optInt or optString?
+                com.setRestaurantId(jsonObject.optString("RestaurantId")); //optInt or optString?
                 com.setDate(jsonObject.optString("Date"));
                 com.setStars_number(jsonObject.optInt("StarsNumber")); //optInt or optString?
                 com.setComment(jsonObject.optString("Comment"));
@@ -568,6 +570,24 @@ public class Restaurant_page extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addComments(ArrayList<Comment> comments){
+        Comment c = new Comment();
+        c.setUsername("Turiddu");
+        c.setRestaurantId("0");
+        c.setComment("Bonu è sicunnu mia");
+        c.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
+        c.setStars_number(2);
+        comments.add(c);
+    }
+
+    public void addRestaurants(ArrayList<Restaurant> resList){
+        Restaurant r = new Restaurant();
+        r.setName("TRATTORIA NDI IAFFIU");
+        r.setAddress(("Sciara curia 7"));
+        r.setPhoneNum("095393930");
+        resList.add(r);
     }
 
     private File createImageFile() throws IOException {

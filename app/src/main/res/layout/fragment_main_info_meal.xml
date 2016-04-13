@@ -30,7 +30,6 @@
             android:ems="10"
             android:inputType="text|textMultiLine|textCapSentences"
             android:maxLength="40"
-            android:freezeText="true"
             style="@style/EditTextCustomHolo"
             android:id="@+id/edit_meal_name" />
     </LinearLayout>
@@ -56,7 +55,6 @@
             android:layout_height="wrap_content"
             android:inputType="text|textMultiLine|textCapSentences"
             android:maxLength="40"
-            android:freezeText="true"
             style="@style/EditTextCustomHolo"
             android:ems="10"
             android:id="@+id/edit_meal_price" />

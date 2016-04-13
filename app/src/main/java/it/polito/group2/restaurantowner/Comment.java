@@ -7,14 +7,14 @@ import java.util.List;
  * Created by Alessio on 09/04/2016.
  */
 public class Comment {
-    int restaurantId;
+    String restaurantId;
     String username;
     String date;
     double stars_number;
     String comment;
     String userphoto;
 
-    public Comment(int restaurantId, String username, String date, double stars_number, String userphoto, String comment) {
+    public Comment(String restaurantId, String username, String date, double stars_number, String userphoto, String comment) {
         this.restaurantId = restaurantId;
         this.username = username;
         this.date = date;
@@ -27,11 +27,11 @@ public class Comment {
 
     }
 
-    public int getRestaurantId() {
+    public String getRestaurantId() {
         return restaurantId;
     }
 
-    public void setRestaurantId(int restaurantId) {
+    public void setRestaurantId(String restaurantId) {
         this.restaurantId = restaurantId;
     }
 

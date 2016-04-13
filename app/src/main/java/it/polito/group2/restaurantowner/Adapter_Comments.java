@@ -60,7 +60,9 @@ public class Adapter_Comments extends RecyclerView.Adapter<Adapter_Comments.Comm
         CommentViewHolder.CommentUsername.setText(comments.get(i).username);
         CommentViewHolder.CommentDate.setText(comments.get(i).date);
         CommentViewHolder.CommentStars.setRating((float) comments.get(i).stars_number);
-        CommentViewHolder.CommentPhoto.setImageURI(Uri.parse(comments.get(i).userphoto));
+        if(comments.get(i).userphoto!=null)
+            CommentViewHolder.CommentPhoto.setImageResource(Integer.parseInt(comments.get(i).userphoto));
+        //CommentViewHolder.CommentPhoto.setImageURI(Uri.parse(comments.get(i).userphoto));
         //CommentViewHolder.Comment.setText(comments.get(i).comment);
         String comment_ell = comments.get(i).comment.substring(0, 7);
         //comment_ell.concat(this.context.getResources().getString(R.string.show_more));
