@@ -57,7 +57,7 @@ public class FragmentInfo extends Fragment {
             dataPasser = (OnInfoPass) a;
         } catch (ClassCastException e) {
             throw new ClassCastException(a.toString()
-                    + " must implement OnDataPass");
+                    + " must implement OnInfoPass");
         }
     }
 
@@ -69,6 +69,7 @@ public class FragmentInfo extends Fragment {
         address = (EditText) rootView.findViewById(R.id.resadd_info_address);
         phone = (EditText) rootView.findViewById(R.id.resadd_info_phone);
         category = (Spinner) rootView.findViewById(R.id.resadd_info_category);
+
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),

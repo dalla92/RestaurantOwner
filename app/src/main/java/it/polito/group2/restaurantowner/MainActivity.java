@@ -2,6 +2,8 @@ package it.polito.group2.restaurantowner;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -9,6 +11,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +41,8 @@ public class MainActivity extends AppCompatActivity
     final static int ACTION_ADD = 1;
     private RestaurantPreviewAdapter mAdapter;
     ArrayList<Restaurant> resList = new ArrayList<>();
+    private static final int VERTICAL_ITEM_SPACE = 5;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +56,36 @@ public class MainActivity extends AppCompatActivity
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
         // use a linear layout manager
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        GridLayoutManager mLayoutManager = null;
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mLayoutManager = new GridLayoutManager(this, 1);
+            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1,5,true));
+        }
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mLayoutManager = new GridLayoutManager(this, 2);
+            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
+        }
+
         mRecyclerView.setLayoutManager(mLayoutManager);
-        // specify an adapter (see also next example)
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        //TODO uncomment when merged
+                        //Intent mIntent = new Intent(this,Restaurant_page.class);
+                        //mIntent.getExtras().putString("RestaurantId", resList.get(position).getRestaurantId());
+                        //startActivity(intent);
+                    }
+                })
+        );
 
         mAdapter = new RestaurantPreviewAdapter(getData());
         mRecyclerView.setAdapter(mAdapter);
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -107,6 +137,28 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+
+        try {
+            JSONUtil.saveJSONResList(this,resList);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+/*    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+
+        try {
+            readJSONResList();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+*/
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
         if (requestCode == ACTION_ADD) {
@@ -116,7 +168,7 @@ public class MainActivity extends AppCompatActivity
                 //resList.add(0,res);
                 mAdapter.addItem(0, res);
                 try {
-                    saveJSONResList(resList);
+                    JSONUtil.saveJSONResList(this, resList);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -144,37 +196,14 @@ public class MainActivity extends AppCompatActivity
     public ArrayList<Restaurant> getData(){
 
         try {
-            resList = readJSONResList();
+            resList = JSONUtil.readJSONResList(this);
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-   /*     Restaurant res = new Restaurant();
-        res.setName("La vecchia fattoria");
-        res.setRating("9,4");
-        res.setReservationNumber("512");
-        res.setReservedPercentage("54%");
-        resList.add(res);
-*/
         return resList;
     }
-
-    public String loadJSONFromAsset() {
-        String json = null;
-        try {
-            InputStream is = getAssets().open("restaurantList.json");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            json = new String(buffer, "UTF-8");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-        return json;
-    }
-
+/*
     public ArrayList<Restaurant> readJSONResList() throws JSONException {
         String json = null;
         ArrayList<Restaurant> resList = new ArrayList<>();
@@ -210,9 +239,11 @@ public class MainActivity extends AppCompatActivity
             res.setName(jsonObject.optString("Name"));
             res.setOrdersPerHour(jsonObject.optString("OrdersPerHour"));
             res.setPhoneNum(jsonObject.optString("PhoneNum"));
+            res.setPhotoUri(jsonObject.optString("Photo"));
             res.setRating(jsonObject.optString("Rating"));
             res.setReservationNumber(jsonObject.optString("ReservationNumber"));
             res.setReservedPercentage(jsonObject.optString("ReservationPercentage"));
+            res.setRestaurantId(jsonObject.optString("RestaurantId"));
             res.setSquaredMeters(jsonObject.optString("SquaredMeters"));
             res.setTableReservation(jsonObject.getBoolean("TableReservation"));
             res.setTableNum(jsonObject.optString("TableNum"));
@@ -231,14 +262,16 @@ public class MainActivity extends AppCompatActivity
             jres.put("Address",res.getAddress());
             jres.put("Category",res.getCategory());
             jres.put("ClosestBus",res.getClosestBus());
-            jres.put("ClosestMetro",res.getClosestMetro());
+            jres.put("ClosestMetro", res.getClosestMetro());
             jres.put("Fidelity",res.isFidelity());
             jres.put("Name",res.getName());
             jres.put("OrdersPerHour",res.getOrdersPerHour());
-            jres.put("PhoneNum",res.getPhoneNum());
-            jres.put("Rating",res.getRating());
+            jres.put("PhoneNum", res.getPhoneNum());
+            jres.put("Photo",res.getPhotoUri());
+            jres.put("Rating", res.getRating());
             jres.put("ReservationNumber",res.getReservationNumber());
             jres.put("ReservationPercentage",res.getReservedPercentage());
+            jres.put("RestaurantId",res.getRestaurantId());
             jres.put("SquaredMeters",res.getSquaredMeters());
             jres.put("TableReservation",res.isTableReservation());
             jres.put("TableNum",res.getTableNum());
@@ -261,5 +294,40 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+    }
+*/
+    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+
+        private int spanCount;
+        private int spacing;
+        private boolean includeEdge;
+
+        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
+            this.spanCount = spanCount;
+            this.spacing = spacing;
+            this.includeEdge = includeEdge;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int position = parent.getChildAdapterPosition(view); // item position
+            int column = position % spanCount; // item column
+
+            if (includeEdge) {
+                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
+                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
+
+                if (position < spanCount) { // top edge
+                    outRect.top = spacing;
+                }
+                outRect.bottom = spacing; // item bottom
+            } else {
+                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
+                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
+                if (position >= spanCount) {
+                    outRect.top = spacing; // item top
+                }
+            }
+        }
     }
 }

@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
@@ -28,10 +29,19 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.UUID;
 
 public class AddRestaurantActivity extends AppCompatActivity implements FragmentInfo.OnInfoPass, FragmentServices.OnServicesPass, FragmentExtras.OnExtrasPass {
 
@@ -89,11 +99,15 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
         if (id == R.id.action_save) {
             saveData();
-            Intent intent=new Intent();
-            intent.putExtra("Restaurant",res);
-            setResult(RESULT_OK,intent);
-            finish();//finishing activity
-            return true;
+            if(res.getName().equals(""))
+                Toast.makeText(this,"Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
+            else {
+                Intent intent = new Intent();
+                intent.putExtra("Restaurant", res);
+                setResult(RESULT_OK, intent);
+                finish();//finishing activity
+                return true;
+            }
         }
 
         //noinspection SimplifiableIfStatement
@@ -107,12 +121,8 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
     public void saveData(){
 
         res = new Restaurant();
-        FragmentInfo fragmentInfo = (FragmentInfo) mSectionsPagerAdapter.getItem(0);
-        fragmentInfo.passData();
-        FragmentServices fragmentServices = (FragmentServices) mSectionsPagerAdapter.getItem(1);
-        fragmentServices.passData();
-        FragmentExtras fragmentExtras = (FragmentExtras) mSectionsPagerAdapter.getItem(2);
-        fragmentExtras.passData();
+        res.setRestaurantId(UUID.randomUUID().toString());
+        mSectionsPagerAdapter.saveDataFromFragments();
     }
 
     @Override
@@ -126,7 +136,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
     @Override
     public void onServicesPass(Boolean fidelity, Boolean tableRes, String numTables, Boolean takeAway, String orderPerHour, List<String> lunchOpenTime,
-                               List<String> lunchCloseTime, List<String> dinnerOpenTime, List<String> dinnerCloseTime, List<Boolean> lunchClosure, List<Boolean> dinnerClosure) {
+                               List<String> lunchCloseTime, List<String> dinnerOpenTime, List<String> dinnerCloseTime, boolean[] lunchClosure, boolean[] dinnerClosure) {
         res.setFidelity(fidelity);
         res.setTableReservation(tableRes);
         if(tableRes)
@@ -134,44 +144,63 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         res.setTakeAway(takeAway);
         if(takeAway)
             res.setOrdersPerHour(orderPerHour);
+        ArrayList<OpenTime> openTimeList = new ArrayList<>();
         for(int i=0;i<7;i++){
             OpenTime lunch = new OpenTime();
-            lunch.setRestaurantName(res.getName());
+            lunch.setRestaurantId(res.getRestaurantId());
             lunch.setType("Lunch");
             lunch.setDayOfWeek(String.valueOf(i));
-            lunch.setIsOpen(lunchClosure.get(i));
+            lunch.setIsOpen(lunchClosure[i]);
             if(lunch.isOpen()){
                 lunch.setOpenHour(lunchOpenTime.get(i));
                 lunch.setCloseHour(lunchCloseTime.get(i));
             }
-
+            openTimeList.add(lunch);
             OpenTime dinner = new OpenTime();
-            dinner.setRestaurantName(res.getName());
+            dinner.setRestaurantId(res.getRestaurantId());
             dinner.setType("Dinner");
             dinner.setDayOfWeek(String.valueOf(i));
-            dinner.setIsOpen(dinnerClosure.get(i));
+            dinner.setIsOpen(dinnerClosure[i]);
             if(dinner.isOpen()){
                 dinner.setOpenHour(dinnerOpenTime.get(i));
                 dinner.setCloseHour(dinnerCloseTime.get(i));
             }
+            openTimeList.add(dinner);
+
+        }
+        try {
+            ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(this);
+            otList.addAll(openTimeList);
+            JSONUtil.saveJSONOpenTimeList(this, otList);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
     }
 
     @Override
     public void onExtrasPass(List<RestaurantService> list) {
-        if(list!=null)
-            for(RestaurantService rs : list){
-               rs.setRestaurantId(res.getName());
+        if(list!=null) {
+            for (RestaurantService rs : list) {
+                rs.setRestaurantId(res.getRestaurantId());
             }
+            try {
+                ArrayList<RestaurantService> rsList = JSONUtil.readJSONServicesList(this);
+                rsList.addAll(list);
+                JSONUtil.saveJSONServiceList(this, rsList);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
+
 
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        private FragmentInfo fi = null;
-        private FragmentServices fs = null;
-        private FragmentExtras fe = null;
+        private FragmentInfo fi;
+        private FragmentServices fs;
+        private FragmentExtras fe;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -182,19 +211,56 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             if(position==0) {
-                if (fi==null)
                     fi = FragmentInfo.newInstance(position + 1);
                 return fi;
             }
             if(position==1) {
-                if (fs==null)
                     fs = FragmentServices.newInstance(position + 1);
                 return fs;
             }
             else {
-                if (fe == null)
                     fe = FragmentExtras.newInstance(position + 1);
                 return fe;
+            }
+        }
+
+        // Here we can finally safely save a reference to the created
+        // Fragment, no matter where it came from (either getItem() or
+        // FragmentManger). Simply save the returned Fragment from
+        // super.instantiateItem() into an appropriate reference depending
+        // on the ViewPager position.
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
+            // save the appropriate reference depending on position
+            switch (position) {
+                case 0:
+                    fi = (FragmentInfo) createdFragment;
+                    break;
+                case 1:
+                    fs = (FragmentServices) createdFragment;
+                    break;
+                case 2:
+                    fe = (FragmentExtras) createdFragment;
+                    break;
+            }
+            return createdFragment;
+        }
+
+        public void saveDataFromFragments() {
+            // do work on the referenced Fragments, but first check if they
+            // even exist yet, otherwise you'll get an NPE.
+
+            if (fi != null) {
+                fi.passData();
+            }
+
+            if (fs != null) {
+                fs.passData();
+            }
+
+            if (fe != null) {
+                fe.passData();
             }
         }
 

@@ -7,18 +7,19 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Daniele on 05/04/2016.
  */
-public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPreviewAdapter.ViewHolder> {
+public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPreviewAdapter.ViewHolder> implements ItemTouchHelperAdapter{
     private List<Restaurant> mDataset;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder  {
         // each data item is just a string in this case
         public ImageView image;
         public TextView resName;
@@ -52,6 +53,7 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
         mDataset = myDataset;
     }
 
+
     // Create new views (invoked by the layout manager)
     @Override
     public RestaurantPreviewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -81,11 +83,25 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
     public void addItem(int position, Restaurant res){
         mDataset.add(position,res);
         notifyItemInserted(position);
-        notifyItemRangeChanged(position,mDataset.size());
+        notifyItemRangeChanged(position, mDataset.size());
     }
     public void removeItem(int position){
         mDataset.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position,mDataset.size());
     }
+
+
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        Restaurant prev = mDataset.remove(fromPosition);
+        mDataset.add(toPosition > fromPosition ? toPosition - 1 : toPosition, prev);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        removeItem(position);
+    }
+
 }

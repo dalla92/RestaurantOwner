@@ -7,7 +7,9 @@ import java.io.Serializable;
  */
 public class Restaurant implements Serializable{
     private String name;
+    private String restaurantId;
     private String userId;
+    private String photoUri;
     private String address;
     private String phoneNum;
     private String category;
@@ -31,12 +33,28 @@ public class Restaurant implements Serializable{
         this.name = name;
     }
 
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
     public String getUserId() {
         return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getPhotoUri() {
+        return photoUri;
+    }
+
+    public void setPhotoUri(String photoUri) {
+        this.photoUri = photoUri;
     }
 
     public String getAddress() {

@@ -88,16 +88,6 @@
         android:layout_below="@+id/spinnerDays"
         android:layout_alignEnd="@+id/textView10" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Open time"
-        android:id="@+id/textView14"
-        android:layout_centerVertical="true"
-        android:layout_alignBaseline="@+id/buttonLunchOpen"
-        android:layout_toStartOf="@+id/buttonLunchOpen" />
-
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -106,14 +96,23 @@
         android:layout_below="@+id/textView13"
         android:layout_toEndOf="@+id/textView5" />
 
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Closed"
+        android:id="@+id/checkBoxLunchClose"
+        android:layout_alignStart="@+id/textView13"
+        android:layout_alignBaseline="@+id/buttonLunchOpen" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Close time"
-        android:id="@+id/textView15"
-        android:layout_alignBottom="@+id/checkBoxLunchClose"
-        android:layout_toStartOf="@+id/buttonLunchClose" />
+        android:text="Open time"
+        android:id="@+id/textView14"
+        android:layout_toStartOf="@+id/buttonLunchOpen"
+        android:layout_alignBaseline="@+id/buttonLunchOpen" />
+
 
     <Button
         android:layout_width="wrap_content"
@@ -127,20 +126,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Dinner"
-        android:id="@+id/textView10"
-        android:layout_below="@+id/buttonLunchClose"
-        android:layout_alignParentStart="true" />
-
+        android:text="Close time"
+        android:id="@+id/textView15"
+        android:layout_toStartOf="@+id/buttonLunchClose"
+        android:layout_alignBaseline="@+id/buttonLunchClose" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Open time"
-        android:id="@+id/textView12"
-        android:layout_alignBaseline="@+id/buttonDinnerOpen"
-        android:layout_toStartOf="@+id/buttonDinnerOpen" />
+        android:text="Dinner"
+        android:id="@+id/textView10"
+        android:layout_below="@+id/buttonLunchClose"
+        android:layout_alignParentStart="true" />
+
 
     <Button
         android:layout_width="wrap_content"
@@ -154,34 +153,36 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="Close time"
-        android:id="@+id/textView11"
-        android:layout_alignBottom="@+id/checkBoxDinnerClose"
-        android:layout_toStartOf="@+id/buttonLunchClose" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set"
-        android:id="@+id/buttonDinnerClose"
-        android:layout_alignTop="@+id/checkBoxDinnerClose"
-        android:layout_toEndOf="@+id/textView11" />
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Closed"
-        android:id="@+id/checkBoxLunchClose"
-        android:layout_alignBottom="@+id/textView14"
-        android:layout_alignStart="@+id/textView13" />
+        android:text="Open time"
+        android:id="@+id/textView12"
+        android:layout_toStartOf="@+id/buttonDinnerOpen"
+        android:layout_alignBaseline="@+id/buttonDinnerOpen" />
 
     <CheckBox
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Closed"
         android:id="@+id/checkBoxDinnerClose"
-        android:layout_alignBottom="@+id/textView12"
-        android:layout_alignStart="@+id/checkBoxLunchClose" />
+        android:layout_alignStart="@+id/checkBoxLunchClose"
+        android:layout_alignBaseline="@+id/textView12" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set"
+        android:id="@+id/buttonDinnerClose"
+        android:layout_below="@+id/textView10"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Close time"
+        android:id="@+id/textView11"
+        android:layout_toStartOf="@+id/buttonDinnerClose"
+        android:layout_alignBaseline="@+id/buttonDinnerClose" />
+
 
 </RelativeLayout>
 

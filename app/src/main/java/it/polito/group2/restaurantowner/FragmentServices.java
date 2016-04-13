@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -40,8 +41,8 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
     ArrayList<String> lunchCloseTime = new ArrayList<String>();
     ArrayList<String> dinnerOpenTime = new ArrayList<String>();
     ArrayList<String> dinnerCloseTime = new ArrayList<String>();
-    ArrayList<Boolean> listLunchClose = new ArrayList<Boolean>();
-    ArrayList<Boolean> listDinnerClose = new ArrayList<Boolean>();
+    boolean[] listLunchClose = new boolean[]{false,false,false,false,false,false,false,false};
+    boolean[] listDinnerClose = new boolean[]{false,false,false,false,false,false,false,false};
     Boolean allDays=false;
     int selectedDay = 0;
     CheckBox fidelity;
@@ -90,14 +91,23 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_add_restaurant_services, container, false);
-
-        for(int i=0;i<8;i++){
-            lunchOpenTime.add(i,"SET");
-            lunchCloseTime.add(i,"SET");
-            dinnerOpenTime.add(i,"SET");
-            dinnerCloseTime.add(i,"SET");
-            listLunchClose.add(i, false);
-            listDinnerClose.add(i, false);
+        if (savedInstanceState != null) {
+            // Restore value of members from saved state
+            lunchOpenTime = savedInstanceState.getStringArrayList("lunchOpenTime");
+            lunchCloseTime = savedInstanceState.getStringArrayList("lunchCloseTime");
+            dinnerOpenTime = savedInstanceState.getStringArrayList("dinnerOpenTime");
+            dinnerCloseTime = savedInstanceState.getStringArrayList("dinnerCloseTime");
+            listLunchClose = savedInstanceState.getBooleanArray("listLunchClose");
+            listDinnerClose = savedInstanceState.getBooleanArray("listDinnerClose");
+        } else {
+            for (int i = 0; i < 8; i++) {
+                lunchOpenTime.add(i, "10:00");
+                lunchCloseTime.add(i, "13:00");
+                dinnerOpenTime.add(i, "19:00");
+                dinnerCloseTime.add(i, "23:00");
+                //listLunchClose.add(i, false);
+                //listDinnerClose.add(i, false);
+            }
         }
 
         fidelity = (CheckBox) rootView.findViewById(R.id.checkBoxFidelity);
@@ -117,7 +127,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                 DialogFragment newFragment = new TimePickerFragment() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String time = hourOfDay + ":" + minute;
+                        String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
                             for(int i=0;i<8;i++)
                                 lunchOpenTime.set(i,time);
@@ -138,7 +148,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                 DialogFragment newFragment = new TimePickerFragment() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String time = hourOfDay + ":" + minute;
+                        String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
                             for(int i=0;i<8;i++)
                                 lunchCloseTime.set(i,time);
@@ -160,7 +170,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                        String time = hourOfDay + ":" + minute;
+                        String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
                             for(int i=0;i<8;i++)
                                 dinnerOpenTime.set(i,time);
@@ -182,7 +192,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                 DialogFragment newFragment = new TimePickerFragment() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String time = hourOfDay + ":" + minute;
+                        String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
                             for(int i=0;i<8;i++)
                                 dinnerCloseTime.set(i,time);
@@ -206,16 +216,16 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                     buttonLunchOpen.setEnabled(false);
                     buttonLunchClose.setText("CLOSED");
                     buttonLunchClose.setEnabled(false);
-                    listLunchClose.set(selectedDay, true);
+                    listLunchClose[selectedDay]= true;
                 }
                 else{
-                    lunchOpenTime.set(selectedDay,"SET");
-                    lunchCloseTime.set(selectedDay,"SET");
-                    buttonLunchOpen.setText("SET");
+                    lunchOpenTime.set(selectedDay,"10:00");
+                    lunchCloseTime.set(selectedDay,"13:00");
+                    buttonLunchOpen.setText("10:00");
                     buttonLunchOpen.setEnabled(true);
-                    buttonLunchClose.setText("SET");
+                    buttonLunchClose.setText("13:00");
                     buttonLunchClose.setEnabled(true);
-                    listLunchClose.set(selectedDay, false);
+                    listLunchClose[selectedDay]= false;
                 }
             }
         });
@@ -225,21 +235,21 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
             public void onClick(View v) {
                 if (((CheckBox) v).isChecked()) {
                     dinnerOpenTime.set(selectedDay,"CLOSED");
-                    dinnerCloseTime.set(selectedDay,"CLOSED");
+                    dinnerCloseTime.set(selectedDay, "CLOSED");
                     buttonDinnerOpen.setText("CLOSED");
                     buttonDinnerOpen.setEnabled(false);
                     buttonDinnerClose.setText("CLOSED");
                     buttonDinnerClose.setEnabled(false);
-                    listDinnerClose.set(selectedDay, true);
+                    listDinnerClose[selectedDay] = true;
                 }
                 else{
-                    dinnerOpenTime.set(selectedDay,"SET");
-                    dinnerCloseTime.set(selectedDay,"SET");
-                    buttonDinnerOpen.setText("SET");
+                    dinnerOpenTime.set(selectedDay,"19:00");
+                    dinnerCloseTime.set(selectedDay, "23:00");
+                    buttonDinnerOpen.setText("19:00");
                     buttonDinnerOpen.setEnabled(true);
-                    buttonDinnerClose.setText("SET");
+                    buttonDinnerClose.setText("23:00");
                     buttonDinnerClose.setEnabled(true);
-                    listDinnerClose.set(selectedDay, false);
+                    listDinnerClose[selectedDay] = false;
                 }
             }
         });
@@ -267,16 +277,16 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                 else {
                     allDays = false;
                     cbLunchClosed.setVisibility(CheckBox.VISIBLE);
-                    cbLunchClosed.setChecked(listLunchClose.get(position));
+                    cbLunchClosed.setChecked(listLunchClose[position]);
                     cbDinnerClosed.setVisibility(CheckBox.VISIBLE);
-                    cbDinnerClosed.setChecked(listDinnerClose.get(position));
+                    cbDinnerClosed.setChecked(listDinnerClose[position]);
 
                 }
                 selectedDay = position;
-                buttonLunchOpen.setEnabled(!listLunchClose.get(position));
-                buttonLunchClose.setEnabled(!listLunchClose.get(position));
-                buttonDinnerOpen.setEnabled(!listDinnerClose.get(position));
-                buttonDinnerClose.setEnabled(!listDinnerClose.get(position));
+                buttonLunchOpen.setEnabled(!listLunchClose[position]);
+                buttonLunchClose.setEnabled(!listLunchClose[position]);
+                buttonDinnerOpen.setEnabled(!listDinnerClose[position]);
+                buttonDinnerClose.setEnabled(!listDinnerClose[position]);
                 buttonLunchOpen.setText(lunchOpenTime.get(selectedDay));
                 buttonLunchClose.setText(lunchCloseTime.get(selectedDay));
                 buttonDinnerOpen.setText(dinnerOpenTime.get(selectedDay));
@@ -290,6 +300,20 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save the user's current game state
+        savedInstanceState.putStringArrayList("lunchOpenTime",lunchOpenTime);
+        savedInstanceState.putStringArrayList("lunchCloseTime",lunchCloseTime);
+        savedInstanceState.putStringArrayList("dinnerOpenTime",dinnerOpenTime);
+        savedInstanceState.putStringArrayList("dinnerCloseTime",dinnerCloseTime);
+        savedInstanceState.putBooleanArray("listLunchClose", listLunchClose);
+        savedInstanceState.putBooleanArray("listDinnerClose",listDinnerClose);
+
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -324,6 +348,6 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
 
     public interface OnServicesPass {
         public void onServicesPass(Boolean fidelity, Boolean tableRes, String numTables, Boolean takeAway, String orderPerHour, List<String> lunchOpenTime,List<String> lunchCloseTime,
-                                   List<String> dinnerOpenTime, List<String> dinnerCloseTime, List<Boolean> lunchClosure, List<Boolean> dinnerClosure);
+                                   List<String> dinnerOpenTime, List<String> dinnerCloseTime, boolean[] lunchClosure, boolean[] dinnerClosure);
     }
 }

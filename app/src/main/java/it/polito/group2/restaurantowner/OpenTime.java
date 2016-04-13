@@ -4,19 +4,19 @@ package it.polito.group2.restaurantowner;
  * Created by Daniele on 07/04/2016.
  */
 public class OpenTime {
-    private String restaurantName;
+    private String restaurantId;
     private String type;
     private String dayOfWeek;
     private boolean isOpen;
     private String openHour;
     private String closeHour;
 
-    public String getRestaurantName() {
-        return restaurantName;
+    public String getRestaurantId() {
+        return restaurantId;
     }
 
-    public void setRestaurantName(String restaurantName) {
-        this.restaurantName = restaurantName;
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
     }
 
     public String getType() {

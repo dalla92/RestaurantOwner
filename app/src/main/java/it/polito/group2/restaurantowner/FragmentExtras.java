@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.List;
 
