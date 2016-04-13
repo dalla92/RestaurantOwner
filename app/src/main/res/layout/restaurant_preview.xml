@@ -1,78 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="5dp">
+
+<RelativeLayout
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="160dp"
-        android:id="@+id/imageView2"
-        android:src="@drawable/restaurant"
+        android:id="@+id/imageViewRes"
+        android:src="@drawable/asd"
+        android:scaleType="centerCrop"
         android:layout_gravity="center_horizontal"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="false" />
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:layout_alignBottom="@+id/imageView2"
+        android:layout_height="80dp"
+        android:layout_alignBottom="@+id/imageViewRes"
         android:background="@drawable/background_res_preview"
         android:layout_alignParentStart="true">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:paddingTop="10dp"
-            android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:paddingStart="4dp"
+            android:text="@string/name"
+            android:textColor="#FFFFFF"
+            android:id="@+id/textViewName"
+            android:textStyle="bold"
+            android:layout_above="@+id/textViewReservationNumber"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/textViewReservedPercentage" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:paddingLeft="4dp"
-                android:text="Name"
-                android:layout_weight="1"
-                android:id="@+id/textView2" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:paddingEnd="4dp"
+            android:text="@string/reserved_percentage"
+            android:gravity="end"
+            android:textColor="#FFFFFF"
+            android:id="@+id/textViewReservedPercentage"
+            android:layout_above="@+id/textViewRating"
+            android:layout_alignEnd="@+id/textViewRating" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:paddingRight="4dp"
-                android:text="% reserved"
-                android:gravity="right"
-                android:layout_weight="1"
-                android:id="@+id/textView3" />
-        </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:paddingEnd="4dp"
+            android:text="@string/rating"
+            android:gravity="end"
+            android:textColor="#FFFFFF"
+            android:id="@+id/textViewRating"
+            android:layout_alignParentBottom="true"
+            android:layout_toStartOf="@+id/imageView2" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_weight="1"
-            android:paddingTop="10dp"
-            android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:paddingStart="4dp"
+            android:text="@string/number_reservations"
+            android:textColor="#FFFFFF"
+            android:id="@+id/textViewReservationNumber"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:paddingLeft="4dp"
-                android:text="# of reservations"
-                android:layout_weight="1"
-                android:id="@+id/textView4" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView2"
+            android:src="@drawable/ic_star"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:paddingRight="4dp"
-                android:text="Rating"
-                android:gravity="right"
-                android:layout_weight="1"
-                android:id="@+id/textView5" />
-        </LinearLayout>
-    </LinearLayout>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView3"
+            android:src="@drawable/ic_cart"
+            android:layout_alignBottom="@+id/textViewReservedPercentage"
+            android:layout_toEndOf="@+id/textViewRating" />
+    </RelativeLayout>
 
 
 </RelativeLayout>
+
+</android.support.v7.widget.CardView>

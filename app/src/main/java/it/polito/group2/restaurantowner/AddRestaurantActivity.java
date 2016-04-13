@@ -1,7 +1,10 @@
 package it.polito.group2.restaurantowner;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -22,15 +25,25 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.util.Calendar;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class AddRestaurantActivity extends AppCompatActivity {
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.UUID;
+
+public class AddRestaurantActivity extends AppCompatActivity implements FragmentInfo.OnInfoPass, FragmentServices.OnServicesPass, FragmentExtras.OnExtrasPass {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -46,6 +59,7 @@ public class AddRestaurantActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+    private Restaurant res;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +97,19 @@ public class AddRestaurantActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (id == R.id.action_save) {
+            saveData();
+            if(res.getName().equals(""))
+                Toast.makeText(this,"Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
+            else {
+                Intent intent = new Intent();
+                intent.putExtra("Restaurant", res);
+                setResult(RESULT_OK, intent);
+                finish();//finishing activity
+                return true;
+            }
+        }
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
@@ -91,224 +118,89 @@ public class AddRestaurantActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class FragmentInfo extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-        String selectedCategory = null;
+    public void saveData(){
 
-        public FragmentInfo() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static FragmentInfo newInstance(int sectionNumber) {
-            FragmentInfo fragment = new FragmentInfo();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_add_restaurant_info, container, false);
-            EditText name = (EditText) rootView.findViewById(R.id.resadd_info_name);
-            EditText address = (EditText) rootView.findViewById(R.id.resadd_info_address);
-            EditText phone = (EditText) rootView.findViewById(R.id.resadd_info_phone);
-            final Spinner category = (Spinner) rootView.findViewById(R.id.resadd_info_category);
-
-            // Create an ArrayAdapter using the string array and a default spinner layout
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this.getContext(),
-                    R.array.categories_array, android.R.layout.simple_spinner_item);
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            // Apply the adapter to the spinner
-            category.setAdapter(adapter);
-            selectedCategory = String.valueOf(category.getSelectedItem());
-
-            category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    selectedCategory = String.valueOf(parent.getItemAtPosition(position));
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-
-                }
-            });
-
-
-            return rootView;
-        }
+        res = new Restaurant();
+        res.setRestaurantId(UUID.randomUUID().toString());
+        mSectionsPagerAdapter.saveDataFromFragments();
     }
 
-    public static class FragmentServices extends Fragment implements TimePickerDialog.OnTimeSetListener {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-        Button buttonLunchOpen;
-        Button buttonLunchClose;
-        Button buttonDinnerOpen;
-        Button buttonDinnerClose;
-
-
-        public FragmentServices() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static FragmentServices newInstance(int sectionNumber) {
-            FragmentServices fragment = new FragmentServices();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_add_restaurant_services, container, false);
-
-            buttonLunchOpen = (Button) rootView.findViewById(R.id.buttonLunchOpen);
-            buttonLunchOpen.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    DialogFragment newFragment = new TimePickerFragment() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            buttonLunchOpen.setText("" + hourOfDay + ":" + minute);
-                        }
-                    };
-                    newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
-                }
-            });
-
-            buttonLunchClose = (Button) rootView.findViewById(R.id.buttonLunchClose);
-            buttonLunchClose.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    DialogFragment newFragment = new TimePickerFragment() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            buttonLunchClose.setText("" + hourOfDay + ":" + minute);
-                        }
-                    };
-                    newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
-                }
-            });
-
-            buttonDinnerOpen = (Button) rootView.findViewById(R.id.buttonDinnerOpen);
-            buttonDinnerOpen.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    DialogFragment newFragment = new TimePickerFragment() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            buttonDinnerOpen.setText("" + hourOfDay + ":" + minute);
-                        }
-                    };
-                    newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
-                }
-            });
-
-            buttonDinnerClose = (Button) rootView.findViewById(R.id.buttonDinnerClose);
-            buttonDinnerClose.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    DialogFragment newFragment = new TimePickerFragment() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            buttonDinnerClose.setText("" + hourOfDay + ":" + minute);
-                        }
-                    };
-                    newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
-                }
-            });
-
-            return rootView;
-        }
-
-        @Override
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            buttonLunchOpen.setText(hourOfDay + minute);
-        }
+    @Override
+    public void onInfoPass(String name, String address, String phone, String category) {
+       res.setName(name);
+        res.setAddress(address);
+        res.setPhoneNum(phone);
+        res.setCategory(category);
     }
 
-    public static class FragmentExtras extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public FragmentExtras() {
+    @Override
+    public void onServicesPass(Boolean fidelity, Boolean tableRes, String numTables, Boolean takeAway, String orderPerHour, List<String> lunchOpenTime,
+                               List<String> lunchCloseTime, List<String> dinnerOpenTime, List<String> dinnerCloseTime, boolean[] lunchClosure, boolean[] dinnerClosure) {
+        res.setFidelity(fidelity);
+        res.setTableReservation(tableRes);
+        if(tableRes)
+            res.setTableNum(numTables);
+        res.setTakeAway(takeAway);
+        if(takeAway)
+            res.setOrdersPerHour(orderPerHour);
+        ArrayList<OpenTime> openTimeList = new ArrayList<>();
+        for(int i=0;i<7;i++){
+            OpenTime lunch = new OpenTime();
+            lunch.setRestaurantId(res.getRestaurantId());
+            lunch.setType("Lunch");
+            lunch.setDayOfWeek(String.valueOf(i));
+            lunch.setIsOpen(lunchClosure[i]);
+            if(lunch.isOpen()){
+                lunch.setOpenHour(lunchOpenTime.get(i));
+                lunch.setCloseHour(lunchCloseTime.get(i));
+            }
+            openTimeList.add(lunch);
+            OpenTime dinner = new OpenTime();
+            dinner.setRestaurantId(res.getRestaurantId());
+            dinner.setType("Dinner");
+            dinner.setDayOfWeek(String.valueOf(i));
+            dinner.setIsOpen(dinnerClosure[i]);
+            if(dinner.isOpen()){
+                dinner.setOpenHour(dinnerOpenTime.get(i));
+                dinner.setCloseHour(dinnerCloseTime.get(i));
+            }
+            openTimeList.add(dinner);
+
+        }
+        try {
+            ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(this);
+            otList.addAll(openTimeList);
+            JSONUtil.saveJSONOpenTimeList(this, otList);
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
 
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static FragmentExtras newInstance(int sectionNumber) {
-            FragmentExtras fragment = new FragmentExtras();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
+    }
 
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_add_restaurant_extras, container, false);
-            return rootView;
+    @Override
+    public void onExtrasPass(List<RestaurantService> list) {
+        if(list!=null) {
+            for (RestaurantService rs : list) {
+                rs.setRestaurantId(res.getRestaurantId());
+            }
+            try {
+                ArrayList<RestaurantService> rsList = JSONUtil.readJSONServicesList(this);
+                rsList.addAll(list);
+                JSONUtil.saveJSONServiceList(this, rsList);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
     }
 
 
-    public static class TimePickerFragment extends DialogFragment
-            implements TimePickerDialog.OnTimeSetListener {
 
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the current time as the default values for the picker
-            final Calendar c = Calendar.getInstance();
-            int hour = c.get(Calendar.HOUR_OF_DAY);
-            int minute = c.get(Calendar.MINUTE);
-
-            // Create a new instance of TimePickerDialog and return it
-            return new TimePickerDialog(getActivity(), this, hour, minute,
-                    DateFormat.is24HourFormat(getActivity()));
-        }
-
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            // Do something with the time chosen by the user
-        }
-    }
-
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        private FragmentInfo fi;
+        private FragmentServices fs;
+        private FragmentExtras fe;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -318,12 +210,58 @@ public class AddRestaurantActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            if(position==0)
-                return FragmentInfo.newInstance(position + 1);
-            if(position==1)
-                return FragmentServices.newInstance(position + 1);
-            else
-                return FragmentExtras.newInstance(position + 1);
+            if(position==0) {
+                    fi = FragmentInfo.newInstance(position + 1);
+                return fi;
+            }
+            if(position==1) {
+                    fs = FragmentServices.newInstance(position + 1);
+                return fs;
+            }
+            else {
+                    fe = FragmentExtras.newInstance(position + 1);
+                return fe;
+            }
+        }
+
+        // Here we can finally safely save a reference to the created
+        // Fragment, no matter where it came from (either getItem() or
+        // FragmentManger). Simply save the returned Fragment from
+        // super.instantiateItem() into an appropriate reference depending
+        // on the ViewPager position.
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment createdFragment = (Fragment) super.instantiateItem(container, position);
+            // save the appropriate reference depending on position
+            switch (position) {
+                case 0:
+                    fi = (FragmentInfo) createdFragment;
+                    break;
+                case 1:
+                    fs = (FragmentServices) createdFragment;
+                    break;
+                case 2:
+                    fe = (FragmentExtras) createdFragment;
+                    break;
+            }
+            return createdFragment;
+        }
+
+        public void saveDataFromFragments() {
+            // do work on the referenced Fragments, but first check if they
+            // even exist yet, otherwise you'll get an NPE.
+
+            if (fi != null) {
+                fi.passData();
+            }
+
+            if (fs != null) {
+                fs.passData();
+            }
+
+            if (fe != null) {
+                fe.passData();
+            }
         }
 
         @Override
