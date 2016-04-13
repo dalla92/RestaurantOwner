@@ -15,13 +15,39 @@
         android:id="@+id/action_more"
         android:orderInCategory="100"
         android:title="@string/action_more"
-        app:showAsAction="always" />
+        app:showAsAction="never" />
+
 
     <item
         android:id="@+id/action_menu"
         android:orderInCategory="100"
         android:title="@string/action_menu"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_reservations"
+        android:orderInCategory="100"
+        android:title="@string/action_reservations"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_offers"
+        android:orderInCategory="100"
+        android:title="@string/action_offers"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_reviews"
+        android:orderInCategory="100"
+        android:title="@string/action_reviews"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_statistics"
+        android:orderInCategory="100"
+        android:title="@string/action_statistics"
+        app:showAsAction="never" />
+
 
     <item
         android:id="@+id/action_confirm"

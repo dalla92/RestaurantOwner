@@ -69,7 +69,7 @@ public class Restaurant_page extends AppCompatActivity
 
         resList = new ArrayList<>();
         comments = new ArrayList<>();
-        addRestaurants();
+        //addRestaurants();
         addComments();
 
         //read all data and fill resList
@@ -80,7 +80,6 @@ public class Restaurant_page extends AppCompatActivity
         }
         try {
             resList = readJSONResList();
-            Log.d("ccc", resList.get(0).getPhoneNum() + " " + resList.get(1).getPhoneNum());
         } catch (JSONException e) {
             e.printStackTrace();
         }
