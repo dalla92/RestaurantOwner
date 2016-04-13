@@ -39,7 +39,7 @@ public class MenuRestaurant_page extends AppCompatActivity
     private Menu menu;
     private ListView listView;
     private Adapter_Meals adapter;
-    private int restaurant_id = 0;
+    private String restaurant_id = "0";
     private ArrayList<Meal> meals;
     private ArrayList<Addition> meals_additions;
     private ArrayList<Addition> meals_categories;
@@ -50,6 +50,24 @@ public class MenuRestaurant_page extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_restaurant_page);
+
+        meals = new ArrayList<>();
+        addMeal();
+        addAddition("0");
+        addCategory("0");
+
+        try {
+            saveJSONMeList();
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        try {
+            readJSONMeList();
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
 
         //navigation drawer
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -64,7 +82,7 @@ public class MenuRestaurant_page extends AppCompatActivity
 
         //take the right restaurant
         Bundle b = getIntent().getExtras();
-        restaurant_id = b.getInt("restaurant_id");
+        restaurant_id = b.getString("restaurant_id");
         //retrieve data
         try {
             meals = readJSONMeList();
@@ -106,7 +124,7 @@ public class MenuRestaurant_page extends AppCompatActivity
     public void onPause() {
         super.onPause();  // Always call the superclass method first
         try {
-            saveJSONMeList(meals);
+            saveJSONMeList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -162,7 +180,7 @@ public class MenuRestaurant_page extends AppCompatActivity
                     getApplicationContext(),
                     Restaurant_page.class);
             Bundle b = new Bundle();
-            b.putInt("restaurant_id", restaurant_id);
+            b.putString("restaurant_id", restaurant_id);
             intent.putExtras(b);
             startActivity(intent);
         }
@@ -176,7 +194,7 @@ public class MenuRestaurant_page extends AppCompatActivity
         //adapter.insert("New empty meal", 0);
         meals.add(0, new Meal());  //insert at the top
         try {
-            saveJSONMeList(meals);
+            saveJSONMeList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -201,7 +219,7 @@ public class MenuRestaurant_page extends AppCompatActivity
                 MenuRestaurant_edit.class);
         Bundle b = new Bundle();
         b.putInt("meal_id", id);
-        b.putInt("restaurant_id", restaurant_id);
+        b.putString("restaurant_id", restaurant_id);
         intent.putExtras(b);
         startActivity(intent);
     }
@@ -226,7 +244,7 @@ public class MenuRestaurant_page extends AppCompatActivity
                         //adapter.remove(meal_name);
                         meals.remove(index_position);
                         try {
-                            saveJSONMeList(meals);
+                            saveJSONMeList();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -246,7 +264,6 @@ public class MenuRestaurant_page extends AppCompatActivity
     public ArrayList<Meal> readJSONMeList() throws JSONException {
         //mealList.json
         String json = null;
-        ArrayList<Meal> meals = new ArrayList<>();
         FileInputStream fis = null;
         String FILENAME = "mealList.json";
         try {
@@ -264,12 +281,16 @@ public class MenuRestaurant_page extends AppCompatActivity
         }
         JSONObject jobj = new JSONObject(json);
         JSONArray jsonArray = jobj.optJSONArray("Meals");
+        if(jobj==null)
+            Log.d("ccc", "essi");
+        if(jsonArray==null)
+            Log.d("ccc", "enno");
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             Meal me = new Meal();
-            if (jsonObject.optInt("RestaurantId") == restaurant_id) {
+            if (jsonObject.optString("RestaurantId").equals(restaurant_id)) {
                 me.setRestaurantId(jsonObject.optString("RestaurantId"));
-                me.setMealId(jsonObject.optInt("MealId"));
+                me.setMealId(jsonObject.optString("MealId"));
                 me.setMeal_photo(jsonObject.optString("MealPhoto"));
                 me.setMeal_name(jsonObject.optString("MealName"));
                 me.setMeal_price(jsonObject.optDouble("MealPrice"));
@@ -304,9 +325,9 @@ public class MenuRestaurant_page extends AppCompatActivity
         for (int i = 0; i < jsonArray2.length(); i++) {
             JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
             Addition ad = new Addition();
-            if (jsonObject2.optInt("RestaurantId") == restaurant_id) {
-                ad.setRestaurant_id(jsonObject2.optInt("RestaurantId"));
-                ad.setMeal_id(jsonObject2.optInt("MealId"));
+            if (jsonObject2.optString("RestaurantId").equals(restaurant_id)) {
+                ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
+                ad.setMeal_id(jsonObject2.optString("MealId"));
                 ad.setName(jsonObject2.optString("AdditionName"));
                 ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                 ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
@@ -335,9 +356,9 @@ public class MenuRestaurant_page extends AppCompatActivity
         for (int i = 0; i < jsonArray3.length(); i++) {
             JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
             Addition ad = new Addition();
-            if (jsonObject3.optInt("RestaurantId") == restaurant_id) {
-                ad.setRestaurant_id(jsonObject3.optInt("RestaurantId"));
-                ad.setMeal_id(jsonObject3.optInt("MealId"));
+            if (jsonObject3.optString("RestaurantId").equals(restaurant_id)) {
+                ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
+                ad.setMeal_id(jsonObject3.optString("MealId"));
                 ad.setName(jsonObject3.optString("CategoryName"));
                 ad.setSelected(jsonObject3.getBoolean("CategorySelected"));
                 ad.setPrice(0);
@@ -346,12 +367,18 @@ public class MenuRestaurant_page extends AppCompatActivity
             }
         }
         //fill additions and categories of my restaurant
-        meals.get(restaurant_id).setMeal_additions(meals_additions); //no further checks because I read if(jsonObject3.optInt("RestaurantId")==restaurant_id) {
-        meals.get(restaurant_id).setMeal_categories(meals_categories);
+        Meal current_meal = null;
+        for(Meal m : meals) {
+            if(m.getRestaurantId().equals(restaurant_id)) {
+                current_meal = m;
+            }
+        }
+        current_meal.setMeal_additions(meals_additions); //no further checks because I read if(jsonObject3.optInt("RestaurantId")==restaurant_id) {
+        current_meal.setMeal_categories(meals_categories);
         return meals;
     }
 
-    public void saveJSONMeList(ArrayList<Meal> meals) throws JSONException {
+    public void saveJSONMeList() throws JSONException {
         //meals writing
         String FILENAME = "mealList.json";
         JSONArray jarray = new JSONArray();
@@ -435,5 +462,68 @@ public class MenuRestaurant_page extends AppCompatActivity
                 e.printStackTrace();
             }
         }
+    }
+
+    public void addMeal(){
+        Meal m = new Meal();
+        m.setMeal_name("Pasta ca sassa");
+        m.setMeal_price(5.0);
+        m.setAvailable(true);
+        m.setCooking_time(10);
+        m.setMealId("0");
+        m.setRestaurantId("0");
+        m.setDescription("Pasta salta con salsa di pomodoro");
+        m.setType1("Vegetarian");
+        m.setTake_away(false);
+        m.setMeal_photo(getResources().getResourceName(R.mipmap.ic_launcher));
+        meals.add(m);
+    }
+
+    public void addAddition(String meal_id){
+        Addition a1 = new Addition();
+        a1.setName("Basilicò");
+        a1.setPrice(0.50);
+        a1.setMeal_id(meal_id);
+        a1.setSelected(true);
+        a1.setRestaurant_id(restaurant_id);
+
+        Addition a2 = new Addition();
+        a2.setName("Peperoncino");
+        a2.setPrice(0.20);
+        a2.setMeal_id(meal_id);
+        a2.setSelected(true);
+        a2.setRestaurant_id(restaurant_id);
+
+        Meal current_meal = null;
+        for(Meal m : meals) {
+            if(m.getRestaurantId().equals(restaurant_id)) {
+                current_meal = m;
+            }
+        }
+        current_meal.getMeal_additions().add(a1);
+        current_meal.getMeal_additions().add(a2);
+    }
+
+    public void addCategory(String meal_id){
+        Addition a1 = new Addition();
+        a1.setName("Pasta");
+        a1.setMeal_id("0");
+        a1.setSelected(true);
+        a1.setRestaurant_id("0");
+
+        Addition a2 = new Addition();
+        a2.setName("Piccante");
+        a2.setMeal_id("0");
+        a2.setSelected(true);
+        a2.setRestaurant_id("0");
+
+        Meal current_meal = null;
+        for(Meal m : meals) {
+            if(m.getRestaurantId().equals(restaurant_id)) {
+                current_meal = m;
+            }
+        }
+        current_meal.getMeal_categories().add(a1);
+        current_meal.getMeal_categories().add(a2);
     }
 }

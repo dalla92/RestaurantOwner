@@ -281,7 +281,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             Meal me = new Meal();
             if (jsonObject.optInt("RestaurantId") == restaurant_id) {
                 me.setRestaurantId(jsonObject.optString("RestaurantId"));
-                me.setMealId(jsonObject.optInt("MealId"));
+                me.setMealId(jsonObject.optString("MealId"));
                 me.setMeal_photo(jsonObject.optString("MealPhoto"));
                 me.setMeal_name(jsonObject.optString("MealName"));
                 me.setMeal_price(jsonObject.optDouble("MealPrice"));
@@ -317,8 +317,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
             Addition ad = new Addition();
             if (jsonObject2.optInt("RestaurantId") == restaurant_id) {
-                ad.setRestaurant_id(jsonObject2.optInt("RestaurantId"));
-                ad.setMeal_id(jsonObject2.optInt("MealId"));
+                ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
+                ad.setMeal_id(jsonObject2.optString("MealId"));
                 ad.setName(jsonObject2.optString("AdditionName"));
                 ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                 ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
@@ -348,8 +348,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
             Addition ad = new Addition();
             if (jsonObject3.optInt("RestaurantId") == restaurant_id) {
-                ad.setRestaurant_id(jsonObject3.optInt("RestaurantId"));
-                ad.setMeal_id(jsonObject3.optInt("MealId"));
+                ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
+                ad.setMeal_id(jsonObject3.optString("MealId"));
                 ad.setName(jsonObject3.optString("CategoryName"));
                 ad.setSelected(jsonObject3.getBoolean("CategorySelected"));
                 ad.setPrice(0);
@@ -713,7 +713,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 Meal me = new Meal();
                 if (jsonObject.optInt("RestaurantId") == restaurant_id) {
                     me.setRestaurantId(jsonObject.optString("RestaurantId"));
-                    me.setMealId(jsonObject.optInt("MealId"));
+                    me.setMealId(jsonObject.optString("MealId"));
                     me.setMeal_photo(jsonObject.optString("MealPhoto"));
                     me.setMeal_name(jsonObject.optString("MealName"));
                     me.setMeal_price(jsonObject.optDouble("MealPrice"));
@@ -749,8 +749,8 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
                 Addition ad = new Addition();
                 if (jsonObject2.optInt("RestaurantId") == restaurant_id) {
-                    ad.setRestaurant_id(jsonObject2.optInt("RestaurantId"));
-                    ad.setMeal_id(jsonObject2.optInt("MealId"));
+                    ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
+                    ad.setMeal_id(jsonObject2.optString("MealId"));
                     ad.setName(jsonObject2.optString("AdditionName"));
                     ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                     ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
@@ -779,9 +779,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             for (int i = 0; i < jsonArray3.length(); i++) {
                 JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
                 Addition ad = new Addition();
-                if (jsonObject3.optInt("RestaurantId") == restaurant_id) {
-                    ad.setRestaurant_id(jsonObject3.optInt("RestaurantId"));
-                    ad.setMeal_id(jsonObject3.optInt("MealId"));
+                if (jsonObject3.optString("RestaurantId").equals(restaurant_id)) {
+                    ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
+                    ad.setMeal_id(jsonObject3.optString("MealId"));
                     ad.setName(jsonObject3.optString("CategoryName"));
                     ad.setSelected(jsonObject3.getBoolean("CategorySelected"));
                     ad.setPrice(0);
@@ -923,9 +923,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             //expandable additions
             parentAddition = "Meal additions";
             //setChildData(childAdditions);
-            childAdditions.add(new Addition(0,0,"rucola", 0, false));
-            childAdditions.add(new Addition(0,0,"parmigiano", 0, false));
-            childAdditions.add(new Addition(0,0,"tonno", 0, false));
+            childAdditions.add(new Addition("0","0","rucola", 0, false));
+            childAdditions.add(new Addition("0","0","parmigiano", 0, false));
+            childAdditions.add(new Addition("0","0","tonno", 0, false));
             additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
             additions_adapter = new MyExpandableAdapter(parentAddition, childAdditions);
             additions.setAdapter(additions_adapter);
@@ -937,9 +937,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             //setGroupParents(parentAddition);
             parentCategory = "Meal categories";
             //setChildData(childAdditions);
-            childCategories.add(new Addition(0,0,"suino", 0, false));
-            childCategories.add(new Addition(0,0,"bovino", 0, false));
-            childCategories.add(new Addition(0,0,"equino", 0, false));
+            childCategories.add(new Addition("0","0","suino", 0, false));
+            childCategories.add(new Addition("0","0","bovino", 0, false));
+            childCategories.add(new Addition("0","0","equino", 0, false));
             categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
             categories_adapter = new MyExpandableAdapter(parentCategory, childCategories);
             categories.setAdapter(categories_adapter);
@@ -951,7 +951,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     childAdditions = additions_adapter.getChildItems();
-                    childAdditions.add(new Addition(0, 0, "New addition", 0, false));
+                    childAdditions.add(new Addition("0","0", "New addition", 0, false));
                     additions_adapter.setChildItems(childAdditions);
                     meals.get(restaurant_id).setMeal_additions(childAdditions);
                     try {
@@ -967,7 +967,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     childCategories = categories_adapter.getChildItems();
-                    childCategories.add(new Addition(0,0,"New category", 0, false));
+                    childCategories.add(new Addition("0","0","New category", 0, false));
                     categories_adapter.setChildItems(childCategories);
                     meals.get(restaurant_id).setMeal_additions(childCategories);
                     try {
@@ -1232,9 +1232,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 Meal me = new Meal();
-                if (jsonObject.optInt("RestaurantId") == restaurant_id) {
+                if (jsonObject.optString("RestaurantId").equals(restaurant_id)) {
                     me.setRestaurantId(jsonObject.optString("RestaurantId"));
-                    me.setMealId(jsonObject.optInt("MealId"));
+                    me.setMealId(jsonObject.optString("MealId"));
                     me.setMeal_photo(jsonObject.optString("MealPhoto"));
                     me.setMeal_name(jsonObject.optString("MealName"));
                     me.setMeal_price(jsonObject.optDouble("MealPrice"));
@@ -1269,9 +1269,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             for (int i = 0; i < jsonArray2.length(); i++) {
                 JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
                 Addition ad = new Addition();
-                if (jsonObject2.optInt("RestaurantId") == restaurant_id) {
-                    ad.setRestaurant_id(jsonObject2.optInt("RestaurantId"));
-                    ad.setMeal_id(jsonObject2.optInt("MealId"));
+                if (jsonObject2.optString("RestaurantId").equals(restaurant_id)) {
+                    ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
+                    ad.setMeal_id(jsonObject2.optString("MealId"));
                     ad.setName(jsonObject2.optString("AdditionName"));
                     ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                     ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
@@ -1300,9 +1300,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             for (int i = 0; i < jsonArray3.length(); i++) {
                 JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
                 Addition ad = new Addition();
-                if (jsonObject3.optInt("RestaurantId") == restaurant_id) {
-                    ad.setRestaurant_id(jsonObject3.optInt("RestaurantId"));
-                    ad.setMeal_id(jsonObject3.optInt("MealId"));
+                if (jsonObject3.optString("RestaurantId").equals(restaurant_id)) {
+                    ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
+                    ad.setMeal_id(jsonObject3.optString("MealId"));
                     ad.setName(jsonObject3.optString("CategoryName"));
                     ad.setSelected(jsonObject3.getBoolean("CategorySelected"));
                     ad.setPrice(0);

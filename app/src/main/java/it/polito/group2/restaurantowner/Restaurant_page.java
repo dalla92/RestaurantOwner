@@ -55,20 +55,32 @@ public class Restaurant_page extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
     private boolean card_view_clicked=false;
     public ArrayList<Restaurant> resList = new ArrayList<>(); //to be consistent with Daniel's code
-    public int restaurant_id = 0; //if not passed by the previous activity
+    public String restaurant_id = "0"; //if not passed by the previous activity
     public int PICK_IMAGE = 0;
     public int REQUEST_TAKE_PHOTO = 1;
     public String photouri;
     public ArrayList<Comment> comments;
+    public Restaurant my_restaurant = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_page);
 
+        resList = new ArrayList<>();
+        comments = new ArrayList<>();
+        addRestaurants();
+        addComments();
+
         //read all data and fill resList
         try {
+            saveJSONResList();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        try {
             resList = readJSONResList();
+            Log.d("ccc", resList.get(0).getPhoneNum() + " " + resList.get(1).getPhoneNum());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -81,14 +93,16 @@ public class Restaurant_page extends AppCompatActivity
         //get the right restaurant
         Bundle b = getIntent().getExtras();
         if(b!=null)
-            restaurant_id = b.getInt("restaurant_id");
+            restaurant_id = b.getString("restaurant_id");
         //fill its data
-        Restaurant my_restaurant = null;
-        try { //if there are data to read
-            my_restaurant = resList.get(restaurant_id);
-        }
-        catch(Exception e){
-            e.printStackTrace();
+        Log.d("ccc", "Given "+restaurant_id);
+        for (Restaurant r : resList) {
+            Log.d("ccc", "Found "+r.getRestaurantId());
+            if (r.getRestaurantId().equals(restaurant_id)) {
+                Log.d("ccc", "Corresponding "+r.getRestaurantId());
+                my_restaurant = r;
+                break;
+            }
         }
         EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
         ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
@@ -96,7 +110,7 @@ public class Restaurant_page extends AppCompatActivity
         EditText edit_restaurant_telephone_number = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
         if(my_restaurant !=null && my_restaurant.getName()!=null)
             edit_restaurant_name.setText(my_restaurant.getName());
-        if(my_restaurant !=null && my_restaurant.getPhotoUri()!=null)
+        if(my_restaurant !=null && my_restaurant.getPhotoUri() != null)
             image.setImageURI(Uri.parse(my_restaurant.getPhotoUri()));
         if(my_restaurant !=null && my_restaurant.getAddress()!=null)
             edit_restaurant_address.setText(my_restaurant.getAddress());
@@ -124,8 +138,14 @@ public class Restaurant_page extends AppCompatActivity
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                Restaurant temp = null;
+                for(Restaurant r : resList) {
+                    if(r.getRestaurantId().equals(restaurant_id)) {
+                        temp = r;
+                    }
+                }
                 Intent fullScreenIntent = new Intent(getApplicationContext(), Enlarged_image.class);
-                fullScreenIntent.putExtra(Enlarged_image.class.getName(), resList.get(restaurant_id).getPhotoUri());
+                fullScreenIntent.putExtra(Enlarged_image.class.getName(), temp.getPhotoUri());
                 startActivity(fullScreenIntent);
             }
         });
@@ -195,7 +215,7 @@ public class Restaurant_page extends AppCompatActivity
     public void onPause() {
         super.onPause();  // Always call the superclass method first
         try {
-            saveJSONResList(resList);
+            saveJSONResList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -237,7 +257,7 @@ public class Restaurant_page extends AppCompatActivity
                         getApplicationContext(),
                         MenuRestaurant_page.class);
                 Bundle b = new Bundle();
-                b.putInt("restaurant_id", restaurant_id);
+                b.putString("restaurant_id", restaurant_id);
                 intent1.putExtras(b);
                 startActivity(intent1);
                 return true;
@@ -247,7 +267,7 @@ public class Restaurant_page extends AppCompatActivity
                         getApplicationContext(),
                         MoreRestaurantInfo.class); //actually this should redirect to Daniel's activity
                 Bundle b2 = new Bundle();
-                b2.putInt("restaurant_id", restaurant_id);
+                b2.putString("restaurant_id", restaurant_id);
                 intent2.putExtras(b2);
                 startActivity(intent2);
                 return true;
@@ -257,16 +277,15 @@ public class Restaurant_page extends AppCompatActivity
                 return true;
 
             case R.id.action_confirm:
-                Restaurant modified_restaurant = resList.get(restaurant_id);
                 EditText edit_restaurant_name2 = (EditText) findViewById(R.id.edit_restaurant_name);
                 EditText edit_restaurant_address2 = (EditText) findViewById(R.id.edit_restaurant_address);
                 EditText edit_restaurant_telephone_number2 = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
-                modified_restaurant.setName(edit_restaurant_name2.getText().toString());
-                modified_restaurant.setAddress(edit_restaurant_address2.getText().toString());
-                modified_restaurant.setPhoneNum(edit_restaurant_telephone_number2.getText().toString());
+                my_restaurant.setName(edit_restaurant_name2.getText().toString());
+                my_restaurant.setAddress(edit_restaurant_address2.getText().toString());
+                my_restaurant.setPhoneNum(edit_restaurant_telephone_number2.getText().toString());
                 hide();
                 try {
-                    saveJSONResList(resList);
+                    saveJSONResList();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -291,7 +310,7 @@ public class Restaurant_page extends AppCompatActivity
                     getApplicationContext(),
                     Restaurant_page.class);
             Bundle b = new Bundle();
-            b.putInt("restaurant_id", restaurant_id);
+            b.putString("restaurant_id", restaurant_id);
             intent.putExtras(b);
             startActivity(intent);
         }
@@ -313,10 +332,9 @@ public class Restaurant_page extends AppCompatActivity
             Uri contentUri = Uri.fromFile(f);
             mediaScanIntent.setData(contentUri);
             this.sendBroadcast(mediaScanIntent);
-            Restaurant modified_restaurant = resList.get(restaurant_id);
-            modified_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
+            my_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
             try {
-                saveJSONResList(resList);
+                saveJSONResList();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -341,19 +359,16 @@ public class Restaurant_page extends AppCompatActivity
                     }
                 }
             }
-            Restaurant modified_restaurant = resList.get(restaurant_id);
-            modified_restaurant.setPhotoUri(photouri);
+            my_restaurant.setPhotoUri(photouri);
             try {
-                saveJSONResList(resList);
+                saveJSONResList();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    // This method creates an ArrayList that has three Comment objects
-    // Checkout the project associated with this tutorial on Github if
-    // you want to use the same images.
+    /*
     private void initializeComments(){
         comments = new ArrayList<>();
         comments.add(new Comment("0", "Turi Lecce", "01/02/2003", 1, "@mipmap/ic_launcher", "Ah chi ni sacciu mba")); //or int photoId R.mipmap.ic_launcher
@@ -361,6 +376,7 @@ public class Restaurant_page extends AppCompatActivity
         comments.add(new Comment("0", "Iano Papale", "21/12/2001", 5, "@mipmap/image_preview_black", "Fussi pi mia ci tunnassi, ma appi problemi cu me soggira ca ogni bota si lassa curriri de scali, iu no sacciu va."));
         comments.add(new Comment("0", "Tano Sghei", "22/05/2000", 3.4, "@mipmap/image_preview_black", "M'uccullassi n'autra vota. Turi ci emu?"));
     }
+    */
 
     private void initializeAdapterComments(){
         Adapter_Comments adapter = new Adapter_Comments(comments, this.getApplicationContext());
@@ -449,9 +465,8 @@ public class Restaurant_page extends AppCompatActivity
     }
 
     public ArrayList<Restaurant> readJSONResList() throws JSONException {
-        String json = null;
         resList = new ArrayList<>();
-        addRestaurants(resList);
+        String json = null;
         FileInputStream fis = null;
         String FILENAME = "restaurantList.json";
         try {
@@ -497,9 +512,8 @@ public class Restaurant_page extends AppCompatActivity
     }
 
     public ArrayList<Comment> readJSONComList() throws JSONException {
-        String json = null;
         comments = new ArrayList<>();
-        addComments(comments);
+        String json = null;
         FileInputStream fis = null;
         String FILENAME = "commentList.json";
         try {
@@ -521,7 +535,7 @@ public class Restaurant_page extends AppCompatActivity
         for(int i=0; i < jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             Comment com = new Comment();
-            if(jsonObject.optInt("RestaurantId")==restaurant_id){ //I read only the comments of my restaurant
+            if(jsonObject.optString("RestaurantId").equals(restaurant_id)){ //I read only the comments of my restaurant
                 com.setRestaurantId(jsonObject.optString("RestaurantId")); //optInt or optString?
                 com.setDate(jsonObject.optString("Date"));
                 com.setStars_number(jsonObject.optInt("StarsNumber")); //optInt or optString?
@@ -533,7 +547,7 @@ public class Restaurant_page extends AppCompatActivity
         return comments;
     }
 
-    public void saveJSONResList(ArrayList<Restaurant> resList) throws JSONException {
+    public void saveJSONResList() throws JSONException {
         String FILENAME = "restaurantList.json";
         JSONArray jarray = new JSONArray();
         for(Restaurant res : resList){
@@ -572,22 +586,54 @@ public class Restaurant_page extends AppCompatActivity
         }
     }
 
-    public void addComments(ArrayList<Comment> comments){
-        Comment c = new Comment();
-        c.setUsername("Turiddu");
-        c.setRestaurantId("0");
-        c.setComment("Bonu è sicunnu mia");
-        c.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
-        c.setStars_number(2);
-        comments.add(c);
+    public void addComments(){
+        Comment c1 = new Comment();
+        c1.setUsername("Turiddu");
+        c1.setRestaurantId("0");
+        c1.setComment("Bonu è sicunnu mia");
+        c1.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
+        c1.setStars_number(4);
+        comments.add(c1);
+
+        Comment c2 = new Comment();
+        c2.setUsername("Iaffiu");
+        c2.setRestaurantId("0");
+        c2.setComment("Seeeeeeeeee bellu bellu");
+        c2.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
+        c2.setStars_number(5);
+        comments.add(c2);
+
+        Comment c3 = new Comment();
+        c3.setUsername("Angelu");
+        c3.setRestaurantId("1");
+        c3.setComment("Non siti cosa");
+        c3.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
+        c3.setStars_number(1);
+        comments.add(c3);
+
+        Comment c4 = new Comment();
+        c4.setUsername("Pina");
+        c4.setRestaurantId("1");
+        c4.setComment("Non stati chiurennu?");
+        c4.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
+        c4.setStars_number(0);
+        comments.add(c4);
     }
 
-    public void addRestaurants(ArrayList<Restaurant> resList){
-        Restaurant r = new Restaurant();
-        r.setName("TRATTORIA NDI IAFFIU");
-        r.setAddress(("Sciara curia 7"));
-        r.setPhoneNum("095393930");
-        resList.add(r);
+    public void addRestaurants(){
+        Restaurant r1 = new Restaurant();
+        r1.setName("TRATTORIA NDI IAFFIU");
+        r1.setAddress(("Sciara curia 7"));
+        r1.setPhoneNum("095393930");
+        r1.setRestaurantId("0");
+        resList.add(r1);
+
+        Restaurant r2 = new Restaurant();
+        r2.setName("BELLA ITALIA");
+        r2.setAddress(("Magellano 38"));
+        r2.setPhoneNum("+44099495930");
+        r2.setRestaurantId("1");
+        resList.add(r2);
     }
 
     private File createImageFile() throws IOException {

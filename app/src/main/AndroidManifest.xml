@@ -2,15 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="it.polito.group2.restaurantowner">
 
+    <uses-feature android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature android:name="android.hardware.camera.front" android:required="true" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="18" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <uses-feature android:name="android.hardware.camera"
-            android:required="true" />
-        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:theme="@style/AppTheme">id.permission.WRITE_EXTERNAL_STORAGE"
             android:maxSdkVersion="18" />
         <activity
             android:name=".MainActivity"

@@ -6,13 +6,13 @@ package it.polito.group2.restaurantowner;
 public class Addition {
 
     //String code = null;
-    int restaurant_id;
-    int meal_id;
+    String restaurant_id;
+    String meal_id;
     String name = null;
     boolean selected = false;
     double price = 0.0;
 
-    public Addition(int restaurant_id, int meal_id, String name, double price, boolean selected) {
+    public Addition(String restaurant_id, String meal_id, String name, double price, boolean selected) {
         super();
         //this.code = code;
         this.name = name;
@@ -51,19 +51,19 @@ public class Addition {
         this.selected = selected;
     }
 
-    public int getRestaurant_id() {
+    public String getRestaurant_id() {
         return restaurant_id;
     }
 
-    public void setRestaurant_id(int restaurant_id) {
+    public void setRestaurant_id(String restaurant_id) {
         this.restaurant_id = restaurant_id;
     }
 
-    public int getMeal_id() {
+    public String getMeal_id() {
         return meal_id;
     }
 
-    public void setMeal_id(int meal_id) {
+    public void setMeal_id(String meal_id) {
         this.meal_id = meal_id;
     }
 }

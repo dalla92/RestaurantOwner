@@ -17,7 +17,7 @@ public class Meal {
     private List<Addition> meal_categories;
     private boolean take_away;
     private String restaurantId;
-    private int mealId;
+    private String mealId;
     private int cooking_time;
     private String description;
 
@@ -106,11 +106,11 @@ public class Meal {
         this.restaurantId = restaurantId;
     }
 
-    public int getMealId() {
+    public String getMealId() {
         return mealId;
     }
 
-    public void setMealId(int mealId) {
+    public void setMealId(String mealId) {
         this.mealId = mealId;
     }
 
