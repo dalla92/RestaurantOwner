@@ -86,4 +86,36 @@
     <string name="rating">Rating</string>
     <string name="number_reservations">Number reservation</string>
 
+    <!-- Offer strings -->
+    <string name="add">Add</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="lunch">Lunch</string>
+    <string name="info">Info</string>
+    <string name="validity">Validity</string>
+    <string name="today">Today</string>
+    <string name="dinner">Dinner</string>
+    <string name="title_activity_offer_list">OfferList</string>
+    <string name="title_activity_add_offer">AddOffer</string>
+    <string name="description">Description</string>
+    <string name="january">January</string>
+    <string name="february">February</string>
+    <string name="march">March</string>
+    <string name="april">April</string>
+    <string name="may">May</string>
+    <string name="june">June</string>
+    <string name="july">July</string>
+    <string name="august">August</string>
+    <string name="september">September</string>
+    <string name="october">October</string>
+    <string name="november">November</string>
+    <string name="december">December</string>
+    <string name="offer_name_error">Insert a name!</string>
+    <string name="offer_desc_error">Insert a description!</string>
+    <string name="title_activity_reservation">Reservation</string>
+
+    <!-- Reservation strings -->
+    <string name="table_section">Table</string>
+    <string name="takeaway_section">Take Away</string>
+
 </resources>

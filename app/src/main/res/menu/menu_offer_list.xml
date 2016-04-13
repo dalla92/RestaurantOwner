@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+tools:context="it.polito.group2.restaurantowner.OfferList">
+
+<item
+    android:id="@+id/icon_new_offer"
+    android:title="@string/add"
+    android:icon="@drawable/ic_add_24dp"
+    app:showAsAction="ifRoom"
+    />
+</menu>

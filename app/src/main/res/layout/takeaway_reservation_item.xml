@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <LinearLayout
+        android:id="@+id/takeaway_reservation_list"
+        android:orientation="vertical"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:clickable="true"
+        >
+
+        <TextView
+            android:id="@+id/reservation_client"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Andrea Cuiuli"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/reservation_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="10:30 AM"
+            android:textSize="14sp"
+            android:paddingTop="4dp"
+            />
+
+        <TextView
+            android:id="@+id/reservation_notes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="One person is allergic to nuts"
+            android:textSize="14sp"
+            android:paddingTop="4dp"
+            />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/table_reservation_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_delete"
+        android:padding="4dp"
+        android:clickable="true"
+        />
+
+</LinearLayout>

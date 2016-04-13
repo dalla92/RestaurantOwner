@@ -52,6 +52,25 @@
         <activity android:name=".MenuRestaurant_edit"
             android:label="@string/title_activity_menu_restaurant_edit"
             android:theme="@style/AppTheme.NoActionBar" />
+			
+			<activity
+            android:name=".OfferList"
+            android:label="@string/title_activity_offer_list"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
+        <activity
+            android:name=".AddOffer"
+            android:label="@string/title_activity_add_offer"
+            android:theme="@style/AppTheme.NoActionBar" >
+
+        </activity>
+        <activity
+            android:name=".Reservation"
+            android:label="@string/title_activity_reservation"
+            android:theme="@style/AppTheme.NoActionBar">
+
+        </activity>
     </application>
 
 </manifest>
