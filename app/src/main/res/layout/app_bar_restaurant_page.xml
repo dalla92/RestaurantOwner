@@ -24,7 +24,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <ImageView
-                android:src="@mipmap/image_preview_black"
+                android:src="@drawable/ic_insert_photo"
                 android:id="@+id/image_to_enlarge"
                 app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
                 android:layout_width="wrap_content"

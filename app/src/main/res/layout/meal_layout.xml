@@ -23,7 +23,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_edit"
+            android:src="@drawable/ic_edit_primary_24dp"
             android:onClick="myClickHandler_edit"
             android:id="@+id/meal_edit" />
 
@@ -42,7 +42,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_delete"
+            android:src="@drawable/ic_remove_primary_24dp"
             android:onClick="myClickHandler_remove"
             android:id="@+id/meal_delete" />
 

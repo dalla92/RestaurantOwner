@@ -9,7 +9,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_edit"
+        android:src="@drawable/ic_edit_primary_24dp"
         android:id="@+id/addition_edit" />
 
     <CheckBox
@@ -35,10 +35,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:src="@drawable/ic_delete"
+        android:src="@drawable/ic_remove_primary_24dp"
         android:id="@+id/addition_delete"
         android:paddingStart="10dp"
-        android:paddingTop="10dp"
+        android:paddingTop="8dp"
         />
 
 </LinearLayout>
