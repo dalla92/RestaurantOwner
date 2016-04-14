@@ -67,22 +67,17 @@ public class Restaurant_page extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_page);
 
+        //get data
         resList = new ArrayList<>();
         comments = new ArrayList<>();
-
-        addComments();
-
-        //read all data and fill resList
-        /*
-        addRestaurants();
         try {
-            saveJSONResList();
+            resList = readJSONResList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        */
+        addComments(restaurant_id);
         try {
-            resList = readJSONResList();
+            saveJSONComList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -91,14 +86,12 @@ public class Restaurant_page extends AppCompatActivity
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        //or initializeComments();
-
         //get the right restaurant
         Bundle b = getIntent().getExtras();
         if(b!=null)
-            restaurant_id = b.getString("restaurant_id");
-        //fill its data
-        Log.d("ccc", "Given "+restaurant_id);
+            restaurant_id = b.getString("RestaurantId");
+        //get data
+        Log.d("ccc", "Given " + restaurant_id);
         for (Restaurant r : resList) {
             Log.d("ccc", "Found "+r.getRestaurantId());
             if (r.getRestaurantId().equals(restaurant_id)) {
@@ -107,6 +100,7 @@ public class Restaurant_page extends AppCompatActivity
                 break;
             }
         }
+        //fill data
         setTitle(my_restaurant.getName());
         EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
         ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
@@ -212,6 +206,9 @@ public class Restaurant_page extends AppCompatActivity
             edit_restaurant_name.setText(state.getString("restaurant_name"));
             edit_restaurant_address.setText(state.getString("restaurant_address"));
             edit_restaurant_telephone_number.setText(state.getString("restaurant_telephone_number"));
+            ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
+            if(photouri!=null)
+                image.setImageURI(Uri.parse(photouri));
         }
     }
 
@@ -306,17 +303,15 @@ public class Restaurant_page extends AppCompatActivity
                 startActivity(intent5);
                 return true;
 
-            case R.id.action_more:
+            case R.id.action_edit:
                 Intent intent6 = new Intent(
                         getApplicationContext(),
-                        MoreRestaurantInfo.class); //actually this should redirect to Daniel's activity
-                Bundle b6 = new Bundle();
-                b6.putString("restaurant_id", restaurant_id);
-                intent6.putExtras(b6);
+                        AddRestaurantActivity.class);
+                intent6.putExtra("Restaurant", my_restaurant);
                 startActivity(intent6);
                 return true;
 
-            case R.id.action_edit:
+            case R.id.action_edit_cover:
                 show();
                 return true;
 
@@ -455,6 +450,7 @@ public class Restaurant_page extends AppCompatActivity
         MenuItem action_edit_item1 = menu.findItem(R.id.action_edit);
         action_edit_item1.setVisible(false);
         //edit text clickable yes/not
+        /*
         EditText edit_restaurant_name1 = (EditText) findViewById(R.id.edit_restaurant_name);
         EditText edit_restaurant_address1 = (EditText) findViewById(R.id.edit_restaurant_address);
         EditText edit_restaurant_telephone_number1 = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
@@ -467,6 +463,7 @@ public class Restaurant_page extends AppCompatActivity
         edit_restaurant_telephone_number1.setFocusableInTouchMode(true);
         edit_restaurant_telephone_number1.setFocusable(true);
         edit_restaurant_telephone_number1.setAlpha(1);
+        */
         //button present yes/not
         Button button_take_photo1 = (Button) findViewById(R.id.button_take_photo);
         button_take_photo1.setVisibility(View.VISIBLE);
@@ -577,6 +574,7 @@ public class Restaurant_page extends AppCompatActivity
                 com.setStars_number(jsonObject.optInt("StarsNumber")); //optInt or optString?
                 com.setComment(jsonObject.optString("Comment"));
                 com.setPhotoId(jsonObject.optString("UserPhoto"));
+                com.setUsername(jsonObject.optString("Username"));
                 comments.add(com);
             }
         }
@@ -622,26 +620,53 @@ public class Restaurant_page extends AppCompatActivity
         }
     }
 
-    public void addComments(){
+    public void saveJSONComList() throws JSONException {
+        String FILENAME = "commentList.json";
+        JSONArray jarray = new JSONArray();
+        for(Comment com : comments){
+            JSONObject jres = new JSONObject();
+            jres.put("RestaurantId",com.getRestaurantId());
+            jres.put("Date",com.getDate());
+            jres.put("StarsNumber",com.getStars_number());
+            jres.put("Comment",com.getComment());
+            jres.put("UserPhoto",com.userphoto());
+            jres.put("Username",com.getUsername());
+            jarray.put(jres);
+        }
+        JSONObject resObj = new JSONObject();
+        resObj.put("Comments", jarray);
+        FileOutputStream fos = null;
+        try {
+            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(resObj.toString().getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void addComments(String restaurant_id){
         Comment c1 = new Comment();
-        c1.setUsername("Turiddu");
-        c1.setRestaurantId("0");
-        c1.setComment("Bonu è sicunnu mia");
+        c1.setUsername("Salvatore Grasso");
+        c1.setRestaurantId(restaurant_id);
+        c1.setComment("Mi è piaciuto tanto");
         c1.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
         c1.setStars_number(4);
         comments.add(c1);
 
         Comment c2 = new Comment();
-        c2.setUsername("Iaffiu");
-        c2.setRestaurantId("0");
-        c2.setComment("Seeeeeeeeee bellu bellu");
+        c2.setUsername("Karl");
+        c2.setRestaurantId(restaurant_id);
+        c2.setComment("Non ho visto di meglio.............................................");
         c2.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
         c2.setStars_number(5);
         comments.add(c2);
 
         Comment c3 = new Comment();
-        c3.setUsername("Angelu");
-        c3.setRestaurantId("1");
+        c3.setUsername("Angelo Spada");
+        c3.setRestaurantId(restaurant_id);
         c3.setComment("Non siti cosa");
         c3.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
         c3.setStars_number(1);
@@ -649,8 +674,8 @@ public class Restaurant_page extends AppCompatActivity
 
         Comment c4 = new Comment();
         c4.setUsername("Pina");
-        c4.setRestaurantId("1");
-        c4.setComment("Non stati chiurennu?");
+        c4.setRestaurantId(restaurant_id);
+        c4.setComment("Pessimo");
         c4.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
         c4.setStars_number(0);
         comments.add(c4);
@@ -661,7 +686,7 @@ public class Restaurant_page extends AppCompatActivity
         r1.setName("TRATTORIA NDI IAFFIU");
         r1.setAddress(("Sciara curia 7"));
         r1.setPhoneNum("095393930");
-        r1.setRestaurantId("0");
+        r1.setRestaurantId(restaurant_id);
         resList.add(r1);
 
         Restaurant r2 = new Restaurant();

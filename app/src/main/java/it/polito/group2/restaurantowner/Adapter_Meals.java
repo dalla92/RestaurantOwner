@@ -1,14 +1,21 @@
 package it.polito.group2.restaurantowner;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.RatingBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -20,86 +27,172 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Alessio on 12/04/2016.
  */
-public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHolder> {
-        ArrayList<Meal> meals;
-        Context context;
-        public String meal_name;
-        public int index;
-        Adapter_Meals(ArrayList<Meal> meals, Context context) {
-        this.meals = meals;
-        this.context = context;
+public class Adapter_Meals extends ArrayAdapter<Meal> {
+    private Activity activity;
+    private ArrayList<Meal> meals;
+    private static LayoutInflater inflater = null;
+    public String meal_name;
+    public int index;
+    public String restaurant_id;
+    public Meal meal_to_delete;
+
+    public Adapter_Meals (Activity activity, int textViewResourceId, ArrayList<Meal> meals, String restaurant_id) {
+        super(activity, textViewResourceId, meals);
+        try {
+            this.activity = activity;
+            this.meals = meals;
+            inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            this.restaurant_id = restaurant_id;
+        } catch (Exception e) {
         }
-public static class MealViewHolder extends RecyclerView.ViewHolder {
-    CardView cv;
-    ImageView MealImage;
-    TextView MealName;
-    TextView MealPrice;
-    ImageView Type1;
-    ImageView Type2;
-    Switch availability;
-
-    MealViewHolder(View itemView) {
-        super(itemView);
-        cv = (CardView) itemView.findViewById(R.id.cv_meal);
-        MealImage = (ImageView) itemView.findViewById(R.id.meal_image);
-        MealName = (TextView) itemView.findViewById(R.id.meal_name);
-        MealPrice = (TextView) itemView.findViewById(R.id.meal_price);
-        Type1 = (ImageView) itemView.findViewById(R.id.meal_type1);
-        Type2 = (ImageView) itemView.findViewById(R.id.meal_type2);
-        availability = (Switch) itemView.findViewById(R.id.meal_availability);
+        Log.d("ccc", "CALLED WITH SUCCESS1");
     }
-}
 
-    @Override
-    public int getItemCount() {
+    public int getCount() {
         return meals.size();
     }
 
-    @Override
-    public MealViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.meal_card_view, viewGroup, false);
-        MealViewHolder pvh = new MealViewHolder(v);
-        return pvh;
+    public Meal getItem(int position) {
+        return meals.get(position);
     }
 
-    @Override
-    public void onBindViewHolder(MealViewHolder MealViewHolder, int i) {
-        MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_photo()));
-        MealViewHolder.MealName.setText(meals.get(i).getMeal_name());
-        MealViewHolder.MealPrice.setText(String.valueOf(meals.get(i).getMeal_price()));
-        MealViewHolder.Type1.setImageURI(Uri.parse(meals.get(i).getType1()));
-        MealViewHolder.Type2.setImageURI(Uri.parse(meals.get(i).getType2()));
-        MealViewHolder.availability.setEnabled(meals.get(i).isAvailable());
-        meal_name = MealViewHolder.MealName.getText().toString();
-        MealViewHolder.availability.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                index = 0;
-                int i = 0;
-                for (; i < meals.size(); i++) {
-                    if (meals.get(i).getMeal_name().equals(meal_name)) {
-                        meals.get(i).setAvailable(v.findViewById(R.id.meal_availability).isEnabled());
-                        break;
-                    }
-                }
-                try {
-                    saveJSONMeList(meals);
-                }
-                catch(JSONException e){
-                    e.printStackTrace();
-                }
+    public long getItemId(int position) {
+        return 0;
+        // return position;
+    }
+
+    public static class ViewHolder {
+        public ImageView MealImage;
+        public TextView MealName;
+        public TextView MealPrice;
+        public ImageView Type1;
+        public ImageView Type2;
+        public Switch availability;
+        public ImageButton edit_button;
+        public ImageButton remove_button;
+
+    }
+
+    public View getView(int position, View convertView, ViewGroup parent) {
+        Log.d("ccc", "CALLED WITH SUCCESS2");
+        View vi = convertView;
+        final ViewHolder holder;
+        int i = position;
+        try {
+            if (convertView == null) {
+                vi = inflater.inflate(R.layout.meal_layout, null);
+                holder = new ViewHolder();
+                holder.MealImage = (ImageView) vi.findViewById(R.id.meal_image);
+                holder.MealName = (TextView) vi.findViewById(R.id.meal_name);
+                holder.MealPrice = (TextView) vi.findViewById(R.id.meal_price);
+                holder.Type1 = (ImageView) vi.findViewById(R.id.meal_type1);
+                holder.Type2 = (ImageView) vi.findViewById(R.id.meal_type2);
+                holder.availability = (Switch) vi.findViewById(R.id.meal_availability);
+                vi.setTag(holder);
+            } else {
+                holder = (ViewHolder) vi.getTag();
             }
-        });
-    }
+            Log.d("ccc", "CALLED WITH SUCCESS2");
 
-    @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
+            //put data
+            /*
+            if(meals.get(i).getMeal_photo()!=null)
+                MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_photo()));
+            */
+            holder.MealName.setText(meals.get(i).getMeal_name());
+            holder.MealPrice.setText(String.valueOf(meals.get(i).getMeal_price()));
+            Log.d("ccc", "set to "+meals.get(i).getMeal_name());
+            /*
+            if(meals.get(i).getType1()!=null)
+                MealViewHolder.Type1.setImageResource(Integer.parseInt(meals.get(i).getType1()));
+            if(meals.get(i).getType2()!=null)
+                MealViewHolder.Type2.setImageResource(Integer.parseInt(meals.get(i).getType2()));
+            */
+            holder.availability.setEnabled(meals.get(i).isAvailable());
+            meal_name = holder.MealName.getText().toString();
+
+            //set click listener
+            holder.edit_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent1 = new Intent(
+                            activity,
+                            MenuRestaurant_edit.class);
+                    Bundle b = new Bundle();
+                    TextView meal_name = (TextView) v.findViewById(R.id.meal_name);
+                    b.putString("restaurant_id", restaurant_id);
+                    b.putString("meal_id", holder.MealName.getText().toString());
+                    intent1.putExtras(b);
+                    activity.startActivity(intent1);
+                }
+            });
+            holder.remove_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    meal_to_delete = null;
+                    Log.d("ccc", meal_name);
+                    for(Meal m : meals){
+                        Log.d("ccc", "Loop: " + m.getMeal_name());
+                        if(m.getMeal_name().equals(meal_name)){
+                            Log.d("ccc", "FOUND");
+                            meal_to_delete = m;
+                            break;
+                        }
+                    }
+                    Log.d("ccc", meal_to_delete.getMeal_name());
+                    //dialog box
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    meals.remove(meal_to_delete);
+                                    if(this==null)
+                                        Log.d("ccc", "IS NULL");
+                                    notifyDataSetChanged();
+                                    notifyDataSetInvalidated();
+                                    try {
+                                        saveJSONMeList(meals);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    break;
+                            }
+                        }
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Are you sure that you want to delete " + meal_name + "?").setPositiveButton("Yes, sure", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+                }
+            });
+            holder.availability.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        index = 0;
+                        int i = 0;
+                        for (; i < meals.size(); i++) {
+                            if (meals.get(i).getMeal_name().equals(meal_name)) {
+                                meals.get(i).setAvailable(v.findViewById(R.id.meal_availability).isEnabled());
+                                break;
+                            }
+                        }
+                        try {
+                            saveJSONMeList(meals);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+        } catch (Exception e) {
+        }
+        return vi;
     }
 
     public void saveJSONMeList(ArrayList<Meal> meals) throws JSONException {
@@ -125,7 +218,7 @@ public static class MealViewHolder extends RecyclerView.ViewHolder {
         resObj.put("Meals", jarray);
         FileOutputStream fos = null;
         try {
-            fos = this.context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos = activity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
             fos.write(resObj.toString().getBytes());
             fos.close();
         } catch (FileNotFoundException e) {
@@ -151,7 +244,7 @@ public static class MealViewHolder extends RecyclerView.ViewHolder {
         resObj2.put("MealsAdditions", jarray2);
         FileOutputStream fos2 = null;
         try {
-            fos2 = this.context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos2 = activity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
             fos2.write(resObj2.toString().getBytes());
             fos2.close();
         } catch (FileNotFoundException e) {
@@ -177,7 +270,7 @@ public static class MealViewHolder extends RecyclerView.ViewHolder {
             resObj.put("MealsCategories", jarray);
             FileOutputStream fos3 = null;
             try {
-                fos3 = this.context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                fos3 = activity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
                 fos3.write(resObj3.toString().getBytes());
                 fos3.close();
             } catch (FileNotFoundException e) {
@@ -187,5 +280,4 @@ public static class MealViewHolder extends RecyclerView.ViewHolder {
             }
         }
     }
-
 }
