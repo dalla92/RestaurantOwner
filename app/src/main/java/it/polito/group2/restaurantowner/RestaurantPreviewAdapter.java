@@ -1,5 +1,8 @@
 package it.polito.group2.restaurantowner;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,6 +18,7 @@ import java.util.List;
  */
 public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPreviewAdapter.ViewHolder> implements ItemTouchHelperAdapter{
     private List<Restaurant> mDataset;
+    private Context mContext;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -49,8 +53,9 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public RestaurantPreviewAdapter(List<Restaurant> myDataset) {
+    public RestaurantPreviewAdapter(List<Restaurant> myDataset, Context myContext) {
         mDataset = myDataset;
+        mContext = myContext;
     }
 
 
@@ -100,8 +105,31 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
     }
 
     @Override
-    public void onItemDismiss(int position) {
-        removeItem(position);
+    public void onItemDismiss(final int position) {
+        AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
+        alert.setTitle("Confirmation!");
+        alert.setMessage("Are you sure you want to delete the restaurant?\nThe operation cannot be undone!");
+        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                removeItem(position);
+                dialog.dismiss();
+
+            }
+        });
+        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                notifyDataSetChanged();
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
+
     }
 
 }

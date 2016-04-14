@@ -6,7 +6,7 @@ package it.polito.group2.restaurantowner;
 public class OpenTime {
     private String restaurantId;
     private String type;
-    private String dayOfWeek;
+    private int dayOfWeek;
     private boolean isOpen;
     private String openHour;
     private String closeHour;
@@ -27,11 +27,11 @@ public class OpenTime {
         this.type = type;
     }
 
-    public String getDayOfWeek() {
+    public int getDayOfWeek() {
         return dayOfWeek;
     }
 
-    public void setDayOfWeek(String dayOfWeek) {
+    public void setDayOfWeek(int dayOfWeek) {
         this.dayOfWeek = dayOfWeek;
     }
 

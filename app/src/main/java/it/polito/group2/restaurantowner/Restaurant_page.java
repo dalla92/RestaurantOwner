@@ -58,6 +58,7 @@ public class Restaurant_page extends AppCompatActivity
     public String restaurant_id = "0"; //if not passed by the previous activity
     public int PICK_IMAGE = 0;
     public int REQUEST_TAKE_PHOTO = 1;
+    public int MODIFY_INFO = 4;
     public String photouri;
     public ArrayList<Comment> comments;
     public Restaurant my_restaurant = null;
@@ -308,7 +309,7 @@ public class Restaurant_page extends AppCompatActivity
                         getApplicationContext(),
                         AddRestaurantActivity.class);
                 intent6.putExtra("Restaurant", my_restaurant);
-                startActivity(intent6);
+                startActivityForResult(intent6, MODIFY_INFO);
                 return true;
 
             case R.id.action_edit_cover:
@@ -395,6 +396,27 @@ public class Restaurant_page extends AppCompatActivity
                 saveJSONResList();
             } catch (JSONException e) {
                 e.printStackTrace();
+            }
+        }
+        if (requestCode == MODIFY_INFO) {
+            // Make sure the request was successful
+            if (resultCode == RESULT_OK) {
+                Restaurant res = (Restaurant) data.getExtras().get("Restaurant");
+                try {
+                    ArrayList<Restaurant> resList = JSONUtil.readJSONResList(this);
+                    for(Restaurant restaurant : resList){
+                        if(restaurant.getRestaurantId().equals(res.getRestaurantId())){
+                            resList.set(resList.indexOf(restaurant),res);
+                        }
+                    }
+                    JSONUtil.saveJSONResList(this, resList);
+                    Intent intent = getIntent();
+                    intent.putExtra("RestaurantId", res.getRestaurantId());
+                    finish();
+                    startActivity(intent);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

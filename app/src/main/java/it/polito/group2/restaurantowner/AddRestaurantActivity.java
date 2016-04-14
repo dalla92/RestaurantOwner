@@ -59,12 +59,19 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private Restaurant res;
+    private Restaurant res = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_restaurant);
+        Intent intent = getIntent();
+        if(intent.hasExtra("Restaurant"))
+            res = (Restaurant) intent.getExtras().get("Restaurant");
+        if(res==null){
+            res = new Restaurant();
+            res.setRestaurantId(UUID.randomUUID().toString());
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -120,8 +127,6 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
     public void saveData(){
 
-        res = new Restaurant();
-        res.setRestaurantId(UUID.randomUUID().toString());
         mSectionsPagerAdapter.saveDataFromFragments();
     }
 
@@ -149,8 +154,8 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             OpenTime lunch = new OpenTime();
             lunch.setRestaurantId(res.getRestaurantId());
             lunch.setType("Lunch");
-            lunch.setDayOfWeek(String.valueOf(i));
-            lunch.setIsOpen(lunchClosure[i]);
+            lunch.setDayOfWeek(i);
+            lunch.setIsOpen(!lunchClosure[i]);
             if(lunch.isOpen()){
                 lunch.setOpenHour(lunchOpenTime.get(i));
                 lunch.setCloseHour(lunchCloseTime.get(i));
@@ -159,8 +164,8 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             OpenTime dinner = new OpenTime();
             dinner.setRestaurantId(res.getRestaurantId());
             dinner.setType("Dinner");
-            dinner.setDayOfWeek(String.valueOf(i));
-            dinner.setIsOpen(dinnerClosure[i]);
+            dinner.setDayOfWeek(i);
+            dinner.setIsOpen(!dinnerClosure[i]);
             if(dinner.isOpen()){
                 dinner.setOpenHour(dinnerOpenTime.get(i));
                 dinner.setCloseHour(dinnerCloseTime.get(i));
@@ -180,6 +185,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
     @Override
     public void onExtrasPass(List<RestaurantService> list) {
+        //TODO in the case of existing restaurant I have to take out from the list the previous services
         if(list!=null) {
             for (RestaurantService rs : list) {
                 rs.setRestaurantId(res.getRestaurantId());
@@ -211,15 +217,15 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             if(position==0) {
-                    fi = FragmentInfo.newInstance(position + 1);
+                    fi = FragmentInfo.newInstance(res);
                 return fi;
             }
             if(position==1) {
-                    fs = FragmentServices.newInstance(position + 1);
+                    fs = FragmentServices.newInstance(res,AddRestaurantActivity.this);
                 return fs;
             }
             else {
-                    fe = FragmentExtras.newInstance(position + 1);
+                    fe = FragmentExtras.newInstance(res,AddRestaurantActivity.this);
                 return fe;
             }
         }

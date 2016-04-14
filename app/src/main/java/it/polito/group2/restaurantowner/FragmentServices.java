@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -19,6 +20,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
+import org.json.JSONException;
+
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,7 +35,6 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
      * The fragment argument representing the section number for this
      * fragment.
      */
-    private static final String ARG_SECTION_NUMBER = "section_number";
     Button buttonLunchOpen;
     Button buttonLunchClose;
     Button buttonDinnerOpen;
@@ -61,10 +63,42 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static FragmentServices newInstance(int sectionNumber) {
+    public static FragmentServices newInstance(Restaurant res, Context mContext) {
         FragmentServices fragment = new FragmentServices();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        if(res.getName()!=null) {
+            args.putBoolean("Fidelity Program", res.isFidelity());
+            args.putBoolean("Table Reservation", res.isTableReservation());
+            args.putString("Table Number", res.getTableNum());
+            args.putBoolean("Take Away", res.isTakeAway());
+            args.putString("Orders Hour", res.getOrdersPerHour());
+            try {
+                ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(mContext);
+                for(OpenTime ot : otList){
+                    if(ot.getRestaurantId().equals(res.getRestaurantId())) {
+                        int day = ot.getDayOfWeek();
+                        if (ot.getType().equals("Lunch")){
+                            if(!ot.isOpen()){
+                                args.putBoolean("ClosedLunch"+day,true);
+                            } else {
+                                args.putString("lunchOpenTime"+day,ot.getOpenHour());
+                                args.putString("lunchCloseTime" + day, ot.getCloseHour());
+                            }
+                        }
+                        if (ot.getType().equals("Dinner")){
+                            if(!ot.isOpen()){
+                                args.putBoolean("ClosedDinner"+day,true);
+                            } else {
+                                args.putString("dinnerOpenTime" + day, ot.getOpenHour());
+                                args.putString("dinnerCloseTime" + day, ot.getCloseHour());
+                            }
+                        }
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         fragment.setArguments(args);
         return fragment;
     }
@@ -91,24 +125,6 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_add_restaurant_services, container, false);
-        if (savedInstanceState != null) {
-            // Restore value of members from saved state
-            lunchOpenTime = savedInstanceState.getStringArrayList("lunchOpenTime");
-            lunchCloseTime = savedInstanceState.getStringArrayList("lunchCloseTime");
-            dinnerOpenTime = savedInstanceState.getStringArrayList("dinnerOpenTime");
-            dinnerCloseTime = savedInstanceState.getStringArrayList("dinnerCloseTime");
-            listLunchClose = savedInstanceState.getBooleanArray("listLunchClose");
-            listDinnerClose = savedInstanceState.getBooleanArray("listDinnerClose");
-        } else {
-            for (int i = 0; i < 8; i++) {
-                lunchOpenTime.add(i, "10:00");
-                lunchCloseTime.add(i, "13:00");
-                dinnerOpenTime.add(i, "19:00");
-                dinnerCloseTime.add(i, "23:00");
-                //listLunchClose.add(i, false);
-                //listDinnerClose.add(i, false);
-            }
-        }
 
         fidelity = (CheckBox) rootView.findViewById(R.id.checkBoxFidelity);
         tableRes = (CheckBox) rootView.findViewById(R.id.checkBoxTable);
@@ -118,6 +134,40 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
 
         final CheckBox cbLunchClosed = (CheckBox) rootView.findViewById(R.id.checkBoxLunchClose);
         final CheckBox cbDinnerClosed = (CheckBox) rootView.findViewById(R.id.checkBoxDinnerClose);
+
+        if(getArguments().isEmpty()) {
+            if (savedInstanceState != null) {
+                // Restore value of members from saved state
+                lunchOpenTime = savedInstanceState.getStringArrayList("lunchOpenTime");
+                lunchCloseTime = savedInstanceState.getStringArrayList("lunchCloseTime");
+                dinnerOpenTime = savedInstanceState.getStringArrayList("dinnerOpenTime");
+                dinnerCloseTime = savedInstanceState.getStringArrayList("dinnerCloseTime");
+                listLunchClose = savedInstanceState.getBooleanArray("listLunchClose");
+                listDinnerClose = savedInstanceState.getBooleanArray("listDinnerClose");
+            } else {
+                for (int i = 0; i < 8; i++) {
+                    lunchOpenTime.add(i, "10:00");
+                    lunchCloseTime.add(i, "13:00");
+                    dinnerOpenTime.add(i, "19:00");
+                    dinnerCloseTime.add(i, "23:00");
+                }
+            }
+        } else{
+            for(int i=0;i<8;i++){
+                lunchOpenTime.add(getArguments().getString("lunchOpenTime" + i, ""));
+                lunchCloseTime.add(getArguments().getString("lunchCloseTime" + i, ""));
+                dinnerOpenTime.add(getArguments().getString("dinnerOpenTime" + i, ""));
+                dinnerCloseTime.add(getArguments().getString("dinnerCloseTime"+i,""));
+                listLunchClose[i] = getArguments().getBoolean("ClosedLunch"+i,false);
+                listDinnerClose[i] = getArguments().getBoolean("ClosedDinner"+i,false);
+            }
+            fidelity.setChecked(getArguments().getBoolean("Fidelity",false));
+            tableRes.setChecked(getArguments().getBoolean("Table Reservation",false));
+            takeAway.setChecked(getArguments().getBoolean("Take Away", false));
+            tableResEdit.setText(getArguments().getString("Table Number", ""));
+            takeAwayEdit.setText(getArguments().getString("Orders Hour", ""));
+        }
+
 
         buttonLunchOpen = (Button) rootView.findViewById(R.id.buttonLunchOpen);
         buttonLunchOpen.setOnClickListener(new View.OnClickListener() {

@@ -1,6 +1,7 @@
 package it.polito.group2.restaurantowner;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -47,10 +48,27 @@ public class FragmentExtras extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static FragmentExtras newInstance(int sectionNumber) {
+    public static FragmentExtras newInstance(Restaurant res,Context mContext) {
         FragmentExtras fragment = new FragmentExtras();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        if(res.getName()!=null) {
+            try {
+                ArrayList<RestaurantService> serList = JSONUtil.readJSONServicesList(mContext);
+                for(RestaurantService ser : serList){
+                    if(ser.getRestaurantId().equals(res.getRestaurantId())) {
+                        args.putBoolean(ser.getName(), true);
+                        if (ser.getName().equals("Squared Meters"))
+                            args.putString("Squared Meters", ser.getAttribute());
+                        if (ser.getName().equals("Closest Metro"))
+                            args.putString("Closest Metro", ser.getAttribute());
+                        if (ser.getName().equals("Closest Bus"))
+                            args.putString("Closest Bus", ser.getAttribute());
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         fragment.setArguments(args);
         return fragment;
     }
@@ -72,74 +90,97 @@ public class FragmentExtras extends Fragment {
         squaredMeters = (EditText) rootView.findViewById(R.id.etSquaredMeters);
         closestMetro = (EditText) rootView.findViewById(R.id.etClosestMetro);
         closestBus = (EditText) rootView.findViewById(R.id.etClosestBus);
+
+        if(!getArguments().isEmpty()){
+            animals.setChecked(getArguments().getBoolean("Animals",false));
+            vegan.setChecked(getArguments().getBoolean("Vegan",false));
+            vegetarian.setChecked(getArguments().getBoolean("Vegetarian",false));
+            glutenFree.setChecked(getArguments().getBoolean("GlutenFree",false));
+            tv.setChecked(getArguments().getBoolean("TV",false));
+            patio.setChecked(getArguments().getBoolean("Patio",false));
+            wifi.setChecked(getArguments().getBoolean("Wi-Fi",false));
+            creditcard.setChecked(getArguments().getBoolean("Credit Card",false));
+            babyspace.setChecked(getArguments().getBoolean("Baby Space",false));
+            ac.setChecked(getArguments().getBoolean("AC",false));
+            squaredMeters.setText(getArguments().getString("Squared Meters", ""));
+            closestMetro.setText(getArguments().getString("Closest Metro", ""));
+            closestBus.setText(getArguments().getString("Closest Bus", ""));
+        }
+
         return rootView;
     }
 
     public void passData() {
         if(dataPasser!=null) {
             ArrayList<RestaurantService> list = new ArrayList<RestaurantService>();
-            if (animals.isSelected()) {
+            if (animals.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("Animals");
                 list.add(rs);
             }
-            if (vegan.isSelected()) {
+            if (vegan.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("Vegan");
                 list.add(rs);
             }
-            if (vegetarian.isSelected()) {
+            if (vegetarian.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("Vegetarian");
                 list.add(rs);
             }
-            if (glutenFree.isSelected()) {
+            if (glutenFree.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("Gluten Free");
                 list.add(rs);
             }
-            if (tv.isSelected()) {
+            if (tv.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("TV");
                 list.add(rs);
             }
-            if (patio.isSelected()) {
+            if (patio.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("Patio");
                 list.add(rs);
             }
-            if (wifi.isSelected()) {
+            if (wifi.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("Wi-Fi");
                 list.add(rs);
             }
-            if (creditcard.isSelected()) {
+            if (creditcard.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("Credit Card");
                 list.add(rs);
             }
-            if (babyspace.isSelected()) {
+            if (babyspace.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("Baby Space");
                 list.add(rs);
             }
-            if (ac.isSelected()) {
+            if (ac.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("AC");
                 list.add(rs);
             }
-            RestaurantService rs = new RestaurantService();
-            rs.setName("Squared Meters");
-            rs.setAttribute(squaredMeters.getText().toString());
-            list.add(rs);
-            RestaurantService rs1 = new RestaurantService();
-            rs.setName("Closest Metro");
-            rs.setAttribute(closestMetro.getText().toString());
-            list.add(rs1);
-            RestaurantService rs2 = new RestaurantService();
-            rs.setName("Closest bus");
-            rs.setAttribute(closestBus.getText().toString());
-            list.add(rs2);
+            if(!squaredMeters.getText().toString().equals("")) {
+                RestaurantService rs = new RestaurantService();
+                rs.setName("Squared Meters");
+                rs.setAttribute(squaredMeters.getText().toString());
+                list.add(rs);
+            }
+            if(!closestMetro.getText().toString().equals("")) {
+                RestaurantService rs1 = new RestaurantService();
+                rs1.setName("Closest Metro");
+                rs1.setAttribute(closestMetro.getText().toString());
+                list.add(rs1);
+            }
+            if(!closestBus.getText().toString().equals("")) {
+                RestaurantService rs2 = new RestaurantService();
+                rs2.setName("Closest bus");
+                rs2.setAttribute(closestBus.getText().toString());
+                list.add(rs2);
+            }
             dataPasser.onExtrasPass(list);
         }
     }

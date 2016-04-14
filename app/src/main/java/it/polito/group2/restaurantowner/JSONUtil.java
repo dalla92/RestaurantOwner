@@ -231,7 +231,7 @@ public class JSONUtil {
             OpenTime ot = new OpenTime();
             ot.setRestaurantId(jsonObject.optString("RestaurantID"));
             ot.setCloseHour(jsonObject.optString("CloseHour"));
-            ot.setDayOfWeek(jsonObject.optString("DayOfWeek"));
+            ot.setDayOfWeek(jsonObject.optInt("DayOfWeek"));
             ot.setOpenHour(jsonObject.optString("OpenHour"));
             ot.setType(jsonObject.optString("Type"));
             ot.setIsOpen(jsonObject.optBoolean("isOpen"));

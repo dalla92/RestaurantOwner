@@ -34,10 +34,15 @@ public class FragmentInfo extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static FragmentInfo newInstance(int sectionNumber) {
+    public static FragmentInfo newInstance(Restaurant res) {
         FragmentInfo fragment = new FragmentInfo();
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        if(res.getName()!=null) {
+            args.putString("Name", res.getName());
+            args.putString("Address", res.getAddress());
+            args.putString("Phone", res.getPhoneNum());
+            args.putString("Category", res.getCategory());
+        }
         fragment.setArguments(args);
         return fragment;
     }
@@ -78,6 +83,16 @@ public class FragmentInfo extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         category.setAdapter(adapter);
+        if(!getArguments().isEmpty()){
+            name.setText(getArguments().getString("Name"));
+            address.setText(getArguments().getString("Address"));
+            phone.setText(getArguments().getString("Phone"));
+            for(int i = 0;i<adapter.getCount();i++) {
+                CharSequence item = adapter.getItem(i);
+                if (item.toString().equals(getArguments().getString("Category")))
+                    category.setSelection(i);
+            }
+        }
         selectedCategory = String.valueOf(category.getSelectedItem());
 
         category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
