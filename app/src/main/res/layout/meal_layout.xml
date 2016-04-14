@@ -20,28 +20,29 @@
             android:src="@mipmap/ic_launcher"
             android:padding="7dp" />
 
-        <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/ic_edit"
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
             android:onClick="myClickHandler_edit"
             android:id="@+id/meal_edit" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="Medium Text"
             android:id="@+id/meal_name"
             android:layout_weight="1"
             android:paddingTop="10dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="5dp" />
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            />
 
-        <ImageButton
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@mipmap/icon_remove"
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_delete"
             android:onClick="myClickHandler_remove"
             android:id="@+id/meal_delete" />
 
@@ -58,7 +59,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/imageView4"
             android:src="@mipmap/money_icon"
-            android:layout_gravity="bottom|left" />
+            android:layout_gravity="bottom|start" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -67,24 +68,25 @@
             android:text="Small Text"
             android:id="@+id/meal_price"
             android:paddingTop="15dp"
-            android:layout_gravity="bottom|left" />
+            android:layout_gravity="bottom|start" />
 
         <ImageView
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:id="@+id/meal_type1"
             android:layout_gravity="center|top"
-            android:paddingRight="7dp" />
+            android:paddingEnd="7dp" />
 
         <ImageView
             android:layout_width="30dp"
             android:layout_height="wrap_content"
             android:id="@+id/meal_type2"
+
             android:layout_gravity="center|top"
-            android:paddingRight="10dp" />
+            android:paddingEnd="10dp" />
 
         <Switch
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textOn="@string/availability"
             android:textOff="NO"
