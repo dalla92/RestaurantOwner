@@ -104,7 +104,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
     }
 
     public void passData() {
-        dataPasser.onServicesPass(fidelity.isSelected(), tableRes.isSelected(), tableResEdit.getText().toString(), takeAway.isSelected(), takeAwayEdit.getText().toString(),
+        dataPasser.onServicesPass(fidelity.isChecked(), tableRes.isChecked(), tableResEdit.getText().toString(), takeAway.isChecked(), takeAwayEdit.getText().toString(),
                 lunchOpenTime, lunchCloseTime, dinnerOpenTime, dinnerCloseTime, listLunchClose, listDinnerClose);
     }
 
