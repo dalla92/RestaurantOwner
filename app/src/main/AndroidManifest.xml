@@ -27,6 +27,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.polito.group2.restaurantowner.MainActivity" />
         </activity>
+        <activity android:name=".ReviewsActivity" />
+        <activity
+            android:name=".StatisticsActivity"
+            android:label="Statistics"/>
+        <activity android:name=".GalleryActivity"></activity>
     </application>
 
 </manifest>
