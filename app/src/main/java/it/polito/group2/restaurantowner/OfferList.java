@@ -40,7 +40,6 @@ public class OfferList extends AppCompatActivity {
         setContentView(R.layout.activity_offer_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        //getSupportActionBar().setTitle("Offers");
         restaurantId = getIntent().getExtras().getString("restaurant_id");
 
         ListView lv = (ListView) findViewById(R.id.offer_list_view);

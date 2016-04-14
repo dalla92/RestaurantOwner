@@ -14,8 +14,9 @@
     tools:showIn="@layout/app_bar_restaurant_page"
     android:orientation="vertical">
 
-<LinearLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <RelativeLayout
@@ -40,94 +41,66 @@
             android:visibility="gone" />
     </RelativeLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/linear_layout_restaurant_name"
-            android:paddingTop="10dp">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/restaurant_name"
+        android:id="@+id/restaurant_name" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/restaurant_name"
-                android:id="@+id/restaurant_name" />
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text|textMultiLine|textCapSentences"
+        android:maxLength="40"
+        android:text="@string/edit_restaurant_name"
+        android:ems="10"
+        android:id="@+id/edit_restaurant_name"
+        android:background="@android:color/transparent"
+        style="@style/EditTextCustomHolo"
+        android:focusable="false"
+        />
 
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="text|textMultiLine|textCapSentences"
-                android:maxLength="40"
-                android:text="@string/edit_restaurant_name"
-                android:ems="10"
-                android:id="@+id/edit_restaurant_name"
-                android:background="@android:color/transparent"
-                style="@style/EditTextCustomHolo"
-                android:focusable="false"
-                />
-        </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/restaurant_address"
+        android:id="@+id/restaurant_address" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/linear_layout_restaurant_name"
-            android:id="@+id/linear_layout_restaurant_address">
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text|textMultiLine|textCapSentences"
+        android:maxLength="40"
+        android:text="@string/edit_restaurant_address"
+        android:ems="10"
+        android:focusable="false"
+        style="@style/EditTextCustomHolo"
+        android:background="@android:color/transparent"
+        android:id="@+id/edit_restaurant_address" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/restaurant_address"
-                android:id="@+id/restaurant_address" />
 
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="text|textMultiLine|textCapSentences"
-                android:maxLength="40"
-                android:text="@string/edit_restaurant_address"
-                android:ems="10"
-                android:focusable="false"
-                style="@style/EditTextCustomHolo"
-                android:background="@android:color/transparent"
-                android:id="@+id/edit_restaurant_address" />
-        </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/restaurant_telephone_number"
+        android:id="@+id/restaurant_telephone_number" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/linear_layout_restaurant_address"
-            android:id="@+id/linear_layout_restaurant_telephone_number">
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text|textMultiLine|textCapSentences"
+        android:maxLength="20"
+        android:text="@string/edit_restaurant_telephone_number"
+        android:ems="10"
+        android:focusable="false"
+        android:background="@android:color/transparent"
+        style="@style/EditTextCustomHolo"
+        android:id="@+id/edit_restaurant_telephone_number" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/restaurant_telephone_number"
-                android:layout_below="@id/linear_layout_restaurant_telephone_number"
-                android:id="@+id/restaurant_telephone_number" />
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="text|textMultiLine|textCapSentences"
-                android:maxLength="20"
-                android:text="@string/edit_restaurant_telephone_number"
-                android:ems="10"
-                android:focusable="false"
-                android:background="@android:color/transparent"
-                style="@style/EditTextCustomHolo"
-                android:id="@+id/edit_restaurant_telephone_number" />
-        </LinearLayout>
-
-    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"

@@ -3,8 +3,8 @@
 
         <string name="app_name">RestaurantOwner</string>
 
-        <string name="navigation_drawer_open">Open navigation drawer</string>
-        <string name="navigation_drawer_close">Close navigation drawer</string>
+        <string name="navigation_drawer_open">Apri navigation drawer</string>
+        <string name="navigation_drawer_close">Chiudi navigation drawer</string>
 
     <string name="action_reservations">PRENOTAZIONI</string>
     <string name="action_offers">OFFERTE</string>
@@ -14,7 +14,7 @@
     <string name="action_edit">IMPOSTAZIONI</string>
 
     <string name="restaurant_page_name">NOME DEL RISTORANTE</string>
-    <string name="button_take_photo">SCATTA FOTO ORA</string>
+    <string name="button_take_photo">SCATTA FOTO</string>
     <string name="button_choose_photo">SCEGLI DA GALLERIA</string>
     <string name="restaurant_name">Nome: </string>
     <string name="restaurant_address">Indirizzo: </string>
@@ -49,17 +49,17 @@
     <string name="add_meal">AGGIUNGI UN PIATTO</string>
     <string name="availability">VENDI</string>
 
-    <string name="meal_name">NOME PIATTO: </string>
-    <string name="meal_price">PREZZO PIATTO: </string>
-    <string name="meal_image">FOTO DEL PIATTO: </string>
-    <string name="meal_description">DESCRIZIONE PIATTO: </string>
-    <string name="meal_possible_additions">SUPPLEMENTI: </string>
-    <string name="meal_possible_categories">CATEGORIE CIBO: </string>
-    <string name="meal_time_for_cooking">cottura</string>
-    <string name="meal_add_new_category">categoria</string>
-    <string name="meal_add_new_addition">supplemento</string>
+    <string name="meal_name">Nome Piatto</string>
+    <string name="meal_price">Prezzo Piatto</string>
+    <string name="meal_image">Foto Piatto</string>
+    <string name="meal_description">Descrizione Piatto</string>
+    <string name="meal_possible_additions">Supplementi</string>
+    <string name="meal_possible_categories">Categorie Cibo</string>
+    <string name="meal_time_for_cooking">Cottura</string>
+    <string name="meal_add_new_category">Categoria</string>
+    <string name="meal_add_new_addition">Supplemento</string>
     <string name="title_activity_menu_restaurant_edit">MODIFICA PIATTO</string>
-    <string name="addition_meal_price">prezzo</string>
+    <string name="addition_meal_price">Prezzo</string>
 
     <string name="addres_section_main_info">INFO PRIMARIE</string>
     <string name="addres_section_other_info">ALTRE INFO</string>
@@ -72,21 +72,55 @@
 
     <string name="action_settings">Settings</string>
     <string name="action_add">Add restaurant</string>
-    <string name="title_activity_restaurant_list">My Restaurants</string>
-    <string name="title_activity_add_restaurant">Add Restaurant</string>
+    <string name="title_activity_restaurant_list">I miei Ristoranti</string>
+    <string name="title_activity_add_restaurant">Aggiungi Ristorante</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="addres_section1">Info</string>
-    <string name="addres_section2">Services</string>
+    <string name="addres_section2">Servizi</string>
     <string name="addres_section3">Extras</string>
-    <string name="name">Name</string>
-    <string name="address">Address</string>
-    <string name="phone">Phone</string>
-    <string name="category">Category</string>
+    <string name="name">Nome</string>
+    <string name="address">Indirizzo</string>
+    <string name="phone">Telefono</string>
+    <string name="category">Categoria</string>
     <string name="title_activity_restaurant_page">Restaurant_page</string>
 
-    <string name="reserved_percentage">Reserved percentage</string>
+    <string name="reserved_percentage">Percentuale prenotazioni</string>
     <string name="rating">Rating</string>
-    <string name="number_reservations">Number reservation</string>
+    <string name="number_reservations">Numero Prenotazioni</string>
+    <string name="action_save">SALVA</string>
+    <string name="add">Aggiungi</string>
+    <string name="april">Aprile</string>
+    <string name="august">Agosto</string>
+    <string name="december">Dicembre</string>
+    <string name="description">Descrizione</string>
+    <string name="dinner">Cena</string>
+    <string name="done">Fatto</string>
+    <string name="february">Febbraio</string>
+    <string name="from">Da</string>
+    <string name="info">Info</string>
+    <string name="january">Gennaio</string>
+    <string name="july">Luglio</string>
+    <string name="june">Giugno</string>
+    <string name="lunch">Pranzo</string>
+    <string name="march">Marzo</string>
+    <string name="may">Maggio</string>
+    <string name="november">Novembre</string>
+    <string name="october">Ottobbre</string>
+    <string name="offer_desc_error">Inserisci descrizione!</string>
+    <string name="offer_name_error">Inserisci un nome!</string>
+    <string name="ordered_meals">Piatti Ordinati</string>
+    <string name="reservation_people">Persone</string>
+    <string name="reservation_title">Prenotazioni</string>
+    <string name="september">Settembre</string>
+    <string name="table_section">Tavolo</string>
+    <string name="takeaway_section">Take Away</string>
+    <string name="title_activity_reservation">Prenotazioni</string>
+    <string name="title_activity_offer_list">Lista Offerte</string>
+    <string name="title_add_offer">Aggiungi Offerta</string>
+    <string name="to">A</string>
+    <string name="today">Oggi</string>
+    <string name="validity">Validità</string>
+    <string name="title_activity_add_offer">Aggiungi Offerta</string>
     <!--Alessio's strings begin-->
 
 

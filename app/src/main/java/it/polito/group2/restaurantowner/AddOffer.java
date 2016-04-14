@@ -33,7 +33,7 @@ public class AddOffer extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Add a new offer");
+        //getSupportActionBar().setTitle(getString(R.string.title_add_offer));
         lunch = dinner = false;
     }
 

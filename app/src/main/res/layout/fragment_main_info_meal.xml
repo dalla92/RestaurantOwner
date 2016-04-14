@@ -7,75 +7,50 @@
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="wrap_content" >
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:id="@+id/layout_meal_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="15dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/meal_name"
-            android:id="@+id/textView21"
-            android:paddingRight="5dp" />
-
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:inputType="text|textMultiLine|textCapSentences"
             android:maxLength="40"
-            style="@style/EditTextCustomHolo"
+            android:layout_marginTop="5dp"
+            android:hint="@string/meal_name"
             android:id="@+id/edit_meal_name" />
-    </LinearLayout>
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_below="@id/layout_meal_name"
-        android:id="@+id/layout_meal_price"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp">
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text|textMultiLine|textCapSentences"
+            android:hint="@string/meal_price"
+            android:maxLength="40"
+            android:layout_marginTop="10dp"
+            android:id="@+id/edit_meal_price" />
+
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/meal_price"
-            android:id="@+id/textView22"
-            android:paddingRight="5dp" />
+            android:text="@string/meal_image"
+            android:textColor="@color/black"
+            android:layout_marginTop="15dp"
+            android:id="@+id/textView23" />
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="text|textMultiLine|textCapSentences"
-            android:maxLength="40"
-            style="@style/EditTextCustomHolo"
-            android:ems="10"
-            android:id="@+id/edit_meal_price" />
     </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/meal_image"
-        android:layout_below="@id/layout_meal_price"
-        android:id="@+id/textView23"
-        android:paddingLeft="15dp"
-        android:paddingTop="15dp"
-        android:paddingRight="15dp" />
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:id="@+id/layout_meal_image"
-        android:layout_below="@id/textView23"
+        android:layout_below="@id/layout_meal_name"
         android:layout_height="wrap_content"
         android:paddingLeft="25dp">
 
