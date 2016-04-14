@@ -92,6 +92,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Set"
+        android:textColor="@android:color/white"
+        android:background="@drawable/custom_button"
         android:id="@+id/buttonLunchOpen"
         android:layout_below="@+id/textView13"
         android:layout_toEndOf="@+id/textView5" />
@@ -118,6 +120,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Set"
+        android:textColor="@android:color/white"
+        android:background="@drawable/custom_button"
         android:id="@+id/buttonLunchClose"
         android:layout_alignTop="@+id/buttonLunchOpen"
         android:layout_alignParentEnd="true" />
@@ -145,6 +149,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Set"
+        android:textColor="@android:color/white"
+        android:background="@drawable/custom_button"
         android:id="@+id/buttonDinnerOpen"
         android:layout_below="@+id/textView10"
         android:layout_toEndOf="@+id/textView5" />
@@ -170,6 +176,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Set"
+        android:textColor="@android:color/white"
+        android:background="@drawable/custom_button"
         android:id="@+id/buttonDinnerClose"
         android:layout_below="@+id/textView10"
         android:layout_alignParentEnd="true" />

@@ -3,19 +3,29 @@ package it.polito.group2.restaurantowner;
 import java.util.Calendar;
 
 public class TableReservation {
-    private String client_name, notes;
+    private String username, notes, restaurantId, tableReservationId;
     private int n_people;
-    private Calendar time;
+    private Calendar date;
 
-    public TableReservation(String client_name, int n_people, Calendar time, String notes) {
-        this.client_name = client_name;
+    public TableReservation(String username, int n_people, Calendar date, String notes, String restaurantId, String tableReservationId) {
+        this.username = username;
         this.notes = notes;
         this.n_people = n_people;
-        this.time = time;
+        this.date = date;
+        this.restaurantId = restaurantId;
+        this.tableReservationId = tableReservationId;
     }
 
-    public String getClient_name() {
-        return client_name;
+    public String getTableReservationId() {
+        return tableReservationId;
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
+    }
+
+    public String getUsername() {
+        return username;
     }
 
     public int getN_people() {
@@ -26,7 +36,7 @@ public class TableReservation {
         return notes;
     }
 
-    public Calendar getTime() {
-        return time;
+    public Calendar getDate() {
+        return date;
     }
 }
