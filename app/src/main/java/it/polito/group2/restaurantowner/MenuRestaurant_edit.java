@@ -69,9 +69,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MenuRestaurant_edit extends AppCompatActivity {
-    public static ArrayList<Meal> meals;
     public SectionsPagerAdapter mSectionsPagerAdapter;
     public ViewPager mViewPager;
     public static AppBarLayout appbar;
@@ -94,12 +95,18 @@ public class MenuRestaurant_edit extends AppCompatActivity {
     public static ExpandableListView categories;
     public static it.polito.group2.restaurantowner.MenuRestaurant_edit.FragmentOtherInfo.MyExpandableAdapter additions_adapter;
     public static it.polito.group2.restaurantowner.MenuRestaurant_edit.FragmentOtherInfo.MyExpandableAdapter categories_adapter;
-    public static int restaurant_id = 0;
-    public static int meal_id = 0;
+    public static String restaurant_id = "0";
+    public static String meal_name = "0";
     public static String photouri = null;
     public static int PICK_IMAGE = 0;
     public static int REQUEST_TAKE_PHOTO = 1;
-
+    private static Set<Meal> meals_read = new HashSet<>();
+    private static Set<Addition> meals_additions_read = new HashSet<>();
+    private static Set<Addition> meals_categories_read = new HashSet<>();
+    private static ArrayList<Meal> meals = new ArrayList<>();
+    private static ArrayList<Addition> meals_additions = new ArrayList<>();
+    private static ArrayList<Addition> meals_categories = new ArrayList<>();
+    public static Meal current_meal = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,13 +123,22 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         else {
             //retrieve data
             Bundle b = getIntent().getExtras();
-            meal_id = b.getInt("meal_id");
-            restaurant_id = b.getInt("restaurant_id");
+            meal_name = b.getString("meal_name");
+            restaurant_id = b.getString("restaurant_id");
             try {
-                meals = readJSONMeList();
+                readJSONMeList();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            
+            //retrieve current_meal
+            for(Meal m : meals){
+                if(m.getMeal_name().equals(meal_name)){
+                    current_meal = m;
+                    break;
+                }
+            }
+            
             //toolbar
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -165,7 +181,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         try {
-            saveJSONMeList(meals);
+            saveJSONMeList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -215,9 +231,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     }
                 }
             }
-            meals.get(restaurant_id).setMeal_photo(photouri);
+            current_meal.setMeal_photo(photouri);
             try{
-                saveJSONMeList(meals);
+                saveJSONMeList();
             }
             catch(JSONException e){
                 e.printStackTrace();
@@ -246,19 +262,22 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         bmOptions.inPurgeable = true;
         Bitmap bitmap = BitmapFactory.decodeFile(photouri, bmOptions);
         mImageView.setImageBitmap(bitmap);
-        meals.get(restaurant_id).setMeal_photo(photouri);
+        current_meal.setMeal_photo(photouri);
         try{
-            saveJSONMeList(meals);
+            saveJSONMeList();
         }
         catch(JSONException e){
             e.printStackTrace();
         }
     }
 
-    public ArrayList<Meal> readJSONMeList() throws JSONException {
+    public void readJSONMeList() throws JSONException {
         //mealList.json
+        meals_read = new HashSet<>();
+        meals_additions_read = new HashSet<>();
+        meals_categories_read = new HashSet<>();
+        Log.d("ccc", "CALLED READ");
         String json = null;
-        ArrayList<Meal> meals = new ArrayList<>();
         FileInputStream fis = null;
         String FILENAME = "mealList.json";
         try {
@@ -270,7 +289,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             json = new String(buffer, "UTF-8");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return meals;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -279,20 +297,20 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             Meal me = new Meal();
-            if (jsonObject.optInt("RestaurantId") == restaurant_id) {
-                me.setRestaurantId(jsonObject.optString("RestaurantId"));
-                me.setMealId(jsonObject.optString("MealId"));
-                me.setMeal_photo(jsonObject.optString("MealPhoto"));
-                me.setMeal_name(jsonObject.optString("MealName"));
-                me.setMeal_price(jsonObject.optDouble("MealPrice"));
-                me.setType1(jsonObject.optString("MealType1"));
-                me.setType2(jsonObject.optString("MealType2"));
-                me.setAvailable(jsonObject.getBoolean("MealAvailable"));
-                me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
-                me.setCooking_time(jsonObject.optInt("MealCookingTime"));
-                me.setDescription(jsonObject.getString("MealDescription"));
-                meals.add(me);
-            }
+            me.setRestaurantId(jsonObject.optString("RestaurantId"));
+            me.setMealId(jsonObject.optString("MealId"));
+            me.setMeal_photo(jsonObject.optString("MealPhoto"));
+            me.setMeal_name(jsonObject.optString("MealName"));
+            me.setMeal_price(jsonObject.optDouble("MealPrice"));
+            me.setType1(jsonObject.optString("MealType1"));
+            me.setType2(jsonObject.optString("MealType2"));
+            me.setAvailable(jsonObject.getBoolean("MealAvailable"));
+            me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
+            me.setCooking_time(jsonObject.optInt("MealCookingTime"));
+            me.setDescription(jsonObject.getString("MealDescription"));
+            Log.d("ccc", "READ");
+            if(me.getRestaurantId().equals(restaurant_id))
+                meals_read.add(me);
         }
         //mealAdditions.json
         String json2 = null;
@@ -307,7 +325,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             json2 = new String(buffer2, "UTF-8");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return meals;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -316,13 +333,13 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         for (int i = 0; i < jsonArray2.length(); i++) {
             JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
             Addition ad = new Addition();
-            if (jsonObject2.optInt("RestaurantId") == restaurant_id) {
+            if (jsonObject2.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
                 ad.setMeal_id(jsonObject2.optString("MealId"));
                 ad.setName(jsonObject2.optString("AdditionName"));
                 ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                 ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
-                childAdditions.add(ad);
+                meals_additions_read.add(ad);
             }
         }
         //mealCategories.json
@@ -338,7 +355,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             json3 = new String(buffer3, "UTF-8");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return meals;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -347,27 +363,38 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         for (int i = 0; i < jsonArray3.length(); i++) {
             JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
             Addition ad = new Addition();
-            if (jsonObject3.optInt("RestaurantId") == restaurant_id) {
+            if (jsonObject3.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
                 ad.setMeal_id(jsonObject3.optString("MealId"));
                 ad.setName(jsonObject3.optString("CategoryName"));
                 ad.setSelected(jsonObject3.getBoolean("CategorySelected"));
                 ad.setPrice(0);
                 //ad.setPrice(jsonObject3.optDouble("CategoryPrice"));
-                childCategories.add(ad);
+                meals_categories_read.add(ad);
             }
         }
-        //fill additions and categories of my restaurant
-        meals.get(restaurant_id).setMeal_additions(childAdditions); //no further checks because I read if(jsonObject3.optInt("RestaurantId")==restaurant_id) {
-        meals.get(restaurant_id).setMeal_categories(childCategories);
-        return meals;
+
+        //remove duplicates
+        remove_duplicates();
     }
 
-    public void saveJSONMeList(ArrayList<Meal> meals) throws JSONException {
+    public void remove_duplicates(){
+        for( Meal m : meals_read) {
+            meals.add(m);
+        }
+        for( Addition a : meals_additions_read) {
+            meals_additions.add(a);
+        }
+        for( Addition a : meals_categories_read) {
+            meals_categories.add(a);
+        }
+    }
+
+    public void saveJSONMeList() throws JSONException {
         //meals writing
         String FILENAME = "mealList.json";
         JSONArray jarray = new JSONArray();
-        for (Meal me : meals) {
+        for (Meal me : meals_read) {
             JSONObject jres = new JSONObject();
             jres.put("RestaurantId", me.getRestaurantId());
             jres.put("MealId", me.getMealId());
@@ -380,6 +407,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             jres.put("MealTakeAway", me.isTake_away());
             jres.put("MealCookingTime", me.getCooking_time());
             jres.put("MealDescription", me.getDescription());
+            Log.d("ccc", "WRITE");
             jarray.put(jres);
         }
         JSONObject resObj = new JSONObject();
@@ -397,7 +425,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         //additions writing
         String FILENAME2 = "mealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (Meal me : meals) {
+        for (Meal me : meals_read) {
             for (Addition ad : me.getMeal_additions()) {
                 JSONObject jres2 = new JSONObject();
                 jres2.put("RestaurantId", ad.getRestaurant_id());
@@ -412,7 +440,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         resObj2.put("MealsAdditions", jarray2);
         FileOutputStream fos2 = null;
         try {
-            fos2 = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos2 = openFileOutput(FILENAME2, Context.MODE_PRIVATE);
             fos2.write(resObj2.toString().getBytes());
             fos2.close();
         } catch (FileNotFoundException e) {
@@ -435,10 +463,10 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 jarray3.put(jres3);
             }
             JSONObject resObj3 = new JSONObject();
-            resObj.put("MealsCategories", jarray);
+            resObj3.put("MealsCategories", jarray3);
             FileOutputStream fos3 = null;
             try {
-                fos3 = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                fos3 = openFileOutput(FILENAME3, Context.MODE_PRIVATE);
                 fos3.write(resObj3.toString().getBytes());
                 fos3.close();
             } catch (FileNotFoundException e) {
@@ -487,9 +515,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    meals.get(restaurant_id).setType1(spinner3.getSelectedItem().toString());
+                    current_meal.setType1(spinner3.getSelectedItem().toString());
                     try {
-                        saveJSONMeList(meals);
+                        saveJSONMeList();
                     }
                     catch(JSONException e){
                         e.printStackTrace();
@@ -509,9 +537,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             spinner4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    meals.get(restaurant_id).setType1(spinner4.getSelectedItem().toString());
+                    current_meal.setType1(spinner4.getSelectedItem().toString());
                     try {
-                        saveJSONMeList(meals);
+                        saveJSONMeList();
                     }
                     catch(JSONException e){
                         e.printStackTrace();
@@ -530,9 +558,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
                     if(!hasFocus) { //when focus is lost only
-                        meals.get(restaurant_id).setMeal_name(edit_meal_name.getText().toString());
+                        current_meal.setMeal_name(edit_meal_name.getText().toString());
                         try {
-                            saveJSONMeList(meals);
+                            saveJSONMeList();
                         }
                         catch(JSONException e){
                             e.printStackTrace();
@@ -544,9 +572,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
                     if(!hasFocus) { //when focus is lost only
-                        meals.get(restaurant_id).setMeal_price(Double.parseDouble(edit_meal_price.getText().toString()));
+                        current_meal.setMeal_price(Double.parseDouble(edit_meal_price.getText().toString()));
                         try {
-                            saveJSONMeList(meals);
+                            saveJSONMeList();
                         }
                         catch(JSONException e){
                             e.printStackTrace();
@@ -557,9 +585,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             check_take_away.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    meals.get(restaurant_id).setMeal_price(Double.parseDouble(edit_meal_price.getText().toString()));
+                    current_meal.setMeal_price(Double.parseDouble(edit_meal_price.getText().toString()));
                     try {
-                        saveJSONMeList(meals);
+                        saveJSONMeList();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -634,7 +662,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         public void onPause() {
             super.onPause();
             try {
-                saveJSONMeList(meals);
+                saveJSONMeList();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -661,9 +689,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     storageDir      /* directory */
             );
             photouri = "file:" + image.getAbsolutePath();
-            meals.get(restaurant_id).setMeal_photo(photouri);
+            current_meal.setMeal_photo(photouri);
             try{
-                saveJSONMeList(meals);
+                saveJSONMeList();
             }
             catch(JSONException e){
                 e.printStackTrace();
@@ -687,10 +715,13 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             }
         }
 
-        public ArrayList<Meal> readJSONMeList() throws JSONException {
+        public void readJSONMeList() throws JSONException {
             //mealList.json
+            meals_read = new HashSet<>();
+            meals_additions_read = new HashSet<>();
+            meals_categories_read = new HashSet<>();
+            Log.d("ccc", "CALLED READ");
             String json = null;
-            ArrayList<Meal> meals = new ArrayList<>();
             FileInputStream fis = null;
             String FILENAME = "mealList.json";
             try {
@@ -702,7 +733,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 json = new String(buffer, "UTF-8");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                return meals;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -711,20 +741,20 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 Meal me = new Meal();
-                if (jsonObject.optInt("RestaurantId") == restaurant_id) {
-                    me.setRestaurantId(jsonObject.optString("RestaurantId"));
-                    me.setMealId(jsonObject.optString("MealId"));
-                    me.setMeal_photo(jsonObject.optString("MealPhoto"));
-                    me.setMeal_name(jsonObject.optString("MealName"));
-                    me.setMeal_price(jsonObject.optDouble("MealPrice"));
-                    me.setType1(jsonObject.optString("MealType1"));
-                    me.setType2(jsonObject.optString("MealType2"));
-                    me.setAvailable(jsonObject.getBoolean("MealAvailable"));
-                    me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
-                    me.setCooking_time(jsonObject.optInt("MealCookingTime"));
-                    me.setDescription(jsonObject.getString("MealDescription"));
-                    meals.add(me);
-                }
+                me.setRestaurantId(jsonObject.optString("RestaurantId"));
+                me.setMealId(jsonObject.optString("MealId"));
+                me.setMeal_photo(jsonObject.optString("MealPhoto"));
+                me.setMeal_name(jsonObject.optString("MealName"));
+                me.setMeal_price(jsonObject.optDouble("MealPrice"));
+                me.setType1(jsonObject.optString("MealType1"));
+                me.setType2(jsonObject.optString("MealType2"));
+                me.setAvailable(jsonObject.getBoolean("MealAvailable"));
+                me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
+                me.setCooking_time(jsonObject.optInt("MealCookingTime"));
+                me.setDescription(jsonObject.getString("MealDescription"));
+                Log.d("ccc", "READ");
+                if(me.getRestaurantId().equals(restaurant_id))
+                    meals_read.add(me);
             }
             //mealAdditions.json
             String json2 = null;
@@ -739,7 +769,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 json2 = new String(buffer2, "UTF-8");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                return meals;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -748,13 +777,13 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             for (int i = 0; i < jsonArray2.length(); i++) {
                 JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
                 Addition ad = new Addition();
-                if (jsonObject2.optInt("RestaurantId") == restaurant_id) {
+                if (jsonObject2.optString("RestaurantId").equals(restaurant_id)) {
                     ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
                     ad.setMeal_id(jsonObject2.optString("MealId"));
                     ad.setName(jsonObject2.optString("AdditionName"));
                     ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                     ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
-                    childAdditions.add(ad);
+                    meals_additions_read.add(ad);
                 }
             }
             //mealCategories.json
@@ -770,7 +799,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 json3 = new String(buffer3, "UTF-8");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                return meals;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -786,20 +814,31 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     ad.setSelected(jsonObject3.getBoolean("CategorySelected"));
                     ad.setPrice(0);
                     //ad.setPrice(jsonObject3.optDouble("CategoryPrice"));
-                    childCategories.add(ad);
+                    meals_categories_read.add(ad);
                 }
             }
-            //fill additions and categories of my restaurant
-            meals.get(restaurant_id).setMeal_additions(childAdditions); //no further checks because I read if(jsonObject3.optInt("RestaurantId")==restaurant_id) {
-            meals.get(restaurant_id).setMeal_categories(childCategories);
-            return meals;
+
+            //remove duplicates
+            remove_duplicates();
         }
 
-        public void saveJSONMeList(ArrayList<Meal> meals) throws JSONException {
+        public void remove_duplicates(){
+            for( Meal m : meals_read) {
+                meals.add(m);
+            }
+            for( Addition a : meals_additions_read) {
+                meals_additions.add(a);
+            }
+            for( Addition a : meals_categories_read) {
+                meals_categories.add(a);
+            }
+        }
+
+        public void saveJSONMeList() throws JSONException {
             //meals writing
             String FILENAME = "mealList.json";
             JSONArray jarray = new JSONArray();
-            for (Meal me : meals) {
+            for (Meal me : meals_read) {
                 JSONObject jres = new JSONObject();
                 jres.put("RestaurantId", me.getRestaurantId());
                 jres.put("MealId", me.getMealId());
@@ -812,6 +851,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 jres.put("MealTakeAway", me.isTake_away());
                 jres.put("MealCookingTime", me.getCooking_time());
                 jres.put("MealDescription", me.getDescription());
+                Log.d("ccc", "WRITE");
                 jarray.put(jres);
             }
             JSONObject resObj = new JSONObject();
@@ -829,7 +869,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             //additions writing
             String FILENAME2 = "mealAddition.json";
             JSONArray jarray2 = new JSONArray();
-            for (Meal me : meals) {
+            for (Meal me : meals_read) {
                 for (Addition ad : me.getMeal_additions()) {
                     JSONObject jres2 = new JSONObject();
                     jres2.put("RestaurantId", ad.getRestaurant_id());
@@ -844,7 +884,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             resObj2.put("MealsAdditions", jarray2);
             FileOutputStream fos2 = null;
             try {
-                fos2 = getActivity().openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                fos2 = getActivity().openFileOutput(FILENAME2, Context.MODE_PRIVATE);
                 fos2.write(resObj2.toString().getBytes());
                 fos2.close();
             } catch (FileNotFoundException e) {
@@ -867,10 +907,10 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     jarray3.put(jres3);
                 }
                 JSONObject resObj3 = new JSONObject();
-                resObj.put("MealsCategories", jarray);
+                resObj3.put("MealsCategories", jarray3);
                 FileOutputStream fos3 = null;
                 try {
-                    fos3 = getActivity().openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                    fos3 = getActivity().openFileOutput(FILENAME3, Context.MODE_PRIVATE);
                     fos3.write(resObj3.toString().getBytes());
                     fos3.close();
                 } catch (FileNotFoundException e) {
@@ -900,8 +940,10 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             rootView = inflater.inflate(R.layout.fragment_other_info_meal, container, false);
 
-            EditText description = (EditText) rootView.findViewById(R.id.edit_meal_description);
-            description.setText(meals.get(restaurant_id).getDescription());
+            if(restaurant_id!=null && !restaurant_id.equals("0")) {
+                EditText description = (EditText) rootView.findViewById(R.id.edit_meal_description);
+                description.setText(current_meal.getDescription());
+            }
             //numberPicker implementation
             NumberPicker np = (NumberPicker) rootView.findViewById(R.id.numberPicker);
             np.setMinValue(1);
@@ -910,9 +952,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                 @Override
                 public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                    meals.get(restaurant_id).setCooking_time(newVal);
+                    current_meal.setCooking_time(newVal);
                     try {
-                        saveJSONMeList(meals);
+                        saveJSONMeList();
                     }
                     catch(JSONException e){
                         e.printStackTrace();
@@ -953,9 +995,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     childAdditions = additions_adapter.getChildItems();
                     childAdditions.add(new Addition("0","0", "New addition", 0, false));
                     additions_adapter.setChildItems(childAdditions);
-                    meals.get(restaurant_id).setMeal_additions(childAdditions);
+                    current_meal.setMeal_additions(childAdditions);
                     try {
-                        saveJSONMeList(meals);
+                        saveJSONMeList();
                     }
                     catch(JSONException e){
                         e.printStackTrace();
@@ -969,9 +1011,9 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     childCategories = categories_adapter.getChildItems();
                     childCategories.add(new Addition("0","0","New category", 0, false));
                     categories_adapter.setChildItems(childCategories);
-                    meals.get(restaurant_id).setMeal_additions(childCategories);
+                    current_meal.setMeal_additions(childCategories);
                     try {
-                        saveJSONMeList(meals);
+                        saveJSONMeList();
                     }
                     catch(JSONException e){
                         e.printStackTrace();
@@ -1006,7 +1048,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         public void onPause() {
             super.onPause();
             try {
-                saveJSONMeList(meals);
+                saveJSONMeList();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -1073,11 +1115,11 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                         notifyDataSetChanged();
                         notifyDataSetInvalidated();
                         if(parentItem.equals("Meal additions"))
-                            meals.get(restaurant_id).setMeal_additions(childItems);
+                            current_meal.setMeal_additions(childItems);
                         else
-                            meals.get(restaurant_id).setMeal_categories(childItems);
+                            current_meal.setMeal_categories(childItems);
                         try {
-                            saveJSONMeList(meals);
+                            saveJSONMeList();
                         }
                         catch(JSONException e){
                             e.printStackTrace();
@@ -1115,11 +1157,11 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                                                          childItems.get(childPosition).setPrice(Double.parseDouble(userInput_price.getText().toString()));
                                                  }
                                                  if(parentItem.equals("Meal additions"))
-                                                     meals.get(restaurant_id).setMeal_additions(childItems);
+                                                     current_meal.setMeal_additions(childItems);
                                                  else
-                                                     meals.get(restaurant_id).setMeal_categories(childItems);
+                                                     current_meal.setMeal_categories(childItems);
                                                  try {
-                                                     saveJSONMeList(meals);
+                                                     saveJSONMeList();
                                                  }
                                                  catch(JSONException e){
                                                      e.printStackTrace();
@@ -1208,10 +1250,13 @@ public class MenuRestaurant_edit extends AppCompatActivity {
 
         }
 
-        public ArrayList<Meal> readJSONMeList() throws JSONException {
+        public void readJSONMeList() throws JSONException {
             //mealList.json
+            meals_read = new HashSet<>();
+            meals_additions_read = new HashSet<>();
+            meals_categories_read = new HashSet<>();
+            Log.d("ccc", "CALLED READ");
             String json = null;
-            ArrayList<Meal> meals = new ArrayList<>();
             FileInputStream fis = null;
             String FILENAME = "mealList.json";
             try {
@@ -1223,7 +1268,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 json = new String(buffer, "UTF-8");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                return meals;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -1232,20 +1276,20 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                 Meal me = new Meal();
-                if (jsonObject.optString("RestaurantId").equals(restaurant_id)) {
-                    me.setRestaurantId(jsonObject.optString("RestaurantId"));
-                    me.setMealId(jsonObject.optString("MealId"));
-                    me.setMeal_photo(jsonObject.optString("MealPhoto"));
-                    me.setMeal_name(jsonObject.optString("MealName"));
-                    me.setMeal_price(jsonObject.optDouble("MealPrice"));
-                    me.setType1(jsonObject.optString("MealType1"));
-                    me.setType2(jsonObject.optString("MealType2"));
-                    me.setAvailable(jsonObject.getBoolean("MealAvailable"));
-                    me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
-                    me.setCooking_time(jsonObject.optInt("MealCookingTime"));
-                    me.setDescription(jsonObject.getString("MealDescription"));
-                    meals.add(me);
-                }
+                me.setRestaurantId(jsonObject.optString("RestaurantId"));
+                me.setMealId(jsonObject.optString("MealId"));
+                me.setMeal_photo(jsonObject.optString("MealPhoto"));
+                me.setMeal_name(jsonObject.optString("MealName"));
+                me.setMeal_price(jsonObject.optDouble("MealPrice"));
+                me.setType1(jsonObject.optString("MealType1"));
+                me.setType2(jsonObject.optString("MealType2"));
+                me.setAvailable(jsonObject.getBoolean("MealAvailable"));
+                me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
+                me.setCooking_time(jsonObject.optInt("MealCookingTime"));
+                me.setDescription(jsonObject.getString("MealDescription"));
+                Log.d("ccc", "READ");
+                if(me.getRestaurantId().equals(restaurant_id))
+                    meals_read.add(me);
             }
             //mealAdditions.json
             String json2 = null;
@@ -1260,7 +1304,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 json2 = new String(buffer2, "UTF-8");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                return meals;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -1275,7 +1318,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     ad.setName(jsonObject2.optString("AdditionName"));
                     ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                     ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
-                    childAdditions.add(ad);
+                    meals_additions_read.add(ad);
                 }
             }
             //mealCategories.json
@@ -1291,7 +1334,6 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 json3 = new String(buffer3, "UTF-8");
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                return meals;
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -1307,20 +1349,31 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     ad.setSelected(jsonObject3.getBoolean("CategorySelected"));
                     ad.setPrice(0);
                     //ad.setPrice(jsonObject3.optDouble("CategoryPrice"));
-                    childCategories.add(ad);
+                    meals_categories_read.add(ad);
                 }
             }
-            //fill additions and categories of my restaurant
-            meals.get(restaurant_id).setMeal_additions(childAdditions); //no further checks because I read if(jsonObject3.optInt("RestaurantId")==restaurant_id) {
-            meals.get(restaurant_id).setMeal_categories(childCategories);
-            return meals;
+
+            //remove duplicates
+            remove_duplicates();
         }
 
-        public void saveJSONMeList(ArrayList<Meal> meals) throws JSONException {
+        public void remove_duplicates(){
+            for( Meal m : meals_read) {
+                meals.add(m);
+            }
+            for( Addition a : meals_additions_read) {
+                meals_additions.add(a);
+            }
+            for( Addition a : meals_categories_read) {
+                meals_categories.add(a);
+            }
+        }
+
+        public void saveJSONMeList() throws JSONException {
             //meals writing
             String FILENAME = "mealList.json";
             JSONArray jarray = new JSONArray();
-            for (Meal me : meals) {
+            for (Meal me : meals_read) {
                 JSONObject jres = new JSONObject();
                 jres.put("RestaurantId", me.getRestaurantId());
                 jres.put("MealId", me.getMealId());
@@ -1333,6 +1386,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 jres.put("MealTakeAway", me.isTake_away());
                 jres.put("MealCookingTime", me.getCooking_time());
                 jres.put("MealDescription", me.getDescription());
+                Log.d("ccc", "WRITE");
                 jarray.put(jres);
             }
             JSONObject resObj = new JSONObject();
@@ -1350,7 +1404,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             //additions writing
             String FILENAME2 = "mealAddition.json";
             JSONArray jarray2 = new JSONArray();
-            for (Meal me : meals) {
+            for (Meal me : meals_read) {
                 for (Addition ad : me.getMeal_additions()) {
                     JSONObject jres2 = new JSONObject();
                     jres2.put("RestaurantId", ad.getRestaurant_id());
@@ -1365,7 +1419,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             resObj2.put("MealsAdditions", jarray2);
             FileOutputStream fos2 = null;
             try {
-                fos2 = getActivity().openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                fos2 = getActivity().openFileOutput(FILENAME2, Context.MODE_PRIVATE);
                 fos2.write(resObj2.toString().getBytes());
                 fos2.close();
             } catch (FileNotFoundException e) {
@@ -1388,10 +1442,10 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     jarray3.put(jres3);
                 }
                 JSONObject resObj3 = new JSONObject();
-                resObj.put("MealsCategories", jarray);
+                resObj3.put("MealsCategories", jarray3);
                 FileOutputStream fos3 = null;
                 try {
-                    fos3 = getActivity().openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                    fos3 = getActivity().openFileOutput(FILENAME3, Context.MODE_PRIVATE);
                     fos3.write(resObj3.toString().getBytes());
                     fos3.close();
                 } catch (FileNotFoundException e) {
@@ -1401,6 +1455,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 }
             }
         }
+
     }
     ////////////////////////FragmentOtherInfo//////////////////////////////////////////
 

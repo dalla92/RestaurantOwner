@@ -234,13 +234,15 @@ public class MenuRestaurant_page extends AppCompatActivity
         intent.putExtras(b);
         startActivity(intent);
         */
+        LinearLayout vwParentRow = (LinearLayout) v.getParent();
+        TextView child = (TextView) vwParentRow.getChildAt(2);
+        final String meal_name = child.getText().toString();
         Intent intent1 = new Intent(
                 getApplicationContext(),
                 MenuRestaurant_edit.class);
         Bundle b = new Bundle();
-        TextView meal_name = (TextView) v.findViewById(R.id.meal_name);
         b.putString("restaurant_id", restaurant_id);
-        b.putString("meal_id", meal_name.getText().toString());
+        b.putString("meal_name", meal_name);
         intent1.putExtras(b);
         startActivity(intent1);
     }
