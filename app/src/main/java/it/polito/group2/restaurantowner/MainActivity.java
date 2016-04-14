@@ -186,11 +186,6 @@ public class MainActivity extends AppCompatActivity
             // TODO Handle the logout action
         } else if (id == R.id.nav_manage) {
             // TODO Handle the manage action
-        } else if (id == R.id.one_restaurant) {
-            Intent intent = new Intent(
-                    getApplicationContext(),
-                    Restaurant_page.class);
-            startActivity(intent);
         }
 
 
