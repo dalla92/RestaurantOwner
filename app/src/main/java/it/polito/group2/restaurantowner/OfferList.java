@@ -32,6 +32,7 @@ public class OfferList extends AppCompatActivity {
     private static final int ADD_REQUEST = 1;
     private ArrayList<Offer> offer_list = getDataJson();
     private BaseAdapter adapter;
+    private String restaurantId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +40,8 @@ public class OfferList extends AppCompatActivity {
         setContentView(R.layout.activity_offer_list);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Offers");
-
+        //getSupportActionBar().setTitle("Offers");
+        restaurantId = getIntent().getExtras().getString("restaurant_id");
 
         ListView lv = (ListView) findViewById(R.id.offer_list_view);
         adapter = new BaseAdapter() {
@@ -89,7 +90,7 @@ public class OfferList extends AppCompatActivity {
                 ImageView delete = (ImageView) convertView.findViewById(R.id.offer_delete);
                 Calendar today = Calendar.getInstance();
                 Calendar target = offer.getTo();
-                if(offer.getTo().after(today.getTime()) ||
+                if(target.after(today.getTime()) ||
                         (target.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                          target.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
                          target.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH))){

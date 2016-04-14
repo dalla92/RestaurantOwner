@@ -59,7 +59,7 @@ public class Restaurant_page extends AppCompatActivity
     public int PICK_IMAGE = 0;
     public int REQUEST_TAKE_PHOTO = 1;
     public int MODIFY_INFO = 4;
-    public String photouri;
+    public String photouri = null;
     public ArrayList<Comment> comments;
     public Restaurant my_restaurant = null;
 
@@ -360,11 +360,13 @@ public class Restaurant_page extends AppCompatActivity
             setPic(image);
             //add photo to gallery
             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-            File f = new File(photouri); //here is passed the mCurrentPhotoPath
-            Uri contentUri = Uri.fromFile(f);
-            mediaScanIntent.setData(contentUri);
-            this.sendBroadcast(mediaScanIntent);
-            my_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
+            if(photouri!=null) {
+                File f = new File(photouri); //here is passed the mCurrentPhotoPath
+                Uri contentUri = Uri.fromFile(f);
+                mediaScanIntent.setData(contentUri);
+                this.sendBroadcast(mediaScanIntent);
+                my_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
+            }
             try {
                 saveJSONResList();
             } catch (JSONException e) {

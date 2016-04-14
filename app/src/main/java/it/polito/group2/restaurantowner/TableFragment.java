@@ -11,21 +11,47 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.json.JSONException;
+import org.w3c.dom.Text;
+
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
 public class TableFragment extends Fragment {
 
-    private ArrayList<TableReservation> reservation_list = getDataJson();
+    private ArrayList<TableReservation> reservation_list;
+    private BaseAdapter adapter;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_table_reservation, container, false);
 
+        Bundle bundle = getArguments();
+        long date_millis = bundle.getLong("date");
+        String restaurantId = bundle.getString("id");
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(date_millis);
+        reservation_list = getDataJson(date, restaurantId);
+
+        Calendar today = Calendar.getInstance();
+        TextView reservation_title = (TextView) rootView.findViewById(R.id.reservation_list_title);
+        if(     date.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                date.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                date.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH))
+
+            reservation_title.setText(new StringBuilder()
+                    .append(getString(R.string.today)).append(" ").append(getString(R.string.reservation_title)));
+        else {
+            reservation_title.setText(new StringBuilder().append(getString((R.string.reservation_title)))
+                    .append(" ").append(date.get(Calendar.DAY_OF_MONTH)).append("  ")
+                    .append(getMonthName(date.get(Calendar.MONTH))).append("  ")
+                    .append(date.get(Calendar.YEAR)).append(" "));
+        }
         ListView lv = (ListView) rootView.findViewById(R.id.table_list_view);
-        BaseAdapter adapter = new BaseAdapter() {
+        adapter = new BaseAdapter() {
 
             @Override
             public int getCount() {
@@ -48,49 +74,64 @@ public class TableFragment extends Fragment {
                     convertView = inflater.inflate(R.layout.table_reservation_item, parent, false);
                 }
 
-                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:MM");
+                SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 TextView text_client_name = (TextView) convertView.findViewById(R.id.reservation_client);
                 TextView text_time = (TextView) convertView.findViewById(R.id.reservation_time);
                 TextView text_people = (TextView) convertView.findViewById(R.id.reservation_people);
                 TextView text_notes = (TextView) convertView.findViewById(R.id.reservation_notes);
 
                 TableReservation reservation = reservation_list.get(position);
-                text_client_name.setText(reservation.getClient_name());
-                text_time.setText(timeFormat.format(reservation.getTime().getTime()));
-                text_people.setText(String.format("%d", reservation.getN_people()));
+                text_client_name.setText(reservation.getUsername());
+                text_time.setText(timeFormat.format(reservation.getDate().getTime()));
+                text_people.setText(String.format("%d %s", reservation.getN_people(), getString(R.string.reservation_people)));
                 text_notes.setText(reservation.getNotes());
 
                 ImageView delete = (ImageView) convertView.findViewById(R.id.table_reservation_delete);
-                delete.setOnClickListener(new View.OnClickListener() {
+                Calendar today = Calendar.getInstance();
+                Calendar target = reservation.getDate();
+                if(target.after(today.getTime()) ||
+                        (target.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                        target.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
+                        target.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH))) {
 
-                    @Override
-                    public void onClick(View v) {
+                    delete.setClickable(true);
+                    delete.setVisibility(View.VISIBLE);
 
-                        AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-                        alert.setTitle("Confirmation!");
-                        alert.setMessage("Are you sure you want to delete this reservation?\nThe operation cannot be undone!");
-                        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    delete.setOnClickListener(new View.OnClickListener() {
 
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                reservation_list.remove(position);
-                                notifyDataSetChanged();
-                                dialog.dismiss();
+                        @Override
+                        public void onClick(View v) {
 
-                            }
-                        });
-                        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
+                            alert.setTitle("Confirmation!");
+                            alert.setMessage("Are you sure you want to delete this reservation?\nThe operation cannot be undone!");
+                            alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    reservation_list.remove(position);
+                                    notifyDataSetChanged();
+                                    dialog.dismiss();
 
-                                dialog.dismiss();
-                            }
-                        });
+                                }
+                            });
+                            alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
 
-                        alert.show();
-                    }
-                });
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            alert.show();
+                        }
+                    });
+                }
+                else{
+                    delete.setClickable(false);
+                    delete.setVisibility(View.GONE);
+                }
                 return convertView;
             }
         };
@@ -100,16 +141,28 @@ public class TableFragment extends Fragment {
         return rootView;
     }
 
-    private ArrayList<TableReservation> getDataJson() {
-        ArrayList<TableReservation> reservations = new ArrayList<>();
-        Calendar today = Calendar.getInstance();
-        TableReservation res1 = new TableReservation("Andrea Cuiuli", 4 , today, "Una persona allergica alle noci");
-        TableReservation res2 = new TableReservation("Andrea Cuiuli", 4 , today, "Una persona allergica alle noci");
-        TableReservation res3 = new TableReservation("Andrea Cuiuli", 4 , today, "Una persona allergica alle noci");
+    private ArrayList<TableReservation> getDataJson(Calendar date, String restaurantId) {
+        /*ArrayList<TableReservation> reservations = new ArrayList<>();
+        TableReservation res1 = new TableReservation("Andrea Cuiuli", 4 , date, "Una persona allergica alle noci", restaurantId);
+        TableReservation res2 = new TableReservation("Andrea Cuiuli", 4 , date, "Una persona allergica alle noci", restaurantId);
+        TableReservation res3 = new TableReservation("Andrea Cuiuli", 4 , date, "Una persona allergica alle noci", restaurantId);
         reservations.add(res1);
         reservations.add(res2);
-        reservations.add(res3);
+        reservations.add(res3);*/
 
-        return reservations;
+        try {
+            return JSONUtil.readJSONTableResList(getActivity(), date, restaurantId);
+        } catch (JSONException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public void changeData(Calendar date, String restaurantId){
+        reservation_list = getDataJson(date, restaurantId);
+        adapter.notifyDataSetChanged();
+    }
+
+    private String getMonthName(int month){
+        return new DateFormatSymbols().getMonths()[month];
     }
 }

@@ -1,5 +1,7 @@
 package it.polito.group2.restaurantowner;
 
+import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -7,9 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.DatePicker;
+import android.widget.TextView;
+
+import java.util.Calendar;
 
 public class Reservation extends AppCompatActivity {
 
+    private PagerAdapter adapter;
+    private String restaurantId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +25,12 @@ public class Reservation extends AppCompatActivity {
         setContentView(R.layout.activity_reservation);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        restaurantId = getIntent().getExtras().getString("restaurant_id");
+        Calendar date;
+        if(getIntent().getExtras().getSerializable("date") == null)
+            date = Calendar.getInstance();
+        else
+            date = (Calendar) getIntent().getExtras().getSerializable("date");
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         tabLayout.addTab(tabLayout.newTab().setText("Table"));
@@ -24,11 +38,11 @@ public class Reservation extends AppCompatActivity {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        final PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount());
+        adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), date.getTimeInMillis(), restaurantId);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
@@ -62,7 +76,25 @@ public class Reservation extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.icon_reservation_cal) {
-            return true;
+            final Calendar c = Calendar.getInstance();
+            int year = c.get(Calendar.YEAR);
+            int month = c.get(Calendar.MONTH);
+            int day = c.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog dialog =  new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+                @Override
+                public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                    Calendar c = Calendar.getInstance();
+                    c.set(Calendar.YEAR, year);
+                    c.set(Calendar.MONTH, monthOfYear);
+                    c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                    adapter.getTakeaway_fragment().changeData(c, restaurantId);
+                    adapter.getTable_fragment().changeData(c, restaurantId);
+                }
+            }, year, month, day);
+            dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+            dialog.show();
         }
 
         return super.onOptionsItemSelected(item);

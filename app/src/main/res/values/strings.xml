@@ -121,5 +121,7 @@
     <!-- Reservation strings -->
     <string name="table_section">Table</string>
     <string name="takeaway_section">Take Away</string>
-
+    <string name="reservation_people">People</string>
+    <string name="ordered_meals">Meal Ordered</string>
+    <string name="reservation_title">Reservations</string>
 </resources>

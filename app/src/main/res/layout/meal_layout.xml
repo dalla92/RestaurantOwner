@@ -24,6 +24,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@mipmap/ic_edit"
+            android:onClick="myClickHandler_edit"
             android:id="@+id/meal_edit" />
 
         <TextView
@@ -41,6 +42,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@mipmap/icon_remove"
+            android:onClick="myClickHandler_remove"
             android:id="@+id/meal_delete" />
 
     </LinearLayout>

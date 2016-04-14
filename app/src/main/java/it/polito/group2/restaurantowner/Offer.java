@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Offer {
-
     private String name, description;
     private Calendar from, to;
     private boolean lunch,dinner;

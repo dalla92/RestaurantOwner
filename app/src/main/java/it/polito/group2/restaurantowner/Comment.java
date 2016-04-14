@@ -13,6 +13,8 @@ public class Comment {
     double stars_number;
     String comment;
     String userphoto;
+    private String commentID; //Filippo: reference to this comment
+
 
     public Comment(String restaurantId, String username, String date, double stars_number, String userphoto, String comment) {
         this.restaurantId = restaurantId;
@@ -74,4 +76,14 @@ public class Comment {
     public void setPhotoId(String photoId) {
         this.userphoto = userphoto;
     }
+
+    /* Filippo start */
+    public String getCommentID() {
+        return commentID;
+    }
+
+    public void setCommentID(String commentID) {
+        this.commentID = commentID;
+    }
+    /* Filippo stop */
 }

@@ -9,61 +9,44 @@
     tools:context="it.polito.group2.restaurantowner.AddRestaurantActivity$PlaceholderFragment">
 
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/name"
-        android:id="@+id/textView6"
-        android:layout_alignBaseline="@id/resadd_info_name"
-        android:layout_alignParentStart="true" />
-
-    <EditText
+    <LinearLayout
+        android:id="@+id/info_linear_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/resadd_info_name"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/textView6" />
+        android:orientation="vertical"
+        android:padding="5dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/address"
-        android:id="@+id/textView7"
-        android:layout_alignBottom="@id/resadd_info_address"
-        android:layout_alignParentStart="true"
-        android:layout_alignBaseline="@id/resadd_info_address" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:hint="@string/name"
+            android:id="@+id/resadd_info_name"
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPostalAddress"
-        android:ems="10"
-        android:id="@+id/resadd_info_address"
-        android:layout_toEndOf="@id/textView7"
-        android:layout_below="@id/resadd_info_name" />
+            />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/phone"
-        android:id="@+id/textView8"
-        android:layout_below="@+id/resadd_info_address"
-        android:layout_alignParentStart="true"
-        android:layout_alignBaseline="@+id/resadd_info_phone" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPostalAddress"
+            android:ems="10"
+            android:hint="@string/address"
+            android:id="@+id/resadd_info_address"
+            android:layout_marginTop="10dp"
+            />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:ems="10"
-        android:id="@+id/resadd_info_phone"
-        android:layout_below="@id/resadd_info_address"
-        android:layout_toEndOf="@id/textView8" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:ems="10"
+            android:hint="@string/phone"
+            android:id="@+id/resadd_info_phone"
+            android:layout_marginTop="10dp"
+            />
+
+    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"
@@ -72,12 +55,13 @@
         android:text="@string/category"
         android:id="@+id/textView9"
         android:layout_alignParentStart="true"
-        android:layout_alignBaseline="@+id/resadd_info_category" />
+        android:layout_below="@id/info_linear_layout"
+        android:layout_marginTop="10dp"/>
 
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/resadd_info_category"
         android:layout_toEndOf="@id/textView9"
-        android:layout_below="@+id/resadd_info_phone" />
+        android:layout_below="@id/info_linear_layout" />
 </RelativeLayout>
