@@ -10,6 +10,9 @@
     <string name="action_offers">OFFERTE</string>
     <string name="action_reviews">COMMENTI</string>
     <string name="action_statistics">STATISTICHE</string>
+    <string name="action_edit_cover">CAMBIA COPERTINA</string>
+    <string name="action_edit">IMPOSTAZIONI</string>
+
 
     <string name="reserved_percentage">Reserved percentage</string>
     <string name="rating">Rating</string>
@@ -27,7 +30,6 @@
     <string name="last_comments">Anteprima ultimi commenti</string>
     <string name="action_confirm">CONFERMA</string>
     <string name="action_more">ALTRO</string>
-    <string name="action_edit">MODIFICA</string>
     <string name="action_menu">MENU</string>
 
     <string name="seating_capacity">POSTI A SEDERE: </string>

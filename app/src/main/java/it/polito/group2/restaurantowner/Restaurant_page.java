@@ -303,17 +303,15 @@ public class Restaurant_page extends AppCompatActivity
                 startActivity(intent5);
                 return true;
 
-            case R.id.action_more:
+            case R.id.action_edit:
                 Intent intent6 = new Intent(
                         getApplicationContext(),
                         AddRestaurantActivity.class);
-                Bundle b6 = new Bundle();
-                b6.putString("restaurant_id", restaurant_id);
-                intent6.putExtras(b6);
+                intent6.putExtra("Restaurant", my_restaurant);
                 startActivity(intent6);
                 return true;
 
-            case R.id.action_edit:
+            case R.id.action_edit_cover:
                 show();
                 return true;
 
@@ -452,6 +450,7 @@ public class Restaurant_page extends AppCompatActivity
         MenuItem action_edit_item1 = menu.findItem(R.id.action_edit);
         action_edit_item1.setVisible(false);
         //edit text clickable yes/not
+        /*
         EditText edit_restaurant_name1 = (EditText) findViewById(R.id.edit_restaurant_name);
         EditText edit_restaurant_address1 = (EditText) findViewById(R.id.edit_restaurant_address);
         EditText edit_restaurant_telephone_number1 = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
@@ -464,6 +463,7 @@ public class Restaurant_page extends AppCompatActivity
         edit_restaurant_telephone_number1.setFocusableInTouchMode(true);
         edit_restaurant_telephone_number1.setFocusable(true);
         edit_restaurant_telephone_number1.setAlpha(1);
+        */
         //button present yes/not
         Button button_take_photo1 = (Button) findViewById(R.id.button_take_photo);
         button_take_photo1.setVisibility(View.VISIBLE);
@@ -665,7 +665,7 @@ public class Restaurant_page extends AppCompatActivity
         comments.add(c2);
 
         Comment c3 = new Comment();
-        c3.setUsername("Angel Spada");
+        c3.setUsername("Angelo Spada");
         c3.setRestaurantId(restaurant_id);
         c3.setComment("Non siti cosa");
         c3.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));

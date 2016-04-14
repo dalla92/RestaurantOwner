@@ -18,7 +18,8 @@
     <string name="last_comments">Last comments preview</string>
     <string name="action_confirm">CONFIRM</string>
     <string name="action_more">MORE</string>
-    <string name="action_edit">EDIT</string>
+    <string name="action_edit_cover">EDIT COVER</string>
+    <string name="action_edit">EDIT INFO</string>
     <string name="action_menu">MENU</string>
     <string name="action_save">SAVE</string>
 

@@ -2,13 +2,19 @@ package it.polito.group2.restaurantowner;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -31,27 +37,32 @@ public class Adapter_Meals extends ArrayAdapter<Meal> {
     private static LayoutInflater inflater = null;
     public String meal_name;
     public int index;
+    public String restaurant_id;
+    public Meal meal_to_delete;
 
-    public Adapter_Meals (Activity activity, int textViewResourceId, ArrayList<Meal> meals) {
+    public Adapter_Meals (Activity activity, int textViewResourceId, ArrayList<Meal> meals, String restaurant_id) {
         super(activity, textViewResourceId, meals);
         try {
             this.activity = activity;
             this.meals = meals;
             inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            this.restaurant_id = restaurant_id;
         } catch (Exception e) {
         }
+        Log.d("ccc", "CALLED WITH SUCCESS1");
     }
 
     public int getCount() {
         return meals.size();
     }
 
-    public Meal getItem(Meal position) {
-        return position;
+    public Meal getItem(int position) {
+        return meals.get(position);
     }
 
     public long getItemId(int position) {
-        return position;
+        return 0;
+        // return position;
     }
 
     public static class ViewHolder {
@@ -61,9 +72,13 @@ public class Adapter_Meals extends ArrayAdapter<Meal> {
         public ImageView Type1;
         public ImageView Type2;
         public Switch availability;
+        public ImageButton edit_button;
+        public ImageButton remove_button;
+
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
+        Log.d("ccc", "CALLED WITH SUCCESS2");
         View vi = convertView;
         final ViewHolder holder;
         int i = position;
@@ -81,12 +96,16 @@ public class Adapter_Meals extends ArrayAdapter<Meal> {
             } else {
                 holder = (ViewHolder) vi.getTag();
             }
+            Log.d("ccc", "CALLED WITH SUCCESS2");
+
+            //put data
             /*
             if(meals.get(i).getMeal_photo()!=null)
                 MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_photo()));
             */
             holder.MealName.setText(meals.get(i).getMeal_name());
             holder.MealPrice.setText(String.valueOf(meals.get(i).getMeal_price()));
+            Log.d("ccc", "set to "+meals.get(i).getMeal_name());
             /*
             if(meals.get(i).getType1()!=null)
                 MealViewHolder.Type1.setImageResource(Integer.parseInt(meals.get(i).getType1()));
@@ -95,6 +114,64 @@ public class Adapter_Meals extends ArrayAdapter<Meal> {
             */
             holder.availability.setEnabled(meals.get(i).isAvailable());
             meal_name = holder.MealName.getText().toString();
+
+            //set click listener
+            holder.edit_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent1 = new Intent(
+                            activity,
+                            MenuRestaurant_edit.class);
+                    Bundle b = new Bundle();
+                    TextView meal_name = (TextView) v.findViewById(R.id.meal_name);
+                    b.putString("restaurant_id", restaurant_id);
+                    b.putString("meal_id", holder.MealName.getText().toString());
+                    intent1.putExtras(b);
+                    activity.startActivity(intent1);
+                }
+            });
+            holder.remove_button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    meal_to_delete = null;
+                    Log.d("ccc", meal_name);
+                    for(Meal m : meals){
+                        Log.d("ccc", "Loop: " + m.getMeal_name());
+                        if(m.getMeal_name().equals(meal_name)){
+                            Log.d("ccc", "FOUND");
+                            meal_to_delete = m;
+                            break;
+                        }
+                    }
+                    Log.d("ccc", meal_to_delete.getMeal_name());
+                    //dialog box
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    meals.remove(meal_to_delete);
+                                    if(this==null)
+                                        Log.d("ccc", "IS NULL");
+                                    notifyDataSetChanged();
+                                    notifyDataSetInvalidated();
+                                    try {
+                                        saveJSONMeList(meals);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    break;
+
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    break;
+                            }
+                        }
+                    };
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setMessage("Are you sure that you want to delete " + meal_name + "?").setPositiveButton("Yes, sure", dialogClickListener)
+                            .setNegativeButton("No", dialogClickListener).show();
+                }
+            });
             holder.availability.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

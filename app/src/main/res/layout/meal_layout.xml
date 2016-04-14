@@ -17,14 +17,14 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:id="@+id/meal_image"
+            android:src="@mipmap/ic_launcher"
             android:padding="7dp" />
 
         <ImageButton
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@mipmap/ic_edit"
-            android:id="@+id/meal_edit"
-            android:onClick="myClickHandler_edit" />
+            android:id="@+id/meal_edit" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -41,8 +41,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@mipmap/icon_remove"
-            android:id="@+id/meal_delete"
-            android:onClick="myClickHandler_remove" />
+            android:id="@+id/meal_delete" />
 
     </LinearLayout>
 
