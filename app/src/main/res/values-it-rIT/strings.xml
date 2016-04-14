@@ -6,7 +6,15 @@
         <string name="navigation_drawer_open">Open navigation drawer</string>
         <string name="navigation_drawer_close">Close navigation drawer</string>
 
-        <!--Alessio's strings begin-->
+    <string name="action_reservations">PRENOTAZIONI</string>
+    <string name="action_offers">OFFERTE</string>
+    <string name="action_reviews">COMMENTI</string>
+    <string name="action_statistics">STATISTICHE</string>
+
+    <string name="reserved_percentage">Reserved percentage</string>
+    <string name="rating">Rating</string>
+    <string name="number_reservations">Number reservation</string>
+
     <string name="restaurant_page_name">NOME DEL RISTORANTE</string>
     <string name="button_take_photo">SCATTA FOTO ORA</string>
     <string name="button_choose_photo">SCEGLI DA GALLERIA</string>
@@ -79,11 +87,6 @@
     <string name="category">Category</string>
     <string name="title_activity_restaurant_page">Restaurant_page</string>
 
-    <string name="reserved_percentage">Reserved percentage</string>
-    <string name="rating">Rating</string>
-    <string name="number_reservations">Number reservation</string>
-
-    <!--Alessio's strings begin-->
 
 
 
