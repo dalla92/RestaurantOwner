@@ -67,6 +67,9 @@ public class MenuRestaurant_page extends AppCompatActivity
         addMeal(restaurant_id);
         addAddition(restaurant_id);
         addCategory(restaurant_id);
+
+        //remove duplicates
+        remove_duplicates();
         
         try {
             saveJSONMeList();
@@ -414,9 +417,6 @@ public class MenuRestaurant_page extends AppCompatActivity
                 meals_categories_read.add(ad);
             }
         }
-
-        //remove duplicates
-        remove_duplicates();
     }
 
     public void saveJSONMeList() throws JSONException {
@@ -454,16 +454,14 @@ public class MenuRestaurant_page extends AppCompatActivity
         //additions writing
         String FILENAME2 = "mealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (Meal me : meals_read) {
-            for (Addition ad : me.getMeal_additions()) {
-                JSONObject jres2 = new JSONObject();
-                jres2.put("RestaurantId", ad.getRestaurant_id());
-                jres2.put("MealId", ad.getMeal_id());
-                jres2.put("AdditionName", ad.getName());
-                jres2.put("AdditionSelected", ad.isSelected());
-                jres2.put("AdditionPrice", ad.getPrice());
-                jarray2.put(jres2);
-            }
+        for (Addition ad : meals_additions_read) {
+            JSONObject jres2 = new JSONObject();
+            jres2.put("RestaurantId", ad.getRestaurant_id());
+            jres2.put("MealId", ad.getMeal_id());
+            jres2.put("AdditionName", ad.getName());
+            jres2.put("AdditionSelected", ad.isSelected());
+            jres2.put("AdditionPrice", ad.getPrice());
+            jarray2.put(jres2);
         }
         JSONObject resObj2 = new JSONObject();
         resObj2.put("MealsAdditions", jarray2);
@@ -480,8 +478,7 @@ public class MenuRestaurant_page extends AppCompatActivity
         //categories writing
         String FILENAME3 = "mealCategory.json";
         JSONArray jarray3 = new JSONArray();
-        for (Meal me : meals) {
-            for (Addition ad : me.getMeal_categories()) {
+        for (Addition ad : meals_categories_read) {
                 JSONObject jres3 = new JSONObject();
                 jres3.put("RestaurantId", ad.getRestaurant_id());
                 jres3.put("MealId", ad.getMeal_id());
@@ -504,7 +501,7 @@ public class MenuRestaurant_page extends AppCompatActivity
                 e.printStackTrace();
             }
         }
-    }
+
 
     public void addMeal(String restaurant_id){
         Log.d("ccc", "CALLED ADDMEAL");
@@ -522,39 +519,49 @@ public class MenuRestaurant_page extends AppCompatActivity
         meals_read.add(m);
     }
 
-    public void addAddition(String meal_id){
+    public void addAddition(String restaurant_id){
         Addition a1 = new Addition();
         a1.setName("Basilicò");
         a1.setPrice(0.50);
-        a1.setMeal_id(meal_id);
+        a1.setMeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
         Addition a2 = new Addition();
         a2.setName("Peperoncino");
         a2.setPrice(0.20);
-        a2.setMeal_id(meal_id);
+        a2.setMeal_id("0");
         a2.setSelected(true);
         a2.setRestaurant_id(restaurant_id);
 
         meals_additions_read.add(a1);
         meals_additions_read.add(a2);
+
+        Log.d("ccc", "ADDITIONS:");
+        for(Addition a : meals_additions_read){
+            Log.d("ccc", a.getName() + " " + a.getMeal_id());
+        }
     }
 
-    public void addCategory(String meal_id){
+    public void addCategory(String restaurant_id){
         Addition a1 = new Addition();
         a1.setName("Pasta");
-        a1.setMeal_id(meal_id);
+        a1.setMeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
         Addition a2 = new Addition();
         a2.setName("Piccante");
-        a2.setMeal_id(meal_id);
+        a2.setMeal_id("0");
         a2.setSelected(true);
         a2.setRestaurant_id(restaurant_id);
 
         meals_categories_read.add(a1);
         meals_categories_read.add(a2);
+
+        Log.d("ccc", "CATEGORIES:");
+        for(Addition a : meals_categories_read){
+            Log.d("ccc", a.getName() + " " + a.getMeal_id());
+        }
     }
 }
