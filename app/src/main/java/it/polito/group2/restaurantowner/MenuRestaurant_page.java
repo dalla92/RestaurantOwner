@@ -85,9 +85,6 @@ public class MenuRestaurant_page extends AppCompatActivity
             Log.d("ccc", m.getMeal_name());
         }
 
-        //remove duplicates
-        remove_duplicates();
-
         //navigation drawer
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -102,12 +99,6 @@ public class MenuRestaurant_page extends AppCompatActivity
         //take the right restaurant
         Bundle b1 = getIntent().getExtras();
         restaurant_id = b1.getString("restaurant_id");
-        //retrieve data
-        try {
-            meals = readJSONMeList();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
         // Get ListView object from xml
         listView = (ListView) findViewById(R.id.list);
@@ -155,11 +146,13 @@ public class MenuRestaurant_page extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
+        /*
         try {
             readJSONMeList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        */
     }
 
     @Override
@@ -205,17 +198,17 @@ public class MenuRestaurant_page extends AppCompatActivity
 
     public void myClickHandler_add(View v) {
         Log.d("myClickHandler", "You want to add a new meal");
-        //adapter.insert("New empty meal", 0);
-        meals.add(0, new Meal());  //insert at the top
+        adapter.insert(new Meal(), 0);
+        //meals.add(0, new Meal());  //insert at the top
         //adapter.insert(new Meal(), 0); //insert at the top
         try {
             saveJSONMeList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        //adapter.notifyDataSetChanged();
-        //adapter.notifyDataSetInvalidated();
-        ((LinearLayout)v.getParent()).refreshDrawableState();
+        adapter.notifyDataSetChanged();
+        adapter.notifyDataSetInvalidated();
+        //((LinearLayout)v.getParent()).refreshDrawableState();
     }
 
     public void myClickHandler_edit(View v) {
@@ -261,6 +254,12 @@ public class MenuRestaurant_page extends AppCompatActivity
         //String meal_name = meal_name_text_view.getText().toString();
         meal_to_delete = null;
         Log.d("ccc", meal_name);
+        if(meal_name.trim().equals("")) {
+            meals.remove(0);
+            adapter.notifyDataSetChanged();
+            adapter.notifyDataSetInvalidated();
+            return;
+        }
         for(Meal m : meals){
             Log.d("ccc", "Loop: " + m.getMeal_name());
             if(m.getMeal_name().equals(meal_name)){
@@ -276,7 +275,7 @@ public class MenuRestaurant_page extends AppCompatActivity
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
-                        meals.remove(meal_to_delete);
+                        //meals.remove(meal_to_delete);
                         if(adapter==null)
                             Log.d("ccc", "IS NULL");
                         adapter.remove(meal_to_delete);
@@ -309,18 +308,14 @@ public class MenuRestaurant_page extends AppCompatActivity
         for( Addition a : meals_categories_read) {
             meals_categories.add(a);
         }
-        //fill additions and categories of my restaurant
-        for(Meal m : meals) {
-            if(m.getRestaurantId().equals(restaurant_id)) {
-                current_meal = m;
-            }
-        }
-        current_meal.setMeal_additions(meals_additions);
-        current_meal.setMeal_additions(meals_categories);
-    }
+     }
 
-    public ArrayList<Meal> readJSONMeList() throws JSONException {
+    public void readJSONMeList() throws JSONException {
         //mealList.json
+        meals_read = new HashSet<>();
+        meals_additions_read = new HashSet<>();
+        meals_categories_read = new HashSet<>();
+        Log.d("ccc", "CALLED READ");
         String json = null;
         FileInputStream fis = null;
         String FILENAME = "mealList.json";
@@ -333,20 +328,14 @@ public class MenuRestaurant_page extends AppCompatActivity
             json = new String(buffer, "UTF-8");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return meals;
         } catch (IOException e) {
             e.printStackTrace();
         }
         JSONObject jobj = new JSONObject(json);
         JSONArray jsonArray = jobj.optJSONArray("Meals");
-        if(jobj==null)
-            Log.d("ccc", "essi");
-        if(jsonArray==null)
-            Log.d("ccc", "enno");
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             Meal me = new Meal();
-            if (jsonObject.optString("RestaurantId").equals(restaurant_id)) {
                 me.setRestaurantId(jsonObject.optString("RestaurantId"));
                 me.setMealId(jsonObject.optString("MealId"));
                 me.setMeal_photo(jsonObject.optString("MealPhoto"));
@@ -358,8 +347,9 @@ public class MenuRestaurant_page extends AppCompatActivity
                 me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
                 me.setCooking_time(jsonObject.optInt("MealCookingTime"));
                 me.setDescription(jsonObject.getString("MealDescription"));
-                meals_read.add(me);
-            }
+                Log.d("ccc", "READ");
+                if(me.getRestaurantId().equals(restaurant_id))
+                    meals_read.add(me);
         }
         //mealAdditions.json
         String json2 = null;
@@ -374,7 +364,6 @@ public class MenuRestaurant_page extends AppCompatActivity
             json2 = new String(buffer2, "UTF-8");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return meals;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -405,7 +394,6 @@ public class MenuRestaurant_page extends AppCompatActivity
             json3 = new String(buffer3, "UTF-8");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return meals;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -424,14 +412,16 @@ public class MenuRestaurant_page extends AppCompatActivity
                 meals_categories_read.add(ad);
             }
         }
-        return meals;
+
+        //remove duplicates
+        remove_duplicates();
     }
 
     public void saveJSONMeList() throws JSONException {
         //meals writing
         String FILENAME = "mealList.json";
         JSONArray jarray = new JSONArray();
-        for (Meal me : meals) {
+        for (Meal me : meals_read) {
             JSONObject jres = new JSONObject();
             jres.put("RestaurantId", me.getRestaurantId());
             jres.put("MealId", me.getMealId());
@@ -444,6 +434,7 @@ public class MenuRestaurant_page extends AppCompatActivity
             jres.put("MealTakeAway", me.isTake_away());
             jres.put("MealCookingTime", me.getCooking_time());
             jres.put("MealDescription", me.getDescription());
+            Log.d("ccc", "WRITE");
             jarray.put(jres);
         }
         JSONObject resObj = new JSONObject();
@@ -461,7 +452,7 @@ public class MenuRestaurant_page extends AppCompatActivity
         //additions writing
         String FILENAME2 = "mealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (Meal me : meals) {
+        for (Meal me : meals_read) {
             for (Addition ad : me.getMeal_additions()) {
                 JSONObject jres2 = new JSONObject();
                 jres2.put("RestaurantId", ad.getRestaurant_id());
@@ -526,7 +517,7 @@ public class MenuRestaurant_page extends AppCompatActivity
         m.setType1("Vegetarian");
         m.setTake_away(false);
         m.setMeal_photo(getResources().getResourceName(R.mipmap.ic_launcher));
-        meals.add(m);
+        meals_read.add(m);
     }
 
     public void addAddition(String meal_id){
@@ -544,14 +535,8 @@ public class MenuRestaurant_page extends AppCompatActivity
         a2.setSelected(true);
         a2.setRestaurant_id(restaurant_id);
 
-        Meal current_meal = null;
-        for(Meal m : meals) {
-            if(m.getRestaurantId().equals(restaurant_id)) {
-                current_meal = m;
-            }
-        }
-        current_meal.getMeal_additions().add(a1);
-        current_meal.getMeal_additions().add(a2);
+        meals_additions_read.add(a1);
+        meals_additions_read.add(a2);
     }
 
     public void addCategory(String meal_id){
@@ -567,13 +552,7 @@ public class MenuRestaurant_page extends AppCompatActivity
         a2.setSelected(true);
         a2.setRestaurant_id(restaurant_id);
 
-        Meal current_meal = null;
-        for(Meal m : meals) {
-            if(m.getRestaurantId().equals(restaurant_id)) {
-                current_meal = m;
-            }
-        }
-        current_meal.getMeal_categories().add(a1);
-        current_meal.getMeal_categories().add(a2);
+        meals_categories_read.add(a1);
+        meals_categories_read.add(a2);
     }
 }

@@ -116,6 +116,7 @@ public class Adapter_Meals extends ArrayAdapter<Meal> {
             meal_name = holder.MealName.getText().toString();
 
             //set click listener
+            /*
             holder.edit_button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -190,6 +191,7 @@ public class Adapter_Meals extends ArrayAdapter<Meal> {
                         }
                     }
                 });
+                       */
         } catch (Exception e) {
         }
         return vi;
