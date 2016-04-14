@@ -121,11 +121,6 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             }
         }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
