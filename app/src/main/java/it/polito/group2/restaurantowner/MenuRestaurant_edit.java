@@ -124,6 +124,11 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             //retrieve data
             Bundle b = getIntent().getExtras();
             Meal current_meal = (Meal) b.get("meal");
+            if(current_meal==null){
+                Log.d("aaa", "CURRENT MEAL IS NULL (ON CREATE)");
+            }
+            else
+                Log.d("aaa", "CURRENT MEAL IS NOT NULL (ON CREATE)");
             try {
                 readJSONMeList();
             } catch (JSONException e) {
@@ -506,12 +511,16 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    current_meal.setType1(spinner3.getSelectedItem().toString());
-                    try {
-                        saveJSONMeList();
+                    if(current_meal==null){
+                        Log.d("aaa", "CURRENT MEAL IS NULL");
                     }
-                    catch(JSONException e){
-                        e.printStackTrace();
+                    else {
+                        current_meal.setType1(spinner3.getSelectedItem().toString());
+                        try {
+                            saveJSONMeList();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 @Override
@@ -528,12 +537,16 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             spinner4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    current_meal.setType1(spinner4.getSelectedItem().toString());
-                    try {
-                        saveJSONMeList();
+                    if(current_meal==null){
+                        Log.d("aaa", "CURRENT MEAL IS NULL");
                     }
-                    catch(JSONException e){
-                        e.printStackTrace();
+                    else {
+                        current_meal.setType1(spinner4.getSelectedItem().toString());
+                        try {
+                            saveJSONMeList();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
                 @Override
@@ -549,12 +562,16 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
                     if(!hasFocus) { //when focus is lost only
-                        current_meal.setMeal_name(edit_meal_name.getText().toString());
-                        try {
-                            saveJSONMeList();
+                        if(current_meal==null){
+                            Log.d("aaa", "CURRENT MEAL IS NULL");
                         }
-                        catch(JSONException e){
-                            e.printStackTrace();
+                        else {
+                            current_meal.setMeal_name(edit_meal_name.getText().toString());
+                            try {
+                                saveJSONMeList();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -563,12 +580,15 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 @Override
                 public void onFocusChange(View v, boolean hasFocus) {
                     if(!hasFocus) { //when focus is lost only
-                        current_meal.setMeal_price(Double.parseDouble(edit_meal_price.getText().toString()));
-                        try {
-                            saveJSONMeList();
-                        }
-                        catch(JSONException e){
-                            e.printStackTrace();
+                        if (current_meal == null) {
+                            Log.d("aaa", "CURRENT MEAL IS NULL");
+                        } else {
+                            current_meal.setMeal_price(Double.parseDouble(edit_meal_price.getText().toString()));
+                            try {
+                                saveJSONMeList();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -576,11 +596,15 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             check_take_away.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    current_meal.setMeal_price(Double.parseDouble(edit_meal_price.getText().toString()));
-                    try {
-                        saveJSONMeList();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    if (current_meal == null) {
+                        Log.d("aaa", "CURRENT MEAL IS NULL");
+                    } else {
+                        current_meal.setMeal_price(Double.parseDouble(edit_meal_price.getText().toString()));
+                        try {
+                            saveJSONMeList();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
@@ -943,12 +967,16 @@ public class MenuRestaurant_edit extends AppCompatActivity {
             np.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
                 @Override
                 public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                    current_meal.setCooking_time(newVal);
-                    try {
-                        saveJSONMeList();
+                    if(current_meal==null){
+                        Log.d("aaa", "CURRENT MEAL IS NULL");
                     }
-                    catch(JSONException e){
-                        e.printStackTrace();
+                    else {
+                        current_meal.setCooking_time(newVal);
+                        try {
+                            saveJSONMeList();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
@@ -986,12 +1014,16 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     childAdditions = additions_adapter.getChildItems();
                     childAdditions.add(new Addition("0","0", "New addition", 0, false));
                     additions_adapter.setChildItems(childAdditions);
-                    current_meal.setMeal_additions(childAdditions);
-                    try {
-                        saveJSONMeList();
+                    if(current_meal==null){
+                        Log.d("aaa", "CURRENT MEAL IS NULL");
                     }
-                    catch(JSONException e){
-                        e.printStackTrace();
+                    else {
+                        current_meal.setMeal_additions(childAdditions);
+                        try {
+                            saveJSONMeList();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
@@ -1002,12 +1034,16 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                     childCategories = categories_adapter.getChildItems();
                     childCategories.add(new Addition("0","0","New category", 0, false));
                     categories_adapter.setChildItems(childCategories);
-                    current_meal.setMeal_additions(childCategories);
-                    try {
-                        saveJSONMeList();
+                    if(current_meal==null){
+                        Log.d("aaa", "CURRENT MEAL IS NULL");
                     }
-                    catch(JSONException e){
-                        e.printStackTrace();
+                    else {
+                        current_meal.setMeal_additions(childCategories);
+                        try {
+                            saveJSONMeList();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
             });
@@ -1105,15 +1141,18 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                         childItems.remove(childPosition);
                         notifyDataSetChanged();
                         notifyDataSetInvalidated();
-                        if(parentItem.equals("Meal additions"))
-                            current_meal.setMeal_additions(childItems);
-                        else
-                            current_meal.setMeal_categories(childItems);
-                        try {
-                            saveJSONMeList();
-                        }
-                        catch(JSONException e){
-                            e.printStackTrace();
+                        if (current_meal == null) {
+                            Log.d("aaa", "CURRENT MEAL IS NULL");
+                        } else {
+                            if (parentItem.equals("Meal additions"))
+                                current_meal.setMeal_additions(childItems);
+                            else
+                                current_meal.setMeal_categories(childItems);
+                            try {
+                                saveJSONMeList();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
@@ -1147,18 +1186,22 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                                                      if(!userInput_price.getText().toString().trim().equals(""))
                                                          childItems.get(childPosition).setPrice(Double.parseDouble(userInput_price.getText().toString()));
                                                  }
-                                                 if(parentItem.equals("Meal additions"))
-                                                     current_meal.setMeal_additions(childItems);
-                                                 else
-                                                     current_meal.setMeal_categories(childItems);
-                                                 try {
-                                                     saveJSONMeList();
+                                                 if(current_meal==null){
+                                                     Log.d("aaa", "CURRENT MEAL IS NULL");
                                                  }
-                                                 catch(JSONException e){
-                                                     e.printStackTrace();
-                                                 }
+                                                 else {
+                                                     if (parentItem.equals("Meal additions"))
+                                                         current_meal.setMeal_additions(childItems);
+                                                     else
+                                                         current_meal.setMeal_categories(childItems);
+                                                     try {
+                                                         saveJSONMeList();
+                                                     } catch (JSONException e) {
+                                                         e.printStackTrace();
+                                                     }
                                                      notifyDataSetChanged();
-                                                 notifyDataSetInvalidated();
+                                                     notifyDataSetInvalidated();
+                                                 }
                                              }
                                          })
                                  .setNegativeButton("Cancel",

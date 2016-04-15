@@ -222,12 +222,27 @@ public class MenuRestaurant_page extends AppCompatActivity
                 getApplicationContext(),
                 MenuRestaurant_edit.class);
         Meal meal_to_edit = null;
-        index_position = -1;
-        for(Meal m : meals){
-            index_position++;
-            if(m.getMeal_name().equals(meal_name)){
-                meal_to_edit = m;
-                break;
+        if(meal_name.trim().equals("")) {
+            meal_to_edit = meals.get(0);
+            /*
+            index_position = -1;
+            for (Meal m : meals) {
+                index_position++;
+                if (m.getMeal_name().trim().equals("")) {
+                    meal_to_edit = m;
+                    break;
+                }
+            }
+            */
+        }
+        else {
+            index_position = -1;
+            for (Meal m : meals) {
+                index_position++;
+                if (m.getMeal_name().equals(meal_name)) {
+                    meal_to_edit = m;
+                    break;
+                }
             }
         }
         if(meal_to_edit!=null){
@@ -348,6 +363,7 @@ public class MenuRestaurant_page extends AppCompatActivity
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             Meal me = new Meal();
+            Log.d("aaa", "TRYING TO READ ONE MEAL");
             me.setRestaurantId(jsonObject.optString("RestaurantId"));
             me.setMealId(jsonObject.optString("MealId"));
             me.setMeal_photo(jsonObject.optString("MealPhoto"));
@@ -359,7 +375,7 @@ public class MenuRestaurant_page extends AppCompatActivity
             me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
             me.setCooking_time(jsonObject.optInt("MealCookingTime"));
             me.setDescription(jsonObject.getString("MealDescription"));
-                //if(me.getRestaurantId().equals(restaurant_id))
+            if(me.getRestaurantId().equals(restaurant_id))
                     meals.add(me);
         }
         //mealAdditions.json
