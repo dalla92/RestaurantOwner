@@ -89,16 +89,6 @@
         android:id="@+id/last_comments"
         android:paddingTop="20dp" />
 
-
-    <android.support.v7.widget.RecyclerView
-        android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:id="@+id/rv"
-        >
-    </android.support.v7.widget.RecyclerView>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -111,9 +101,7 @@
             android:layout_height="wrap_content"
             android:text="@string/button_take_photo"
             android:id="@+id/button_take_photo"
-            android:visibility="gone"
-            android:focusable="true"
-            android:focusableInTouchMode="true" />
+            android:visibility="gone" />
 
         <Button
             android:layout_width="wrap_content"
@@ -122,9 +110,18 @@
             android:id="@+id/button_choose_photo"
             android:layout_toRightOf="@id/button_take_photo"
             android:visibility="gone"
-            android:focusable="true"
-            android:focusableInTouchMode="true" />
+            />
+
     </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:id="@+id/rv"
+        >
+    </android.support.v7.widget.RecyclerView>
 
 </LinearLayout>
 
