@@ -149,6 +149,9 @@
     <string name="statistics_Oct">Oct</string>
     <string name="statistics_Nov">Nov</string>
     <string name="statistics_Dec">Dec</string>
+    <string name="statistics_filter_week">Week</string>
+    <string name="statistics_filter_month">Month</string>
+    <string name="statistics_filter_year">Year</string>
 
     <!-- Reviews Activity -->
     <string name="reviews_activity">Reviews</string>
