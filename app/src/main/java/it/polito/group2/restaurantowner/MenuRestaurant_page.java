@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public class MenuRestaurant_page extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -134,7 +135,7 @@ public class MenuRestaurant_page extends AppCompatActivity
         listView.setAdapter(adapter);
     }
 
-    /*
+
     @Override
     public void onPause() {
         super.onPause();  // Always call the superclass method first
@@ -144,7 +145,7 @@ public class MenuRestaurant_page extends AppCompatActivity
             e.printStackTrace();
         }
     }
-    */
+
 
     /*
     @Override
@@ -203,7 +204,16 @@ public class MenuRestaurant_page extends AppCompatActivity
         Log.d("myClickHandler", "You want to add a new meal");
         //adapter.insert(new Meal(), 0);
         Meal m = new Meal();
+        m.setMeal_name("");
+        m.setMeal_price(5.0);
+        m.setAvailable(true);
+        m.setCooking_time(10);
+        m.setMealId(UUID.randomUUID().toString());
         m.setRestaurantId(restaurant_id);
+        m.setDescription("");
+        m.setType1("Celiac");
+        m.setTake_away(false);
+        m.setMeal_photo(getResources().getResourceName(R.mipmap.ic_launcher));
         meals.add(0, m);  //insert at the top
         try {
             saveJSONMeList_modified();
@@ -617,7 +627,7 @@ public class MenuRestaurant_page extends AppCompatActivity
         m.setMeal_price(5.0);
         m.setAvailable(true);
         m.setCooking_time(10);
-        m.setMealId("0");
+        m.setMealId(UUID.randomUUID().toString());
         m.setRestaurantId(restaurant_id);
         m.setDescription("Pasta salta con salsa di pomodoro");
         m.setType1("Vegetarian");

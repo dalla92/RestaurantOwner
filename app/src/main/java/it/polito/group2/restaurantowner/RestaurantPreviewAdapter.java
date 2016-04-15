@@ -2,6 +2,8 @@ package it.polito.group2.restaurantowner;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +12,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +24,7 @@ import java.util.List;
  */
 public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPreviewAdapter.ViewHolder> implements ItemTouchHelperAdapter{
     private List<Restaurant> mDataset;
-    private Context mContext;
+    private static Context mContext;
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -42,7 +48,24 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
             reservedPercentage = (TextView) v.findViewById(R.id.textViewReservedPercentage);
         }
         public void setData(Restaurant obj, int position){
-            //TODO this.image.setImageBitmap();
+            if(obj.getPhotoUri()!="") {
+                Uri imageUri = Uri.parse(obj.getPhotoUri());
+                InputStream imageStream = null;
+                try {
+                    imageStream = mContext.getContentResolver().openInputStream(imageUri);
+                    this.image.setImageBitmap(BitmapFactory.decodeStream(imageStream));
+                } catch (FileNotFoundException e) {
+                    // Handle the error
+                } finally {
+                    if (imageStream != null) {
+                        try {
+                            imageStream.close();
+                        } catch (IOException e) {
+                            // Ignore the exception
+                        }
+                    }
+                }
+            }
             this.resName.setText(obj.getName());
             this.rating.setText(obj.getRating());
             this.reservationNumber.setText(obj.getReservationNumber());

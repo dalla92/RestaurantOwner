@@ -44,31 +44,35 @@
         <activity
             android:name=".MoreRestaurantInfo"
             android:label="@string/restaurant_page_name"
-            android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".MenuRestaurant_page"
             android:label="@string/title_activity_menu_restaurant_page"
+            android:parentActivityName=".Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MenuRestaurant_edit"
             android:label="@string/title_activity_menu_restaurant_edit"
+            android:parentActivityName=".MenuRestaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />
 			
 			<activity
-            android:name=".OfferList"
-            android:label="@string/title_activity_offer_list"
-            android:theme="@style/AppTheme.NoActionBar">
+                android:name=".OfferList"
+                android:label="@string/title_activity_offer_list"
+                android:parentActivityName=".Restaurant_page"
+                android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
         <activity
             android:name=".AddOffer"
             android:label="@string/title_activity_add_offer"
+            android:parentActivityName=".OfferList"
             android:theme="@style/AppTheme.NoActionBar" >
 
         </activity>
         <activity
             android:name=".Reservation"
             android:label="@string/title_activity_reservation"
+            android:parentActivityName=".Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar">
 
         </activity>
