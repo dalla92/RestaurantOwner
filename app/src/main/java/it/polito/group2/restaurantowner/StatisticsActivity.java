@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 
+import android.support.design.widget.NavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -38,15 +39,19 @@ import android.widget.TextView;
 
 import java.util.GregorianCalendar;
 
-public class StatisticsActivity extends AppCompatActivity {
+public class StatisticsActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
 
     private int restaurantID;
     private DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
+
         LineChart chart = (LineChart) findViewById(R.id.chart);
 
         //get the restaurant obj
@@ -62,6 +67,9 @@ public class StatisticsActivity extends AppCompatActivity {
         } else {
             //error on restaurant id
         }
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
     }
 
@@ -483,5 +491,34 @@ public class StatisticsActivity extends AppCompatActivity {
             return 2;
 
         return 0;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_reviews, menu);
+        this.menu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return true;
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        /*
+        int id = item.getItemId();
+        if (id == R.id.nav_logout) {
+            // TODO Handle the logout action
+        } else if (id == R.id.nav_manage) {
+            // TODO Handle the manage action
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        */
+        return true;
     }
 }
