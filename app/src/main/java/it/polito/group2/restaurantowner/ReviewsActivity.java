@@ -104,7 +104,7 @@ public class ReviewsActivity extends AppCompatActivity
             comment.setComment("Commento dell'utente");
             comment.setCommentID(UUID.randomUUID().toString());
             comment.setStars_number(4);
-            comment.setUsername("User " + i);
+            comment.setUsername("Utente " + i);
             comment.setRestaurantId("");
             commentList.add(comment);
         }
