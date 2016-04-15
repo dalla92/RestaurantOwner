@@ -80,7 +80,7 @@ public class TakeAwayFragment extends Fragment {
                     convertView = inflater.inflate(R.layout.takeaway_reservation_item, parent, false);
                 }
 
-                SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
                 TextView text_client_name = (TextView) convertView.findViewById(R.id.reservation_client);
                 TextView text_time = (TextView) convertView.findViewById(R.id.reservation_time);
                 TextView text_notes = (TextView) convertView.findViewById(R.id.reservation_notes);
