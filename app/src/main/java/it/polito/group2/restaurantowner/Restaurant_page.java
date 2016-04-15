@@ -345,6 +345,7 @@ public class Restaurant_page extends AppCompatActivity
         //take a photo result
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //view photo
+            Log.d("aaa", "BREAK2");
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
             setPic();
             //add photo to gallery
@@ -354,6 +355,10 @@ public class Restaurant_page extends AppCompatActivity
                 Uri contentUri = Uri.fromFile(f);
                 mediaScanIntent.setData(contentUri);
                 this.sendBroadcast(mediaScanIntent);
+                //photouri = contentUri.toString();
+                Log.d("aaa", "BREAK3"+contentUri.toString());
+                Log.d("aaa", "BREAK4" + Uri.parse(photouri));
+                image.setImageURI(Uri.parse(photouri));
                 my_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
             }
             try {
@@ -707,17 +712,13 @@ public class Restaurant_page extends AppCompatActivity
     }
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
             File photoFile = null;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                // Error occurred while creating the File
-                //nothing
+                Log.d("aaa", "BREAK1");
             }
-            // Continue only if the File was successfully created
             if (photoFile != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         Uri.fromFile(photoFile));
