@@ -77,4 +77,5 @@ public class Adapter_Comments extends RecyclerView.Adapter<Adapter_Comments.Comm
         super.onAttachedToRecyclerView(recyclerView);
     }
 
+
 }

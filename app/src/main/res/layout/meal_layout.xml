@@ -97,7 +97,9 @@
             android:textStyle="bold"
             android:checked="false"
             android:layout_weight="1"
-            android:layout_gravity="bottom" />
+            android:layout_gravity="bottom"
+            android:clickable="true"
+            android:enabled="true" />
 
     </LinearLayout>
 

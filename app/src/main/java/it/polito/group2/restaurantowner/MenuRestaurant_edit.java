@@ -123,22 +123,13 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         else {
             //retrieve data
             Bundle b = getIntent().getExtras();
-            meal_name = b.getString("meal_name");
-            restaurant_id = b.getString("restaurant_id");
+            Meal current_meal = (Meal) b.get("meal");
             try {
                 readJSONMeList();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            
-            //retrieve current_meal
-            for(Meal m : meals){
-                if(m.getMeal_name().equals(meal_name)){
-                    current_meal = m;
-                    break;
-                }
-            }
-            
+
             //toolbar
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
