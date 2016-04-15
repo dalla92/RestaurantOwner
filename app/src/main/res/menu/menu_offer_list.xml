@@ -7,7 +7,7 @@ tools:context="it.polito.group2.restaurantowner.OfferList">
 <item
     android:id="@+id/icon_new_offer"
     android:title="@string/add"
-    android:icon="@drawable/ic_add_24dp"
+    android:icon="@drawable/ic_add_white_24dp"
     app:showAsAction="ifRoom"
     />
 </menu>

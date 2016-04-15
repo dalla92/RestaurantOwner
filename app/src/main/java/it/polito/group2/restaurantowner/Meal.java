@@ -1,12 +1,13 @@
 package it.polito.group2.restaurantowner;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by Alessio on 12/04/2016.
  */
-public class Meal {
+public class Meal implements Serializable{
     private String meal_photo;
     private String meal_name;
     private double meal_price;

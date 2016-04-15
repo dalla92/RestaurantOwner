@@ -3,39 +3,42 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:descendantFocusability="blocksDescendants"
     android:layout_height="match_parent"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:padding="5dp">
 
-    <ImageButton
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@mipmap/ic_edit"
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit_primary_24dp"
         android:id="@+id/addition_edit" />
 
     <CheckBox
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="addition"
+        android:layout_gravity="center_horizontal"
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:id="@+id/meal_addition"
-        android:layout_weight="0.7"
-        android:minWidth="400dp"
-        android:paddingLeft="10dp" />
+        android:layout_weight="1"
+        android:layout_marginStart="10dp" />
 
     <EditText
-        android:layout_width="150dp"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
-        android:inputType="numberSigned"
-        android:ems="10"
+        android:textAlignment="center"
+        android:inputType="number"
         android:id="@+id/edit_addition_price"
-        android:layout_weight="0.3"
-        android:layout_gravity="right"
         android:hint="@string/addition_meal_price" />
 
-    <ImageButton
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@mipmap/icon_remove"
-        android:id="@+id/addition_delete" />
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/ic_remove_primary_24dp"
+        android:id="@+id/addition_delete"
+        android:paddingStart="10dp"
+        android:paddingTop="8dp"
+        />
 
 </LinearLayout>

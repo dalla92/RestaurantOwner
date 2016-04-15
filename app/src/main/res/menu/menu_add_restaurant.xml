@@ -6,7 +6,7 @@
         android:id="@+id/action_save"
         android:orderInCategory="100"
         android:title="hytf"
-        android:icon="@drawable/ic_done_24dp"
+        android:icon="@drawable/ic_done_white_24dp"
         app:showAsAction="always" />
 
 </menu>

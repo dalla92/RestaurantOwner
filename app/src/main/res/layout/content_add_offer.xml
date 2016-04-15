@@ -83,7 +83,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_calendar_black"
+                android:src="@drawable/ic_calendar_black_24dp"
                 android:layout_gravity="center"
                android:padding="4dp"
                 />
@@ -137,7 +137,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_calendar_black"
+                android:src="@drawable/ic_calendar_black_24dp"
                 android:layout_gravity="center"
                 android:padding="4dp"
                 />

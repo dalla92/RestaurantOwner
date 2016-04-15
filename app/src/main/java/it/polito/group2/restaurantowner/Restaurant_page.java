@@ -2,6 +2,7 @@ package it.polito.group2.restaurantowner;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -61,7 +62,7 @@ public class Restaurant_page extends AppCompatActivity
     public int REQUEST_TAKE_PHOTO = 1;
     public int MODIFY_INFO = 4;
     public String photouri = null;
-    public ArrayList<Comment> comments;
+    public ArrayList<Comment> comments = new ArrayList<>();
     public Restaurant my_restaurant = null;
 
     @Override
@@ -70,8 +71,6 @@ public class Restaurant_page extends AppCompatActivity
         setContentView(R.layout.activity_restaurant_page);
 
         //get data
-        resList = new ArrayList<>();
-        comments = new ArrayList<>();
         try {
             resList = readJSONResList();
         } catch (JSONException e) {
@@ -104,14 +103,20 @@ public class Restaurant_page extends AppCompatActivity
         }
         //fill data
         setTitle(my_restaurant.getName());
+        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        if(userDetails != null) {
+            ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
+            if (userDetails.getString("photouri", null) != null) {
+                Uri photouri = Uri.parse(userDetails.getString("photouri", null));
+                if (photouri != null)
+                    image.setImageURI(photouri);
+            }
+        }
         EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
-        ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
         EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
         EditText edit_restaurant_telephone_number = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
         if(my_restaurant !=null && my_restaurant.getName()!=null)
             edit_restaurant_name.setText(my_restaurant.getName());
-        if(my_restaurant !=null && my_restaurant.getPhotoUri() != null)
-            image.setImageURI(Uri.parse(my_restaurant.getPhotoUri()));
         if(my_restaurant !=null && my_restaurant.getAddress()!=null)
             edit_restaurant_address.setText(my_restaurant.getAddress());
         if(my_restaurant !=null && my_restaurant.getPhoneNum()!=null)
@@ -133,20 +138,19 @@ public class Restaurant_page extends AppCompatActivity
         imageview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    resList = readJSONResList();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Restaurant temp = null;
-                for(Restaurant r : resList) {
-                    if(r.getRestaurantId().equals(restaurant_id)) {
-                        temp = r;
+                SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+                if(userDetails != null) {
+                    String parameter = userDetails.getString("photouri", null);
+                    if(parameter!=null){
+                        Intent intent = new Intent(
+                                getApplicationContext(),
+                                Enlarged_image.class);
+                        Bundle b = new Bundle();
+                        b.putString("photouri", parameter);
+                        intent.putExtras(b);
+                        startActivity(intent);
                     }
                 }
-                Intent fullScreenIntent = new Intent(getApplicationContext(), Enlarged_image.class);
-                fullScreenIntent.putExtra(Enlarged_image.class.getName(), temp.getPhotoUri());
-                startActivity(fullScreenIntent);
             }
         });
 
@@ -190,27 +194,17 @@ public class Restaurant_page extends AppCompatActivity
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
-        EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
-        EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
-        EditText edit_restaurant_telephone_number = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
-        state.putString("restaurant_name", edit_restaurant_name.getText().toString());
-        state.putString("restaurant_address", edit_restaurant_address.getText().toString());
-        state.putString("restaurant_telephone_number", edit_restaurant_telephone_number.getText().toString());
+        state.putString("photouri", photouri);
     }
 
     @Override
     public void onRestoreInstanceState(Bundle state) {
         super.onRestoreInstanceState(state);
         if(state!=null) {
-            EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
-            EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
-            EditText edit_restaurant_telephone_number = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
-            edit_restaurant_name.setText(state.getString("restaurant_name"));
-            edit_restaurant_address.setText(state.getString("restaurant_address"));
-            edit_restaurant_telephone_number.setText(state.getString("restaurant_telephone_number"));
-            ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
-            if(photouri!=null)
-                image.setImageURI(Uri.parse(photouri));
+            if(state.getString("photouri")!=null) {
+                ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
+                image.setImageURI(Uri.parse(state.getString("photouri")));
+            }
         }
     }
 
@@ -224,6 +218,7 @@ public class Restaurant_page extends AppCompatActivity
         }
     }
 
+    /*
     @Override
     public void onResume() {
         super.onResume();  // Always call the superclass method first
@@ -232,7 +227,9 @@ public class Restaurant_page extends AppCompatActivity
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
     }
+    */
 
     @Override
     public void onBackPressed() {
@@ -310,6 +307,8 @@ public class Restaurant_page extends AppCompatActivity
                         getApplicationContext(),
                         AddRestaurantActivity.class);
                 intent6.putExtra("Restaurant", my_restaurant);
+                final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
+                appbar.setExpanded(false);
                 startActivityForResult(intent6, MODIFY_INFO);
                 return true;
 
@@ -318,12 +317,7 @@ public class Restaurant_page extends AppCompatActivity
                 return true;
 
             case R.id.action_confirm:
-                EditText edit_restaurant_name2 = (EditText) findViewById(R.id.edit_restaurant_name);
-                EditText edit_restaurant_address2 = (EditText) findViewById(R.id.edit_restaurant_address);
-                EditText edit_restaurant_telephone_number2 = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
-                my_restaurant.setName(edit_restaurant_name2.getText().toString());
-                my_restaurant.setAddress(edit_restaurant_address2.getText().toString());
-                my_restaurant.setPhoneNum(edit_restaurant_telephone_number2.getText().toString());
+
                 hide();
                 try {
                     saveJSONResList();
@@ -358,7 +352,7 @@ public class Restaurant_page extends AppCompatActivity
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //view photo
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
-            setPic(image);
+            setPic();
             //add photo to gallery
             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             if(photouri!=null) {
@@ -422,6 +416,8 @@ public class Restaurant_page extends AppCompatActivity
                 }
             }
         }
+
+        hide();
     }
 
     /*
@@ -470,10 +466,12 @@ public class Restaurant_page extends AppCompatActivity
 
     public void show(){
         //menu item show/hide
+        /*
         MenuItem action_confirm_item1 = menu.findItem(R.id.action_confirm);
         action_confirm_item1.setVisible(true);
         MenuItem action_edit_item1 = menu.findItem(R.id.action_edit);
         action_edit_item1.setVisible(false);
+        */
         //edit text clickable yes/not
         /*
         EditText edit_restaurant_name1 = (EditText) findViewById(R.id.edit_restaurant_name);
@@ -492,16 +490,20 @@ public class Restaurant_page extends AppCompatActivity
         //button present yes/not
         Button button_take_photo1 = (Button) findViewById(R.id.button_take_photo);
         button_take_photo1.setVisibility(View.VISIBLE);
+        button_take_photo1.requestFocus();
         Button button_choose_photo1 = (Button) findViewById(R.id.button_choose_photo);
         button_choose_photo1.setVisibility(View.VISIBLE);
+        button_choose_photo1.requestFocus();
     }
 
     public void hide(){
         //menu item show/hide
+        /*
         MenuItem action_confirm_item2 = menu.findItem(R.id.action_confirm);
         action_confirm_item2.setVisible(false);
         MenuItem action_edit_item2 = menu.findItem(R.id.action_edit);
         action_edit_item2.setVisible(true);
+        */
         //edit text clickable yes/not
         EditText edit_restaurant_name2 = (EditText) findViewById(R.id.edit_restaurant_name);
         EditText edit_restaurant_address2 = (EditText) findViewById(R.id.edit_restaurant_address);
@@ -758,7 +760,8 @@ public class Restaurant_page extends AppCompatActivity
         }
     }
 
-    private void setPic(ImageView mImageView) {
+    private void setPic() {
+        ImageView mImageView = (ImageView) findViewById(R.id.image_to_enlarge);
         // Get the dimensions of the View
         int targetW = mImageView.getWidth();
         int targetH = mImageView.getHeight();
@@ -778,7 +781,13 @@ public class Restaurant_page extends AppCompatActivity
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
         Bitmap bitmap = BitmapFactory.decodeFile(photouri, bmOptions);
-        mImageView.setImageBitmap(bitmap);
+        if(bitmap!=null)
+            mImageView.setImageBitmap(bitmap);
+        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        SharedPreferences.Editor edit = userDetails.edit();
+        edit.putString("photouri", photouri);
+        //I can not save the photo, but i could save its URI
+        edit.commit();
     }
 
 

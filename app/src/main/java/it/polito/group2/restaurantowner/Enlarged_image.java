@@ -18,26 +18,23 @@ public class Enlarged_image extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = getIntent();
-        String imagepathuri = intent.getStringExtra(Enlarged_image.class.getName());
-        if(imagepathuri!=null) {
-            //Uri uri=Uri.parse("R.drawable.image");
-            Uri image_uri = Uri.parse(String.valueOf(imagepathuri));
-            Bitmap bitmap = null;
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), image_uri);
-            }
-            catch(Exception e){
-                Log.e("Exception" , "Exception occurred in MediaStore.Images.Media.getBitmap");
-            }
-            ImageView myimage = (ImageView) findViewById(R.id.enlarged_image);
-            if(bitmap != null) {
-                myimage.setImageBitmap(bitmap);
-                myimage.setScaleType(ImageView.ScaleType.MATRIX);
-            }
-        }
-        else
-            Log.e("ENLARGED_IMAGE", "There is no image to enlarge");
         setContentView(R.layout.enlarged_image);
+        String photouri = getIntent().getExtras().getString("photouri");
+        Log.d("ccc", "Photo uri is " + photouri);
+        Uri image_uri = Uri.
+                parse(photouri);
+
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), image_uri);
+        }
+        catch(Exception e){
+            Log.e("Exception" , "Exception occurred in MediaStore.Images.Media.getBitmap");
+        }
+        ImageView myimage = (ImageView) findViewById(R.id.enlarged_image);
+        if(bitmap != null) {
+            myimage.setImageBitmap(bitmap);
+            //myimage.setScaleType(ImageView.ScaleType.MATRIX);
+        }
     }
 }

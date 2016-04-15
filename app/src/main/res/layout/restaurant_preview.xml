@@ -5,7 +5,8 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="5dp">
+    card_view:cardCornerRadius="5dp"
+    android:layout_margin="5dp">
 
 <RelativeLayout
     android:orientation="vertical" android:layout_width="match_parent"
@@ -89,7 +90,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/imageView3"
-            android:src="@drawable/ic_cart"
+            android:src="@drawable/ic_cart_white_24dp"
             android:layout_alignBottom="@+id/textViewReservedPercentage"
             android:layout_toEndOf="@+id/textViewRating" />
     </RelativeLayout>

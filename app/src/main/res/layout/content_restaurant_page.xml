@@ -15,120 +15,71 @@
     tools:showIn="@layout/app_bar_restaurant_page"
     android:orientation="vertical">
 
-<LinearLayout android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="5dp"
-        >
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/restaurant_name"
+        android:id="@+id/restaurant_name" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_take_photo"
-            android:id="@+id/button_take_photo"
-            android:visibility="gone" />
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text|textMultiLine|textCapSentences"
+        android:maxLength="40"
+        android:text="@string/edit_restaurant_name"
+        android:ems="10"
+        android:id="@+id/edit_restaurant_name"
+        android:background="@android:color/transparent"
+        style="@style/EditTextCustomHolo"
+        android:focusable="false"
+        />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_choose_photo"
-            android:id="@+id/button_choose_photo"
-            android:layout_toRightOf="@id/button_take_photo"
-            android:visibility="gone" />
-    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/restaurant_address"
+        android:id="@+id/restaurant_address" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text|textMultiLine|textCapSentences"
+        android:maxLength="40"
+        android:text="@string/edit_restaurant_address"
+        android:ems="10"
+        android:focusable="false"
+        style="@style/EditTextCustomHolo"
+        android:background="@android:color/transparent"
+        android:id="@+id/edit_restaurant_address" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/linear_layout_restaurant_name"
-            android:paddingTop="10dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/restaurant_name"
-                android:id="@+id/restaurant_name" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/restaurant_telephone_number"
+        android:id="@+id/restaurant_telephone_number" />
 
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="text|textMultiLine|textCapSentences"
-                android:maxLength="40"
-                android:text="@string/edit_restaurant_name"
-                android:ems="10"
-                android:id="@+id/edit_restaurant_name"
-                android:background="@android:color/transparent"
-                style="@style/EditTextCustomHolo"
-                android:focusable="false"
-                />
-        </LinearLayout>
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text|textMultiLine|textCapSentences"
+        android:maxLength="20"
+        android:text="@string/edit_restaurant_telephone_number"
+        android:ems="10"
+        android:focusable="false"
+        android:background="@android:color/transparent"
+        style="@style/EditTextCustomHolo"
+        android:id="@+id/edit_restaurant_telephone_number" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/linear_layout_restaurant_name"
-            android:id="@+id/linear_layout_restaurant_address">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/restaurant_address"
-                android:id="@+id/restaurant_address" />
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="text|textMultiLine|textCapSentences"
-                android:maxLength="40"
-                android:text="@string/edit_restaurant_address"
-                android:ems="10"
-                android:focusable="false"
-                style="@style/EditTextCustomHolo"
-                android:background="@android:color/transparent"
-                android:id="@+id/edit_restaurant_address" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/linear_layout_restaurant_address"
-            android:id="@+id/linear_layout_restaurant_telephone_number">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/restaurant_telephone_number"
-                android:layout_below="@id/linear_layout_restaurant_telephone_number"
-                android:id="@+id/restaurant_telephone_number" />
-
-            <EditText
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:inputType="text|textMultiLine|textCapSentences"
-                android:maxLength="20"
-                android:text="@string/edit_restaurant_telephone_number"
-                android:ems="10"
-                android:focusable="false"
-                android:background="@android:color/transparent"
-                style="@style/EditTextCustomHolo"
-                android:id="@+id/edit_restaurant_telephone_number" />
-        </LinearLayout>
-
-    </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
@@ -147,6 +98,33 @@
         android:id="@+id/rv"
         >
     </android.support.v7.widget.RecyclerView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_take_photo"
+            android:id="@+id/button_take_photo"
+            android:visibility="gone"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/button_choose_photo"
+            android:id="@+id/button_choose_photo"
+            android:layout_toRightOf="@id/button_take_photo"
+            android:visibility="gone"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
+    </RelativeLayout>
 
 </LinearLayout>
 

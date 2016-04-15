@@ -5,46 +5,39 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <LinearLayout
-        android:orientation="horizontal"
+
+    <EditText
         android:layout_width="match_parent"
-        android:id="@+id/layout_description"
         android:layout_height="wrap_content"
-        android:paddingLeft="15dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="@string/meal_description"
-            android:id="@+id/textView24" />
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text|textMultiLine|textCapSentences"
-            android:maxLength="200"
-            android:id="@+id/edit_meal_description" />
-    </LinearLayout>
+        android:inputType="text|textMultiLine|textCapSentences"
+        android:maxLength="200"
+        android:hint="@string/meal_description"
+        android:id="@+id/edit_meal_description"
+        android:layout_margin="10dp"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <ExpandableListView
             android:id="@+id/additions_list"
             android:layout_height="match_parent"
             android:layout_width="wrap_content"
             android:groupIndicator="@null" />
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <ExpandableListView
             android:id="@+id/categories_list"
             android:layout_height="match_parent"
             android:layout_width="wrap_content"
             android:groupIndicator="@null" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -57,9 +50,8 @@
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_action_add"
+            android:src="@drawable/ic_add_primary_24dp"
             android:id="@+id/addition_add"
-            android:background="#000000"
             android:onClick="myClickHandler_add_addition"
             android:layout_gravity="right" />
 
@@ -77,9 +69,8 @@
         <ImageView
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/ic_action_add"
+            android:src="@drawable/ic_add_primary_24dp"
             android:id="@+id/category_add"
-            android:background="#000000"
             android:onClick="myClickHandler_add_category" />
 
         <TextView
@@ -97,7 +88,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/imageView3"
-            android:src="@mipmap/timer_icon" />
+            android:src="@drawable/ic_timer_primary_24dp" />
 
         <NumberPicker
             android:layout_width="wrap_content"
@@ -105,7 +96,8 @@
             android:scaleY="0.8"
             android:scaleX="0.8"
             android:id="@+id/numberPicker"
-            android:layout_gravity="top" />
+            android:layout_gravity="top"
+            android:solidColor="@color/colorPrimary"/>
 
         <TextView
             android:layout_width="wrap_content"

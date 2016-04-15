@@ -47,17 +47,17 @@
     <string name="add_meal">ADD A MEAL</string>
     <string name="availability">SALE</string>
 
-    <string name="meal_name">MEAL NAME: </string>
-    <string name="meal_price">MEAL PRICE: </string>
-    <string name="meal_image">MEAL PHOTO: </string>
-    <string name="meal_description">MEAL DESCRIPTION: </string>
-    <string name="meal_possible_additions">MEAL ADDITIONS: </string>
-    <string name="meal_possible_categories">MEAL CATEGORIES: </string>
-    <string name="meal_time_for_cooking">cooking</string>
-    <string name="meal_add_new_category">category</string>
-    <string name="meal_add_new_addition">addition</string>
+    <string name="meal_name">Meal Name</string>
+    <string name="meal_price">Meal Price</string>
+    <string name="meal_image">Meal Photo</string>
+    <string name="meal_description">Meal Description</string>
+    <string name="meal_possible_additions">Meal Addition </string>
+    <string name="meal_possible_categories">Meal Categories </string>
+    <string name="meal_time_for_cooking">Cooking</string>
+    <string name="meal_add_new_category">Category</string>
+    <string name="meal_add_new_addition">Addition</string>
     <string name="title_activity_menu_restaurant_edit">EDIT MEAL</string>
-    <string name="addition_meal_price">price</string>
+    <string name="addition_meal_price">Price</string>
 
     <string name="addres_section_main_info">MAIN INFO</string>
     <string name="addres_section_other_info">MORE INFO</string>
@@ -99,8 +99,8 @@
     <string name="validity">Validity</string>
     <string name="today">Today</string>
     <string name="dinner">Dinner</string>
-    <string name="title_activity_offer_list">OfferList</string>
-    <string name="title_activity_add_offer">AddOffer</string>
+    <string name="title_activity_offer_list">Offer List</string>
+    <string name="title_activity_add_offer">Add a new offer</string>
     <string name="description">Description</string>
     <string name="january">January</string>
     <string name="february">February</string>
@@ -116,7 +116,8 @@
     <string name="december">December</string>
     <string name="offer_name_error">Insert a name!</string>
     <string name="offer_desc_error">Insert a description!</string>
-    <string name="title_activity_reservation">Reservation</string>
+    <string name="title_activity_reservation">Reservations</string>
+    <string name="done">Done</string>
 
     <!-- Reservation strings -->
     <string name="table_section">Table</string>
