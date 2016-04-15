@@ -12,6 +12,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -156,7 +157,7 @@ public class Restaurant_page extends AppCompatActivity
         rv.setHasFixedSize(true);
         initializeAdapterComments();
         final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
-        ScrollView scroll = (ScrollView) findViewById(R.id.parent_scroll);
+        NestedScrollView scroll = (NestedScrollView) findViewById(R.id.parent_scroll);
         scroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
