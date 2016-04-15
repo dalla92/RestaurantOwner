@@ -124,5 +124,6 @@
     <!--Alessio's strings begin-->
 
 
-
+    <!-- Reviews Activity -->
+    <string name="reviews_activity">Commenti</string>
     </resources>
