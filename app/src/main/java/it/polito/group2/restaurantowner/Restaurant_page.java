@@ -103,7 +103,6 @@ public class Restaurant_page extends AppCompatActivity
         }
         //fill data
         //setTitle(my_restaurant.getName());
-        /*
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         if(userDetails != null) {
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
@@ -113,9 +112,6 @@ public class Restaurant_page extends AppCompatActivity
                     image.setImageURI(photouri);
             }
         }
-        */
-        ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
-        image.setImageURI(Uri.parse(my_restaurant.getPhotoUri()));
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
@@ -251,84 +247,95 @@ public class Restaurant_page extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-    //    getMenuInflater().inflate(R.menu.main_restaurant, menu);
-    //     this.menu = menu;
+        getMenuInflater().inflate(R.menu.main_restaurant, menu);
+        this.menu = menu;
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.action_menu:
+                Intent intent1 = new Intent(
+                        getApplicationContext(),
+                        MenuRestaurant_page.class);
+                Bundle b = new Bundle();
+                b.putString("restaurant_id", restaurant_id);
+                intent1.putExtras(b);
+                startActivity(intent1);
+                return true;
 
-        return super.onOptionsItemSelected(item);
+            case R.id.action_offers:
+                Intent intent2 = new Intent(
+                        getApplicationContext(),
+                        OfferList.class);
+                Bundle b2 = new Bundle();
+                b2.putString("restaurant_id", restaurant_id);
+                intent2.putExtras(b2);
+                startActivity(intent2);
+                return true;
+
+            case R.id.action_reservations:
+                Intent intent3 = new Intent(
+                        getApplicationContext(),
+                        Reservation.class);
+                Bundle b3 = new Bundle();
+                b3.putString("restaurant_id", restaurant_id);
+                intent3.putExtras(b3);
+                startActivity(intent3);
+                return true;
+
+            case R.id.action_reviews:
+                Intent intent4 = new Intent(
+                        getApplicationContext(),
+                        ReviewsActivity.class); //here Filippo must insert his class name
+                Bundle b4 = new Bundle();
+                b4.putString("restaurant_id", restaurant_id);
+                intent4.putExtras(b4);
+                startActivity(intent4);
+                return true;
+
+            case R.id.action_statistics:
+                Intent intent5 = new Intent(
+                        getApplicationContext(),
+                        StatisticsActivity.class); //here Filippo must insert his class name
+                Bundle b5 = new Bundle();
+                b5.putString("restaurant_id", restaurant_id);
+                intent5.putExtras(b5);
+                startActivity(intent5);
+                return true;
+
+            case R.id.action_edit:
+                Intent intent6 = new Intent(
+                        getApplicationContext(),
+                        AddRestaurantActivity.class);
+                intent6.putExtra("Restaurant", my_restaurant);
+                final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
+                appbar.setExpanded(false);
+                startActivityForResult(intent6, MODIFY_INFO);
+                return true;
+
+            case R.id.action_edit_cover:
+                show();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         int id = item.getItemId();
-        if(id == R.id.action_menu) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MenuRestaurant_page.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurant_id);
-            intent1.putExtras(b);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.action_offers) {
-            Intent intent2 = new Intent(
-                    getApplicationContext(),
-                    OfferList.class);
-            Bundle b2 = new Bundle();
-            b2.putString("restaurant_id", restaurant_id);
-            intent2.putExtras(b2);
-            startActivity(intent2);
-            return true;
-        } else if(id==R.id.action_reservations){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    Reservation.class);
-            Bundle b3 = new Bundle();
-            b3.putString("restaurant_id", restaurant_id);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        } else if(id==R.id.action_reviews){
-            Intent intent4 = new Intent(
-                    getApplicationContext(),
-                    ReviewsActivity.class); //here Filippo must insert his class name
-            Bundle b4 = new Bundle();
-            b4.putString("restaurant_id", restaurant_id);
-            intent4.putExtras(b4);
-            startActivity(intent4);
-            return true;
-        } else if(id==R.id.action_statistics){
-            Intent intent5 = new Intent(
-                    getApplicationContext(),
-                    StatisticsActivity.class); //here Filippo must insert his class name
-            Bundle b5 = new Bundle();
-            b5.putString("restaurant_id", restaurant_id);
-            intent5.putExtras(b5);
-            startActivity(intent5);
-            return true;
-        } else if(id==R.id.action_edit){
-            Intent intent6 = new Intent(
-                    getApplicationContext(),
-                    AddRestaurantActivity.class);
-            intent6.putExtra("Restaurant", my_restaurant);
-            final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
-            appbar.setExpanded(false);
-            startActivityForResult(intent6, MODIFY_INFO);
-            return true;
-        } else if(id==R.id.action_edit_cover) {
-            drawer.closeDrawer(GravityCompat.START);
-            show();
-            return true;
+        if (id == R.id.nav_logout) {
+            // TODO Handle the logout action
+        } else if (id == R.id.nav_manage) {
+            // TODO Handle the manage action
         }
-
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -352,7 +359,7 @@ public class Restaurant_page extends AppCompatActivity
                 Log.d("aaa", "BREAK3"+contentUri.toString());
                 Log.d("aaa", "BREAK4" + Uri.parse(photouri));
                 image.setImageURI(Uri.parse(photouri));
-                my_restaurant.setPhotoUri(photouri); // ***MAYBE***
+                my_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
             }
             try {
                 saveJSONResList();
@@ -418,18 +425,11 @@ public class Restaurant_page extends AppCompatActivity
                 }
             }
         }
-        /*
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor edit = userDetails.edit();
         edit.putString(restaurant_id, photouri);
         //I can not save the photo, but i could save its URI
         edit.commit();
-        */
-        try{
-            saveJSONResList();
-        }
-        catch(JSONException e){
-        }
         hide();
     }
 
