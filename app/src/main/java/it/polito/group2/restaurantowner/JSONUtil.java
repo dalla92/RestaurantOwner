@@ -112,6 +112,91 @@ public class JSONUtil {
         return resList;
     }
 
+    public static void saveJSONOfferList(Context mContext, ArrayList<Offer> offerList) throws JSONException {
+        String FILENAME = "offerList.json";
+        JSONArray jarray = new JSONArray();
+        SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy");
+        for (Offer offer : offerList) {
+            JSONObject jres = new JSONObject();
+            jres.put("RestaurantID", offer.getRestaurantId());
+            jres.put("DateFrom", timeFormat.format(offer.getFrom().getTime()));
+            jres.put("DateTo", timeFormat.format(offer.getTo().getTime()));
+            jres.put("OfferName", offer.getName());
+            jres.put("Description", offer.getDescription());
+            jres.put("OfferID", offer.getOfferId());
+            jres.put("Lunch", offer.isLunch());
+            jres.put("Dinner", offer.isDinner());
+            jarray.put(jres);
+        }
+        JSONObject resObj = new JSONObject();
+        resObj.put("Offers", jarray);
+        FileOutputStream fos = null;
+        try {
+            fos = mContext.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(resObj.toString().getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<Offer> readJSONOfferList(Context mContext,String targetRestaurantId) throws JSONException{
+        String json = null;
+        ArrayList<Offer> offerList = new ArrayList<>();
+        FileInputStream fis = null;
+        String FILENAME = "offerList.json";
+        try {
+            fis = mContext.openFileInput(FILENAME);
+            int size = fis.available();
+            byte[] buffer = new byte[size];
+            fis.read(buffer);
+            fis.close();
+            json = new String(buffer, "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return offerList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject jobj = new JSONObject(json);
+        JSONArray jsonArray = jobj.optJSONArray("Offers");
+        //Iterate the jsonArray and print the info of JSONObjects
+        for(int i=0; i < jsonArray.length(); i++){
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+            String restaurantId = jsonObject.optString("RestaurantID");
+            if(!restaurantId.equals(targetRestaurantId))
+                continue;
+
+            SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Calendar cFrom = Calendar.getInstance();
+            Calendar cTo = Calendar.getInstance();
+
+            String dateFrom = jsonObject.optString("DateFrom");
+            String dateTo = jsonObject.optString("DateTo");
+            try {
+                cFrom.setTime(timeFormat.parse(dateFrom));
+                cTo.setTime(timeFormat.parse(dateTo));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            String offerName = jsonObject.optString("OfferName");
+            String description = jsonObject.optString("Description");
+            String offerId = jsonObject.optString("OfferID");
+            boolean lunch = jsonObject.optBoolean("Lunch");
+            boolean dinner = jsonObject.optBoolean("Dinner");
+
+            Offer offer = new Offer(offerId, restaurantId, offerName, description, cTo, cFrom, lunch, dinner);
+            offerList.add(offer);
+        }
+
+        return offerList;
+    }
+
     public static ArrayList<TableReservation> readJSONTableResList(Context mContext, Calendar targetDate, String targetRestaurantId) throws JSONException{
         String json = null;
         ArrayList<TableReservation> tableResList = new ArrayList<>();
@@ -166,6 +251,34 @@ public class JSONUtil {
         return tableResList;
     }
 
+    public static void saveJSONTakeAwayResList(Context mContext, ArrayList<TakeAwayReservation> reservations) throws JSONException {
+        String FILENAME = "takeAwayReservation.json";
+        JSONArray jarray = new JSONArray();
+        SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        for (TakeAwayReservation res : reservations) {
+            JSONObject jres = new JSONObject();
+            jres.put("RestaurantID", res.getRestaurantId());
+            jres.put("Date", timeFormat.format(res.getDate().getTime()));
+            jres.put("Username", res.getUsername());
+            jres.put("Notes", res.getNotes());
+            jres.put("TakeAwayReservationID", res.getTakeAwayReservationId());
+            saveJSONOrderedMeal(mContext, res.getOrdered_meals());
+            jarray.put(jres);
+        }
+        JSONObject resObj = new JSONObject();
+        resObj.put("TakeAwayReservations", jarray);
+        FileOutputStream fos = null;
+        try {
+            fos = mContext.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(resObj.toString().getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static ArrayList<TakeAwayReservation> readJSONTakeAwayResList(Context mContext, Calendar targetDate, String targetRestaurantId) throws JSONException{
         String json = null;
         ArrayList<TakeAwayReservation> takeAwayResList = new ArrayList<>();
@@ -186,7 +299,7 @@ public class JSONUtil {
         }
 
         JSONObject jobj = new JSONObject(json);
-        JSONArray jsonArray = jobj.optJSONArray("TableReservations");
+        JSONArray jsonArray = jobj.optJSONArray("TakeAwayReservations");
         //Iterate the jsonArray and print the info of JSONObjects
         for(int i=0; i < jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -212,7 +325,7 @@ public class JSONUtil {
             String username = jsonObject.optString("Username");
             String notes = jsonObject.optString("Notes");
             String takeAwayReservationId = jsonObject.optString("TakeAwayReservationID");
-            ArrayList<OrderedMeal> orderedMeals = readJSONTakeAwayMeal(mContext, takeAwayReservationId);
+            ArrayList<OrderedMeal> orderedMeals = readJSONOrderedMeal(mContext, takeAwayReservationId);
 
             TakeAwayReservation takeAwayRes = new TakeAwayReservation(username, orderedMeals, c, notes, restaurantId, takeAwayReservationId);
             takeAwayResList.add(takeAwayRes);
@@ -220,11 +333,37 @@ public class JSONUtil {
         return takeAwayResList;
     }
 
-    private static ArrayList<OrderedMeal> readJSONTakeAwayMeal(Context mContext, String targetTakeAwayReservationId) throws JSONException {
+    private static void saveJSONOrderedMeal(Context mContext, ArrayList<OrderedMeal> ordered_meals) throws JSONException {
+        String FILENAME = "orderedMeal.json";
+        JSONArray jarray = new JSONArray();
+        ArrayList<OrderedMeal> orderedMealComplete = readJSONOrderedMealFull(mContext);
+        orderedMealComplete.addAll(ordered_meals);
+        for (OrderedMeal meal : orderedMealComplete) {
+            JSONObject jres = new JSONObject();
+            jres.put("TakeAwayReservationID", meal.getTakeAwayReservationId());
+            jres.put("MealName",meal.getMeal_name());
+            jres.put("quantity", meal.getQuantity());
+            jarray.put(jres);
+        }
+        JSONObject resObj = new JSONObject();
+        resObj.put("OrderedMeals", jarray);
+        FileOutputStream fos = null;
+        try {
+            fos = mContext.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(resObj.toString().getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static ArrayList<OrderedMeal> readJSONOrderedMeal(Context mContext, String targetTakeAwayReservationId) throws JSONException {
         String json = null;
         ArrayList<OrderedMeal> orderedMealList = new ArrayList<>();
         FileInputStream fis = null;
-        String FILENAME = "takeAwayMeal.json";
+        String FILENAME = "orderedMeal.json";
         try {
             fis = mContext.openFileInput(FILENAME);
             int size = fis.available();
@@ -240,7 +379,7 @@ public class JSONUtil {
         }
 
         JSONObject jobj = new JSONObject(json);
-        JSONArray jsonArray = jobj.optJSONArray("TableReservations");
+        JSONArray jsonArray = jobj.optJSONArray("OrderedMeals");
         //Iterate the jsonArray and print the info of JSONObjects
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -251,12 +390,45 @@ public class JSONUtil {
 
             String mealName = jsonObject.optString("MealName");
             int quantity = jsonObject.optInt("quantity");
-            OrderedMeal orderedMeal = new OrderedMeal(mealName, quantity);
+            OrderedMeal orderedMeal = new OrderedMeal(mealName, quantity, takeAwayReservationId);
             orderedMealList.add(orderedMeal);
         }
         return orderedMealList;
     }
 
+    private static ArrayList<OrderedMeal> readJSONOrderedMealFull(Context mContext) throws JSONException {
+        String json = null;
+        ArrayList<OrderedMeal> orderedMealList = new ArrayList<>();
+        FileInputStream fis = null;
+        String FILENAME = "orderedMeal.json";
+        try {
+            fis = mContext.openFileInput(FILENAME);
+            int size = fis.available();
+            byte[] buffer = new byte[size];
+            fis.read(buffer);
+            fis.close();
+            json = new String(buffer, "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return orderedMealList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject jobj = new JSONObject(json);
+        JSONArray jsonArray = jobj.optJSONArray("OrderedMeals");
+        //Iterate the jsonArray and print the info of JSONObjects
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+            String takeAwayReservationId = jsonObject.optString("TakeAwayReservationID");
+            String mealName = jsonObject.optString("MealName");
+            int quantity = jsonObject.optInt("quantity");
+            OrderedMeal orderedMeal = new OrderedMeal(mealName, quantity, takeAwayReservationId);
+            orderedMealList.add(orderedMeal);
+        }
+        return orderedMealList;
+    }
 
 
     public static void saveJSONServiceList(Context mContext, List<RestaurantService> serList) throws JSONException {
@@ -390,4 +562,5 @@ public class JSONUtil {
         }
         return otList;
     }
+
 }

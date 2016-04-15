@@ -11,16 +11,10 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
-
 import java.text.DateFormatSymbols;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.UUID;
 
 public class AddOffer extends AppCompatActivity {
 
@@ -80,6 +74,7 @@ public class AddOffer extends AppCompatActivity {
             intent.putExtra("to", to);
             intent.putExtra("lunch", lunch);
             intent.putExtra("dinner", dinner);
+            intent.putExtra("offerID", UUID.randomUUID().toString());
             setResult(RESULT_OK, intent);
             finish();
             return true;

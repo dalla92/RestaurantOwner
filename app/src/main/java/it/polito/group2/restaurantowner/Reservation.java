@@ -12,6 +12,8 @@ import android.view.MenuItem;
 import android.widget.DatePicker;
 import android.widget.TextView;
 
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class Reservation extends AppCompatActivity {
@@ -91,6 +93,18 @@ public class Reservation extends AppCompatActivity {
 
                     adapter.getTakeaway_fragment().changeData(c, restaurantId);
                     adapter.getTable_fragment().changeData(c, restaurantId);
+                    c = Calendar.getInstance();
+                    if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
+                        getSupportActionBar().setTitle((getString(R.string.title_activity_reservation)));
+                    else {
+                        getSupportActionBar().setTitle(new StringBuilder()
+                                .append(getString(R.string.title_activity_reservation))
+                                .append("  (")
+                                .append(dayOfMonth)
+                                .append(" ").append(getMonthName(monthOfYear))
+                                .append(" ")
+                                .append(year).append(")"));
+                    }
                 }
             }, year, month, day);
             dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
@@ -98,6 +112,10 @@ public class Reservation extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private String getMonthName(int month){
+        return new DateFormatSymbols().getMonths()[month];
     }
 
 }

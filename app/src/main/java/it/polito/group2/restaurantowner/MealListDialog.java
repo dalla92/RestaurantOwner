@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.view.Gravity;
@@ -39,6 +40,7 @@ public class MealListDialog extends DialogFragment {
         getDialog().setTitle(R.string.ordered_meals);
         TextView title = (TextView) getDialog().findViewById(android.R.id.title);
         title.setGravity(Gravity.CENTER);
+        title.setTextColor(Color.WHITE);
         title.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
         ArrayList<OrderedMeal> ordered_meals = (ArrayList<OrderedMeal>) getArguments().getSerializable("data");
         MealListAdapter adapter = new MealListAdapter(getActivity(), ordered_meals);

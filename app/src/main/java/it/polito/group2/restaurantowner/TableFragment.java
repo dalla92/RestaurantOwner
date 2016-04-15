@@ -36,7 +36,7 @@ public class TableFragment extends Fragment {
         date.setTimeInMillis(date_millis);
         reservation_list = getDataJson(date, restaurantId);
 
-        Calendar today = Calendar.getInstance();
+        /*Calendar today = Calendar.getInstance();
         TextView reservation_title = (TextView) rootView.findViewById(R.id.reservation_list_title);
         if(     date.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 date.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
@@ -49,7 +49,8 @@ public class TableFragment extends Fragment {
                     .append(" ").append(date.get(Calendar.DAY_OF_MONTH)).append("  ")
                     .append(getMonthName(date.get(Calendar.MONTH))).append("  ")
                     .append(date.get(Calendar.YEAR)).append(" "));
-        }
+        }*/
+
         ListView lv = (ListView) rootView.findViewById(R.id.table_list_view);
         adapter = new BaseAdapter() {
 

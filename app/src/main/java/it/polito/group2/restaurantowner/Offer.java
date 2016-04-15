@@ -4,17 +4,27 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class Offer {
-    private String name, description;
+    private String name, description, offerId, restaurantId;
     private Calendar from, to;
     private boolean lunch,dinner;
 
-    public Offer(String name, String description, Calendar from, Calendar to, boolean lunch, boolean dinner) {
+    public Offer(String offerId, String restaurantId, String name, String description, Calendar from, Calendar to, boolean lunch, boolean dinner) {
         this.name = name;
         this.description = description;
         this.from = from;
         this.to = to;
         this.lunch = lunch;
         this.dinner = dinner;
+        this.offerId = offerId;
+        this.restaurantId = restaurantId;
+    }
+
+    public String getOfferId() {
+        return offerId;
+    }
+
+    public String getRestaurantId() {
+        return restaurantId;
     }
 
     public Calendar getFrom() {

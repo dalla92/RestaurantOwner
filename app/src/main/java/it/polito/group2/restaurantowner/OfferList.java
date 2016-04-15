@@ -21,16 +21,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 public class OfferList extends AppCompatActivity {
 
     private static final int ADD_REQUEST = 1;
-    private ArrayList<Offer> offer_list = getDataJson();
+    private ArrayList<Offer> offer_list;
     private BaseAdapter adapter;
     private String restaurantId;
 
@@ -41,6 +44,8 @@ public class OfferList extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         restaurantId = getIntent().getExtras().getString("restaurant_id");
+        //createFakeData();
+        offer_list = getDataJson();
 
         ListView lv = (ListView) findViewById(R.id.offer_list_view);
         adapter = new BaseAdapter() {
@@ -48,6 +53,11 @@ public class OfferList extends AppCompatActivity {
             @Override
             public int getCount() {
                 return offer_list.size();
+            }
+
+            @Override
+            public boolean isEnabled(int position){
+                return false;
             }
 
             @Override
@@ -110,6 +120,7 @@ public class OfferList extends AppCompatActivity {
                                 public void onClick(DialogInterface dialog, int which) {
                                     offer_list.remove(position);
                                     notifyDataSetChanged();
+                                    saveDataToJson(offer_list);
                                     dialog.dismiss();
 
                                 }
@@ -162,21 +173,33 @@ public class OfferList extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private ArrayList<Offer> getDataJson() {
+    private void createFakeData(){
         ArrayList<Offer> offers = new ArrayList<>();
         Calendar today = Calendar.getInstance();
-        Offer offer1 = new Offer("Offer 1", "50% off on the dinner menu", today, today, false, true);
-        Offer offer2 = new Offer("Offer 2", "50% off on the lunch menu", today, today, true, false);
-        Offer offer3 = new Offer("Offer 3", "30% off on the menu", today, today, true, true);
-        Offer offer4 = new Offer("Offer 4", "every 20 euro a beer for free", today, today, true, true);
-        Offer offer5 = new Offer("Offer 5", "50% off on the dinner menu", today, today, false, true);
+        Offer offer1 = new Offer(UUID.randomUUID().toString(), restaurantId, "Offer 1", "50% off on the dinner menu", today, today, false, true);
+        Offer offer2 = new Offer(UUID.randomUUID().toString(), restaurantId, "Offer 2", "50% off on the lunch menu", today, today, true, false);
+        Offer offer3 = new Offer(UUID.randomUUID().toString(), restaurantId, "Offer 3", "30% off on the menu", today, today, true, true);
+        Offer offer4 = new Offer(UUID.randomUUID().toString(), restaurantId, "Offer 4", "every 20 euro a beer for free", today, today, true, true);
+        Offer offer5 = new Offer(UUID.randomUUID().toString(), restaurantId, "Offer 5", "50% off on the dinner menu", today, today, false, true);
         offers.add(offer1);
         offers.add(offer2);
         offers.add(offer3);
         offers.add(offer4);
         offers.add(offer5);
 
-        return offers;
+        try {
+            JSONUtil.saveJSONOfferList(this, offers);
+        } catch (JSONException e) {
+            Log.d("failed", "problema nel createFakeData delle offer");
+        }
+    }
+    private ArrayList<Offer> getDataJson() {
+
+        try {
+            return JSONUtil.readJSONOfferList(this, restaurantId);
+        } catch (JSONException e) {
+            return new ArrayList<>();
+        }
     }
 
     @Override
@@ -187,15 +210,25 @@ public class OfferList extends AppCompatActivity {
                 String desc = data.getStringExtra("description");
                 String from = data.getStringExtra("from");
                 String to = data.getStringExtra("to");
+                String offerId = data.getStringExtra("offerID");
                 boolean lunch = data.getBooleanExtra("lunch", false);
                 boolean dinner = data.getBooleanExtra("dinner", false);
 
                 Calendar from_date = getDateFromText(from);
                 Calendar to_date = getDateFromText(to);
-                Offer offer =new Offer(name, desc, from_date, to_date, lunch, dinner);
+                Offer offer =new Offer(offerId, restaurantId, name, desc, from_date, to_date, lunch, dinner);
                 offer_list.add(offer);
                 adapter.notifyDataSetChanged();
+                saveDataToJson(offer_list);
             }
+        }
+    }
+
+    private void saveDataToJson(ArrayList<Offer> offers) {
+        try {
+            JSONUtil.saveJSONOfferList(this, offers);
+        } catch (JSONException e) {
+            Log.d("failed", "problema nel saveDataJson delle offer");
         }
     }
 

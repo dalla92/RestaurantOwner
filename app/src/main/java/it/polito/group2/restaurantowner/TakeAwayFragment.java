@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.UUID;
 
 public class TakeAwayFragment extends Fragment {
 
@@ -34,9 +36,12 @@ public class TakeAwayFragment extends Fragment {
         String restaurantId = bundle.getString("id");
         Calendar date = Calendar.getInstance();
         date.setTimeInMillis(date_millis);
+        createFakeData(date, restaurantId);
         reservation_list = getDataJson(date, restaurantId);
 
+        /*Log.d("date", date.getTime().toString());
         Calendar today = Calendar.getInstance();
+        Log.d("date", today.getTime().toString());
         TextView reservation_title = (TextView) rootView.findViewById(R.id.reservation_list_title);
         if(     date.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                 date.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
@@ -49,7 +54,7 @@ public class TakeAwayFragment extends Fragment {
                     .append(" ").append(date.get(Calendar.DAY_OF_MONTH)).append("  ")
                     .append(getMonthName(date.get(Calendar.MONTH))).append("  ")
                     .append(date.get(Calendar.YEAR)).append(" "));
-        }
+        }*/
 
         ListView lv = (ListView) rootView.findViewById(R.id.table_list_view);
         adapter = new BaseAdapter() {
@@ -146,22 +151,52 @@ public class TakeAwayFragment extends Fragment {
         return rootView;
     }
 
-    private ArrayList<TakeAwayReservation> getDataJson(Calendar date, String restaurantId) {
-        /*ArrayList<TakeAwayReservation> reservations = new ArrayList<>();
+    private void createFakeData(Calendar date, String restaurantId) {
+        ArrayList<TakeAwayReservation> reservations = new ArrayList<>();
         Calendar today = Calendar.getInstance();
         Calendar tomorrow = Calendar.getInstance();
         tomorrow.set(Calendar.DAY_OF_MONTH, today.get(Calendar.DAY_OF_MONTH) + 1);
-        ArrayList<OrderedMeal> mealOrdered = new ArrayList<>();
-        mealOrdered.add(new OrderedMeal("Spaghetti alla carbonara", 2));
-        mealOrdered.add(new OrderedMeal("Pizza Margerita", 3));
-        mealOrdered.add(new OrderedMeal("Antipasto di mare", 2));
-        mealOrdered.add(new OrderedMeal("Heineken", 5));
-        TakeAwayReservation res1 = new TakeAwayReservation("Andrea Cuiuli", mealOrdered , date, "Una persona allergica alle noci", restaurantId);
-        TakeAwayReservation res2 = new TakeAwayReservation("Andrea Cuiuli", mealOrdered , date, "Una persona allergica alle noci", restaurantId);
-        TakeAwayReservation res3 = new TakeAwayReservation("Andrea Cuiuli", mealOrdered , date, "Una persona allergica alle noci", restaurantId);
+        String id1 = UUID.randomUUID().toString();
+        String id2 = UUID.randomUUID().toString();
+        String id3 = UUID.randomUUID().toString();
+        ArrayList<OrderedMeal> mealOrdered1 = new ArrayList<>();
+        mealOrdered1.add(new OrderedMeal("Spaghetti alla carbonara", 2, id1));
+        mealOrdered1.add(new OrderedMeal("Pizza Margerita", 3, id1));
+        mealOrdered1.add(new OrderedMeal("Antipasto di mare", 2, id1));
+        mealOrdered1.add(new OrderedMeal("Heineken", 5, id1));
+        TakeAwayReservation res1 = new TakeAwayReservation("Andrea Cuiuli", mealOrdered1, date, "Una persona allergica alle noci", restaurantId, id1);
+
+        ArrayList<OrderedMeal> mealOrdered2 = new ArrayList<>();
+        mealOrdered2.add(new OrderedMeal("Linguine allo scoglio", 2, id2));
+        mealOrdered2.add(new OrderedMeal("Pizza Napoletana", 3, id2));
+        TakeAwayReservation res2 = new TakeAwayReservation("Andrea Cuiuli", mealOrdered2, date, "Una persona allergica alle noci", restaurantId, id2);
+
+        ArrayList<OrderedMeal> mealOrdered3 = new ArrayList<>();
+        mealOrdered3.add(new OrderedMeal("Antipasto Rustico", 1, id3));
+        mealOrdered3.add(new OrderedMeal("Vino della casa", 1, id3));
+        mealOrdered3.add(new OrderedMeal("Carpaccio di manzo", 1, id3));
+        TakeAwayReservation res3 = new TakeAwayReservation("Andrea Cuiuli", mealOrdered3 , date, "Una persona allergica alle noci", restaurantId, id3);
+
         reservations.add(res1);
         reservations.add(res2);
-        reservations.add(res3);*/
+        reservations.add(res3);
+
+        try {
+            JSONUtil.saveJSONTakeAwayResList(getActivity(), reservations);
+        } catch (JSONException e) {
+            Log.d("failed", "problema nel createFakeData delle takeAwayReservations");
+        }
+    }
+
+    private void saveDataToJson(ArrayList<TakeAwayReservation> reservations) {
+        try {
+            JSONUtil.saveJSONTakeAwayResList(getActivity(), reservations);
+        } catch (JSONException e) {
+            Log.d("failed", "problema nel saveDataJson delle takeAwayReservations");
+        }
+    }
+
+    private ArrayList<TakeAwayReservation> getDataJson(Calendar date, String restaurantId) {
 
         try {
             return JSONUtil.readJSONTakeAwayResList(getActivity(), date, restaurantId);

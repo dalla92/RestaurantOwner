@@ -52,14 +52,14 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1">
+        >
 
         <ImageView
-            android:layout_width="40dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/imageView4"
-            android:src="@mipmap/money_icon"
-            android:layout_gravity="bottom|start" />
+            android:src="@drawable/ic_money_prymary"
+             />
 
         <TextView
             android:layout_width="wrap_content"
@@ -68,39 +68,50 @@
             android:text="Small Text"
             android:id="@+id/meal_price"
             android:paddingTop="15dp"
-            android:layout_gravity="bottom|start" />
+            />
 
         <ImageView
-            android:layout_width="30dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/meal_type1"
-            android:layout_gravity="center|top"
             android:paddingEnd="7dp" />
 
         <ImageView
-            android:layout_width="30dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/meal_type2"
-
-            android:layout_gravity="center|top"
             android:paddingEnd="10dp" />
 
-        <Switch
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textOn="@string/availability"
-            android:textOff="NO"
-            android:id="@+id/meal_availability"
-            android:showText="false"
-            android:singleLine="false"
-            android:splitTrack="false"
-            android:textStyle="bold"
-            android:checked="false"
+            android:orientation="vertical"
             android:layout_weight="1"
-            android:layout_gravity="bottom"
-            android:clickable="true"
-            android:enabled="true" />
+            >
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Available"
+                android:textSize="15sp"
+                android:layout_gravity="end"
+                />
+
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:textOn="@string/availability"
+                android:textOff="NO"
+                android:id="@+id/meal_availability"
+                android:singleLine="false"
+                android:splitTrack="false"
+                android:layout_gravity="end"
+                android:textStyle="bold"
+                android:checked="false"
+                android:clickable="true"
+                android:enabled="true" />
+
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

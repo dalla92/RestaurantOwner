@@ -30,6 +30,7 @@
             android:name=".AddRestaurantActivity"
             android:label="@string/title_activity_add_restaurant"
             android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="stateHidden"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -65,6 +66,7 @@
         <activity
             android:name=".AddOffer"
             android:label="@string/title_activity_add_offer"
+            android:windowSoftInputMode="stateHidden"
             android:parentActivityName=".OfferList"
             android:theme="@style/AppTheme.NoActionBar" >
 

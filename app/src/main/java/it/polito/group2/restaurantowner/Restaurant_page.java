@@ -103,7 +103,7 @@ public class Restaurant_page extends AppCompatActivity
             }
         }
         //fill data
-        setTitle(my_restaurant.getName());
+        //setTitle(my_restaurant.getName());
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         if(userDetails != null) {
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
