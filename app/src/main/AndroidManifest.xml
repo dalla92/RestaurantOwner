@@ -19,8 +19,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        id.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="18" />
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
@@ -71,24 +69,25 @@
             android:label="@string/title_activity_menu_restaurant_edit"
             android:parentActivityName=".MenuRestaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".OfferList"
-            android:label="@string/title_activity_offer_list"
-            android:theme="@style/AppTheme.NoActionBar">
+			
+			<activity
+                android:name=".OfferList"
+                android:label="@string/title_activity_offer_list"
+                android:parentActivityName=".Restaurant_page"
+                android:theme="@style/AppTheme.NoActionBar">
+
         </activity>
         <activity
             android:name=".AddOffer"
             android:label="@string/title_activity_add_offer"
-            android:theme="@style/AppTheme.NoActionBar">
             android:windowSoftInputMode="stateHidden"
             android:parentActivityName=".OfferList"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar" >
 
         </activity>
         <activity
             android:name=".Reservation"
             android:label="@string/title_activity_reservation"
-            android:theme="@style/AppTheme.NoActionBar">
             android:parentActivityName=".Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar">
 

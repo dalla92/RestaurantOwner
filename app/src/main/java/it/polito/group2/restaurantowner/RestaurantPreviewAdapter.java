@@ -2,10 +2,14 @@ package it.polito.group2.restaurantowner;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +71,14 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
                 }
             }
             */
+            SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);
+            if(userDetails != null) {
+                if (userDetails.getString(obj.getRestaurantId(), null) != null) {
+                    Uri photouri = Uri.parse(userDetails.getString(obj.getRestaurantId(), null));
+                    if (photouri != null)
+                        this.image.setImageURI(photouri);
+                }
+            }
             this.resName.setText(obj.getName());
             this.rating.setText(obj.getRating());
             this.reservationNumber.setText(obj.getReservationNumber());

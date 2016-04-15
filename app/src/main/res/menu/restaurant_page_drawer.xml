@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/action_edit_cover"
+            android:title="@string/action_edit_cover"
+            android:icon="@drawable/ic_menu_gallery" />
+
+        <item
+            android:id="@+id/action_edit"
+            android:title="@string/action_edit"
+            android:icon="@drawable/ic_edit_primary_24dp"/>
+
+
+        <item
+            android:id="@+id/action_menu"
+            android:icon="@drawable/ic_menu_24dp"
+            android:title="@string/action_menu" />
+
+        <item
+            android:id="@+id/action_reservations"
+            android:icon="@drawable/ic_calendar_black_24dp"
+            android:title="@string/action_reservations" />
+
+        <item
+            android:id="@+id/action_offers"
+            android:icon="@drawable/ic_report_24dp"
+            android:title="@string/action_offers" />
+
+        <item
+            android:id="@+id/action_reviews"
+            android:icon="@drawable/ic_star"
+            android:title="@string/action_reviews" />
+
+        <item
+            android:id="@+id/action_statistics"
+            android:icon="@drawable/ic_trending_up_24dp"
+            android:title="@string/action_statistics" />
+
+
+        <item
+            android:id="@+id/action_confirm"
+            android:icon="@drawable/ic_done_white_24dp"
+            android:title="@string/action_confirm"
+            android:visible="false" />
+    </group>
+
+
+</menu>
