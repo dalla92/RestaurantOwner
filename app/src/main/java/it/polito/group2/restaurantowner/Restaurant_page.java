@@ -103,6 +103,7 @@ public class Restaurant_page extends AppCompatActivity
         }
         //fill data
         //setTitle(my_restaurant.getName());
+        /*
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         if(userDetails != null) {
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
@@ -112,6 +113,9 @@ public class Restaurant_page extends AppCompatActivity
                     image.setImageURI(photouri);
             }
         }
+        */
+        ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
+        image.setImageURI(Uri.parse(my_restaurant.getPhotoUri()));
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
@@ -359,7 +363,7 @@ public class Restaurant_page extends AppCompatActivity
                 Log.d("aaa", "BREAK3"+contentUri.toString());
                 Log.d("aaa", "BREAK4" + Uri.parse(photouri));
                 image.setImageURI(Uri.parse(photouri));
-                my_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
+                my_restaurant.setPhotoUri(photouri); // ***MAYBE***
             }
             try {
                 saveJSONResList();
@@ -425,11 +429,18 @@ public class Restaurant_page extends AppCompatActivity
                 }
             }
         }
+        /*
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor edit = userDetails.edit();
         edit.putString(restaurant_id, photouri);
         //I can not save the photo, but i could save its URI
         edit.commit();
+        */
+        try{
+            saveJSONResList();
+        }
+        catch(JSONException e){
+        }
         hide();
     }
 

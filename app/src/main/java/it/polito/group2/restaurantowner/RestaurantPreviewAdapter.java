@@ -68,6 +68,8 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
                 }
             }
             */
+
+            /*
             SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);
             if(userDetails != null) {
                 if (userDetails.getString(obj.getRestaurantId(), null) != null) {
@@ -76,6 +78,9 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
                         this.image.setImageURI(photouri);
                 }
             }
+            */
+            this.image.setImageURI(Uri.parse(obj.getPhotoUri()));
+
             this.resName.setText(obj.getName());
             this.rating.setText(obj.getRating());
             this.reservationNumber.setText(obj.getReservationNumber());
