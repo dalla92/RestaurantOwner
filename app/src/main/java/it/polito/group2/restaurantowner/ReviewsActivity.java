@@ -46,7 +46,7 @@ public class ReviewsActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reviews);
+        setContentView(R.layout.app_bar_reviews);
 
         Bundle b = getIntent().getExtras();
         if(b != null) {
@@ -60,6 +60,7 @@ public class ReviewsActivity extends AppCompatActivity
         //navigation drawer
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        /*
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -67,7 +68,7 @@ public class ReviewsActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+*/
         //cardview implementation
 
         rv = (RecyclerView) findViewById(R.id.rv);
@@ -75,14 +76,14 @@ public class ReviewsActivity extends AppCompatActivity
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
         initializeAdapterReviews();
-        final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
+        /*final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
         ScrollView scroll = (ScrollView) findViewById(R.id.parent_scroll);
         scroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
                 appbar.setExpanded(false);
             }
-        });
+        });*/
 
     }
 

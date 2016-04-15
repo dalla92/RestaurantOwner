@@ -45,7 +45,7 @@
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:id="@+id/userPhoto"
-                        android:src="@drawable/blank_profile_picture"
+                        android:src="@drawable/blank_profile"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentTop="true"
                         android:layout_marginRight="16dp"
