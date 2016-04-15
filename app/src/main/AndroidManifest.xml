@@ -69,6 +69,7 @@
         <activity
             android:name=".MenuRestaurant_edit"
             android:label="@string/title_activity_menu_restaurant_edit"
+            android:windowSoftInputMode="stateHidden"
             android:parentActivityName=".MenuRestaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -79,7 +80,6 @@
         <activity
             android:name=".AddOffer"
             android:label="@string/title_activity_add_offer"
-            android:theme="@style/AppTheme.NoActionBar">
             android:windowSoftInputMode="stateHidden"
             android:parentActivityName=".OfferList"
             android:theme="@style/AppTheme.NoActionBar">
@@ -88,7 +88,6 @@
         <activity
             android:name=".Reservation"
             android:label="@string/title_activity_reservation"
-            android:theme="@style/AppTheme.NoActionBar">
             android:parentActivityName=".Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar">
 
