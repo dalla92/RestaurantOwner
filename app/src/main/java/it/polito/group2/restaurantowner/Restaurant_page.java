@@ -58,7 +58,7 @@ public class Restaurant_page extends AppCompatActivity
     private RecyclerView.LayoutManager mLayoutManager;
     private boolean card_view_clicked=false;
     public ArrayList<Restaurant> resList = new ArrayList<>(); //to be consistent with Daniel's code
-    public String restaurant_id = "0"; //if not passed by the previous activity
+    public String restaurant_id = null; //if not passed by the previous activity
     public int PICK_IMAGE = 0;
     public int REQUEST_TAKE_PHOTO = 1;
     public int MODIFY_INFO = 4;
@@ -71,6 +71,10 @@ public class Restaurant_page extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_page);
 
+        //get the right restaurant
+        Bundle b = getIntent().getExtras();
+        if(b!=null)
+            restaurant_id = b.getString("RestaurantId");
         //get data
         try {
             resList = readJSONResList();
@@ -88,11 +92,6 @@ public class Restaurant_page extends AppCompatActivity
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        //get the right restaurant
-        Bundle b = getIntent().getExtras();
-        if(b!=null)
-            restaurant_id = b.getString("RestaurantId");
-        //get data
         Log.d("ccc", "Given " + restaurant_id);
         for (Restaurant r : resList) {
             Log.d("ccc", "Found "+r.getRestaurantId());
@@ -107,8 +106,8 @@ public class Restaurant_page extends AppCompatActivity
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         if(userDetails != null) {
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
-            if (userDetails.getString("photouri", null) != null) {
-                Uri photouri = Uri.parse(userDetails.getString("photouri", null));
+            if (userDetails.getString(restaurant_id, null) != null) {
+                Uri photouri = Uri.parse(userDetails.getString(restaurant_id, null));
                 if (photouri != null)
                     image.setImageURI(photouri);
             }
@@ -116,7 +115,6 @@ public class Restaurant_page extends AppCompatActivity
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-
 
         EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
         EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
@@ -146,7 +144,7 @@ public class Restaurant_page extends AppCompatActivity
             public void onClick(View v) {
                 SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
                 if(userDetails != null) {
-                    String parameter = userDetails.getString("photouri", null);
+                    String parameter = userDetails.getString(restaurant_id, null);
                     if(parameter!=null){
                         Intent intent = new Intent(
                                 getApplicationContext(),
@@ -322,16 +320,6 @@ public class Restaurant_page extends AppCompatActivity
                 show();
                 return true;
 
-            case R.id.action_confirm:
-
-                hide();
-                try {
-                    saveJSONResList();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -394,17 +382,27 @@ public class Restaurant_page extends AppCompatActivity
                     }
                 }
             }
+            if(my_restaurant == null)
+                Log.d("aaa", "MY RESTAURANT IS NULL");
             my_restaurant.setPhotoUri(photouri);
             try {
                 saveJSONResList();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            /*
+            SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+            SharedPreferences.Editor edit = userDetails.edit();
+            edit.putString(restaurant_id, photouri);
+            //I can not save the photo, but i could save its URI
+            edit.commit();
+            */
         }
         if (requestCode == MODIFY_INFO) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 Restaurant res = (Restaurant) data.getExtras().get("Restaurant");
+                my_restaurant = res;
                 try {
                     ArrayList<Restaurant> resList = JSONUtil.readJSONResList(this);
                     for(Restaurant restaurant : resList){
@@ -422,7 +420,11 @@ public class Restaurant_page extends AppCompatActivity
                 }
             }
         }
-
+        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        SharedPreferences.Editor edit = userDetails.edit();
+        edit.putString(restaurant_id, photouri);
+        //I can not save the photo, but i could save its URI
+        edit.commit();
         hide();
     }
 
@@ -471,28 +473,6 @@ public class Restaurant_page extends AppCompatActivity
     }
 
     public void show(){
-        //menu item show/hide
-        /*
-        MenuItem action_confirm_item1 = menu.findItem(R.id.action_confirm);
-        action_confirm_item1.setVisible(true);
-        MenuItem action_edit_item1 = menu.findItem(R.id.action_edit);
-        action_edit_item1.setVisible(false);
-        */
-        //edit text clickable yes/not
-        /*
-        EditText edit_restaurant_name1 = (EditText) findViewById(R.id.edit_restaurant_name);
-        EditText edit_restaurant_address1 = (EditText) findViewById(R.id.edit_restaurant_address);
-        EditText edit_restaurant_telephone_number1 = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
-        edit_restaurant_name1.setFocusableInTouchMode(true);
-        edit_restaurant_name1.setFocusable(true);
-        edit_restaurant_name1.setAlpha(1);
-        edit_restaurant_address1.setFocusableInTouchMode(true);
-        edit_restaurant_address1.setFocusable(true);
-        edit_restaurant_address1.setAlpha(1);
-        edit_restaurant_telephone_number1.setFocusableInTouchMode(true);
-        edit_restaurant_telephone_number1.setFocusable(true);
-        edit_restaurant_telephone_number1.setAlpha(1);
-        */
         //button present yes/not
         Button button_take_photo1 = (Button) findViewById(R.id.button_take_photo);
         button_take_photo1.setVisibility(View.VISIBLE);
@@ -503,26 +483,6 @@ public class Restaurant_page extends AppCompatActivity
     }
 
     public void hide(){
-        //menu item show/hide
-        /*
-        MenuItem action_confirm_item2 = menu.findItem(R.id.action_confirm);
-        action_confirm_item2.setVisible(false);
-        MenuItem action_edit_item2 = menu.findItem(R.id.action_edit);
-        action_edit_item2.setVisible(true);
-        */
-        //edit text clickable yes/not
-        EditText edit_restaurant_name2 = (EditText) findViewById(R.id.edit_restaurant_name);
-        EditText edit_restaurant_address2 = (EditText) findViewById(R.id.edit_restaurant_address);
-        EditText edit_restaurant_telephone_number2 = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
-        edit_restaurant_name2.setFocusableInTouchMode(false);
-        edit_restaurant_name2.setFocusable(false);
-        edit_restaurant_name2.setAlpha(0);
-        edit_restaurant_address2.setFocusableInTouchMode(false);
-        edit_restaurant_address2.setFocusable(false);
-        edit_restaurant_address2.setAlpha(0);
-        edit_restaurant_telephone_number2.setFocusableInTouchMode(false);
-        edit_restaurant_telephone_number2.setFocusable(false);
-        edit_restaurant_telephone_number2.setAlpha(0);
         //button present yes/not
         Button button_take_photo2 = (Button) findViewById(R.id.button_take_photo);
         button_take_photo2.setVisibility(View.GONE);
@@ -789,11 +749,13 @@ public class Restaurant_page extends AppCompatActivity
         Bitmap bitmap = BitmapFactory.decodeFile(photouri, bmOptions);
         if(bitmap!=null)
             mImageView.setImageBitmap(bitmap);
+        /*
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor edit = userDetails.edit();
         edit.putString("photouri", photouri);
         //I can not save the photo, but i could save its URI
         edit.commit();
+        */
     }
 
 

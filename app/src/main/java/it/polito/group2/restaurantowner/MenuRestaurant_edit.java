@@ -123,18 +123,26 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         else {
             //retrieve data
             Bundle b = getIntent().getExtras();
-            Meal current_meal = (Meal) b.get("meal");
+            if(getIntent().hasExtra("meal"))
+                current_meal = (Meal) b.get("meal");
+            else{
+                Intent intent1 = new Intent(
+                        getApplicationContext(),
+                        Restaurant_page.class);
+                startActivity(intent1);
+            }
             if(current_meal==null){
                 Log.d("aaa", "CURRENT MEAL IS NULL (ON CREATE)");
             }
             else
                 Log.d("aaa", "CURRENT MEAL IS NOT NULL (ON CREATE)");
+            /*
             try {
                 readJSONMeList();
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
+            */
             //toolbar
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
@@ -159,11 +167,21 @@ public class MenuRestaurant_edit extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_save) {
+            if(current_meal.getMeal_name().equals(""))
+                Toast.makeText(this,"Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
+            else {
+                Intent intent = new Intent();
+                //intent.putExtra("Restaurant", res);
+                setResult(RESULT_OK, intent);
+                finish();//finishing activity
+                return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
