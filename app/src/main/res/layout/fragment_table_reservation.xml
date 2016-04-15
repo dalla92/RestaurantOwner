@@ -9,6 +9,7 @@
         android:orientation="vertical"
         android:layout_marginTop="5dp">
 
+
         <ListView
             android:id="@+id/table_list_view"
             android:layout_width="wrap_content"

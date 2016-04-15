@@ -93,6 +93,7 @@ public class Reservation extends AppCompatActivity {
 
                     adapter.getTakeaway_fragment().changeData(c, restaurantId);
                     adapter.getTable_fragment().changeData(c, restaurantId);
+
                     c = Calendar.getInstance();
                     c.set(Calendar.YEAR, c.get(Calendar.YEAR));
                     c.set(Calendar.MONTH, c.get(Calendar.MONTH));
