@@ -69,7 +69,6 @@
     <string name="category_name">Category name</string>
 
 
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -125,4 +124,17 @@
     <string name="reservation_people">People</string>
     <string name="ordered_meals">Meal Ordered</string>
     <string name="reservation_title">Reservations</string>
+
+    <!-- Statistics Activity -->
+    <string name="statistics_activity">Statistics</string>
+    <string name="statistics_Sun">Sun</string>
+    <string name="statistics_Mon">Mon</string>
+    <string name="statistics_Tue">Tue</string>
+    <string name="statistics_Wed">Wed</string>
+    <string name="statistics_Thu">Thu</string>
+    <string name="statistics_Fri">Fri</string>
+    <string name="statistics_Sat">Sat</string>
+
+    <!-- Reviews Activity -->
+    <string name="reviews_activity">Reviews</string>
 </resources>

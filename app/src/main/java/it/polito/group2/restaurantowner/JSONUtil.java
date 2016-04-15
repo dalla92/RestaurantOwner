@@ -563,4 +563,42 @@ public class JSONUtil {
         return otList;
     }
 
+    /* Filippo edits start */
+    public static ArrayList<Comment> readJsonReviewList(Context mContext, String restaurantID)
+            throws JSONException {
+        String json = null;
+        ArrayList<Comment> commentList = new ArrayList<>();
+        FileInputStream fis = null;
+        String FILENAME = "commentList.json";
+        try {
+            fis = mContext.openFileInput(FILENAME);
+            int size = fis.available();
+            byte[] buffer = new byte[size];
+            fis.read(buffer);
+            fis.close();
+            json = new String(buffer, "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return commentList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        JSONObject jobj = new JSONObject(json);
+        JSONArray jsonArray = jobj.optJSONArray("Comments");
+        Comment comment;
+
+        //Iterate the jsonArray and print the info of JSONObjects
+        for(int i=0; i < jsonArray.length(); i++){
+
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            if(jsonObject.optString("RestaurantID").equals(restaurantID)) {
+                comment = new Comment();
+                comment.setDate(jsonObject.optString("Date") + " " + jsonObject.optString("Time"));
+                commentList.add(comment);
+            }
+        }
+        return commentList;
+    }
+    /* Filippo edits stop */
+
 }

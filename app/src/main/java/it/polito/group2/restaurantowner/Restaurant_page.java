@@ -291,7 +291,7 @@ public class Restaurant_page extends AppCompatActivity
             case R.id.action_reviews:
                 Intent intent4 = new Intent(
                         getApplicationContext(),
-                        Restaurant_page.class); //here Filippo must insert his class name
+                        ReviewsActivity.class); //here Filippo must insert his class name
                 Bundle b4 = new Bundle();
                 b4.putString("restaurant_id", restaurant_id);
                 intent4.putExtras(b4);
@@ -301,7 +301,7 @@ public class Restaurant_page extends AppCompatActivity
             case R.id.action_statistics:
                 Intent intent5 = new Intent(
                         getApplicationContext(),
-                        Restaurant_page.class); //here Filippo must insert his class name
+                        StatisticsActivity.class); //here Filippo must insert his class name
                 Bundle b5 = new Bundle();
                 b5.putString("restaurant_id", restaurant_id);
                 intent5.putExtras(b5);
