@@ -62,6 +62,56 @@ public class JSONUtil {
         }
     }
 
+    public static ArrayList<Restaurant> readJSONResList(Context mContext) throws JSONException {
+        String json = null;
+        ArrayList<Restaurant> resList = new ArrayList<>();
+        FileInputStream fis = null;
+        String FILENAME = "restaurantList.json";
+        try {
+            fis = mContext.openFileInput(FILENAME);
+            int size = fis.available();
+            byte[] buffer = new byte[size];
+            fis.read(buffer);
+            fis.close();
+            json = new String(buffer, "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return resList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        JSONObject jobj = new JSONObject(json);
+        JSONArray jsonArray = jobj.optJSONArray("Restaurants");
+        //Iterate the jsonArray and print the info of JSONObjects
+        for(int i=0; i < jsonArray.length(); i++){
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+            Restaurant res = new Restaurant();
+            res.setAddress(jsonObject.optString("Address"));
+            res.setCategory(jsonObject.optString("Category"));
+            res.setClosestBus(jsonObject.optString("ClosestBus"));
+            res.setClosestMetro(jsonObject.optString("ClosestMetro"));
+            res.setFidelity(jsonObject.getBoolean("Fidelity"));
+            res.setName(jsonObject.optString("Name"));
+            res.setOrdersPerHour(jsonObject.optString("OrdersPerHour"));
+            res.setPhoneNum(jsonObject.optString("PhoneNum"));
+            res.setPhotoUri(jsonObject.optString("Photo"));
+            res.setRating(jsonObject.optString("Rating"));
+            res.setReservationNumber(jsonObject.optString("ReservationNumber"));
+            res.setReservedPercentage(jsonObject.optString("ReservationPercentage"));
+            res.setRestaurantId(jsonObject.optString("RestaurantId"));
+            res.setSquaredMeters(jsonObject.optString("SquaredMeters"));
+            res.setTableReservation(jsonObject.getBoolean("TableReservation"));
+            res.setTableNum(jsonObject.optString("TableNum"));
+            res.setTakeAway(jsonObject.getBoolean("TakeAway"));
+            res.setUserId(jsonObject.optString("UserId"));
+            resList.add(res);
+        }
+        return resList;
+    }
+
     public static ArrayList<TableReservation> readJSONTableResList(Context mContext, Calendar targetDate, String targetRestaurantId) throws JSONException{
         String json = null;
         ArrayList<TableReservation> tableResList = new ArrayList<>();
@@ -207,55 +257,7 @@ public class JSONUtil {
         return orderedMealList;
     }
 
-    public static ArrayList<Restaurant> readJSONResList(Context mContext) throws JSONException {
-        String json = null;
-        ArrayList<Restaurant> resList = new ArrayList<>();
-        FileInputStream fis = null;
-        String FILENAME = "restaurantList.json";
-        try {
-            fis = mContext.openFileInput(FILENAME);
-            int size = fis.available();
-            byte[] buffer = new byte[size];
-            fis.read(buffer);
-            fis.close();
-            json = new String(buffer, "UTF-8");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return resList;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-
-        JSONObject jobj = new JSONObject(json);
-        JSONArray jsonArray = jobj.optJSONArray("Restaurants");
-        //Iterate the jsonArray and print the info of JSONObjects
-        for(int i=0; i < jsonArray.length(); i++){
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-            Restaurant res = new Restaurant();
-            res.setAddress(jsonObject.optString("Address"));
-            res.setCategory(jsonObject.optString("Category"));
-            res.setClosestBus(jsonObject.optString("ClosestBus"));
-            res.setClosestMetro(jsonObject.optString("ClosestMetro"));
-            res.setFidelity(jsonObject.getBoolean("Fidelity"));
-            res.setName(jsonObject.optString("Name"));
-            res.setOrdersPerHour(jsonObject.optString("OrdersPerHour"));
-            res.setPhoneNum(jsonObject.optString("PhoneNum"));
-            res.setPhotoUri(jsonObject.optString("Photo"));
-            res.setRating(jsonObject.optString("Rating"));
-            res.setReservationNumber(jsonObject.optString("ReservationNumber"));
-            res.setReservedPercentage(jsonObject.optString("ReservationPercentage"));
-            res.setRestaurantId(jsonObject.optString("RestaurantId"));
-            res.setSquaredMeters(jsonObject.optString("SquaredMeters"));
-            res.setTableReservation(jsonObject.getBoolean("TableReservation"));
-            res.setTableNum(jsonObject.optString("TableNum"));
-            res.setTakeAway(jsonObject.getBoolean("TakeAway"));
-            res.setUserId(jsonObject.optString("UserId"));
-            resList.add(res);
-        }
-        return resList;
-    }
 
     public static void saveJSONServiceList(Context mContext, List<RestaurantService> serList) throws JSONException {
         String FILENAME = "serviceList.json";

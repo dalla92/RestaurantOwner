@@ -71,6 +71,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         if(res==null){
             res = new Restaurant();
             res.setRestaurantId(UUID.randomUUID().toString());
+            res.setPhotoUri("");
             //TODO take off this hardcoded values and get the real values
             res.setRating("4.5");
             res.setReservedPercentage("27%");
