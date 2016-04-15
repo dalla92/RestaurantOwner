@@ -127,6 +127,9 @@
 
     <!-- Statistics Activity -->
     <string name="statistics_activity">Statistics</string>
+    <string name="statistics_chart_title">Orders - Bookings</string>
+    <string name="statistics_booking_line">Table reservations</string>
+    <string name="statistics_order_line">Take away reservations</string>
     <string name="statistics_Sun">Sun</string>
     <string name="statistics_Mon">Mon</string>
     <string name="statistics_Tue">Tue</string>
@@ -134,6 +137,21 @@
     <string name="statistics_Thu">Thu</string>
     <string name="statistics_Fri">Fri</string>
     <string name="statistics_Sat">Sat</string>
+    <string name="statistics_Jan">Jan</string>
+    <string name="statistics_Feb">Feb</string>
+    <string name="statistics_Mar">Mar</string>
+    <string name="statistics_Apr">Apr</string>
+    <string name="statistics_May">May</string>
+    <string name="statistics_Jun">Jun</string>
+    <string name="statistics_Jul">Jul</string>
+    <string name="statistics_Aug">Aug</string>
+    <string name="statistics_Sep">Sep</string>
+    <string name="statistics_Oct">Oct</string>
+    <string name="statistics_Nov">Nov</string>
+    <string name="statistics_Dec">Dec</string>
+    <string name="statistics_filter_week">Week</string>
+    <string name="statistics_filter_month">Month</string>
+    <string name="statistics_filter_year">Year</string>
 
     <!-- Reviews Activity -->
     <string name="reviews_activity">Reviews</string>

@@ -46,7 +46,7 @@ public class ReviewsActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reviews);
+        setContentView(R.layout.app_bar_reviews);
 
         Bundle b = getIntent().getExtras();
         if(b != null) {
@@ -60,6 +60,7 @@ public class ReviewsActivity extends AppCompatActivity
         //navigation drawer
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        /*
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -67,7 +68,7 @@ public class ReviewsActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
+*/
         //cardview implementation
 
         rv = (RecyclerView) findViewById(R.id.rv);
@@ -75,14 +76,14 @@ public class ReviewsActivity extends AppCompatActivity
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
         initializeAdapterReviews();
-        final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
+        /*final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
         ScrollView scroll = (ScrollView) findViewById(R.id.parent_scroll);
         scroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
             public void onScrollChanged() {
                 appbar.setExpanded(false);
             }
-        });
+        });*/
 
     }
 
@@ -103,7 +104,7 @@ public class ReviewsActivity extends AppCompatActivity
             comment.setComment("Commento dell'utente");
             comment.setCommentID(UUID.randomUUID().toString());
             comment.setStars_number(4);
-            comment.setUsername("User " + i);
+            comment.setUsername("Utente " + i);
             comment.setRestaurantId("");
             commentList.add(comment);
         }
@@ -114,16 +115,6 @@ public class ReviewsActivity extends AppCompatActivity
     private void initializeAdapterReviews(){
         Adapter_Reviews adapter = new Adapter_Reviews(commentList, this.getApplicationContext());
         rv.setAdapter(adapter);
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
     }
 
     @Override
@@ -142,6 +133,7 @@ public class ReviewsActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
+        /*
         int id = item.getItemId();
         if (id == R.id.nav_logout) {
             // TODO Handle the logout action
@@ -150,6 +142,7 @@ public class ReviewsActivity extends AppCompatActivity
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
+        */
         return true;
     }
 

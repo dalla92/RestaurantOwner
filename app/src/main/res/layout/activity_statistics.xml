@@ -19,20 +19,20 @@
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Week"
+            android:text="@string/statistics_filter_week"
             android:onClick="onRadioButtonClicked"
             android:id="@+id/weekFilter"
             android:checked="true" />
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Month"
+            android:text="@string/statistics_filter_month"
             android:onClick="onRadioButtonClicked"
             android:id="@+id/monthFilter" />
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Year"
+            android:text="@string/statistics_filter_year"
             android:onClick="onRadioButtonClicked"
             android:id="@+id/yearFilter"/>
     </RadioGroup>

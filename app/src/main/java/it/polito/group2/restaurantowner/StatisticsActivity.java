@@ -55,7 +55,7 @@ public class StatisticsActivity extends AppCompatActivity {
             restaurantID = b.getInt("restaurantID");
             LineData data = new LineData(getDataName(), getDataSet());
             chart.setData(data);
-            chart.setDescription("Orders - Bookings");
+            chart.setDescription(getString(R.string.statistics_chart_title));
             chart.animateXY(2000, 2000);
             chart.invalidate();
 
@@ -208,10 +208,10 @@ public class StatisticsActivity extends AppCompatActivity {
             valueSet2.add(val);
         }
 
-        LineDataSet dataSet1 = new LineDataSet(valueSet1, "Booking");
+        LineDataSet dataSet1 = new LineDataSet(valueSet1, getString(R.string.statistics_booking_line));
         dataSet1.setColor(Color.rgb(0, 155, 0));
 
-        LineDataSet dataSet2 = new LineDataSet(valueSet2, "Order");
+        LineDataSet dataSet2 = new LineDataSet(valueSet2, getString(R.string.statistics_order_line));
         dataSet2.setColor(Color.rgb(155, 0, 0));
 
         dataSets = new ArrayList<>();
@@ -242,18 +242,18 @@ public class StatisticsActivity extends AppCompatActivity {
                 }
                 break;
             case 2:
-                xAxis.add("Jan");
-                xAxis.add("Feb");
-                xAxis.add("Mar");
-                xAxis.add("Apr");
-                xAxis.add("May");
-                xAxis.add("Jun");
-                xAxis.add("Jul");
-                xAxis.add("Aug");
-                xAxis.add("Sep");
-                xAxis.add("Oct");
-                xAxis.add("Nov");
-                xAxis.add("Dec");
+                xAxis.add(getString(R.string.statistics_Jan));
+                xAxis.add(getString(R.string.statistics_Feb));
+                xAxis.add(getString(R.string.statistics_Mar));
+                xAxis.add(getString(R.string.statistics_Apr));
+                xAxis.add(getString(R.string.statistics_May));
+                xAxis.add(getString(R.string.statistics_Jun));
+                xAxis.add(getString(R.string.statistics_Jul));
+                xAxis.add(getString(R.string.statistics_Aug));
+                xAxis.add(getString(R.string.statistics_Sep));
+                xAxis.add(getString(R.string.statistics_Oct));
+                xAxis.add(getString(R.string.statistics_Nov));
+                xAxis.add(getString(R.string.statistics_Dec));
                 break;
         }
 
@@ -461,7 +461,7 @@ public class StatisticsActivity extends AppCompatActivity {
         LineChart chart = (LineChart) findViewById(R.id.chart);
         LineData data = new LineData(getDataName(), getDataSet());
         chart.setData(data);
-        chart.setDescription("Orders - Bookings");
+        chart.setDescription(getString(R.string.statistics_chart_title));
         chart.animateXY(2000, 2000);
         chart.invalidate();
     }
