@@ -46,7 +46,7 @@ public class ReviewsActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.app_bar_reviews);
+        setContentView(R.layout.activity_reviews);
 
         Bundle b = getIntent().getExtras();
         if(b != null) {
@@ -68,14 +68,15 @@ public class ReviewsActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-*/
-        //cardview implementation
+        */
 
+        //cardview implementation
         rv = (RecyclerView) findViewById(R.id.rv);
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
         initializeAdapterReviews();
+
         /*final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
         ScrollView scroll = (ScrollView) findViewById(R.id.parent_scroll);
         scroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {

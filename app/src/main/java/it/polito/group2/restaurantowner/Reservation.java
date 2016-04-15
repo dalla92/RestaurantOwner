@@ -95,11 +95,6 @@ public class Reservation extends AppCompatActivity {
                     adapter.getTable_fragment().changeData(c, restaurantId);
 
                     c = Calendar.getInstance();
-                    c.set(Calendar.YEAR, c.get(Calendar.YEAR));
-                    c.set(Calendar.MONTH, c.get(Calendar.MONTH));
-                    c.set(Calendar.DAY_OF_MONTH, c.get(Calendar.DAY_OF_MONTH));
-                    c.set(Calendar.HOUR_OF_DAY, 0);
-                    c.set(Calendar.MINUTE, 0);
                     if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
                         getSupportActionBar().setTitle((getString(R.string.title_activity_reservation)));
                     else {
@@ -113,7 +108,7 @@ public class Reservation extends AppCompatActivity {
                     }
                 }
             }, year, month, day);
-            dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+            //dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
             dialog.show();
         }
 

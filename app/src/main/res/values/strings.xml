@@ -1,51 +1,51 @@
 <resources>
-    <string name="app_name">RestaurantOwner</string>
+    <string name="app_name">FastEat</string>
 
-    <string name="action_reservations">RESERVATIONS</string>
-    <string name="action_offers">OFFERS</string>
-    <string name="action_reviews">REVIEWS</string>
-    <string name="action_statistics">STATISTICS</string>
+    <string name="action_reservations">Reservations</string>
+    <string name="action_offers">Offers</string>
+    <string name="action_reviews">Reviews</string>
+    <string name="action_statistics">Statistics</string>
 
-    <string name="restaurant_page_name">RESTAURANT NAME</string>
-    <string name="button_take_photo">TAKE PHOTO NOW</string>
-    <string name="button_choose_photo">CHOOSE FROM GALLERY</string>
-    <string name="restaurant_name">Name: </string>
-    <string name="restaurant_address">Address: </string>
+    <string name="restaurant_page_name">Restaurant Name</string>
+    <string name="button_take_photo">Take Photo Now</string>
+    <string name="button_choose_photo">Choose From Gallery</string>
+    <string name="restaurant_name">Name:</string>
+    <string name="restaurant_address">Address:</string>
     <string name="restaurant_telephone_number">Telephone: </string>
     <string name="edit_restaurant_name"> Insert name</string>
     <string name="edit_restaurant_address"> Insert address</string>
     <string name="edit_restaurant_telephone_number"> Insert tel</string>
     <string name="last_comments">Last comments preview</string>
-    <string name="action_confirm">CONFIRM</string>
-    <string name="action_more">MORE</string>
-    <string name="action_edit_cover">EDIT COVER</string>
-    <string name="action_edit">EDIT INFO</string>
-    <string name="action_menu">MENU</string>
-    <string name="action_save">SAVE</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_more">More</string>
+    <string name="action_edit_cover">Edit Cover</string>
+    <string name="action_edit">Edit Info</string>
+    <string name="action_menu">Menu</string>
+    <string name="action_save">Save</string>
 
 
-    <string name="seating_capacity">SEATING CAPACITY: </string>
-    <string name="squared_metres">SQUARED METRES: </string>
-    <string name="closest_metro_stop">CLOSEST METRO STOP: </string>
-    <string name="closest_bus_stop">CLOSEST BUS STOP: </string>
-    <string name="credit_card">CREDIT CARD</string>
+    <string name="seating_capacity">Seating capacity</string>
+    <string name="squared_metres">Squared meters</string>
+    <string name="closest_metro_stop">Closest metro stop</string>
+    <string name="closest_bus_stop">Closest bus stop</string>
+    <string name="credit_card">Credit Card</string>
     <string name="wifi">WI-FI</string>
-    <string name="inside">INSIDE</string>
-    <string name="outside">OUTSIDE</string>
+    <string name="inside">Inside</string>
+    <string name="outside">Outside</string>
     <string name="take_away">TAKE-AWAY</string>
-    <string name="mandatory_booking_via_telephone">BOOKING ONLY VIA TELEPHONE</string>
-    <string name="celiac">CELIAC</string>
-    <string name="vegan">VEGAN</string>
-    <string name="vegetarian">VEGETARIAN</string>
-    <string name="bar">BAR</string>
-    <string name="canteen">CANTEEN</string>
-    <string name="fastfood">FAST-FOOD</string>
-    <string name="restaurant">RESTAURANT</string>
+    <string name="mandatory_booking_via_telephone">Booking only via telephone</string>
+    <string name="celiac">Celiac</string>
+    <string name="vegan">Vegan</string>
+    <string name="vegetarian">Vegetarian</string>
+    <string name="bar">Bar</string>
+    <string name="canteen">Canteen</string>
+    <string name="fastfood">Fast-food</string>
+    <string name="restaurant">Restaurant</string>
 
 
-    <string name="title_activity_menu_restaurant_page">MENU</string>
-    <string name="add_meal">ADD A MEAL</string>
-    <string name="availability">SALE</string>
+    <string name="title_activity_menu_restaurant_page">Menu</string>
+    <string name="add_meal">Add a meal</string>
+    <string name="availability">Sale</string>
 
     <string name="meal_name">Meal Name</string>
     <string name="meal_price">Meal Price</string>
@@ -56,11 +56,11 @@
     <string name="meal_time_for_cooking">Cooking</string>
     <string name="meal_add_new_category">Category</string>
     <string name="meal_add_new_addition">Addition</string>
-    <string name="title_activity_menu_restaurant_edit">EDIT MEAL</string>
+    <string name="title_activity_menu_restaurant_edit">Edit Meal</string>
     <string name="addition_meal_price">Price</string>
 
-    <string name="addres_section_main_info">MAIN INFO</string>
-    <string name="addres_section_other_info">MORE INFO</string>
+    <string name="addres_section_main_info">Main Info</string>
+    <string name="addres_section_other_info">More Info</string>
 
     <string name="show_more"> (read all...)</string>
 
@@ -117,6 +117,7 @@
     <string name="offer_desc_error">Insert a description!</string>
     <string name="title_activity_reservation">Reservations</string>
     <string name="done">Done</string>
+    <string name="no_offer">No Offers</string>
 
     <!-- Reservation strings -->
     <string name="table_section">Table</string>
@@ -124,10 +125,11 @@
     <string name="reservation_people">People</string>
     <string name="ordered_meals">Meal Ordered</string>
     <string name="reservation_title">Reservations</string>
+    <string name="no_reservation">No Reservations</string>
 
     <!-- Statistics Activity -->
     <string name="statistics_activity">Statistics</string>
-    <string name="statistics_chart_title">Orders - Bookings</string>
+    <string name="statistics_chart_title">Take Away reservations</string>
     <string name="statistics_booking_line">Table reservations</string>
     <string name="statistics_order_line">Take away reservations</string>
     <string name="statistics_Sun">Sun</string>
@@ -149,10 +151,11 @@
     <string name="statistics_Oct">Oct</string>
     <string name="statistics_Nov">Nov</string>
     <string name="statistics_Dec">Dec</string>
-    <string name="statistics_filter_week">Week</string>
-    <string name="statistics_filter_month">Month</string>
-    <string name="statistics_filter_year">Year</string>
+    <string name="statistics_filter_week">Weekly</string>
+    <string name="statistics_filter_month">Monthly</string>
+    <string name="statistics_filter_year">Yearly</string>
 
     <!-- Reviews Activity -->
     <string name="reviews_activity">Reviews</string>
+    <string name="title_add_offer">Add new Offer</string>
 </resources>

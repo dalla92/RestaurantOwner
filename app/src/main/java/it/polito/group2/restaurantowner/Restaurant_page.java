@@ -103,6 +103,7 @@ public class Restaurant_page extends AppCompatActivity
         }
         //fill data
         //setTitle(my_restaurant.getName());
+        /*
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         if(userDetails != null) {
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
@@ -112,6 +113,9 @@ public class Restaurant_page extends AppCompatActivity
                     image.setImageURI(photouri);
             }
         }
+        */
+        ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
+        image.setImageURI(Uri.parse(my_restaurant.getPhotoUri()));
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
@@ -334,6 +338,7 @@ public class Restaurant_page extends AppCompatActivity
         //take a photo result
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //view photo
+            Log.d("aaa", "BREAK2");
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
             setPic();
             //add photo to gallery
@@ -343,7 +348,11 @@ public class Restaurant_page extends AppCompatActivity
                 Uri contentUri = Uri.fromFile(f);
                 mediaScanIntent.setData(contentUri);
                 this.sendBroadcast(mediaScanIntent);
-                my_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
+                //photouri = contentUri.toString();
+                Log.d("aaa", "BREAK3"+contentUri.toString());
+                Log.d("aaa", "BREAK4" + Uri.parse(photouri));
+                image.setImageURI(Uri.parse(photouri));
+                my_restaurant.setPhotoUri(photouri); // ***MAYBE***
             }
             try {
                 saveJSONResList();
@@ -409,11 +418,18 @@ public class Restaurant_page extends AppCompatActivity
                 }
             }
         }
+        /*
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor edit = userDetails.edit();
         edit.putString(restaurant_id, photouri);
         //I can not save the photo, but i could save its URI
         edit.commit();
+        */
+        try{
+            saveJSONResList();
+        }
+        catch(JSONException e){
+        }
         hide();
     }
 
@@ -696,17 +712,13 @@ public class Restaurant_page extends AppCompatActivity
     }
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
             File photoFile = null;
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                // Error occurred while creating the File
-                //nothing
+                Log.d("aaa", "BREAK1");
             }
-            // Continue only if the File was successfully created
             if (photoFile != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
                         Uri.fromFile(photoFile));

@@ -111,6 +111,7 @@ public class AddOffer extends AppCompatActivity {
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
 
+
         // Create a new instance of DatePickerDialog and return it
         DatePickerDialog dialog =  new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override

@@ -47,6 +47,14 @@ public class OfferList extends AppCompatActivity {
         //createFakeData();
         offer_list = getDataJson();
 
+        TextView offer_title = (TextView) findViewById(R.id.offer_list_title);
+        if(offer_list.isEmpty()) {
+            offer_title.setVisibility(View.VISIBLE);
+            offer_title.setText(getString(R.string.no_offer));
+        }
+        else
+            offer_title.setVisibility(View.GONE);
+
         ListView lv = (ListView) findViewById(R.id.offer_list_view);
         adapter = new BaseAdapter() {
 

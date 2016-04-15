@@ -6,10 +6,8 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +69,8 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
                 }
             }
             */
+
+            /*
             SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);
             if(userDetails != null) {
                 if (userDetails.getString(obj.getRestaurantId(), null) != null) {
@@ -79,6 +79,9 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
                         this.image.setImageURI(photouri);
                 }
             }
+            */
+            this.image.setImageURI(Uri.parse(obj.getPhotoUri()));
+
             this.resName.setText(obj.getName());
             this.rating.setText(obj.getRating());
             this.reservationNumber.setText(obj.getReservationNumber());

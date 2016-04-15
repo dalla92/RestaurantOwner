@@ -12,7 +12,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="it.polito.group2.restaurantowner.ReviewsActivity"
-    tools:showIn="@layout/app_bar_reviews"
+    tools:showIn="@layout/activity_reviews"
     android:orientation="vertical">
 
     <LinearLayout

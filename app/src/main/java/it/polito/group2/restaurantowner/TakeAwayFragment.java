@@ -39,22 +39,13 @@ public class TakeAwayFragment extends Fragment {
         createFakeData(date, restaurantId);
         reservation_list = getDataJson(date, restaurantId);
 
-        /*Log.d("date", date.getTime().toString());
-        Calendar today = Calendar.getInstance();
-        Log.d("date", today.getTime().toString());
         TextView reservation_title = (TextView) rootView.findViewById(R.id.reservation_list_title);
-        if(     date.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
-                date.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
-                date.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH))
-
-            reservation_title.setText(new StringBuilder()
-                    .append(getString(R.string.today)).append(" ").append(getString(R.string.reservation_title)));
-        else {
-            reservation_title.setText(new StringBuilder().append(getString((R.string.reservation_title)))
-                    .append(" ").append(date.get(Calendar.DAY_OF_MONTH)).append("  ")
-                    .append(getMonthName(date.get(Calendar.MONTH))).append("  ")
-                    .append(date.get(Calendar.YEAR)).append(" "));
-        }*/
+        if(reservation_list.isEmpty()) {
+            reservation_title.setVisibility(View.VISIBLE);
+            reservation_title.setText(getString(R.string.no_reservation));
+        }
+        else
+            reservation_title.setVisibility(View.GONE);
 
         ListView lv = (ListView) rootView.findViewById(R.id.table_list_view);
         adapter = new BaseAdapter() {
@@ -208,6 +199,13 @@ public class TakeAwayFragment extends Fragment {
 
     public void changeData(Calendar date, String restaurantId){
         reservation_list = getDataJson(date, restaurantId);
+        TextView reservation_title = (TextView) getActivity().findViewById(R.id.reservation_list_title);
+        if(reservation_list.isEmpty()) {
+            reservation_title.setVisibility(View.VISIBLE);
+            reservation_title.setText(getString(R.string.no_reservation));
+        }
+        else
+            reservation_title.setVisibility(View.GONE);
         adapter.notifyDataSetChanged();
     }
 

@@ -67,6 +67,7 @@
         <activity
             android:name=".MenuRestaurant_edit"
             android:label="@string/title_activity_menu_restaurant_edit"
+            android:windowSoftInputMode="stateHidden"
             android:parentActivityName=".MenuRestaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />
 			
