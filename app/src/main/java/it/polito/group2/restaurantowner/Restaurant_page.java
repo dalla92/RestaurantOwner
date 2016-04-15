@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -112,6 +113,11 @@ public class Restaurant_page extends AppCompatActivity
                     image.setImageURI(photouri);
             }
         }
+
+        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
+
+
         EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
         EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
         EditText edit_restaurant_telephone_number = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
