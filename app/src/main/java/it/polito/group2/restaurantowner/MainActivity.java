@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity
 
     final static int ACTION_ADD = 1;
     private RestaurantPreviewAdapter mAdapter;
+    private  RecyclerView  mRecyclerView;
     ArrayList<Restaurant> resList = new ArrayList<>();
     private static final int VERTICAL_ITEM_SPACE = 5;
 
@@ -53,7 +54,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        RecyclerView  mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
@@ -149,17 +150,19 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-/*    @Override
-    public void onResume() {
-        super.onResume();  // Always call the superclass method first
+    @Override
+    public void onRestart() {
+        super.onRestart();  // Always call the superclass method first
 
         try {
-            readJSONResList();
+            resList = JSONUtil.readJSONResList(this);
+            mAdapter = new RestaurantPreviewAdapter(getData(),this);
+            mRecyclerView.setAdapter(mAdapter);
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-*/
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
