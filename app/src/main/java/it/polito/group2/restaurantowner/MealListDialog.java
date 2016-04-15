@@ -39,7 +39,7 @@ public class MealListDialog extends DialogFragment {
 
         getDialog().setTitle(R.string.ordered_meals);
         TextView title = (TextView) getDialog().findViewById(android.R.id.title);
-        title.setGravity(Gravity.CENTER);
+        title.setGravity(Gravity.CENTER_HORIZONTAL);
         title.setTextColor(Color.WHITE);
         title.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark));
         ArrayList<OrderedMeal> ordered_meals = (ArrayList<OrderedMeal>) getArguments().getSerializable("data");

@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="160dp"
         android:id="@+id/imageViewRes"
-        android:src="@drawable/ic_insert_photo"
+        android:src="@drawable/no_image"
         android:scaleType="centerCrop"
         android:layout_gravity="center_horizontal"
         android:layout_alignParentEnd="true"
