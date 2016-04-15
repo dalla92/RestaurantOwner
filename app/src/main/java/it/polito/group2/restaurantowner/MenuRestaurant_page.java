@@ -3,12 +3,18 @@ package it.polito.group2.restaurantowner;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.telecom.Call;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,11 +24,55 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewConfiguration;
+import android.view.ViewTreeObserver;
+import android.view.animation.Animation;
+import android.view.animation.ScaleAnimation;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Toast;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,8 +89,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class MenuRestaurant_page extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class MenuRestaurant_page extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private Menu menu;
     private ListView listView;
     private Adapter_Meals adapter;
@@ -53,6 +102,8 @@ public class MenuRestaurant_page extends AppCompatActivity
     Meal meal_to_delete;
     Meal current_meal = null;
     public final int MODIFY_MEAL = 1;
+    public Swipe_Detector s_d = null;
+    private  RecyclerView  mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,30 +115,6 @@ public class MenuRestaurant_page extends AppCompatActivity
         if(b!=null)
             restaurant_id = b.getString("restaurant_id");
 
-        //check if file already exists and is not empty, otherwise create it
-        /*
-        FileInputStream fis = null;
-        String FILENAME = "mealList.json";
-        try {
-            fis = openFileInput(FILENAME);
-            int size = fis.available();
-            byte[] buffer = new byte[size];
-            fis.read(buffer);
-            fis.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        File file = new File("mealList.json");
-        if(!file.exists()) {
-        try {
-                saveJSONMeList();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        */
         Log.d("aaa", "SIZE1: " + meals.size());
         String FILENAME = "mealList.json";
         File file = getFileStreamPath(FILENAME);
@@ -128,13 +155,55 @@ public class MenuRestaurant_page extends AppCompatActivity
         Bundle b1 = getIntent().getExtras();
         restaurant_id = b1.getString("restaurant_id");
 
-        // Get ListView object from xml
-        listView = (ListView) findViewById(R.id.list);
-        Log.d("ccc", "SIZE "+ meals.size());
+        //recycler view
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        GridLayoutManager mLayoutManager = null;
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mLayoutManager = new GridLayoutManager(this, 1);
+            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1,5,true));
+        }
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mLayoutManager = new GridLayoutManager(this, 2);
+            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
+        }
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        myClickHandler_edit(view);
+                    }
+                })
+        );
+        Log.d("ccc", "SIZE " + meals.size());
         adapter = new Adapter_Meals(this, 0, meals, restaurant_id);
-        listView.setAdapter(adapter);
-    }
+        mRecyclerView.setAdapter(adapter);
+        //delete with swipe
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
+        /*
+        //swipe gesture spot
+        s_d = new Swipe_Detector();
+        listView.setOnTouchListener(s_d);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(s_d.swipeDetected()) {
+                    if(s_d.getAction() == Swipe_Detector.Action.RL) {
+                        //overridePendingTransition(R.anim.slide_left_in, R.anim.slide_left_out);
+                        myClickHandler_remove(view.findViewById(R.id.meal_delete));
+                    } else {
+                        //overridePendingTransition(R.anim.slide_right_in, R.anim.slide_right_out);
+                        myClickHandler_remove(view.findViewById(R.id.meal_delete));
+                    }
+                }
+            }
+        });
+        */
+    }
 
     @Override
     public void onPause() {
@@ -221,12 +290,10 @@ public class MenuRestaurant_page extends AppCompatActivity
             e.printStackTrace();
         }
         adapter.notifyDataSetChanged();
-        adapter.notifyDataSetInvalidated();
     }
 
     public void myClickHandler_edit(View v) {
-        LinearLayout vwParentRow = (LinearLayout) v.getParent();
-        TextView child = (TextView) vwParentRow.getChildAt(2);
+        TextView child = (TextView) v.findViewById(R.id.meal_name);
         final String meal_name = child.getText().toString();
         Intent intent1 = new Intent(
                 getApplicationContext(),
@@ -273,7 +340,6 @@ public class MenuRestaurant_page extends AppCompatActivity
         if(meal_name.trim().equals("")) {
             meals.remove(0);
             adapter.notifyDataSetChanged();
-            adapter.notifyDataSetInvalidated();
             try {
                 saveJSONMeList_modified();
             } catch (JSONException e) {
@@ -304,7 +370,6 @@ public class MenuRestaurant_page extends AppCompatActivity
                             e.printStackTrace();
                         }
                         adapter.notifyDataSetChanged();
-                        adapter.notifyDataSetInvalidated();
                         break;
 
                     case DialogInterface.BUTTON_NEGATIVE:
@@ -325,7 +390,6 @@ public class MenuRestaurant_page extends AppCompatActivity
                 Meal m = (Meal) data.getExtras().get("meal");
                 meals.set(index_position, m);
                 adapter.notifyDataSetChanged();
-                adapter.notifyDataSetInvalidated();
                 try {
                     saveJSONMeList_modified();
                 } catch (JSONException e) {
@@ -681,4 +745,40 @@ public class MenuRestaurant_page extends AppCompatActivity
             Log.d("ccc", a.getName() + " " + a.getMeal_id());
         }
     }
+
+    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+
+        private int spanCount;
+        private int spacing;
+        private boolean includeEdge;
+
+        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
+            this.spanCount = spanCount;
+            this.spacing = spacing;
+            this.includeEdge = includeEdge;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            int position = parent.getChildAdapterPosition(view); // item position
+            int column = position % spanCount; // item column
+
+            if (includeEdge) {
+                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
+                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
+
+                if (position < spanCount) { // top edge
+                    outRect.top = spacing;
+                }
+                outRect.bottom = spacing; // item bottom
+            } else {
+                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
+                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
+                if (position >= spanCount) {
+                    outRect.top = spacing; // item top
+                }
+            }
+        }
+    }
+
 }
