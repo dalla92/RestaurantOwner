@@ -23,15 +23,31 @@
             app:expandedTitleMarginStart="48dp"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <ImageView
-                android:src="@drawable/no_image"
-                android:id="@+id/image_to_enlarge"
-                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+            <FrameLayout
+                android:id="@+id/frame_layout"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                android:fitsSystemWindows="true"
-                app:layout_collapseMode="parallax" />
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true">
+
+                <ImageView
+                    android:src="@drawable/no_image"
+                    android:id="@+id/image_to_enlarge"
+                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerCrop"
+                    android:fitsSystemWindows="true"
+                    app:layout_collapseMode="parallax" />
+
+                <ImageView
+                    android:id="@+id/edit_cover_picture"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="50dp"
+                    android:src="@drawable/ic_insert_photo_white_35dp"/>
+        </FrameLayout>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"

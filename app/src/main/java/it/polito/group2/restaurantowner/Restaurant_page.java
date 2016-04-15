@@ -1,6 +1,7 @@
 package it.polito.group2.restaurantowner;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -19,9 +20,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.ListPopupWindow;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -65,6 +69,10 @@ public class Restaurant_page extends AppCompatActivity
     public String photouri = null;
     public ArrayList<Comment> comments = new ArrayList<>();
     public Restaurant my_restaurant = null;
+
+    /*private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int SELECT_PICTURE = 2;
+    private String mCurrentPhotoPath, bitmapPath;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +120,8 @@ public class Restaurant_page extends AppCompatActivity
                     image.setImageURI(photouri);
             }
         }
+
+        setUpPicture();
 
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
@@ -193,6 +203,47 @@ public class Restaurant_page extends AppCompatActivity
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
             }
         });
+    }
+
+    private void setUpPicture() {
+        final ImageView img = (ImageView) findViewById(R.id.edit_cover_picture);
+        if (img != null) {
+            img.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu popup = new PopupMenu(Restaurant_page.this, img);
+                    popup.getMenuInflater().inflate(R.menu.menu_popup_pictures, popup.getMenu());
+
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        public boolean onMenuItemClick(MenuItem item) {
+                            int id = item.getItemId();
+
+                            if (id == R.id.camera) {
+                                dispatchTakePictureIntent();
+                                return true;
+                            }
+                            if (id == R.id.gallery) {
+                                Intent intent = new Intent();
+                                intent.setType("image/*");
+                                intent.setAction(Intent.ACTION_GET_CONTENT);
+                                startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+                                return true;
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                    });
+                    popup.setGravity(Gravity.CENTER);
+                    popup.show();
+                    /*if (popup.getDragToOpenListener() instanceof ListPopupWindow.ForwardingListener) {
+                        ListPopupWindow.ForwardingListener listener = (ListPopupWindow.ForwardingListener) popup.getDragToOpenListener();
+                        listener.getPopup().setVerticalOffset(-(img.getHeight()) / 2);
+                        listener.getPopup().show();
+                    }*/
+                }
+            });
+        }
     }
 
     @Override
@@ -362,15 +413,19 @@ public class Restaurant_page extends AppCompatActivity
         //choose a photo result
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
             Uri imageUri = data.getData();
-            photouri = imageUri.toString();
+            //photouri = imageUri.toString();
             InputStream imageStream = null;
             try {
                 imageStream = getContentResolver().openInputStream(imageUri);
                 ImageView image_to_enlarge = (ImageView) findViewById(R.id.image_to_enlarge);
-                image_to_enlarge.setImageBitmap(BitmapFactory.decodeStream(imageStream));
+                Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
+                image_to_enlarge.setImageBitmap(bitmap);
+                photouri = saveToInternalStorage(bitmap);
             } catch (FileNotFoundException e) {
-                // Handle the error
-            } finally {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally {
                 if (imageStream != null) {
                     try {
                         imageStream.close();
@@ -423,6 +478,26 @@ public class Restaurant_page extends AppCompatActivity
         //I can not save the photo, but i could save its URI
         edit.commit();
         hide();
+    }
+
+    private String saveToInternalStorage(Bitmap bitmapImage) throws IOException {
+        ContextWrapper cw = new ContextWrapper(getApplicationContext());
+        // path to /data/data/yourapp/app_data/imageDir
+        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
+        // Create imageDir
+        File myPath= new File(directory, "profile.png");
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(myPath);
+            // Use the compress method on the BitMap object to write image to the OutputStream
+            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            fos.close();
+        }
+        return myPath.getAbsolutePath();
     }
 
     /*
@@ -699,9 +774,11 @@ public class Restaurant_page extends AppCompatActivity
                 storageDir      /* directory */
         );
         // Save a file: path for use with ACTION_VIEW intents
-        photouri = "file:" + image.getAbsolutePath();
+        photouri = image.getAbsolutePath();
         return image;
     }
+
+
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
