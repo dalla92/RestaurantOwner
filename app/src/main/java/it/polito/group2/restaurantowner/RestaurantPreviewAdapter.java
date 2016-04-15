@@ -48,7 +48,7 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
             reservedPercentage = (TextView) v.findViewById(R.id.textViewReservedPercentage);
         }
         public void setData(Restaurant obj, int position){
-            if(obj.getPhotoUri()!="") {
+           /* TODO if(obj.getPhotoUri()!="") {
                 Uri imageUri = Uri.parse(obj.getPhotoUri());
                 InputStream imageStream = null;
                 try {
@@ -66,6 +66,7 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
                     }
                 }
             }
+            */
             this.resName.setText(obj.getName());
             this.rating.setText(obj.getRating());
             this.reservationNumber.setText(obj.getReservationNumber());
