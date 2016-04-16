@@ -1,9 +1,11 @@
 package it.polito.group2.restaurantowner;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Application;
 import android.app.Dialog;
 import android.app.ExpandableListActivity;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -169,7 +171,7 @@ public class MenuRestaurant_edit extends AppCompatActivity {
         int id = item.getItemId();
         if (id == R.id.action_save) {
             if(current_meal.getMeal_name().equals(""))
-                Toast.makeText(this,"Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"Please insert meal name to continue", Toast.LENGTH_SHORT).show();
             else {
                 Intent intent = new Intent();
                 //intent.putExtra("Restaurant", res);
@@ -178,6 +180,31 @@ public class MenuRestaurant_edit extends AppCompatActivity {
                 return true;
             }
         }
+        if (id == android.R.id.home){
+            Intent mStartActivity = new Intent(this, MainActivity.class);
+            int mPendingIntentId = 123456;
+            PendingIntent mPendingIntent = PendingIntent.getActivity(this, mPendingIntentId,    mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+            AlarmManager mgr = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+            System.exit(0);
+            /*
+                Bundle bundle = new Bundle();
+                bundle.putString("restaurant_id", restaurant_id);
+                Intent mIntent = new Intent();
+                mIntent.putExtras(bundle);
+                setResult(RESULT_OK, mIntent);
+                super.onBackPressed();
+           */
+            /*
+            Log.d("ccc", "CALLEDSDS");
+            Intent intent5 = new Intent(
+                    getApplicationContext(),
+                    MainActivity.class);
+            intent5.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent5);
+            */
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

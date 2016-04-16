@@ -153,7 +153,9 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
 
         //take the right restaurant
         Bundle b1 = getIntent().getExtras();
-        restaurant_id = b1.getString("restaurant_id");
+        if(getIntent()!=null)
+            if(getIntent().getExtras()!=null)
+                restaurant_id = b1.getString("restaurant_id");
 
         //recycler view
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);

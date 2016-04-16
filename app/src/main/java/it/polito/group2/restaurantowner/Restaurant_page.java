@@ -110,7 +110,6 @@ public class Restaurant_page extends AppCompatActivity
             }
         }
         //fill data
-        //setTitle(my_restaurant.getName());
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         if(userDetails != null) {
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
@@ -139,6 +138,9 @@ public class Restaurant_page extends AppCompatActivity
         //navigation drawer
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle(my_restaurant.getName());
+
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -250,6 +252,9 @@ public class Restaurant_page extends AppCompatActivity
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
         state.putString("photouri", photouri);
+        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        SharedPreferences.Editor edit = userDetails.edit();
+        edit.putString(restaurant_id, photouri);
     }
 
     @Override
