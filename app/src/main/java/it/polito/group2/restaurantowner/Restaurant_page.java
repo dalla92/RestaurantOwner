@@ -255,6 +255,7 @@ public class Restaurant_page extends AppCompatActivity
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor edit = userDetails.edit();
         edit.putString(restaurant_id, photouri);
+        edit.commit();
     }
 
     @Override

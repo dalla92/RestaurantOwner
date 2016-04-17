@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,7 @@ public class FragmentInfo extends Fragment {
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
+            Log.d("aaa", "passed in fragment info");
             dataPasser = (OnInfoPass) a;
         } catch (ClassCastException e) {
             throw new ClassCastException(a.toString()

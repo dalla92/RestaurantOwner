@@ -44,6 +44,24 @@
             android:layout_marginTop="15dp"
             android:id="@+id/textView23" />
 
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/take_away"
+            android:id="@+id/check_take_away"
+            android:layout_gravity="right|top"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:clickable="true"
+            android:editable="true"
+            android:paddingLeft="30dp" />
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:id="@+id/meal_photo"
+            android:padding="5dp" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -52,7 +70,7 @@
         android:id="@+id/layout_meal_image"
         android:layout_below="@id/layout_meal_name"
         android:layout_height="wrap_content"
-        android:paddingLeft="25dp">
+        android:paddingLeft="10dp">
 
         <Button
             android:layout_width="wrap_content"
@@ -66,7 +84,8 @@
             android:layout_height="wrap_content"
             android:text="@string/button_choose_photo"
             android:id="@+id/button_choose_photo2"
-            android:layout_gravity="right" />
+            android:layout_gravity="right"
+            android:paddingLeft="5dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -76,7 +95,8 @@
         android:layout_below="@id/layout_meal_image"
         android:padding="15dp"
         android:paddingTop="15dp"
-        android:id="@+id/layoutz">
+        android:id="@+id/layoutz"
+        android:layout_alignParentStart="false">
 
         <Spinner
             android:layout_width="wrap_content"
@@ -84,31 +104,13 @@
             android:id="@+id/spinner3"
             android:layout_gravity="left" />
 
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/take_away"
-            android:id="@+id/check_take_away"
-            android:layout_gravity="right"
-            android:button="@null"
-            android:drawableRight="?android:attr/listChoiceIndicatorMultiple"
-            android:paddingLeft="30dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_below="@id/layoutz"
-        android:layout_width="match_parent"
-        android:padding="15dp"
-        android:paddingTop="15dp"
-        android:layout_height="wrap_content">
-
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/spinner4"
-            android:layout_gravity="center" />
+            android:layout_gravity="right"
+            android:paddingLeft="25dp" />
+
     </LinearLayout>
 
 </RelativeLayout>

@@ -204,7 +204,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
             for (Addition ad : me.getMeal_additions()) {
                 JSONObject jres2 = new JSONObject();
                 jres2.put("RestaurantId", ad.getRestaurant_id());
-                jres2.put("MealId", ad.getMeal_id());
+                jres2.put("MealId", ad.getmeal_id());
                 jres2.put("AdditionName", ad.getName());
                 jres2.put("AdditionSelected", ad.isSelected());
                 jres2.put("AdditionPrice", ad.getPrice());
@@ -230,7 +230,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
             for (Addition ad : me.getMeal_categories()) {
                 JSONObject jres3 = new JSONObject();
                 jres3.put("RestaurantId", ad.getRestaurant_id());
-                jres3.put("MealId", ad.getMeal_id());
+                jres3.put("MealId", ad.getmeal_id());
                 jres3.put("CategoryName", ad.getName());
                 jres3.put("CategorySelected", ad.isSelected());
                 jres3.put("CategoryPrice", 0);

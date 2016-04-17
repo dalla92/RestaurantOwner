@@ -477,7 +477,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             Addition ad = new Addition();
             if (jsonObject2.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
-                ad.setMeal_id(jsonObject2.optString("MealId"));
+                ad.setmeal_id(jsonObject2.optString("MealId"));
                 ad.setName(jsonObject2.optString("AdditionName"));
                 ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                 ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
@@ -507,7 +507,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             Addition ad = new Addition();
             if (jsonObject3.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
-                ad.setMeal_id(jsonObject3.optString("MealId"));
+                ad.setmeal_id(jsonObject3.optString("MealId"));
                 ad.setName(jsonObject3.optString("CategoryName"));
                 ad.setSelected(jsonObject3.getBoolean("CategorySelected"));
                 ad.setPrice(0);
@@ -556,7 +556,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         for (Addition ad : meals_additions) {
             JSONObject jres2 = new JSONObject();
             jres2.put("RestaurantId", ad.getRestaurant_id());
-            jres2.put("MealId", ad.getMeal_id());
+            jres2.put("MealId", ad.getmeal_id());
             jres2.put("AdditionName", ad.getName());
             jres2.put("AdditionSelected", ad.isSelected());
             jres2.put("AdditionPrice", ad.getPrice());
@@ -580,7 +580,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         for (Addition ad : meals_categories) {
                 JSONObject jres3 = new JSONObject();
                 jres3.put("RestaurantId", ad.getRestaurant_id());
-                jres3.put("MealId", ad.getMeal_id());
+                jres3.put("MealId", ad.getmeal_id());
                 jres3.put("CategoryName", ad.getName());
                 jres3.put("CategorySelected", ad.isSelected());
                 jres3.put("CategoryPrice", 0);
@@ -641,7 +641,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         for (Addition ad : meals_additions) {
             JSONObject jres2 = new JSONObject();
             jres2.put("RestaurantId", ad.getRestaurant_id());
-            jres2.put("MealId", ad.getMeal_id());
+            jres2.put("MealId", ad.getmeal_id());
             jres2.put("AdditionName", ad.getName());
             jres2.put("AdditionSelected", ad.isSelected());
             jres2.put("AdditionPrice", ad.getPrice());
@@ -665,7 +665,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         for (Addition ad : meals_categories) {
             JSONObject jres3 = new JSONObject();
             jres3.put("RestaurantId", ad.getRestaurant_id());
-            jres3.put("MealId", ad.getMeal_id());
+            jres3.put("MealId", ad.getmeal_id());
             jres3.put("CategoryName", ad.getName());
             jres3.put("CategorySelected", ad.isSelected());
             jres3.put("CategoryPrice", 0);
@@ -706,14 +706,14 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         Addition a1 = new Addition();
         a1.setName("Basilicò");
         a1.setPrice(0.50);
-        a1.setMeal_id("0");
+        a1.setmeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
         Addition a2 = new Addition();
         a2.setName("Peperoncino");
         a2.setPrice(0.20);
-        a2.setMeal_id("0");
+        a2.setmeal_id("0");
         a2.setSelected(true);
         a2.setRestaurant_id(restaurant_id);
 
@@ -722,20 +722,20 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
 
         Log.d("ccc", "ADDITIONS:");
         for(Addition a : meals_additions){
-            Log.d("ccc", a.getName() + " " + a.getMeal_id());
+            Log.d("ccc", a.getName() + " " + a.getmeal_id());
         }
     }
 
     public void addCategory(String restaurant_id){
         Addition a1 = new Addition();
         a1.setName("Pasta");
-        a1.setMeal_id("0");
+        a1.setmeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
         Addition a2 = new Addition();
         a2.setName("Piccante");
-        a2.setMeal_id("0");
+        a2.setmeal_id("0");
         a2.setSelected(true);
         a2.setRestaurant_id(restaurant_id);
 
@@ -744,7 +744,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
 
         Log.d("ccc", "CATEGORIES:");
         for(Addition a : meals_categories){
-            Log.d("ccc", a.getName() + " " + a.getMeal_id());
+            Log.d("ccc", a.getName() + " " + a.getmeal_id());
         }
     }
 
