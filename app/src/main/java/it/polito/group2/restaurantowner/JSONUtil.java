@@ -531,7 +531,7 @@ public class JSONUtil {
         }
     }
 
-    public static ArrayList<OpenTime> readJSONOpenTimeList(Context mContext) throws JSONException {
+    public static ArrayList<OpenTime> readJSONOpenTimeList(Context mContext,String restaurantId) throws JSONException {
         String json = null;
         ArrayList<OpenTime> otList = new ArrayList<>();
         FileInputStream fis = null;
@@ -556,18 +556,22 @@ public class JSONUtil {
         //Iterate the jsonArray and print the info of JSONObjects
         for(int i=0; i < jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-            OpenTime ot = new OpenTime();
-            ot.setRestaurantId(jsonObject.optString("RestaurantID"));
-            ot.setCloseHour(jsonObject.optString("CloseHour"));
-            ot.setDayOfWeek(jsonObject.optInt("DayOfWeek"));
-            ot.setOpenHour(jsonObject.optString("OpenHour"));
-            ot.setType(jsonObject.optString("Type"));
-            ot.setIsOpen(jsonObject.optBoolean("isOpen"));
-
-            otList.add(ot);
+            if(!jsonObject.optString("RestaurantID").equals(restaurantId)) {
+                OpenTime ot = new OpenTime();
+                ot.setRestaurantId(jsonObject.optString("RestaurantID"));
+                ot.setCloseHour(jsonObject.optString("CloseHour"));
+                ot.setDayOfWeek(jsonObject.optInt("DayOfWeek"));
+                ot.setOpenHour(jsonObject.optString("OpenHour"));
+                ot.setType(jsonObject.optString("Type"));
+                ot.setIsOpen(jsonObject.optBoolean("isOpen"));
+                otList.add(ot);
+            }
         }
         return otList;
+    }
+
+    public static ArrayList<OpenTime> readJSONOpenTimeList(Context mContext) throws JSONException {
+        return readJSONOpenTimeList(mContext,null);
     }
 
     /* Filippo edits start */

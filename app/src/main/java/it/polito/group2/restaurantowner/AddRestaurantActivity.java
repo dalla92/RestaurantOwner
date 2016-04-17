@@ -174,7 +174,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
         }
         try {
-            ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(this);
+            ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(this,res.getRestaurantId());
             otList.addAll(openTimeList);
             JSONUtil.saveJSONOpenTimeList(this, otList);
         } catch (JSONException e) {
@@ -185,13 +185,12 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
     @Override
     public void onExtrasPass(List<RestaurantService> list) {
-        //TODO in the case of existing restaurant I have to take out from the list the previous services
         if(list!=null) {
             for (RestaurantService rs : list) {
                 rs.setRestaurantId(res.getRestaurantId());
             }
             try {
-                ArrayList<RestaurantService> rsList = JSONUtil.readJSONServicesList(this);
+                ArrayList<RestaurantService> rsList = JSONUtil.readJSONServicesList(this,res.getRestaurantId());
                 rsList.addAll(list);
                 JSONUtil.saveJSONServiceList(this, rsList);
             } catch (JSONException e) {
