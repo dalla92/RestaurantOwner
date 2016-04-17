@@ -94,7 +94,7 @@ public class FragmentMainInfo extends Fragment {
     onMainInfoPass dataPasser;
     private EditText meal_name;
     private EditText meal_price;
-    private String photouri;
+    private String photouri = "";
     private Spinner type1;
     private Spinner type2;
     private CheckBox take_away;
@@ -132,6 +132,12 @@ public class FragmentMainInfo extends Fragment {
     */
 
     public void passData() {
+        meal_name.getText().toString();
+        Double.parseDouble(meal_price.getText().toString());
+        //photouri;
+        String.valueOf(type1.getSelectedItem());
+        String.valueOf(type2.getSelectedItem());
+        take_away.isSelected();
         Log.d("aaa", "passed in fragment main info3");
         if(dataPasser==null)
             Log.d("aaa", "datapasser is null3");
@@ -170,12 +176,12 @@ public class FragmentMainInfo extends Fragment {
 
         //feed already present data and set behaviour
         //feed spinner3
-        Spinner spinner3 = (Spinner) rootView.findViewById(R.id.spinner3);
+        type1 = (Spinner) rootView.findViewById(R.id.spinner3);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.meal_types_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        selectedCategory1 = String.valueOf(spinner3.getSelectedItem());
-        spinner3.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        selectedCategory1 = String.valueOf(type1.getSelectedItem());
+        type1.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedCategory1 = String.valueOf(parent.getItemAtPosition(position));
@@ -184,27 +190,27 @@ public class FragmentMainInfo extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        spinner3.setAdapter(adapter);
+        type1.setAdapter(adapter);
         if(!getArguments().isEmpty()) {
             if(getArguments().getString("type1")!=null){
                 if(getArguments().getString("type1").equals("Celiac"))
-                    spinner3.setSelection(0);
+                    type1.setSelection(0);
             else if(getArguments().getString("type1").equals("Vegan"))
-                    spinner3.setSelection(1);
+                    type1.setSelection(1);
             else if(getArguments().getString("type1").equals("Vegetarian"))
-                    spinner3.setSelection(2);
+                    type1.setSelection(2);
             }
         }
 
         //feed spinner4
-        final Spinner spinner4 = (Spinner) rootView.findViewById(R.id.spinner4);
+        type2 = (Spinner) rootView.findViewById(R.id.spinner4);
         ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getActivity(),
                 R.array.meal_types_array, android.R.layout.simple_spinner_item);
         adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        spinner4.setAdapter(adapter);
-        selectedCategory2 = String.valueOf(spinner4.getSelectedItem());
-        spinner4.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        type2.setAdapter(adapter);
+        selectedCategory2 = String.valueOf(type2.getSelectedItem());
+        type2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 selectedCategory2 = String.valueOf(parent.getItemAtPosition(position));
@@ -217,29 +223,30 @@ public class FragmentMainInfo extends Fragment {
         if(!getArguments().isEmpty()) {
             if(getArguments().getString("type2")!=null){
                 if(getArguments().getString("type2").equals("Celiac"))
-                    spinner4.setSelection(0);
+                    type2.setSelection(0);
                 else if(getArguments().getString("type2").equals("Vegan"))
-                    spinner4.setSelection(1);
+                    type2.setSelection(1);
                 else if(getArguments().getString("type2").equals("Vegetarian"))
-                    spinner4.setSelection(2);
+                    type2.setSelection(2);
             }
         }
 
         //catch other changes and save them
-        final EditText edit_meal_name = (EditText) rootView.findViewById(R.id.edit_meal_name);
-        final EditText edit_meal_price = (EditText) rootView.findViewById(R.id.edit_meal_price);
-        final CheckBox check_take_away = (CheckBox) rootView.findViewById(R.id.check_take_away);
+        meal_name = (EditText) rootView.findViewById(R.id.edit_meal_name);
+        meal_price = (EditText) rootView.findViewById(R.id.edit_meal_price);
+        meal_price.setText("0.0");
+        take_away = (CheckBox) rootView.findViewById(R.id.check_take_away);
         if(!getArguments().isEmpty()) {
             if(getArguments().getString("meal_name")!=null) {
-                edit_meal_name.setText(getArguments().getString("meal_name"));
+                meal_name.setText(getArguments().getString("meal_name"));
             }
             if(getArguments().getString("meal_price")!=null) {
-                edit_meal_price.setText(getArguments().getString("meal_name"));
+                meal_price.setText(getArguments().getString("meal_name"));
             }
             if(getArguments().getBoolean("take_away")==false) {
-                check_take_away.setChecked(false);
+                take_away.setChecked(false);
             } else
-                check_take_away.setChecked(true);
+                take_away.setChecked(true);
         }
 
         Button button2 = (Button) rootView.findViewById(R.id.button_choose_photo2);

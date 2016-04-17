@@ -44,23 +44,29 @@
             android:layout_marginTop="15dp"
             android:id="@+id/textView23" />
 
-        <CheckBox
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/take_away"
-            android:id="@+id/check_take_away"
-            android:layout_gravity="right|top"
-            android:focusable="false"
-            android:focusableInTouchMode="false"
-            android:clickable="true"
-            android:editable="true"
-            android:paddingLeft="30dp" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:id="@+id/meal_photo"
-            android:padding="5dp" />
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:id="@+id/meal_photo"
+                android:padding="5dp" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/take_away"
+                android:id="@+id/check_take_away"
+                android:layout_gravity="right|top"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:clickable="true"
+                android:editable="true"
+                android:paddingLeft="30dp" />
+        </LinearLayout>
 
     </LinearLayout>
 
