@@ -106,12 +106,9 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
             }
         }
         if (id == android.R.id.home) {
-            Intent mStartActivity = new Intent(this, MainActivity.class);
-            int mPendingIntentId = 123456;
-            PendingIntent mPendingIntent = PendingIntent.getActivity(this, mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
-            AlarmManager mgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
-            System.exit(0);
+
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

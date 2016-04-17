@@ -458,7 +458,7 @@ public class JSONUtil {
 
     }
 
-    public static ArrayList<RestaurantService> readJSONServicesList(Context mContext) throws JSONException {
+    public static ArrayList<RestaurantService> readJSONServicesList(Context mContext,String restaurantID) throws JSONException {
         String json = null;
         ArrayList<RestaurantService> resList = new ArrayList<>();
         FileInputStream fis = null;
@@ -484,14 +484,21 @@ public class JSONUtil {
         for(int i=0; i < jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-            RestaurantService res = new RestaurantService();
-            res.setRestaurantId(jsonObject.optString("RestaurantID"));
-            res.setName(jsonObject.optString("Name"));
-            res.setAttribute(jsonObject.optString("Attribute"));
+            if(!jsonObject.optString("RestaurantID").equals(restaurantID)) {
 
-            resList.add(res);
+                RestaurantService res = new RestaurantService();
+                res.setRestaurantId(jsonObject.optString("RestaurantID"));
+                res.setName(jsonObject.optString("Name"));
+                res.setAttribute(jsonObject.optString("Attribute"));
+
+                resList.add(res);
+            }
         }
         return resList;
+    }
+
+    public static ArrayList<RestaurantService> readJSONServicesList(Context mContext) throws JSONException {
+        return readJSONServicesList(mContext,"");
     }
 
 

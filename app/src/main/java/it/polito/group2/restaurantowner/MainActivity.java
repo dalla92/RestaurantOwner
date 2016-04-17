@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity
 
         try {
             resList = JSONUtil.readJSONResList(this);
-            mAdapter = new RestaurantPreviewAdapter(getData(),this);
+            mAdapter = new RestaurantPreviewAdapter(resList,this);
             mRecyclerView.setAdapter(mAdapter);
         } catch (JSONException e) {
             e.printStackTrace();
