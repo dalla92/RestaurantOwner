@@ -3,10 +3,12 @@ package it.polito.group2.restaurantowner;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serializable;
+
 /**
  * Created by Alessio on 08/04/2016.
  */
-public class Addition implements android.os.Parcelable {
+public class Addition implements Serializable {
 
     //String code = null;
     String restaurant_id;
@@ -74,7 +76,7 @@ public class Addition implements android.os.Parcelable {
 
 
 
-
+/*
     protected Addition(Parcel in) {
         restaurant_id = in.readString();
         meal_id = in.readString();
@@ -109,4 +111,7 @@ public class Addition implements android.os.Parcelable {
             return new Addition[size];
         }
     };
+
+*/
+
 }

@@ -72,7 +72,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.mipmap.ic_launcher);
+        //getSupportActionBar().setHomeAsUpIndicator(R.mipmap.ic_launcher);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -99,7 +99,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                 Toast.makeText(this,"Please insert meal name to continue", Toast.LENGTH_SHORT).show();
             else {
                 Intent intent = new Intent();
-                //intent.putExtra("Restaurant", res);
+                intent.putExtra("meal", current_meal);
                 setResult(RESULT_OK, intent);
                 finish();//finishing activity
                 return true;
