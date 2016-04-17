@@ -1,6 +1,7 @@
 package it.polito.group2.restaurantowner;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
@@ -20,6 +21,9 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
 
     GestureDetector mGestureDetector;
 
+    Rect outRect = new Rect();
+    int[] location = new int[2];
+
     public RecyclerItemClickListener(Context context, OnItemClickListener listener) {
         mListener = listener;
         mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
@@ -38,8 +42,9 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
                 int w = sw.getWidth();
                 int h = sw.getHeight();
                 childView.getLocationOnScreen(values);
-                if (e.getX() > values[0] && e.getX() < values[0] + w && e.getY() > values[1] && e.getY() < values[1] + h)
+                if(inViewInBounds(sw,(int)e.getRawX(),(int)e.getRawY())){
                     return false;
+                }
             }
         }
         if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
@@ -47,6 +52,14 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
             return true;
         }
         return false;
+    }
+
+
+    private boolean inViewInBounds(View view, int x, int y){
+        view.getDrawingRect(outRect);
+        view.getLocationOnScreen(location);
+        outRect.offset(location[0], location[1]);
+        return outRect.contains(x, y);
     }
 
     @Override public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) { }
