@@ -2,7 +2,7 @@ package it.polito.group2.restaurantowner;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Alessio on 12/04/2016.
@@ -14,8 +14,8 @@ public class Meal implements Serializable{
     private String type1;
     private String type2;
     private boolean available;
-    private List<Addition> meal_additions;
-    private List<Addition> meal_categories;
+    private ArrayList<Addition> meal_additions;
+    private ArrayList<Addition> meal_categories;
     private boolean take_away;
     private String restaurantId;
     private String mealId;
@@ -75,19 +75,19 @@ public class Meal implements Serializable{
         this.available = available;
     }
 
-    public List<Addition> getMeal_additions() {
+    public ArrayList<Addition> getMeal_additions() {
         return meal_additions;
     }
 
-    public void setMeal_additions(List<Addition> meal_additions) {
+    public void setMeal_additions(ArrayList<Addition> meal_additions) {
         this.meal_additions = meal_additions;
     }
 
-    public List<Addition> getMeal_categories() {
+    public ArrayList<Addition> getMeal_categories() {
         return meal_categories;
     }
 
-    public void setMeal_categories(List<Addition> meal_categories) {
+    public void setMeal_categories(ArrayList<Addition> meal_categories) {
         this.meal_categories = meal_categories;
     }
 

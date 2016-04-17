@@ -24,8 +24,10 @@
             android:id="@+id/additions_list"
             android:background="@color/colorPrimary"
             android:childDivider="@color/colorAccent"
+            android:divider="@color/colorAccent"
+            android:dividerHeight="1.3dp"
             android:listSelector="@color/colorPrimary"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent" />
 
     </LinearLayout>
@@ -37,9 +39,12 @@
 
         <ExpandableListView
             android:id="@+id/categories_list"
+            android:background="@color/colorAccent"
             android:childDivider="@color/colorPrimary"
+            android:divider="@color/colorPrimary"
             android:listSelector="@color/colorAccent"
-            android:layout_height="match_parent"
+            android:dividerHeight="1.3dp"
+            android:layout_height="wrap_content"
             android:layout_width="match_parent" />
 
     </LinearLayout>

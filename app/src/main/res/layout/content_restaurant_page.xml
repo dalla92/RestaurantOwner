@@ -104,15 +104,15 @@
             android:visibility="gone"
             />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/last_comments"
-            android:id="@+id/last_comments"
-            android:paddingTop="20dp" />
-
     </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/last_comments"
+        android:id="@+id/last_comments"
+        android:paddingTop="20dp" />
 
     <android.support.v7.widget.RecyclerView
         android:focusable="false"

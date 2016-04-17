@@ -25,14 +25,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.view.MotionEvent;
 import android.view.View;
@@ -271,20 +274,47 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         return true;
     }
 
+    public void myClickHandler_switch(View v){
+        ViewGroup vg1 = (ViewGroup) v.getParent();
+        LinearLayout r = (LinearLayout) ((ViewGroup) vg1.getParent()).getParent();
+        TextView child = (TextView) r.findViewById(R.id.meal_name);
+        String meal_name = child.getText().toString();
+        Switch available = (Switch) v.findViewById(R.id.meal_availability);
+        Log.d("aaa", "to found: " + meal_name);
+        boolean av = available.isChecked();
+        int i = 0;
+        for (; i < meals.size(); i++) {
+            Log.d("aaa", "now: "+meal_name);
+            if (meals.get(i).getMeal_name().equals(meal_name)) {
+                Log.d("aaa", "ok: "+meals.get(i).getMeal_name() + " put to " +av);
+                meals.get(i).setAvailable(av);
+                break;
+            }
+        }
+        Log.d("aaa", String.valueOf(meals.get(i).isAvailable()));
+        try {
+            saveJSONMeList_modified();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public void myClickHandler_add(View v) {
         Log.d("myClickHandler", "You want to add a new meal");
         //adapter.insert(new Meal(), 0);
         Meal m = new Meal();
         m.setMeal_name("");
-        m.setMeal_price(5.0);
-        m.setAvailable(true);
-        m.setCooking_time(10);
+        m.setMeal_price(0.0);
+        m.setAvailable(false);
+        m.setCooking_time(0);
         m.setMealId(UUID.randomUUID().toString());
         m.setRestaurantId(restaurant_id);
         m.setDescription("");
-        m.setType1("Celiac");
+        m.setType1("More");
+        m.setType2("More");
         m.setTake_away(false);
-        m.setMeal_photo(getResources().getResourceName(R.mipmap.ic_launcher));
+        m.setMeal_photo("");
         meals.add(0, m);  //insert at the top
         try {
             saveJSONMeList_modified();
@@ -327,6 +357,29 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         if(meal_to_edit!=null){
         intent1.putExtra("meal", meal_to_edit);
         startActivityForResult(intent1, MODIFY_MEAL);
+        }
+    }
+
+    public void myClickHandler_enlarge(View v) {
+        ImageView imageview = (ImageView) v.findViewById(R.id.meal_image);
+        TextView child = (TextView) v.findViewById(R.id.meal_name);
+        String meal_name = child.getText().toString();
+        int i = 0;
+        for (; i < meals.size(); i++) {
+            Log.d("aaa", "now: " + meal_name);
+            if (meals.get(i).getMeal_name().equals(meal_name)) {
+                Log.d("aaa", "ok: " + meals.get(i).getMeal_name());
+                if (meals.get(i).getMeal_photo() != null && !meals.get(i).getMeal_photo().equals((""))) {
+                    Intent intent = new Intent(
+                            getApplicationContext(),
+                            Enlarged_image.class);
+                    Bundle b = new Bundle();
+                    b.putString("photouri", meals.get(i).getMeal_photo());
+                    intent.putExtras(b);
+                    startActivity(intent);
+                    break;
+                }
+            }
         }
     }
 
@@ -392,6 +445,9 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
                 Meal m = (Meal) data.getExtras().get("meal");
                 meals.set(index_position, m);
                 adapter.notifyDataSetChanged();
+                /*
+                */
+
                 try {
                     saveJSONMeList_modified();
                 } catch (JSONException e) {
@@ -686,7 +742,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         }
     }
 
-    public void addMeal(String restaurant_id){
+    public void addMeal(String restaurant_id) {
         Log.d("ccc", "CALLED ADDMEAL");
         Meal m = new Meal();
         m.setMeal_name("Pasta ca sassa");
@@ -698,7 +754,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         m.setDescription("Pasta salta con salsa di pomodoro");
         m.setType1("Vegetarian");
         m.setTake_away(false);
-        m.setMeal_photo(getResources().getResourceName(R.mipmap.ic_launcher));
+        //m.setMeal_photo(getResources().getResourceName(R.mipmap.ic_launcher));
         meals.add(m);
     }
 

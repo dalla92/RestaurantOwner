@@ -24,10 +24,11 @@
         android:weightSum="1">
 
         <ImageView
-            android:layout_width="80dp"
+            android:layout_width="140dp"
             android:layout_height="80dp"
             android:id="@+id/meal_image"
             android:src="@mipmap/ic_launcher"
+            android:onClick="myClickHandler_enlarge"
             android:padding="7dp" />
 
 
@@ -109,7 +110,8 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:clickable="true"
-                android:editable="true" />
+                android:editable="true"
+                android:onClick="myClickHandler_switch"/>
 
         </LinearLayout>
     </LinearLayout>

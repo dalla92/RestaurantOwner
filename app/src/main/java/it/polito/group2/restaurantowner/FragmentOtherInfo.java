@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,6 +57,7 @@ public class FragmentOtherInfo extends Fragment {
     public static ExpandableListView categories;
     public static Context context;
     public static String meal_id;
+    public static Meal current_meal;
     public static FragmentOtherInfo fragment;
 
     public FragmentOtherInfo() {
@@ -67,6 +69,7 @@ public class FragmentOtherInfo extends Fragment {
         args.putString("meal_description", m.getDescription());
         args.putInt("cooking_time", m.getCooking_time());
         context = c;
+        current_meal = m;
         meal_id = m.getMealId();
         try{
             readJSONMeList();
@@ -125,6 +128,7 @@ public class FragmentOtherInfo extends Fragment {
             }
         });
         //expandable additions
+        childAdditions = current_meal.getMeal_additions();
         parentAddition = "Meal additions";
         additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
         additions_adapter = new MyExpandableAdapter(parentAddition, childAdditions);
@@ -133,10 +137,12 @@ public class FragmentOtherInfo extends Fragment {
         additions.setGroupIndicator(null);
         additions.setClickable(true);
         //expandable categories
+        childCategories = current_meal.getMeal_categories();
         parentCategory = "Meal categories";
         categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
         categories_adapter = new MyExpandableAdapter(parentCategory, childCategories);
         categories.setAdapter(categories_adapter);
+        categories.setDividerHeight(5);
         categories.setGroupIndicator(null);
         categories.setClickable(true);
 
@@ -145,8 +151,10 @@ public class FragmentOtherInfo extends Fragment {
             @Override
             public void onClick(View v) {
                 childAdditions = additions_adapter.getChildItems();
-                childAdditions.add(new Addition("0","0", getResources().getText(R.string.meal_add_new_addition).toString(), 0, false));
+                childAdditions.add(new Addition(current_meal.getRestaurantId(),current_meal.getMealId(), getResources().getText(R.string.meal_add_new_addition).toString(), 0, false));
                 additions_adapter.setChildItems(childAdditions);
+                additions.expandGroup(0);
+
             }
         });
         final ImageView category_add_button = (ImageView) rootView.findViewById(R.id.category_add);
@@ -154,8 +162,9 @@ public class FragmentOtherInfo extends Fragment {
             @Override
             public void onClick(View v) {
                 childCategories = categories_adapter.getChildItems();
-                childCategories.add(new Addition("0","0",getResources().getText(R.string.meal_add_new_category).toString(), 0, false));
+                childCategories.add(new Addition(current_meal.getRestaurantId(),current_meal.getMealId(),getResources().getText(R.string.meal_add_new_category).toString(), 0, false));
                 categories_adapter.setChildItems(childCategories);
+                categories.expandGroup(0);
             }
         });
 
@@ -199,7 +208,7 @@ public class FragmentOtherInfo extends Fragment {
         public View getChildView(int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
             //child = (ArrayList<String>) childItems.get(groupPosition);
             CheckBox checkbox_text = null;
-            EditText edittex_text = null;
+            TextView textview = null;
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.possible_additions_layout, null);
             }
@@ -209,8 +218,8 @@ public class FragmentOtherInfo extends Fragment {
             checkbox_text = (CheckBox) convertView.findViewById(R.id.meal_addition);
             checkbox_text.setText(childItems.get(childPosition).getName());
             if(parentItem.equals("Meal additions")) {
-                edittex_text = (EditText) convertView.findViewById(R.id.edit_addition_price);
-                edittex_text.setText( String.valueOf(childItems.get(childPosition).getPrice()));
+                textview = (TextView) convertView.findViewById(R.id.edit_addition_price);
+                textview.setText( String.valueOf(childItems.get(childPosition).getPrice()));
             }
             convertView.findViewById(R.id.addition_delete).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -226,10 +235,10 @@ public class FragmentOtherInfo extends Fragment {
                         else
                             current_meal.setMeal_categories(childItems);
                     */
-                    }
-                });
+                }
+            });
 
-            convertView.findViewById(R.id.addition_edit).setOnClickListener(new View.OnClickListener() {
+            convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     LayoutInflater li = LayoutInflater.from(context);
@@ -264,8 +273,8 @@ public class FragmentOtherInfo extends Fragment {
                                                 else
                                                     current_meal.setMeal_categories(childItems);
                                             */
-                                                notifyDataSetChanged();
-                                                notifyDataSetInvalidated();
+                                            notifyDataSetChanged();
+                                            notifyDataSetInvalidated();
                                         }
                                     })
                             .setNegativeButton("Cancel",

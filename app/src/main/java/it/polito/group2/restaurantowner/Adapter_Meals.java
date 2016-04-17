@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -70,50 +71,33 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         Log.d("ccc", "CALLED WITH SUCCESS1");
     }
 
-        @Override
-        public MealViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-            View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.meal_layout, viewGroup, false);
-            MealViewHolder pvh = new MealViewHolder(v);
-            return pvh;
-        }
+    @Override
+    public MealViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.meal_layout, viewGroup, false);
+        MealViewHolder pvh = new MealViewHolder(v);
+        return pvh;
+    }
 
-        @Override
-        public void onBindViewHolder(MealViewHolder MealViewHolder, int i) {
+    @Override
+    public void onBindViewHolder(MealViewHolder MealViewHolder, int i) {
+        if(meals.get(i).getMeal_photo()!=null && !meals.get(i).getMeal_photo().equals(""))
             MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_photo()));
-            MealViewHolder.MealName.setText(meals.get(i).getMeal_name());
-            MealViewHolder.MealPrice.setText(String.valueOf(meals.get(i).getMeal_price()));
+        MealViewHolder.MealName.setText(meals.get(i).getMeal_name());
+        MealViewHolder.MealPrice.setText(String.valueOf(meals.get(i).getMeal_price()));
         /*
         if(meals.get(i).getType1()!=null)
             MealViewHolder.Type1.setImageResource(Integer.parseInt(meals.get(i).getType1()));
         if(meals.get(i).getType2()!=null)
             MealViewHolder.Type2.setImageResource(Integer.parseInt(meals.get(i).getType2()));
         */
-            MealViewHolder.availability.setEnabled(meals.get(i).isAvailable());
-            meal_name = MealViewHolder.MealName.getText().toString();
-            MealViewHolder.availability.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    index = 0;
-                    int i = 0;
-                    for (; i < meals.size(); i++) {
-                        if (meals.get(i).getMeal_name().equals(meal_name)) {
-                            meals.get(i).setAvailable(v.findViewById(R.id.meal_availability).isEnabled());
-                            break;
-                        }
-                    }
-                    try {
-                        saveJSONMeList(meals);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-        }
+        MealViewHolder.availability.setChecked(meals.get(i).isAvailable());
+        //MealViewHolder.availability.setEnabled();
+    }
 
-        @Override
-        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-            super.onAttachedToRecyclerView(recyclerView);
-        }
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+    }
 
     @Override
     public int getItemCount() {
@@ -165,7 +149,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         alert.show();
 
     }
-    
+
     public void saveJSONMeList(ArrayList<Meal> meals) throws JSONException {
         //meals writing
         String FILENAME = "mealList.json";

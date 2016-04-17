@@ -5,120 +5,143 @@
     android:layout_height="match_parent"
     android:id="@+id/parent_scroll">
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-
-    <LinearLayout
-        android:orientation="vertical"
-        android:id="@+id/layout_meal_name"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp">
+        android:layout_height="wrap_content" >
 
-        <EditText
+        <LinearLayout
+            android:orientation="vertical"
+            android:id="@+id/layout_meal_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text|textMultiLine|textCapSentences"
-            android:maxLength="40"
-            android:layout_marginTop="5dp"
-            android:hint="@string/meal_name"
-            android:id="@+id/edit_meal_name" />
+            android:padding="15dp">
 
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text|textMultiLine|textCapSentences"
-            android:hint="@string/meal_price"
-            android:maxLength="40"
-            android:layout_marginTop="10dp"
-            android:id="@+id/edit_meal_price" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text|textMultiLine|textCapSentences"
+                android:maxLength="40"
+                android:layout_marginTop="5dp"
+                android:hint="@string/meal_name"
+                android:id="@+id/edit_meal_name" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number|numberDecimal"
+                android:hint="@string/meal_price"
+                android:maxLength="40"
+                android:layout_marginTop="10dp"
+                android:id="@+id/edit_meal_price" />
 
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/meal_image"
-            android:textColor="@color/black"
-            android:layout_marginTop="15dp"
-            android:id="@+id/textView23" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/meal_image"
+                android:textColor="@color/black"
+                android:layout_marginTop="15dp"
+                android:id="@+id/textView23" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_below="@id/textView23"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:id="@+id/meal_photo"
+                    android:padding="5dp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/take_away"
+                        android:id="@+id/check_take_away"
+                        android:layout_gravity="right|top"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:clickable="true"
+                        android:editable="true"
+                        android:paddingLeft="30dp" />
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_below="@id/check_take_away"
+                        android:layout_height="match_parent">
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:id="@+id/layoutxx"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="textEnd">
+
+                            <Spinner
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/spinner3"
+                                android:textAlignment="textEnd"
+                                android:paddingLeft="25dp"
+                                android:paddingBottom="10dp"
+                                android:paddingTop="25dp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/layoutxx"
+                            android:layout_alignStart="@id/layoutxx">
+
+                            <Spinner
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/spinner4"
+                                android:textAlignment="textEnd"
+                                android:paddingLeft="25dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:id="@+id/layout_meal_image"
+            android:layout_below="@id/layout_meal_name"
+            android:layout_height="wrap_content"
+            android:paddingLeft="7dp">
 
-            <ImageView
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:id="@+id/meal_photo"
-                android:padding="5dp" />
-
-            <CheckBox
+            <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/take_away"
-                android:id="@+id/check_take_away"
-                android:layout_gravity="right|top"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:clickable="true"
-                android:editable="true"
-                android:paddingLeft="30dp" />
+                android:text="@string/button_take_photo"
+                android:id="@+id/button_take_photo2"
+                android:layout_gravity="left" />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_choose_photo"
+                android:id="@+id/button_choose_photo2"
+                android:layout_gravity="right"
+                android:paddingLeft="5dp" />
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:id="@+id/layout_meal_image"
-        android:layout_below="@id/layout_meal_name"
-        android:layout_height="wrap_content"
-        android:paddingLeft="10dp">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_take_photo"
-            android:id="@+id/button_take_photo2"
-            android:layout_gravity="left" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_choose_photo"
-            android:id="@+id/button_choose_photo2"
-            android:layout_gravity="right"
-            android:paddingLeft="5dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/layout_meal_image"
-        android:padding="15dp"
-        android:paddingTop="15dp"
-        android:id="@+id/layoutz"
-        android:layout_alignParentStart="false">
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/spinner3"
-            android:layout_gravity="left" />
-
-        <Spinner
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/spinner4"
-            android:layout_gravity="right"
-            android:paddingLeft="25dp" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+    </RelativeLayout>
 
 </ScrollView>

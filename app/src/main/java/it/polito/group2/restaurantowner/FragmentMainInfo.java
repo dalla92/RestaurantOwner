@@ -98,6 +98,7 @@ public class FragmentMainInfo extends Fragment {
     private Spinner type1;
     private Spinner type2;
     private CheckBox take_away;
+    private boolean is_take_away;
     public int PICK_IMAGE = 0;
     public int REQUEST_TAKE_PHOTO = 1;
     public View rootView = null;
@@ -132,15 +133,11 @@ public class FragmentMainInfo extends Fragment {
     */
 
     public void passData() {
-        meal_name.getText().toString();
-        Double.parseDouble(meal_price.getText().toString());
-        //photouri;
-        String.valueOf(type1.getSelectedItem());
-        String.valueOf(type2.getSelectedItem());
-        take_away.isSelected();
         Log.d("aaa", "passed in fragment main info3");
         if(dataPasser==null)
             Log.d("aaa", "datapasser is null3");
+        if(meal_price.getText().toString().equals(""))
+            meal_price.setText("0.0");
         dataPasser.
                 onMainInfoPass(
                         meal_name.getText().toString(),
@@ -148,7 +145,7 @@ public class FragmentMainInfo extends Fragment {
                         photouri,
                         String.valueOf(type1.getSelectedItem()),
                         String.valueOf(type2.getSelectedItem()),
-                        take_away.isSelected());
+                        is_take_away);
     }
 
     public interface onMainInfoPass {
@@ -175,6 +172,13 @@ public class FragmentMainInfo extends Fragment {
         rootView = inflater.inflate(R.layout.fragment_main_info_meal, container, false);
 
         //feed already present data and set behaviour
+        ImageView image = (ImageView) rootView.findViewById(R.id.meal_photo);
+        if(!getArguments().isEmpty()) {
+            if (getArguments().getString("meal_photo") != null) {
+                image.setImageURI(Uri.parse(getArguments().getString("meal_photo")));
+                photouri = getArguments().getString("meal_photo");
+            }
+        }
         //feed spinner3
         type1 = (Spinner) rootView.findViewById(R.id.spinner3);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
@@ -193,12 +197,14 @@ public class FragmentMainInfo extends Fragment {
         type1.setAdapter(adapter);
         if(!getArguments().isEmpty()) {
             if(getArguments().getString("type1")!=null){
-                if(getArguments().getString("type1").equals("Celiac"))
-                    type1.setSelection(0);
-            else if(getArguments().getString("type1").equals("Vegan"))
+                if(getArguments().getString("type1").equals("Celiac") || getArguments().getString("type1").equals("Celiaco"))
                     type1.setSelection(1);
-            else if(getArguments().getString("type1").equals("Vegetarian"))
+                else if(getArguments().getString("type1").equals("Vegan") || getArguments().getString("type1").equals("Vegano"))
                     type1.setSelection(2);
+                else if(getArguments().getString("type1").equals("Vegetarian") || getArguments().getString("type1").equals("Vegetariano"))
+                    type1.setSelection(3);
+                else if(getArguments().getString("type1").equals("More") || getArguments().getString("type1").equals("Altro"))
+                    type1.setSelection(0);
             }
         }
 
@@ -222,31 +228,42 @@ public class FragmentMainInfo extends Fragment {
         });
         if(!getArguments().isEmpty()) {
             if(getArguments().getString("type2")!=null){
-                if(getArguments().getString("type2").equals("Celiac"))
-                    type2.setSelection(0);
-                else if(getArguments().getString("type2").equals("Vegan"))
+                if(getArguments().getString("type2").equals("Celiac") || getArguments().getString("type2").equals("Celiaco"))
                     type2.setSelection(1);
-                else if(getArguments().getString("type2").equals("Vegetarian"))
+                else if(getArguments().getString("type2").equals("Vegan") || getArguments().getString("type2").equals("Vegano"))
                     type2.setSelection(2);
+                else if(getArguments().getString("type2").equals("Vegetarian") || getArguments().getString("type2").equals("Vegetariano"))
+                    type2.setSelection(3);
+                else if(getArguments().getString("type2").equals("More") || getArguments().getString("type2").equals("Altro"))
+                    type2.setSelection(0);
             }
         }
 
         //catch other changes and save them
         meal_name = (EditText) rootView.findViewById(R.id.edit_meal_name);
         meal_price = (EditText) rootView.findViewById(R.id.edit_meal_price);
-        meal_price.setText("0.0");
         take_away = (CheckBox) rootView.findViewById(R.id.check_take_away);
+        take_away.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                is_take_away = take_away.isChecked();
+            }
+        });
         if(!getArguments().isEmpty()) {
             if(getArguments().getString("meal_name")!=null) {
                 meal_name.setText(getArguments().getString("meal_name"));
             }
-            if(getArguments().getString("meal_price")!=null) {
-                meal_price.setText(getArguments().getString("meal_name"));
+            if(getArguments().getDouble("meal_price")!=0) {
+                meal_price.setText(String.valueOf(getArguments().getDouble("meal_price")));
             }
             if(getArguments().getBoolean("take_away")==false) {
                 take_away.setChecked(false);
-            } else
+                is_take_away = false;
+            } else {
                 take_away.setChecked(true);
+                is_take_away = true;
+            }
+
         }
 
         Button button2 = (Button) rootView.findViewById(R.id.button_choose_photo2);
