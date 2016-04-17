@@ -106,9 +106,10 @@
                 android:splitTrack="false"
                 android:layout_gravity="end"
                 android:textStyle="bold"
-                android:checked="false"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
                 android:clickable="true"
-                android:enabled="true" />
+                android:editable="true" />
 
         </LinearLayout>
     </LinearLayout>

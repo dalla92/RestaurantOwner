@@ -22,21 +22,26 @@
 
         <ExpandableListView
             android:id="@+id/additions_list"
+            android:background="@color/colorPrimary"
+            android:divider="@color/colorAccent"
+            android:childDivider="@color/colorAccent"
             android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:groupIndicator="@null" />
+            android:layout_width="match_parent" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/linear_layout_exp1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <ExpandableListView
             android:id="@+id/categories_list"
+            android:background="@color/colorPrimary"
+            android:divider="@color/colorAccent"
+            android:childDivider="@color/colorAccent"
             android:layout_height="match_parent"
-            android:layout_width="wrap_content"
-            android:groupIndicator="@null" />
+            android:layout_width="match_parent" />
 
     </LinearLayout>
 
