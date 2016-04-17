@@ -23,8 +23,8 @@
         <ExpandableListView
             android:id="@+id/additions_list"
             android:background="@color/colorPrimary"
-            android:divider="@color/colorAccent"
             android:childDivider="@color/colorAccent"
+            android:listSelector="@color/colorPrimary"
             android:layout_height="match_parent"
             android:layout_width="match_parent" />
 
@@ -37,9 +37,9 @@
 
         <ExpandableListView
             android:id="@+id/categories_list"
-            android:background="@color/colorPrimary"
-            android:divider="@color/colorAccent"
-            android:childDivider="@color/colorAccent"
+            android:background="@color/colorAccent"
+            android:childDivider="@color/colorPrimary"
+            android:listSelector="@color/colorAccent"
             android:layout_height="match_parent"
             android:layout_width="match_parent" />
 
