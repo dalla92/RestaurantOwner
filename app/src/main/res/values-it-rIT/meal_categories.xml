@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="meal_categories_array">
+        <item>Nessuno</item>
+        <item>Antipasti</item>
+        <item>Primo piatto</item>
+        <item>Secondo piatto</item>
+        <item>Contorno</item>
+        <item>Dolce</item>
+        <item>Frutta</item>
+    </string-array>
+</resources>

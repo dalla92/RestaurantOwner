@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="meal_categories_array">
+        <item>None</item>
+        <item>Starter</item>
+        <item>Primary dish</item>
+        <item>Secondary dish</item>
+        <item>Contour</item>
+        <item>Sweet</item>
+        <item>Fruit</item>
+    </string-array>
+</resources>

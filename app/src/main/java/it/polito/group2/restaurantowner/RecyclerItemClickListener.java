@@ -9,6 +9,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 
 /**
@@ -52,7 +53,11 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
         }
         //allow to click meal photo
         if(childView instanceof CardView) {
-            ImageView mp = (ImageView) childView.findViewById(R.id.meal_photo);
+            /*
+            LinearLayout ll1 = (LinearLayout) childView.getParent();
+            LinearLayout ll2 = (LinearLayout) ll1.getParent();
+            */
+            ImageView mp = (ImageView) view.findViewById(R.id.meal_image);
             if(mp!=null) {
                 int[] values = new int[2];
                 int w = mp.getWidth();

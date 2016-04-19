@@ -35,48 +35,34 @@
                 android:id="@+id/edit_meal_price" />
 
 
-            <TextView
+            <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/meal_image"
-                android:textColor="@color/black"
-                android:layout_marginTop="15dp"
-                android:id="@+id/textView23" />
+                android:text="@string/take_away"
+                android:id="@+id/check_take_away"
+                android:layout_gravity="left|top"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:clickable="true"
+                android:editable="true"
+                android:paddingLeft="30dp"
+                android:paddingTop="15dp" />
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_below="@id/textView23"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                    android:layout_width="140dp"
+                    android:layout_height="200dp"
                     android:id="@+id/meal_photo"
-                    android:padding="5dp" />
+                    android:padding="10dp"
+                    android:paddingTop="20dp" />
 
                 <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                    <CheckBox
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/take_away"
-                        android:id="@+id/check_take_away"
-                        android:layout_gravity="right|top"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:clickable="true"
-                        android:editable="true"
-                        android:paddingLeft="30dp" />
-
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="match_parent"
-                        android:layout_below="@id/check_take_away"
-                        android:layout_height="match_parent">
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
                         <LinearLayout
                             android:orientation="horizontal"
@@ -88,29 +74,50 @@
                             <Spinner
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
+                                android:id="@+id/spinner5"
+                                android:textAlignment="textEnd"
+                                android:paddingRight="20dp"
+                                android:paddingBottom="15dp"
+                                android:paddingTop="10dp" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/layoutyy"
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/layoutxx"
+                            android:textAlignment="textEnd"
+                            android:layout_alignStart="@id/layoutxx">
+
+                            <Spinner
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
                                 android:id="@+id/spinner3"
                                 android:textAlignment="textEnd"
-                                android:paddingLeft="25dp"
-                                android:paddingBottom="10dp"
-                                android:paddingTop="25dp" />
-
+                                android:paddingRight="20dp"
+                                android:paddingBottom="15dp"
+                                android:paddingTop="10dp"  />
                         </LinearLayout>
 
                         <LinearLayout
                             android:orientation="horizontal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_below="@+id/layoutxx"
-                            android:layout_alignStart="@id/layoutxx">
+                            android:layout_below="@+id/layoutyy"
+                            android:layout_alignStart="@id/layoutxx"
+                            android:textAlignment="textEnd">
 
                             <Spinner
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:id="@+id/spinner4"
                                 android:textAlignment="textEnd"
-                                android:paddingLeft="25dp" />
+                                android:paddingRight="20dp"
+                                android:paddingBottom="15dp"
+                                android:paddingTop="10dp"   />
                         </LinearLayout>
-                    </LinearLayout>
 
                 </RelativeLayout>
 

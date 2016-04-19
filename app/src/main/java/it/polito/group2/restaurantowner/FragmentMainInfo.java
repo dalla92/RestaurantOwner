@@ -91,12 +91,14 @@ public class FragmentMainInfo extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     String selectedCategory1 = null;
     String selectedCategory2 = null;
+    String selectedCategory3 = null;
     onMainInfoPass dataPasser;
     private EditText meal_name;
     private EditText meal_price;
     private String photouri = "";
     private Spinner type1;
     private Spinner type2;
+    private Spinner category;
     private CheckBox take_away;
     private boolean is_take_away;
     public int PICK_IMAGE = 0;
@@ -116,6 +118,7 @@ public class FragmentMainInfo extends Fragment {
             args.putString("meal_photo", m.getMeal_photo());
             args.putString("type1", m.getType1());
             args.putString("type2", m.getType2());
+            args.putString("category", m.getCategory());
             args.putBoolean("take_away", m.isTake_away());
         }
         fragment.setArguments(args);
@@ -138,18 +141,20 @@ public class FragmentMainInfo extends Fragment {
             Log.d("aaa", "datapasser is null3");
         if(meal_price.getText().toString().equals(""))
             meal_price.setText("0.0");
-        dataPasser.
+        Log.d("ddd", String.valueOf(category.getSelectedItem()));
+                dataPasser.
                 onMainInfoPass(
                         meal_name.getText().toString(),
                         Double.parseDouble(meal_price.getText().toString()),
                         photouri,
                         String.valueOf(type1.getSelectedItem()),
                         String.valueOf(type2.getSelectedItem()),
+                        String.valueOf(category.getSelectedItem()),
                         is_take_away);
     }
 
     public interface onMainInfoPass {
-        public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  String type1, String type2, boolean take_away);
+        public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  String type1, String type2, String category, boolean take_away);
     }
 
     @Override
@@ -214,7 +219,7 @@ public class FragmentMainInfo extends Fragment {
                 R.array.meal_types_array, android.R.layout.simple_spinner_item);
         adapter2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
-        type2.setAdapter(adapter);
+        type2.setAdapter(adapter2);
         selectedCategory2 = String.valueOf(type2.getSelectedItem());
         type2.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -236,6 +241,43 @@ public class FragmentMainInfo extends Fragment {
                     type2.setSelection(3);
                 else if(getArguments().getString("type2").equals("More") || getArguments().getString("type2").equals("Altro"))
                     type2.setSelection(0);
+            }
+        }
+
+        //feed spinner5
+        category = (Spinner) rootView.findViewById(R.id.spinner5);
+        ArrayAdapter<CharSequence> adapter3 = ArrayAdapter.createFromResource(getActivity(),
+                R.array.meal_categories_array, android.R.layout.simple_spinner_item);
+        adapter3.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        category.setAdapter(adapter3);
+        selectedCategory3 = String.valueOf(category.getSelectedItem());
+        category.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedCategory3 = String.valueOf(parent.getItemAtPosition(position));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+        if(!getArguments().isEmpty()) {
+            if(getArguments().getString("category")!=null){
+                if(getArguments().getString("category").equals("Nessuno") || getArguments().getString("category").equals("None"))
+                    category.setSelection(0);
+                else if(getArguments().getString("category").equals("Antipasti") || getArguments().getString("category").equals("Starter"))
+                    category.setSelection(1);
+                else if(getArguments().getString("category").equals("Primo piatto") || getArguments().getString("category").equals("Primary dish"))
+                    category.setSelection(2);
+                else if(getArguments().getString("category").equals("Secondo piatto") || getArguments().getString("category").equals("Secondary dish"))
+                    category.setSelection(3);
+                else if(getArguments().getString("category").equals("Contorno") || getArguments().getString("category").equals("Contour"))
+                    category.setSelection(4);
+                else if(getArguments().getString("category").equals("Dolce") || getArguments().getString("category").equals("Sweet"))
+                    category.setSelection(5);
+                else if(getArguments().getString("category").equals("Frutta") || getArguments().getString("category").equals("Fruit"))
+                    category.setSelection(6);
             }
         }
 

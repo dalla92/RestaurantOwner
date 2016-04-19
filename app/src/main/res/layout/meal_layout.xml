@@ -25,7 +25,7 @@
 
         <ImageView
             android:layout_width="140dp"
-            android:layout_height="80dp"
+            android:layout_height="100dp"
             android:id="@+id/meal_image"
             android:src="@mipmap/ic_launcher"
             android:onClick="myClickHandler_enlarge"
