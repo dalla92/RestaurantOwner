@@ -9,13 +9,9 @@
         android:name="android.hardware.camera.front"
         android:required="true" />
 
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-    <uses-permission
-        android:name="android.permission.MANAGE_DOCUMENTS" />
+    <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
 
     <application
         android:allowBackup="true"
@@ -24,8 +20,69 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".owner.MainActivity"
             android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".owner.AddRestaurantActivity"
+            android:label="@string/title_activity_add_restaurant"
+            android:parentActivityName=".owner.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".owner.MainActivity" />
+        </activity>
+        <activity
+            android:name=".owner.Restaurant_page"
+            android:label="@string/restaurant_page_name"
+            android:parentActivityName=".owner.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".owner.StatisticsActivity"
+            android:label="@string/statistics_activity"
+            android:parentActivityName=".owner.Restaurant_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".owner.ReviewsActivity"
+            android:label="@string/reviews_activity"
+            android:parentActivityName=".owner.Restaurant_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".owner.Enlarged_image" />
+        <activity
+            android:name=".owner.MoreRestaurantInfo"
+            android:label="@string/restaurant_page_name"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".owner.MenuRestaurant_page"
+            android:label="@string/title_activity_menu_restaurant_page"
+            android:parentActivityName=".owner.Restaurant_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".owner.MenuRestaurant_edit"
+            android:label="@string/title_activity_menu_restaurant_edit"
+            android:parentActivityName=".owner.MenuRestaurant_page"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".owner.offer.OfferListActivity"
+            android:label="@string/title_activity_offer_list"
+            android:parentActivityName=".owner.Restaurant_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".owner.offer.AddOfferActivity"
+            android:label="@string/title_activity_add_offer"
+            android:parentActivityName=".owner.offer.OfferListActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name=".owner.Reservation"
+            android:label="@string/title_activity_reservation"
+            android:parentActivityName=".owner.Restaurant_page"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".user.restaurant_page.UserRestaurantActivity"
+            android:label="@string/title_activity_user_restaurant"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,70 +90,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".AddRestaurantActivity"
-            android:label="@string/title_activity_add_restaurant"
-            android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="stateHidden"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.polito.group2.restaurantowner.MainActivity" />
-        </activity>
-        <activity
-            android:name=".Restaurant_page"
-            android:label="@string/restaurant_page_name"
-            android:parentActivityName=".MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".StatisticsActivity"
-            android:label="@string/statistics_activity"
-            android:parentActivityName=".Restaurant_page"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".ReviewsActivity"
-            android:label="@string/reviews_activity"
-            android:parentActivityName=".Restaurant_page"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".Enlarged_image" />
-        <activity
-            android:name=".MoreRestaurantInfo"
-            android:label="@string/restaurant_page_name"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".MenuRestaurant_page"
-            android:label="@string/title_activity_menu_restaurant_page"
-            android:parentActivityName=".Restaurant_page"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".MenuRestaurant_edit"
-            android:label="@string/title_activity_menu_restaurant_edit"
-            android:windowSoftInputMode="stateHidden"
-            android:parentActivityName=".MenuRestaurant_page"
-            android:theme="@style/AppTheme.NoActionBar" />
-			
-			<activity
-                android:name=".OfferList"
-                android:label="@string/title_activity_offer_list"
-                android:parentActivityName=".Restaurant_page"
-                android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-        <activity
-            android:name=".AddOffer"
-            android:label="@string/title_activity_add_offer"
-            android:windowSoftInputMode="stateHidden"
-            android:parentActivityName=".OfferList"
-            android:theme="@style/AppTheme.NoActionBar" >
-
-        </activity>
-        <activity
-            android:name=".Reservation"
-            android:label="@string/title_activity_reservation"
-            android:parentActivityName=".Restaurant_page"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+        <activity android:name=".user.restaurant_page.UserRestaurantGallery"></activity>
     </application>
 
 </manifest>

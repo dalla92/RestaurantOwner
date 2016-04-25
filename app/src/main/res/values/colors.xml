@@ -8,4 +8,5 @@
     <color name="divider">#848484</color>
     <color name="black">#000000</color>
     <color name="transparent">@android:color/transparent</color>
+    <color name="star_on">#ffc800</color>
 </resources>

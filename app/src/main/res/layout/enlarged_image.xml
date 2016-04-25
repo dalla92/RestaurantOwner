@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="it.polito.group2.restaurantowner.Enlarged_image">
+    tools:context=".owner.Enlarged_image">
 
     <ImageView
         android:layout_width="wrap_content"
