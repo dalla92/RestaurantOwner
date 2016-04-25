@@ -20,6 +20,7 @@ public class Meal implements Serializable{
     private String mealId;
     private int cooking_time;
     private String description;
+    private String category;
 
     public Meal(){
         meal_additions = new ArrayList<Addition>();
@@ -128,5 +129,13 @@ public class Meal implements Serializable{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }

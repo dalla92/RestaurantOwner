@@ -312,7 +312,8 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
 
     public void myClickHandler_enlarge(View v) {
         ImageView imageview = (ImageView) v.findViewById(R.id.meal_image);
-        TextView child = (TextView) v.findViewById(R.id.meal_name);
+        LinearLayout ll = (LinearLayout) v.getParent();
+        TextView child = (TextView) ll.findViewById(R.id.meal_name);
         String meal_name = child.getText().toString();
         int i = 0;
         for (; i < meals.size(); i++) {
@@ -394,6 +395,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             if (resultCode == RESULT_OK) {
                 Meal m = (Meal) data.getExtras().get("meal");
                 meals.set(index_position, m);
+                Log.d("ddd", "onActivityResult " + m.getCategory());
                 adapter.notifyDataSetChanged();
                 /*
                 */
@@ -453,6 +455,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             me.setMeal_price(jsonObject.optDouble("MealPrice"));
             me.setType1(jsonObject.optString("MealType1"));
             me.setType2(jsonObject.optString("MealType2"));
+            me.setCategory(jsonObject.optString("Category"));
             me.setAvailable(jsonObject.getBoolean("MealAvailable"));
             me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
             me.setCooking_time(jsonObject.optInt("MealCookingTime"));
@@ -537,6 +540,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             jres.put("MealPrice", me.getMeal_price());
             jres.put("MealType1", me.getType1());
             jres.put("MealType2", me.getType2());
+            jres.put("Category", me.getCategory());
             jres.put("MealAvailable", me.isAvailable());
             jres.put("MealTakeAway", me.isTake_away());
             jres.put("MealCookingTime", me.getCooking_time());
@@ -622,6 +626,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             jres.put("MealPrice", me.getMeal_price());
             jres.put("MealType1", me.getType1());
             jres.put("MealType2", me.getType2());
+            jres.put("Category", me.getCategory());
             jres.put("MealAvailable", me.isAvailable());
             jres.put("MealTakeAway", me.isTake_away());
             jres.put("MealCookingTime", me.getCooking_time());
@@ -703,6 +708,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         m.setRestaurantId(restaurant_id);
         m.setDescription("Pasta salta con salsa di pomodoro");
         m.setType1("Vegetarian");
+        m.setCategory("Primo piatto");
         m.setTake_away(false);
         //m.setMeal_photo(getResources().getResourceName(R.mipmap.ic_launcher));
         meals.add(m);

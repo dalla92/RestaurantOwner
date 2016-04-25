@@ -84,6 +84,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
             else {
                 Intent intent = new Intent();
                 intent.putExtra("meal", current_meal);
+                Log.d("ddd", "onOptionsItemSelected" + current_meal.getCategory());
                 setResult(RESULT_OK, intent);
                 finish();//finishing activity
                 return true;
@@ -99,12 +100,14 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     }
 
     @Override
-    public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  String type1, String type2, boolean take_away) {
+    public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  String type1, String type2, String category, boolean take_away) {
         current_meal.setMeal_name(meal_name);
         current_meal.setMeal_price(meal_price);
         current_meal.setMeal_photo(photouri);
         current_meal.setType1(type1);
         current_meal.setType2(type2);
+        Log.d("ddd", "onmaininfopass " + category);
+        current_meal.setCategory(category);
         current_meal.setTake_away(take_away);
     }
 

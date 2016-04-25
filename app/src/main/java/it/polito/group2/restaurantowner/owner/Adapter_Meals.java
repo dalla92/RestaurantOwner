@@ -159,6 +159,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
             jres.put("MealPrice", me.getMeal_price());
             jres.put("MealType1", me.getType1());
             jres.put("MealType2", me.getType2());
+            jres.put("Category", me.getCategory());
             jres.put("MealAvailable", me.isAvailable());
             jres.put("MealTakeAway", me.isTake_away());
             jres.put("MealCookingTime", me.getCooking_time());
