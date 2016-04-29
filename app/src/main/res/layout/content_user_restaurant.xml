@@ -10,19 +10,163 @@
     android:clipToPadding="false"
     tools:context="it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity">
 
+
+    <!--fragment
+        android:id="@+id/fragment_offer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    </fragment -->
+
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:cardElevation="6dp"
-        app:cardUseCompatPadding="true">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/fixed_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:text="@string/large_text" />
+            android:orientation="vertical">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="148dp"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginStart="10dp"
+                            android:text="Restaurant Name"
+                            android:textSize="24sp"
+                            android:textColor="@color/black"
+                            />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginStart="6dp">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="Via vittorio Emanuele, 15 Torino (TO)"
+                                android:drawableLeft="@drawable/ic_location_18dp"
+                                android:drawablePadding="4dp"
+                                android:textSize="14sp"
+                                android:layout_weight="1"/>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="6dp"
+                                android:text="150km"
+                                android:drawableLeft="@drawable/ic_distance_walk_24dp"
+                                android:drawablePadding="3dp"
+                                />
+
+                        </LinearLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginTop="10dp"
+                            android:text="+39 3663473694"
+                            android:drawableLeft="@drawable/ic_phone_18dp"
+                            android:drawablePadding="4dp"
+                            android:textSize="14sp"
+                            />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginStart="10dp">
+
+                            <TextView
+                                android:id="@+id/restaurant_stars_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginRight="5dp"
+                                android:text="4.0"
+                                android:textSize="16sp"/>
+
+                            <RatingBar
+                                android:id="@+id/restaurant_stars"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:isIndicator="true"
+                                android:numStars="5"
+                                android:rating="4"
+                                style="@style/Widget.AppCompat.RatingBar.Small" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/icon_expand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_expand_24dp"
+                    android:layout_gravity="center|bottom"
+                    />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/test_expand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Fidelity Program"
+                        android:textSize="16sp"
+                        android:textColor="@color/black"
+                        />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="8dp"
+                        android:text="Via vittorio Emanuele, 15 Torino (TO)"
+                        android:textSize="14sp"
+                        />
+
+                    <RatingBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:isIndicator="true"
+                        android:numStars="5"
+                        android:rating="4"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginStart="10dp"
+                        style="@style/Widget.AppCompat.RatingBar.Small"
+                        />
+            </LinearLayout>
+        </LinearLayout>
     </android.support.v7.widget.CardView>
 
 </android.support.v4.widget.NestedScrollView>

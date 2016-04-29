@@ -5,8 +5,9 @@
     <color name="coloPrimaryLight">#3F81B5</color>
     <color name="colorAccent">#FF4081</color>
     <color name="colorAccentOpaque">#AAFF4081</color>
-    <color name="divider">#848484</color>
+    <color name="divider">#8c8c8c</color>
     <color name="black">#000000</color>
     <color name="transparent">@android:color/transparent</color>
     <color name="star_on">#ffc800</color>
+    <color name="gray">#7b7b7b</color>
 </resources>

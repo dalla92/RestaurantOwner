@@ -64,10 +64,39 @@ public class JSONUtil {
         }
     }
 
-    public boolean isBookmark(String userID, String restaurantID){
-        //TODO check if user with userID has restaurant with restaurantID in his bookmarks
-        return true;
+    public static boolean isBookmark(Context mContext, String targetUsername, String targetRestaurantId) throws JSONException {
+        String json = null;
+        FileInputStream fis = null;
+        String FILENAME = "bookmarks.json";
+        try {
+            fis = mContext.openFileInput(FILENAME);
+            int size = fis.available();
+            byte[] buffer = new byte[size];
+            fis.read(buffer);
+            fis.close();
+            json = new String(buffer, "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject jobj = new JSONObject(json);
+        JSONArray jsonArray = jobj.optJSONArray("Bookmarks");
+        //Iterate the jsonArray and print the info of JSONObjects
+        for(int i=0; i < jsonArray.length(); i++){
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+            String restaurantId = jsonObject.optString("RestaurantID");
+            String username = jsonObject.optString("Username");
+            if(restaurantId.equals(targetRestaurantId) && username.equals(targetUsername))
+                return true;
+        }
+        return false;
     }
+
+
 
     public static ArrayList<Restaurant> readJSONResList(Context mContext) throws JSONException {
         String json = null;

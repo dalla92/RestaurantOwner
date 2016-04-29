@@ -1,5 +1,10 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,9 +16,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RatingBar;
+import android.widget.Toast;
+
+import org.json.JSONException;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.owner.JSONUtil;
 
 public class UserRestaurantActivity extends AppCompatActivity {
 
@@ -36,14 +48,87 @@ public class UserRestaurantActivity extends AppCompatActivity {
             @Override
             public void onGenerated(Palette palette) {
                 int primaryDark = ContextCompat.getColor(UserRestaurantActivity.this, R.color.colorPrimaryDark);
-                int primary =ContextCompat.getColor(UserRestaurantActivity.this, R.color.colorPrimary);
+                int primary = ContextCompat.getColor(UserRestaurantActivity.this, R.color.colorPrimary);
 
                 collapsing.setContentScrimColor(palette.getMutedColor(primary));
                 collapsing.setStatusBarScrimColor(palette.getDarkVibrantColor(primaryDark));
             }
         });
 
+        setBookmarkButton();
 
+        LinearLayout fixedLayout = (LinearLayout) findViewById(R.id.fixed_layout);
+        final LinearLayout layoutToExpand = (LinearLayout) findViewById(R.id.test_expand);
+        assert fixedLayout != null;
+        fixedLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentHeight, newHeight;
+                boolean modified = false;
+
+                final ImageView iconExpand = (ImageView) findViewById(R.id.icon_expand);
+                assert iconExpand != null;
+                if(iconExpand.getVisibility() == View.VISIBLE){
+                    currentHeight = 0;
+                    newHeight = 300;
+                }
+                else{
+                    currentHeight = 300;
+                    newHeight = 0;
+                }
+
+                ValueAnimator slideAnimator = ValueAnimator.ofInt(currentHeight, newHeight).setDuration(300);
+                slideAnimator.addListener(new Animator.AnimatorListener() {
+                    boolean modified = false;
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        if(iconExpand.getVisibility() == View.VISIBLE) {
+                            iconExpand.setVisibility(View.GONE);
+                            modified = true;
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if(iconExpand.getVisibility() == View.GONE && !modified) {
+                            iconExpand.setVisibility(View.VISIBLE);
+                            modified = false;
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+                slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        // get the value the interpolator is at
+                        Integer value = (Integer) animation.getAnimatedValue();
+                        // I'm going to set the layout's height 1:1 to the tick
+                        assert layoutToExpand != null;
+                        layoutToExpand.getLayoutParams().height = value.intValue();
+                        // force all layouts to see which ones are affected by
+                        // this layouts height change
+                        layoutToExpand.requestLayout();
+                    }
+                });
+                AnimatorSet set = new AnimatorSet();
+                set.play(slideAnimator);
+                set.setInterpolator(new AccelerateDecelerateInterpolator());
+                set.start();
+            }
+        });
+    }
+
+
+    private void setBookmarkButton() {
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.bookmark_fab);
         if (fab != null) {
             fab.setBackgroundTintList(ColorStateList.valueOf( ContextCompat.getColor(this, android.R.color.white)));
@@ -61,7 +146,14 @@ public class UserRestaurantActivity extends AppCompatActivity {
         }
     }
 
-    private boolean isBookmark(){
-        return false;
+
+    private boolean isBookmark() {
+        try {
+            JSONUtil.isBookmark(this, userID, restaurantID);
+            return true;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

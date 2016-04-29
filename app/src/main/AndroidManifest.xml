@@ -22,7 +22,9 @@
         <activity
             android:name=".owner.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" >
+
+        </activity>
         <activity
             android:name=".owner.AddRestaurantActivity"
             android:label="@string/title_activity_add_restaurant"
@@ -89,6 +91,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
         <activity android:name=".user.restaurant_page.UserRestaurantGallery"></activity>
     </application>
