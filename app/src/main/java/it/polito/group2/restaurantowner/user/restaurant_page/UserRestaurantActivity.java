@@ -16,10 +16,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 
 import org.json.JSONException;
+
+import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.owner.JSONUtil;
@@ -54,7 +58,34 @@ public class UserRestaurantActivity extends AppCompatActivity {
 
         setBookmarkButton();
         addInfoExpandAnimation();
+        setTimesList();
 
+    }
+
+    private void setTimesList() {
+        ListView timesList = (ListView) findViewById(R.id.times_list);
+        assert timesList != null;
+        timesList.setAdapter(new BaseAdapter() {
+            @Override
+            public int getCount() {
+                return 0;
+            }
+
+            @Override
+            public Object getItem(int position) {
+                return null;
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return 0;
+            }
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                return null;
+            }
+        });
     }
 
     private void addInfoExpandAnimation() {

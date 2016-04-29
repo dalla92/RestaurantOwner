@@ -159,4 +159,13 @@
     <string name="reviews_activity">Reviews</string>
     <string name="title_add_offer">Add new Offer</string>
     <string name="title_activity_user_restaurant">UserRestaurantActivity</string>
+
+    <!-- UserRestaurantPage Activity -->
+    <string name="times_Mon">Monday</string>
+    <string name="times_Tue">Tuesday</string>
+    <string name="times_Wed">Wednesday</string>
+    <string name="times_Thu">Thursday</string>
+    <string name="times_Fri">Friday</string>
+    <string name="times_Sat">Saturday</string>
+    <string name="times_Sun">Sunday</string>
 </resources>
