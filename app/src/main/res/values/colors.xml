@@ -9,5 +9,5 @@
     <color name="black">#000000</color>
     <color name="transparent">@android:color/transparent</color>
     <color name="star_on">#ffc800</color>
-    <color name="gray">#7b7b7b</color>
+    <color name="gray">#7B7B7B</color>
 </resources>

@@ -1,9 +1,7 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
 import android.animation.Animator;
-import android.animation.AnimatorInflater;
 import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -16,11 +14,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RatingBar;
-import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -56,7 +53,11 @@ public class UserRestaurantActivity extends AppCompatActivity {
         });
 
         setBookmarkButton();
+        addInfoExpandAnimation();
 
+    }
+
+    private void addInfoExpandAnimation() {
         LinearLayout fixedLayout = (LinearLayout) findViewById(R.id.fixed_layout);
         final LinearLayout layoutToExpand = (LinearLayout) findViewById(R.id.test_expand);
         assert fixedLayout != null;
@@ -64,25 +65,27 @@ public class UserRestaurantActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 int currentHeight, newHeight;
-                boolean modified = false;
 
                 final ImageView iconExpand = (ImageView) findViewById(R.id.icon_expand);
                 assert iconExpand != null;
-                if(iconExpand.getVisibility() == View.VISIBLE){
+                assert layoutToExpand != null;
+                layoutToExpand.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                int targetHeight = layoutToExpand.getMeasuredHeight();
+                if (iconExpand.getVisibility() == View.VISIBLE) {
                     currentHeight = 0;
-                    newHeight = 300;
-                }
-                else{
-                    currentHeight = 300;
+                    newHeight = targetHeight;
+                } else {
+                    currentHeight = targetHeight;
                     newHeight = 0;
                 }
 
                 ValueAnimator slideAnimator = ValueAnimator.ofInt(currentHeight, newHeight).setDuration(300);
                 slideAnimator.addListener(new Animator.AnimatorListener() {
                     boolean modified = false;
+
                     @Override
                     public void onAnimationStart(Animator animation) {
-                        if(iconExpand.getVisibility() == View.VISIBLE) {
+                        if (iconExpand.getVisibility() == View.VISIBLE) {
                             iconExpand.setVisibility(View.GONE);
                             modified = true;
                         }
@@ -90,7 +93,7 @@ public class UserRestaurantActivity extends AppCompatActivity {
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        if(iconExpand.getVisibility() == View.GONE && !modified) {
+                        if (iconExpand.getVisibility() == View.GONE && !modified) {
                             iconExpand.setVisibility(View.VISIBLE);
                             modified = false;
                         }
@@ -112,7 +115,6 @@ public class UserRestaurantActivity extends AppCompatActivity {
                         // get the value the interpolator is at
                         Integer value = (Integer) animation.getAnimatedValue();
                         // I'm going to set the layout's height 1:1 to the tick
-                        assert layoutToExpand != null;
                         layoutToExpand.getLayoutParams().height = value.intValue();
                         // force all layouts to see which ones are affected by
                         // this layouts height change
