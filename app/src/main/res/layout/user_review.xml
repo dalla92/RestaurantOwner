@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:layout_marginBottom="1dp"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/user_review_picture"
+                android:focusable="false"
+                android:focusableInTouchMode="false"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:src="@drawable/blank_profile"
+                android:layout_marginRight="16dp"
+                android:layout_gravity="left" />
+
+            <TextView
+                android:id="@+id/user_review_username"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/black"
+                android:textSize="20sp"
+                android:maxLines="1" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/user_review_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:layout_gravity="start"
+            android:text="23/05/2016 16:30"/>
+
+        <RatingBar
+            android:id="@+id/user_review_stars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:numStars="5"
+            android:isIndicator="true"
+            style="@style/Base.Widget.AppCompat.RatingBar.Small" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/user_review_comment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:ellipsize="end"
+        android:text="This is the comment..."
+        android:textSize="16sp"
+        android:layout_weight="1"
+        android:maxLines="2" />
+
+</LinearLayout>
