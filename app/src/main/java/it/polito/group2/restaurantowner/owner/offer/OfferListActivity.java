@@ -98,11 +98,11 @@ public class OfferListActivity extends AppCompatActivity {
                 from.setText(dateFormat.format(offer.getFrom().getTime()));
                 to.setText(dateFormat.format(offer.getTo().getTime()));
                 if(offer.isLunch() && offer.isDinner())
-                    lunch_dinner.setText(getString(R.string.lunch) + "/" + getString(R.string.dinner));
+                    lunch_dinner.setText(getString(R.string.valid_for) + getString(R.string.lunch) + "/" + getString(R.string.dinner));
                 else if(offer.isLunch())
-                    lunch_dinner.setText(getString(R.string.lunch));
+                    lunch_dinner.setText(getString(R.string.valid_for) + getString(R.string.lunch));
                 else
-                    lunch_dinner.setText(getString(R.string.dinner));
+                    lunch_dinner.setText(getString(R.string.valid_for) + getString(R.string.dinner));
 
                 ImageView delete = (ImageView) convertView.findViewById(R.id.offer_delete);
                 Calendar today = Calendar.getInstance();
@@ -201,6 +201,7 @@ public class OfferListActivity extends AppCompatActivity {
             Log.d("failed", "problema nel createFakeData delle offer");
         }
     }
+
     private ArrayList<Offer> getDataJson() {
 
         try {

@@ -19,6 +19,7 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,11 +35,13 @@ import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.owner.JSONUtil;
+import it.polito.group2.restaurantowner.owner.offer.Offer;
 
 public class UserRestaurantActivity extends AppCompatActivity {
 
     private String userID, restaurantID;
     private ArrayList<Review> reviews;
+    private ArrayList<Offer> offers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,7 @@ public class UserRestaurantActivity extends AppCompatActivity {
         });
 
         reviews = getReviewsJson();
+        offers = getOffersJSON();
 
         setBookmarkButton();
         addInfoExpandAnimation();
@@ -72,9 +76,21 @@ public class UserRestaurantActivity extends AppCompatActivity {
         setTimesList();
         setCallAction();
         setUserReviews();
+        setRestaurantOffers();
+    }
+
+    private void setRestaurantOffers() {
+        RecyclerView offerList = (RecyclerView) findViewById(R.id.user_offer_list);
+        assert offerList != null;
+        offerList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        offerList.setNestedScrollingEnabled(false);
+        OfferAdapter adapter = new OfferAdapter(offers, this);
+        offerList.setAdapter(adapter);
     }
 
     private void setUserReviews() {
+        TextView reviews_num = (TextView) findViewById(R.id.user_restaurant_num_reviews);
+        reviews_num.setText(""+reviews.size());
         RecyclerView reviewList = (RecyclerView) findViewById(R.id.user_review_list);
         assert reviewList != null;
         reviewList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
@@ -283,15 +299,40 @@ public class UserRestaurantActivity extends AppCompatActivity {
         }
     }
 
+    public void cycleTextViewExpansion(View v){
+        TextView tv = (TextView) findViewById(R.id.user_review_comment);
+        assert tv != null;
+        //int collapsedMaxLines = 2;
+        tv.setMaxLines(5);
+        /*ObjectAnimator animation = ObjectAnimator.ofInt(tv, "maxLines",
+                tv.getMaxLines() == collapsedMaxLines? tv.getLineCount() : collapsedMaxLines);
+        animation.setDuration(200).start();*/
+    }
+
     private ArrayList<Review> getReviewsJson() {
         ArrayList<Review> reviews = new ArrayList<>();
-        String comment = "Davvero un bel locale, personale accogliente e mangiare davvero sopra la media. I prezzi sono accessibile e data la qualità del cibo sono più che giusti.";
-        Review r = new Review(restaurantID, "Paola Caruso", Calendar.getInstance(), comment, UUID.randomUUID().toString(), null, 4.5f);
-        reviews.add(r);
-        reviews.add(r);
-        reviews.add(r);
-        reviews.add(r);
+        String c1 = "Davvero un bel locale, personale accogliente e mangiare davvero sopra la media. I prezzi sono accessibile e data la qualità del cibo sono più che giusti.";
+        Review r1 = new Review(restaurantID, "Paola Caruso", Calendar.getInstance(), c1, UUID.randomUUID().toString(), null, 4.5f);
+        String c2 = "Think of Recyclerview not as a ListView 1:1 replacement but rather as a more flexible component for complex use cases. And as you say, your solution is what google expected of you.";
+        Review r2 = new Review(restaurantID, "Paola Caruso", Calendar.getInstance(), c2, UUID.randomUUID().toString(), null, 4.5f);
+        String c3 = "n adapter who can delegate onClick to an interface passed on the constructor, which is the correct pattern for both ListView and Recyclerview.";
+        Review r3 = new Review(restaurantID, "Paola Caruso", Calendar.getInstance(), c3, UUID.randomUUID().toString(), null, 4.5f);
+        String c4 = "Now look into that last piece of code: onCreateViewHolder(ViewGroup parent, int viewType) the signature already suggest different view types.";
+        Review r4 = new Review(restaurantID, "Paola Caruso", Calendar.getInstance(), c4, UUID.randomUUID().toString(), null, 4.5f);
+        reviews.add(r1);
+        reviews.add(r2);
+        reviews.add(r3);
+        reviews.add(r4);
         return reviews;
+    }
+
+    private ArrayList<Offer> getOffersJSON(){
+        try {
+            return JSONUtil.readJSONOfferList(this, restaurantID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
     private boolean isBookmark() {

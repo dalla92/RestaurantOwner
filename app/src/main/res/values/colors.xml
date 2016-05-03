@@ -11,4 +11,5 @@
     <color name="star_on">#ffc800</color>
     <color name="gray">#7B7B7B</color>
     <color name="background">#efefef</color>
+    <color name="review_divider">#e7e7e7</color>
 </resources>

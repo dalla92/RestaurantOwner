@@ -1,7 +1,6 @@
 package it.polito.group2.restaurantowner.owner.offer;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class Offer {
     private String name, description, offerId, restaurantId;
