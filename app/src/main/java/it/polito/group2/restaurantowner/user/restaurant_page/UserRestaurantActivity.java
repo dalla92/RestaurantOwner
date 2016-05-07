@@ -26,7 +26,15 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
+
 import org.json.JSONException;
 
 import java.util.ArrayList;
@@ -35,13 +43,15 @@ import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.owner.JSONUtil;
+import it.polito.group2.restaurantowner.owner.Restaurant;
 import it.polito.group2.restaurantowner.owner.offer.Offer;
 
 public class UserRestaurantActivity extends AppCompatActivity {
 
-    private String userID, restaurantID;
+    private String userID, restaurantID = "id1";
     private ArrayList<Review> reviews;
     private ArrayList<Offer> offers;
+    private Restaurant targetRestaurant;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +61,32 @@ public class UserRestaurantActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
-        collapsing.setTitle("Restaurant Name");
+
+        Firebase firebase = new Firebase("https://have-break.firebaseio.com/restaurants");
+        /*Firebase restaurantRef = firebase.child(restaurantID);
+        Restaurant r = new Restaurant("Da Pino", restaurantID, "2", "dunnio", "Via Vittorio Emanuele 14", "01105487980", "Kebab",
+                                        true, true, true, "50", "10", "300", "Marconi" , "Caserma Morelli", "4.5", "10", "50%");
+        restaurantRef.setValue(r);*/
+        //Query queryRef = firebase.orderByChild("restaurantId");
+
+        firebase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot child: dataSnapshot.getChildren()) {
+                    targetRestaurant = child.getValue(Restaurant.class);
+                    Log.d("prova", targetRestaurant.toString());
+                    collapsing.setTitle(targetRestaurant.getName());
+                    setRestaurantInfo();
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.d("test", "failed read " + firebaseError.getMessage());
+            }
+        });
+
+
         collapsing.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
 
         ImageView image = (ImageView) findViewById(R.id.user_restaurant_image);
@@ -79,6 +114,20 @@ public class UserRestaurantActivity extends AppCompatActivity {
         setRestaurantOffers();
     }
 
+    private void setRestaurantInfo() {
+        TextView name = (TextView) findViewById(R.id.restaurant_name);
+        TextView address = (TextView) findViewById(R.id.restaurant_address);
+        TextView phone = (TextView) findViewById(R.id.restaurant_phone);
+        TextView text_rating = (TextView) findViewById(R.id.restaurant_stars_text);
+        RatingBar rating = (RatingBar) findViewById(R.id.restaurant_stars);
+
+        name.setText(targetRestaurant.getName());
+        address.setText(targetRestaurant.getAddress());
+        phone.setText(targetRestaurant.getPhoneNum());
+        text_rating.setText(targetRestaurant.getRating());
+        rating.setRating(Float.valueOf(targetRestaurant.getRating()));
+    }
+
     private void setRestaurantOffers() {
         RecyclerView offerList = (RecyclerView) findViewById(R.id.user_offer_list);
         assert offerList != null;
@@ -101,7 +150,7 @@ public class UserRestaurantActivity extends AppCompatActivity {
 
 
     private void addTimesExpandAnimation() {
-        final TextView timesText = (TextView) findViewById(R.id.restaurant_times);
+        final TextView timesText = (TextView) findViewById(R.id.restaurant_today_time);
         assert timesText != null;
         timesText.setOnClickListener(new View.OnClickListener() {
             boolean clicked = false;

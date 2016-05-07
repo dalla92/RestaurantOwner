@@ -25,6 +25,53 @@ public class Restaurant implements Serializable{
     private String reservationNumber;
     private String reservedPercentage;
 
+    @Override
+    public String toString() {
+        return "Restaurant{" +
+                "name='" + name + '\'' +
+                ", restaurantId='" + restaurantId + '\'' +
+                ", userId='" + userId + '\'' +
+                ", photoUri='" + photoUri + '\'' +
+                ", address='" + address + '\'' +
+                ", phoneNum='" + phoneNum + '\'' +
+                ", category='" + category + '\'' +
+                ", fidelity=" + fidelity +
+                ", tableReservation=" + tableReservation +
+                ", takeAway=" + takeAway +
+                ", tableNum='" + tableNum + '\'' +
+                ", ordersPerHour='" + ordersPerHour + '\'' +
+                ", squaredMeters='" + squaredMeters + '\'' +
+                ", closestMetro='" + closestMetro + '\'' +
+                ", closestBus='" + closestBus + '\'' +
+                ", rating='" + rating + '\'' +
+                ", reservationNumber='" + reservationNumber + '\'' +
+                ", reservedPercentage='" + reservedPercentage + '\'' +
+                '}';
+    }
+
+    public Restaurant(String name, String restaurantId, String userId, String photoUri, String address, String phoneNum, String category, boolean fidelity, boolean tableReservation, boolean takeAway, String tableNum, String ordersPerHour, String squaredMeters, String closestMetro, String closestBus, String rating, String reservationNumber, String reservedPercentage) {
+        this.name = name;
+        this.restaurantId = restaurantId;
+        this.userId = userId;
+        this.photoUri = photoUri;
+        this.address = address;
+        this.phoneNum = phoneNum;
+        this.category = category;
+        this.fidelity = fidelity;
+        this.tableReservation = tableReservation;
+        this.takeAway = takeAway;
+        this.tableNum = tableNum;
+        this.ordersPerHour = ordersPerHour;
+        this.squaredMeters = squaredMeters;
+        this.closestMetro = closestMetro;
+        this.closestBus = closestBus;
+        this.rating = rating;
+        this.reservationNumber = reservationNumber;
+        this.reservedPercentage = reservedPercentage;
+    }
+
+    public Restaurant(){ }
+
     public String getName() {
         return name;
     }
