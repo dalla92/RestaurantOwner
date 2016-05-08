@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;

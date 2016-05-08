@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Restaurant;
 
 /**
  * Created by Daniele on 07/04/2016.

@@ -28,6 +28,9 @@ import java.util.Calendar;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.OpenTime;
+import it.polito.group2.restaurantowner.data.Restaurant;
 
 /**
  * Created by Daniele on 07/04/2016.

@@ -28,7 +28,8 @@ import java.util.Date;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.owner.JSONUtil;
+import it.polito.group2.restaurantowner.data.Offer;
+import it.polito.group2.restaurantowner.data.JSONUtil;
 
 public class OfferListActivity extends AppCompatActivity {
 

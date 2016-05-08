@@ -120,7 +120,7 @@
     <string name="done">Done</string>
     <string name="no_offer">No Offers</string>
 
-    <!-- Reservation strings -->
+    <!-- ReservationActivity strings -->
     <string name="table_section">Table</string>
     <string name="takeaway_section">Take Away</string>
     <string name="reservation_people">People</string>
@@ -169,4 +169,7 @@
     <string name="times_Fri">Friday</string>
     <string name="times_Sat">Saturday</string>
     <string name="times_Sun">Sunday</string>
+    <string name="menu">Menu</string>
+    <string name="title_activity_add_review">AddReviewActivity</string>
+    <string name="comment">Add a Comment</string>
 </resources>

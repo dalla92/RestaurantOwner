@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +15,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Review;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>  {
 
@@ -73,7 +73,10 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         else
             holder.picture.setImageBitmap(picture);
 
-        holder.comment.setText(reviews.get(position).getComment());
+        if(reviews.get(position).getComment().equals(""))
+            holder.comment.setVisibility(View.GONE);
+        else
+            holder.comment.setText(reviews.get(position).getComment());
     }
 
     @Override

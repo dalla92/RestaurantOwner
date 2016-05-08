@@ -41,6 +41,8 @@ import java.io.File;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Addition;
+import it.polito.group2.restaurantowner.data.Meal;
 
 public class MenuRestaurant_page extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private Menu menu;

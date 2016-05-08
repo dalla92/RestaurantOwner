@@ -16,6 +16,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -26,32 +27,31 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RatingBar;
 import android.widget.TextView;
-
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
 
 import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.owner.JSONUtil;
-import it.polito.group2.restaurantowner.owner.Restaurant;
-import it.polito.group2.restaurantowner.owner.offer.Offer;
+import it.polito.group2.restaurantowner.data.MenuCategory;
+import it.polito.group2.restaurantowner.data.Review;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.data.Offer;
 
 public class UserRestaurantActivity extends AppCompatActivity {
 
-    private String userID, restaurantID = "id1";
+    private static final int ADD_REQUEST = 1;
+    private String userID, restaurantID;
     private ArrayList<Review> reviews;
     private ArrayList<Offer> offers;
+    private ArrayList<MenuCategory> categories;
     private Restaurant targetRestaurant;
+    private ReviewAdapter reviewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +62,11 @@ public class UserRestaurantActivity extends AppCompatActivity {
 
         final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
 
-        Firebase firebase = new Firebase("https://have-break.firebaseio.com/restaurants");
-        /*Firebase restaurantRef = firebase.child(restaurantID);
-        Restaurant r = new Restaurant("Da Pino", restaurantID, "2", "dunnio", "Via Vittorio Emanuele 14", "01105487980", "Kebab",
+        /*Firebase firebase = new Firebase("https://have-break.firebaseio.com/restaurants");
+        Firebase restaurantRef = firebase.push();
+        Restaurant r = new Restaurant("Da Pino", restaurantRef.getKey(), "2", "dunnio", "Via Vittorio Emanuele 14", "01105487980", "Kebab",
                                         true, true, true, "50", "10", "300", "Marconi" , "Caserma Morelli", "4.5", "10", "50%");
-        restaurantRef.setValue(r);*/
+        restaurantRef.setValue(r);
         //Query queryRef = firebase.orderByChild("restaurantId");
 
         firebase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -74,7 +74,7 @@ public class UserRestaurantActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child: dataSnapshot.getChildren()) {
                     targetRestaurant = child.getValue(Restaurant.class);
-                    Log.d("prova", targetRestaurant.toString());
+                    //Log.d("prova", targetRestaurant.toString());
                     collapsing.setTitle(targetRestaurant.getName());
                     setRestaurantInfo();
                 }
@@ -84,7 +84,10 @@ public class UserRestaurantActivity extends AppCompatActivity {
             public void onCancelled(FirebaseError firebaseError) {
                 Log.d("test", "failed read " + firebaseError.getMessage());
             }
-        });
+        });*/
+
+
+        //getRestaurantAndSetButtons();
 
 
         collapsing.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
@@ -103,7 +106,9 @@ public class UserRestaurantActivity extends AppCompatActivity {
         });
 
         reviews = getReviewsJson();
+        Collections.sort(reviews);
         offers = getOffersJSON();
+        categories = getCategoriesJson();
 
         setBookmarkButton();
         addInfoExpandAnimation();
@@ -112,9 +117,168 @@ public class UserRestaurantActivity extends AppCompatActivity {
         setCallAction();
         setUserReviews();
         setRestaurantOffers();
+        setRestaurantMenu();
     }
 
-    private void setRestaurantInfo() {
+    private void setRestaurantMenu() {
+        final RecyclerView menu = (RecyclerView) findViewById(R.id.user_restaurant_menu);
+        assert menu != null;
+        menu.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        menu.setNestedScrollingEnabled(false);
+        MenuAdapter adapter = new MenuAdapter(categories, this);
+        menu.setAdapter(adapter);
+
+        menu.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        final int targetHeight = menu.getMeasuredHeight();
+
+        if(targetHeight > 600){
+            menu.getLayoutParams().height = 600;
+            menu.requestLayout();
+            final ImageView iconExpand = (ImageView) findViewById(R.id.user_restaurant_menu_icon_expand);
+            assert iconExpand != null;
+            iconExpand.setVisibility(View.VISIBLE);
+
+            CardView menuLayout = (CardView) findViewById(R.id.user_restaurant_menu_layout);
+            assert menuLayout != null;
+            menuLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("prova", "clicked");
+                    int currentHeight, newHeight;
+
+                    if (iconExpand.getVisibility() == View.VISIBLE) {
+                        currentHeight = 600;
+                        newHeight = targetHeight;
+                    } else {
+                        currentHeight = targetHeight;
+                        newHeight = 600;
+                    }
+
+                    ValueAnimator slideAnimator = ValueAnimator.ofInt(currentHeight, newHeight).setDuration(300);
+                    slideAnimator.addListener(new Animator.AnimatorListener() {
+                        boolean modified = false;
+
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            if (iconExpand.getVisibility() == View.VISIBLE) {
+                                iconExpand.setVisibility(View.INVISIBLE);
+                                modified = true;
+                            }
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            if (iconExpand.getVisibility() == View.INVISIBLE && !modified) {
+                                iconExpand.setVisibility(View.VISIBLE);
+                                modified = false;
+                            }
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    });
+
+                    slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            // get the value the interpolator is at
+                            Integer value = (Integer) animation.getAnimatedValue();
+                            // I'm going to set the layout's height 1:1 to the tick
+                            menu.getLayoutParams().height = value.intValue();
+                            // force all layouts to see which ones are affected by
+                            // this layouts height change
+                            menu.requestLayout();
+                        }
+                    });
+                    AnimatorSet set = new AnimatorSet();
+                    set.play(slideAnimator);
+                    set.setInterpolator(new AccelerateDecelerateInterpolator());
+                    set.start();
+                }
+            });
+
+        }
+    }
+
+    public void addReview(View v){
+        Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
+        startActivityForResult(intent, ADD_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == ADD_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                String comment = data.getStringExtra("comment");
+                float starNumber = data.getFloatExtra("starsNumber", 0.0f);
+
+                Calendar date = Calendar.getInstance();
+                Review review =new Review(restaurantID, "Mario Rossi", date, comment, UUID.randomUUID().toString(), null, starNumber);
+                reviews.add(review);
+                Collections.sort(reviews);
+                reviewAdapter.notifyDataSetChanged();
+                //TODO save data
+            }
+        }
+    }
+
+    private void getRestaurantAndSetButtons() {
+        ArrayList<Restaurant> resList = new ArrayList<>();
+        //read all restaurants
+        try {
+            resList = JSONUtil.readJSONResList(this);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        //if application is re-installed, it will be empty so I need to add one
+        if(resList.isEmpty()) {
+            Restaurant res = new Restaurant();
+            res.setRestaurantId(UUID.randomUUID().toString());
+            resList.add(res);
+            //in order to read, I need to write first
+            try {
+                JSONUtil.saveJSONResList(this,resList);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        targetRestaurant = resList.get(0); //I overwrite the actual restaurantID
+        userID = "0";
+
+        /*Button orders_button = (Button) findViewById(R.id.orders_button);
+        orders_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(
+                        getApplicationContext(),
+                        UserTableReservationActivity.class);
+                intent.putExtra("Restaurant", current_restaurant);
+                startActivity(intent);
+            }
+        });
+
+        Button reservations_button = (Button) findViewById(R.id.reservations_button);
+        reservations_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(
+                        getApplicationContext(),
+                        UserMyReservations.class);
+                intent.putExtra("Username", username);
+                startActivity(intent);
+            }
+        });*/
+    }
+
+    /*private void setRestaurantInfo() {
         TextView name = (TextView) findViewById(R.id.restaurant_name);
         TextView address = (TextView) findViewById(R.id.restaurant_address);
         TextView phone = (TextView) findViewById(R.id.restaurant_phone);
@@ -126,7 +290,7 @@ public class UserRestaurantActivity extends AppCompatActivity {
         phone.setText(targetRestaurant.getPhoneNum());
         text_rating.setText(targetRestaurant.getRating());
         rating.setRating(Float.valueOf(targetRestaurant.getRating()));
-    }
+    }*/
 
     private void setRestaurantOffers() {
         RecyclerView offerList = (RecyclerView) findViewById(R.id.user_offer_list);
@@ -144,8 +308,8 @@ public class UserRestaurantActivity extends AppCompatActivity {
         assert reviewList != null;
         reviewList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         reviewList.setNestedScrollingEnabled(false);
-        ReviewAdapter adapter = new ReviewAdapter(reviews, this);
-        reviewList.setAdapter(adapter);
+        reviewAdapter = new ReviewAdapter(reviews, this);
+        reviewList.setAdapter(reviewAdapter);
     }
 
 
@@ -359,21 +523,56 @@ public class UserRestaurantActivity extends AppCompatActivity {
     }
 
     private ArrayList<Review> getReviewsJson() {
+        /*try {
+            return JSONUtil.readJSONReviewList(this, restaurantID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }*/
+
         ArrayList<Review> reviews = new ArrayList<>();
+
         String c1 = "Davvero un bel locale, personale accogliente e mangiare davvero sopra la media. I prezzi sono accessibile e data la qualità del cibo sono più che giusti.";
-        Review r1 = new Review(restaurantID, "Paola Caruso", Calendar.getInstance(), c1, UUID.randomUUID().toString(), null, 4.5f);
+        Calendar date1 = Calendar.getInstance();
+        date1.set(Calendar.HOUR_OF_DAY, 12);
+        Review r1 = new Review(restaurantID, "Paola C.", date1, c1, UUID.randomUUID().toString(), null, 4.5f);
+
         String c2 = "Think of Recyclerview not as a ListView 1:1 replacement but rather as a more flexible component for complex use cases. And as you say, your solution is what google expected of you.";
-        Review r2 = new Review(restaurantID, "Paola Caruso", Calendar.getInstance(), c2, UUID.randomUUID().toString(), null, 4.5f);
-        String c3 = "n adapter who can delegate onClick to an interface passed on the constructor, which is the correct pattern for both ListView and Recyclerview.";
-        Review r3 = new Review(restaurantID, "Paola Caruso", Calendar.getInstance(), c3, UUID.randomUUID().toString(), null, 4.5f);
+        Calendar date2 = Calendar.getInstance();
+        date2.set(Calendar.HOUR_OF_DAY, 10);
+        Review r2 = new Review(restaurantID, "Mario R.", date2, c2, UUID.randomUUID().toString(), null, 3f);
+
+
+        Calendar date3 = Calendar.getInstance();
+        date3.set(Calendar.HOUR_OF_DAY, 8);
+        Review r3 = new Review(restaurantID, "Antonio V.", date3, "", UUID.randomUUID().toString(), null, 4f);
+
         String c4 = "Now look into that last piece of code: onCreateViewHolder(ViewGroup parent, int viewType) the signature already suggest different view types.";
-        Review r4 = new Review(restaurantID, "Paola Caruso", Calendar.getInstance(), c4, UUID.randomUUID().toString(), null, 4.5f);
+        Calendar date4 = Calendar.getInstance();
+        date4.set(Calendar.HOUR_OF_DAY, 12);
+        date4.set(Calendar.MINUTE, 30);
+        Review r4 = new Review(restaurantID, "Paola F.", date4, c4, UUID.randomUUID().toString(), null, 2.5f);
+
         reviews.add(r1);
         reviews.add(r2);
         reviews.add(r3);
         reviews.add(r4);
         return reviews;
     }
+
+    private ArrayList<MenuCategory> getCategoriesJson() {
+        ArrayList<MenuCategory> categories = new ArrayList<>();
+        MenuCategory c1 = new MenuCategory("ciao", "Primi Piatti", restaurantID);
+        MenuCategory c2 = new MenuCategory("ciao", "Secondi Piatti", restaurantID);
+        MenuCategory c3 = new MenuCategory("ciao", "Contorni", restaurantID);
+        MenuCategory c4 = new MenuCategory("ciao", "Dessert", restaurantID);
+        categories.add(c1);
+        categories.add(c2);
+        categories.add(c3);
+        categories.add(c4);
+
+        return categories;
+    }
+
 
     private ArrayList<Offer> getOffersJSON(){
         try {

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<it.polito.group2.restaurantowner.user.restaurant_page.InterceptTouchCardView
+    android:id="@+id/user_restaurant_menu_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="26sp"
+            android:text="@string/menu"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/user_restaurant_menu"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+        </android.support.v7.widget.RecyclerView>
+
+        <ImageView
+            android:id="@+id/user_restaurant_menu_icon_expand"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_expand_24dp"
+            android:layout_gravity="center|bottom"
+            android:visibility="gone"
+            />
+
+    </LinearLayout>
+
+</it.polito.group2.restaurantowner.user.restaurant_page.InterceptTouchCardView>

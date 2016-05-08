@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Restaurant;
 
 /**
  * Created by Daniele on 05/04/2016.

@@ -1,7 +1,9 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.data;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import it.polito.group2.restaurantowner.data.Addition;
 
 /**
  * Created by Alessio on 12/04/2016.

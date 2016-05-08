@@ -1,7 +1,9 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.data;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import it.polito.group2.restaurantowner.data.OrderedMeal;
 
 public class TakeAwayReservation {
     private String username, notes, restaurantId, takeAwayReservationId;

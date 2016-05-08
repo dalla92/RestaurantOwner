@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.TableReservation;
 
 public class TableFragment extends Fragment {
 

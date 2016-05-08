@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.data;
 
 import java.io.Serializable;
 
@@ -47,27 +47,6 @@ public class Restaurant implements Serializable{
                 ", reservationNumber='" + reservationNumber + '\'' +
                 ", reservedPercentage='" + reservedPercentage + '\'' +
                 '}';
-    }
-
-    public Restaurant(String name, String restaurantId, String userId, String photoUri, String address, String phoneNum, String category, boolean fidelity, boolean tableReservation, boolean takeAway, String tableNum, String ordersPerHour, String squaredMeters, String closestMetro, String closestBus, String rating, String reservationNumber, String reservedPercentage) {
-        this.name = name;
-        this.restaurantId = restaurantId;
-        this.userId = userId;
-        this.photoUri = photoUri;
-        this.address = address;
-        this.phoneNum = phoneNum;
-        this.category = category;
-        this.fidelity = fidelity;
-        this.tableReservation = tableReservation;
-        this.takeAway = takeAway;
-        this.tableNum = tableNum;
-        this.ordersPerHour = ordersPerHour;
-        this.squaredMeters = squaredMeters;
-        this.closestMetro = closestMetro;
-        this.closestBus = closestBus;
-        this.rating = rating;
-        this.reservationNumber = reservationNumber;
-        this.reservedPercentage = reservedPercentage;
     }
 
     public Restaurant(){ }

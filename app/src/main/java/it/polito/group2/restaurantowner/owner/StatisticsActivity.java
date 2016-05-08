@@ -23,6 +23,8 @@ import java.util.Calendar;
 import android.support.v7.widget.Toolbar;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.TableReservation;
+import it.polito.group2.restaurantowner.data.TakeAwayReservation;
 
 public class StatisticsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{

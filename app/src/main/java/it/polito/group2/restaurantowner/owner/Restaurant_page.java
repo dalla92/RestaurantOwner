@@ -50,6 +50,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
 
 public class Restaurant_page extends AppCompatActivity
@@ -340,7 +342,7 @@ public class Restaurant_page extends AppCompatActivity
         } else if(id==R.id.action_reservations){
             Intent intent3 = new Intent(
                     getApplicationContext(),
-                    Reservation.class);
+                    ReservationActivity.class);
             Bundle b3 = new Bundle();
             b3.putString("restaurant_id", restaurant_id);
             intent3.putExtras(b3);

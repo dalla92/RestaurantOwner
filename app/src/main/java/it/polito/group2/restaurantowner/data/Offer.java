@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner.offer;
+package it.polito.group2.restaurantowner.data;
 
 import java.util.Calendar;
 

@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.data;
 
 /**
  * Created by Daniele on 07/04/2016.

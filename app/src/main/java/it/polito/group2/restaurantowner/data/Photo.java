@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.data;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,7 +14,7 @@ public class Photo {
     private String uploadTime;
     private Restaurant photoOwner;
 
-    Photo(String imageByte) {
+    public Photo(String imageByte) {
         byte[] b = Base64.decode(imageByte, Base64.DEFAULT);
         bitmap = BitmapFactory.decodeByteArray(b, 0, b.length);
         name = "";
@@ -23,7 +23,7 @@ public class Photo {
         photoOwner = null;
     }
 
-    Photo(Bitmap image) {
+    public Photo(Bitmap image) {
         bitmap = image;
         name = "";
         description = "";

@@ -25,9 +25,7 @@
         <activity
             android:name=".owner.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" >
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".owner.AddRestaurantActivity"
             android:label="@string/title_activity_add_restaurant"
@@ -81,7 +79,7 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".owner.Reservation"
+            android:name=".owner.ReservationActivity"
             android:label="@string/title_activity_reservation"
             android:parentActivityName=".owner.Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />
@@ -93,9 +91,12 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-        <activity android:name=".user.restaurant_page.UserRestaurantGallery"></activity>
+        <activity android:name=".user.restaurant_page.UserRestaurantGallery" />
+        <activity
+            android:name=".user.restaurant_page.AddReviewActivity"
+            android:label="@string/title_activity_add_review"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

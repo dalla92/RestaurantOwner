@@ -22,6 +22,8 @@ import org.json.JSONException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.Restaurant;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity
         super.onPause();  // Always call the superclass method first
 
         try {
-            JSONUtil.saveJSONResList(this,resList);
+            JSONUtil.saveJSONResList(this, resList);
         } catch (JSONException e) {
             e.printStackTrace();
         }

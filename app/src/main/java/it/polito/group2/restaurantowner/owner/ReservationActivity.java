@@ -15,7 +15,7 @@ import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
 
-public class Reservation extends AppCompatActivity {
+public class ReservationActivity extends AppCompatActivity {
 
     private PagerAdapter adapter;
     private String restaurantId;

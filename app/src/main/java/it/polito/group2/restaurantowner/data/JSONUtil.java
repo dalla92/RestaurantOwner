@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.data;
 
 import android.content.Context;
 
@@ -16,7 +16,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import it.polito.group2.restaurantowner.owner.offer.Offer;
+import it.polito.group2.restaurantowner.data.Offer;
+import it.polito.group2.restaurantowner.data.OpenTime;
+import it.polito.group2.restaurantowner.data.OrderedMeal;
+import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.data.TableReservation;
+import it.polito.group2.restaurantowner.data.TakeAwayReservation;
+import it.polito.group2.restaurantowner.owner.Comment;
+import it.polito.group2.restaurantowner.owner.RestaurantService;
 
 /**
  * Created by Daniele on 13/04/2016.
@@ -149,7 +156,7 @@ public class JSONUtil {
     }
 
     public static void saveJSONOfferList(Context mContext, ArrayList<Offer> offerList) throws JSONException {
-        String FILENAME = "offerList.json";
+        String FILENAME = "offer.json";
         JSONArray jarray = new JSONArray();
         SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy");
         for (Offer offer : offerList) {
@@ -182,7 +189,7 @@ public class JSONUtil {
         String json = null;
         ArrayList<Offer> offerList = new ArrayList<>();
         FileInputStream fis = null;
-        String FILENAME = "offerList.json";
+        String FILENAME = "offer.json";
         try {
             fis = mContext.openFileInput(FILENAME);
             int size = fis.available();
@@ -232,6 +239,59 @@ public class JSONUtil {
 
         return offerList;
     }
+
+    public static ArrayList<Review> readJSONReviewList(Context mContext ,String targetRestaurantId) throws JSONException{
+        String json = null;
+        ArrayList<Review> reviewList = new ArrayList<>();
+        FileInputStream fis = null;
+        String FILENAME = "review.json";
+        try {
+            fis = mContext.openFileInput(FILENAME);
+            int size = fis.available();
+            byte[] buffer = new byte[size];
+            fis.read(buffer);
+            fis.close();
+            json = new String(buffer, "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return reviewList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject jobj = new JSONObject(json);
+        JSONArray jsonArray = jobj.optJSONArray("Reviews");
+        //Iterate the jsonArray and print the info of JSONObjects
+        for(int i=0; i < jsonArray.length(); i++){
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+            String restaurantId = jsonObject.optString("RestaurantID");
+            if(!restaurantId.equals(targetRestaurantId))
+                continue;
+
+            SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            Calendar reviewDate = Calendar.getInstance();
+
+            String date = jsonObject.optString("Date");
+            try {
+                reviewDate.setTime(timeFormat.parse(date));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            float starsNumber = (float) jsonObject.optDouble("starsNumber");
+            String comment = jsonObject.optString("Comment");
+            String reviewID = jsonObject.optString("Id");
+            String username = jsonObject.optString("UserID");
+
+            Review review = new Review(restaurantId, username, reviewDate, comment, reviewID, null, starsNumber);
+            reviewList.add(review);
+        }
+
+        return reviewList;
+    }
+
+
 
     public static ArrayList<TableReservation> readJSONTableResList(Context mContext, Calendar targetDate, String targetRestaurantId) throws JSONException{
         String json = null;
