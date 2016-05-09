@@ -6,14 +6,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-public class PagerAdapter extends FragmentStatePagerAdapter {
+public class FragmentPageAdapter extends FragmentStatePagerAdapter {
     private int mNumOfTabs;
     private long date;
     private TableFragment table_fragment;
     private TakeAwayFragment takeaway_fragment;
     private String restaurantId;
 
-    public PagerAdapter(FragmentManager fm, int NumOfTabs, long date, String restaurantId) {
+    public FragmentPageAdapter(FragmentManager fm, int NumOfTabs, long date, String restaurantId) {
         super(fm);
         this.mNumOfTabs = NumOfTabs;
         this.date = date;
