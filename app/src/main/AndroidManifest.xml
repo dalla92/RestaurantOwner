@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="it.polito.group2.restaurantowner">
+    package="it.polito.group2.restaurantowner" >
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -13,25 +13,38 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MANAGE_DOCUMENTS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme" >
+
+        <!-- Facebook Configuration -->
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
         <activity
             android:name=".owner.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" >
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".owner.AddRestaurantActivity"
             android:label="@string/title_activity_add_restaurant"
             android:parentActivityName=".owner.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".owner.MainActivity" />
@@ -85,15 +98,36 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.UserRestaurantActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity android:name=".user.restaurant_page.UserRestaurantGallery" />
+        <activity
+            android:name=".user.restaurant_page.UserRestaurantList"
+            android:label="@string/title_activity_user_restaurant_list"
+            android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-        <activity android:name=".user.restaurant_page.UserRestaurantGallery"></activity>
+        <activity
+            android:name=".user.restaurant_page.Filter"
+            android:parentActivityName=".user.restaurant_page.UserRestaurantList"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+        <activity
+            android:name=".user.restaurant_page.FilterCategory"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyALrSmimC0G6n0AKkouBalM-ZbargnPxZ4" />
+
     </application>
 
 </manifest>

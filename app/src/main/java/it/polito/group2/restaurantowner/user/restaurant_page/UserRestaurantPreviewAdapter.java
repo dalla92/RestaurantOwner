@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.user.restaurant_page;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,19 +9,73 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.owner.Restaurant;
 
 /**
  * Created by Daniele on 05/04/2016.
  */
-public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPreviewAdapter.ViewHolder> implements ItemTouchHelperAdapter{
+public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder> implements Filterable {
     private List<Restaurant> mDataset;
     private static Context mContext;
+    private CategoryFilter categoryFilter;
+
+    @Override
+    public Filter getFilter() {
+        if (categoryFilter == null)
+            categoryFilter = new CategoryFilter(this);
+
+        return categoryFilter;
+    }
+
+    public class CategoryFilter extends Filter{
+
+        private UserRestaurantPreviewAdapter pAdapter;
+
+        public CategoryFilter(UserRestaurantPreviewAdapter pAd){
+            pAdapter = pAd;
+        }
+
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+            if (constraint == null || constraint.length() == 0) {
+                results.values = mDataset;
+                results.count = mDataset.size();
+            }
+            else {
+// We perform filtering operation
+                List<Restaurant> nResList = new ArrayList<Restaurant>();
+
+                for (Restaurant r : mDataset) {
+                    if (r.getCategory().equals(constraint.toString()))
+                        nResList.add(r);
+                }
+
+                results.values = nResList;
+                results.count = nResList.size();
+
+            }
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            // Now we have to inform the adapter about the new list filtered
+                int size = mDataset.size();
+                mDataset = (List<Restaurant>) results.values;
+                notifyDataSetChanged();
+            notifyItemRangeChanged(0,size);
+        }
+    }
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -32,7 +86,7 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
         public TextView resName;
         public TextView rating;
         public TextView reservationNumber;
-        public TextView reservedPercentage;
+        public TextView distance;
         public Restaurant current;
         public int position;
 
@@ -42,7 +96,7 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
             resName = (TextView) v.findViewById(R.id.textViewName);
             rating = (TextView) v.findViewById(R.id.textViewRating);
             reservationNumber = (TextView) v.findViewById(R.id.textViewReservationNumber);
-            reservedPercentage = (TextView) v.findViewById(R.id.textViewReservedPercentage);
+            distance = (TextView) v.findViewById(R.id.textViewDistance);
         }
         public void setData(Restaurant obj, int position){
            /* TODO if(obj.getPhotoUri()!="") {
@@ -75,14 +129,15 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
             this.resName.setText(obj.getName());
             this.rating.setText(obj.getRating());
             this.reservationNumber.setText(obj.getReservationNumber());
-            this.reservedPercentage.setText(obj.getReservedPercentage());
+            //TODO calculate distance form current location
+            this.distance.setText("23 KM");
             this.position = position;
             this.current = obj;
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public RestaurantPreviewAdapter(List<Restaurant> myDataset, Context myContext) {
+    public UserRestaurantPreviewAdapter(List<Restaurant> myDataset, Context myContext) {
         mDataset = myDataset;
         mContext = myContext;
     }
@@ -90,10 +145,10 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
 
     // Create new views (invoked by the layout manager)
     @Override
-    public RestaurantPreviewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public UserRestaurantPreviewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.restaurant_preview, parent, false);
+                .inflate(R.layout.user_restaurant_preview, parent, false);
         // set the view's size, margins, paddings and layout parameters
         ViewHolder vh = new ViewHolder(v);
         return vh;
@@ -105,7 +160,7 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         Restaurant current = mDataset.get(position);
-        holder.setData(current,position);
+        holder.setData(current, position);
 
     }
 
@@ -119,46 +174,7 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
         notifyItemInserted(position);
         notifyItemRangeChanged(position, mDataset.size());
     }
-    public void removeItem(int position){
-        mDataset.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position,mDataset.size());
-    }
 
 
-    @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-        Restaurant prev = mDataset.remove(fromPosition);
-        mDataset.add(toPosition > fromPosition ? toPosition - 1 : toPosition, prev);
-        notifyItemMoved(fromPosition, toPosition);
-    }
-
-    @Override
-    public void onItemDismiss(final int position) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
-        alert.setTitle("Confirmation!");
-        alert.setMessage("Are you sure you want to delete the restaurant?\nThe operation cannot be undone!");
-        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                removeItem(position);
-                dialog.dismiss();
-
-            }
-        });
-        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                notifyItemChanged(position);
-                notifyDataSetChanged();
-                dialog.dismiss();
-            }
-        });
-
-        alert.show();
-
-    }
 
 }

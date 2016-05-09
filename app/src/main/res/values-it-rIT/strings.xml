@@ -154,4 +154,9 @@
     <string name="statistics_filter_week">Settimanale</string>
     <string name="statistics_filter_year">Annuale</string>
     <string name="statistics_order_line">Prenotazioni Take Away</string>
+    <string name="filter">Filter the restaurant list</string>
+    <string name="distance">Distance</string>
+    <string name="price_range">Price range</string>
+    <string name="restaurant_type">Restaurant type</string>
+    <string name="time">Time</string>
 </resources>
