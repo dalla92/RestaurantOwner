@@ -17,7 +17,7 @@ import it.polito.group2.restaurantowner.R;
 
 public class ReservationActivity extends AppCompatActivity {
 
-    private PagerAdapter adapter;
+    private FragmentPageAdapter adapter;
     private String restaurantId;
 
     @Override
@@ -39,7 +39,7 @@ public class ReservationActivity extends AppCompatActivity {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        adapter = new PagerAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), date.getTimeInMillis(), restaurantId);
+        adapter = new FragmentPageAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), date.getTimeInMillis(), restaurantId);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
