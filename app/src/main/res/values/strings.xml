@@ -170,13 +170,7 @@
     <string name="times_Sat">Saturday</string>
     <string name="times_Sun">Sunday</string>
     <string name="menu">Menu</string>
-    <string name="title_activity_add_review">AddReviewActivity</string>
+    <string name="title_activity_add_review">Add a review</string>
     <string name="comment">Add a Comment</string>
-    <string name="title_activity_gallery_view">GalleryViewActivity</string>
-
-    <string name="title_activity_fullscreen_gallery">FullscreenGalleryActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-
-    <string name="title_activity_fullscreen_activity_test">FullscreenActivityTest</string>
+    <string name="title_activity_gallery_view">Gallery</string>
 </resources>

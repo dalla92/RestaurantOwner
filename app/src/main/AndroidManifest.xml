@@ -105,7 +105,6 @@
         <activity
             android:name=".user.restaurant_page.gallery.FullScreenGalleryActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_fullscreen_gallery"
             android:theme="@style/MyFullscreenTheme" />
 
     </application>
