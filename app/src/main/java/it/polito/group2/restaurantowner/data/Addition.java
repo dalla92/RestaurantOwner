@@ -11,12 +11,14 @@ import java.io.Serializable;
 public class Addition implements Serializable {
 
     //String code = null;
+    String addition_id;
     String restaurant_id;
     String meal_id;
     String name = null;
     double price = 0.0;
     boolean selected = false;
 
+    //TODO aggiungere addition_id al costruttore
     public Addition(String restaurant_id, String meal_id, String name, double price, boolean selected) {
         super();
         //this.code = code;
@@ -31,6 +33,13 @@ public class Addition implements Serializable {
 
     }
 
+    public String getAddition_id() {
+        return addition_id;
+    }
+
+    public void setAddition_id(String addition_id) {
+        this.addition_id = addition_id;
+    }
     //public String getCode() {
     //return code;
     //}
