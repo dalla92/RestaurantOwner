@@ -1,14 +1,19 @@
 package it.polito.group2.restaurantowner.user.restaurant_page.gallery;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,6 +32,7 @@ public class GalleryViewActivity extends AppCompatActivity {
 
     private GalleryViewAdapter mGridAdapter;
     private ArrayList<GalleryViewItem> mGridData;
+    private String restaurantID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +40,10 @@ public class GalleryViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_gallery_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Bundle bundle = getIntent().getExtras();
+        restaurantID = bundle.getString("restaurantID");
 
         GridView mGridView = (GridView) findViewById(R.id.gridView);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -54,7 +64,7 @@ public class GalleryViewActivity extends AppCompatActivity {
                 //Get item at position
                 GalleryViewItem item = (GalleryViewItem) parent.getItemAtPosition(position);
 
-                Intent intent = new Intent(GalleryViewActivity.this, FullScreenActivity.class);
+                Intent intent = new Intent(GalleryViewActivity.this, FullScreenGalleryActivity.class);
                 ImageView imageView = (ImageView) v.findViewById(R.id.grid_item_image);
 
                 // Interesting data to pass across are the thumbnail size/location, the
@@ -85,6 +95,20 @@ public class GalleryViewActivity extends AppCompatActivity {
         mProgressBar.setVisibility(View.VISIBLE);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if(id == android.R.id.home){
+            onBackPressed();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     //Downloading data asynchronously
     public class AsyncHttpTask extends AsyncTask<String, Void, Integer> {

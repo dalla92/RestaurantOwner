@@ -55,9 +55,9 @@ public class Review implements Comparable<Review>{
     @Override
     public int compareTo(Review another) {
         if(this.date.before(another.getDate()))
-            return -1;
-        else if(this.date.after(another.getDate()))
             return 1;
+        else if(this.date.after(another.getDate()))
+            return -1;
         else
             return 0;
     }

@@ -42,6 +42,7 @@ import it.polito.group2.restaurantowner.data.Review;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.Offer;
+import it.polito.group2.restaurantowner.user.restaurant_page.gallery.GalleryViewActivity;
 
 public class UserRestaurantActivity extends AppCompatActivity {
 
@@ -291,6 +292,12 @@ public class UserRestaurantActivity extends AppCompatActivity {
         text_rating.setText(targetRestaurant.getRating());
         rating.setRating(Float.valueOf(targetRestaurant.getRating()));
     }*/
+
+    public void openGallery(View v){
+        Intent intent = new Intent(this, GalleryViewActivity.class);
+        intent.putExtra("restaurantID", restaurantID);
+        startActivity(intent);
+    }
 
     private void setRestaurantOffers() {
         RecyclerView offerList = (RecyclerView) findViewById(R.id.user_offer_list);

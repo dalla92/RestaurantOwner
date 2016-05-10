@@ -24,7 +24,7 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 
-public class FullScreenActivity extends AppCompatActivity {
+public class FullScreenGalleryActivity extends AppCompatActivity {
     private static final int ANIM_DURATION = 600;
     private TouchImageView imageView;
 
