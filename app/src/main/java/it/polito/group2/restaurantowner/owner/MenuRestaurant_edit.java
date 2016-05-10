@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Addition;
+import it.polito.group2.restaurantowner.data.Meal;
 
 /**
  * Created by Alessio on 16/04/2016.

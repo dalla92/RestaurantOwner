@@ -1,10 +1,10 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +15,9 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Review;
 
-public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
+public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>  {
 
     private ArrayList<Review> reviews;
     private Context context;
@@ -26,7 +27,8 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         this.context = context;
     }
 
-    public class ReviewViewHolder extends RecyclerView.ViewHolder{
+
+    public class ReviewViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView username, date, comment;
         public ImageView picture;
         public RatingBar stars;
@@ -38,7 +40,19 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             picture = (ImageView) itemView.findViewById(R.id.user_review_picture);
             stars = (RatingBar) itemView.findViewById(R.id.user_review_stars);
             comment = (TextView) itemView.findViewById(R.id.user_review_comment);
+            comment.setOnClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            if(v instanceof TextView) {
+                TextView tv = (TextView) v;
+                int collapsedMaxLines = 2;
+                ObjectAnimator animation = ObjectAnimator.ofInt(tv, "maxLines", tv.getMaxLines() == collapsedMaxLines? 200 : collapsedMaxLines);
+                animation.setDuration(200).start();
+            }
+        }
+
     }
 
     @Override
@@ -50,17 +64,19 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     @Override
     public void onBindViewHolder(ReviewViewHolder holder, int position) {
         holder.username.setText(reviews.get(position).getUsername());
-        holder.comment.setText(reviews.get(position).getComment());
+        holder.stars.setRating(reviews.get(position).getStars_number());
         SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
-        Log.d("prova", format.format(reviews.get(position).getDate().getTime()));
         holder.date.setText(format.format(reviews.get(position).getDate().getTime()));
         Bitmap picture = reviews.get(position).getPicture();
         if(picture == null)
-            holder.picture.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.blank_profile));
+            holder.picture.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.blank_profile_thumb));
         else
             holder.picture.setImageBitmap(picture);
 
-        //holder.stars.setRating(reviews.get(position).getStars_number());
+        if(reviews.get(position).getComment().equals(""))
+            holder.comment.setVisibility(View.GONE);
+        else
+            holder.comment.setText(reviews.get(position).getComment());
     }
 
     @Override

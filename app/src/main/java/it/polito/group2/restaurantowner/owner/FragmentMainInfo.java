@@ -33,6 +33,7 @@ import android.widget.CheckBox;
 import android.widget.Spinner;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Meal;
 
 /**
  * Created by Alessio on 16/04/2016.

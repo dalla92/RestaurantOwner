@@ -23,6 +23,9 @@ import java.util.Calendar;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.OrderedMeal;
+import it.polito.group2.restaurantowner.data.TakeAwayReservation;
 
 public class TakeAwayFragment extends Fragment {
 

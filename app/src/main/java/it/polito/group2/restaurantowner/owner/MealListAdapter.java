@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.OrderedMeal;
 
 /**
  * Created by TheChuck on 14/04/2016.

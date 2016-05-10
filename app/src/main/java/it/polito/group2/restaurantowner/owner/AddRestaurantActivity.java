@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.OpenTime;
+import it.polito.group2.restaurantowner.data.Restaurant;
 
 public class AddRestaurantActivity extends AppCompatActivity implements FragmentInfo.OnInfoPass, FragmentServices.OnServicesPass, FragmentExtras.OnExtrasPass {
 
@@ -155,7 +158,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
         }
         try {
-            ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(this,res.getRestaurantId());
+            ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(this, res.getRestaurantId());
             otList.addAll(openTimeList);
             JSONUtil.saveJSONOpenTimeList(this, otList);
         } catch (JSONException e) {

@@ -91,8 +91,9 @@
 
     <!-- Offer strings -->
     <string name="add">Add</string>
-    <string name="from">From</string>
-    <string name="to">To</string>
+    <string name="from">From:</string>
+    <string name="to">To:</string>
+    <string name="valid_for">Valid for </string>
     <string name="lunch">Lunch</string>
     <string name="info">Info</string>
     <string name="validity">Validity</string>
@@ -119,7 +120,7 @@
     <string name="done">Done</string>
     <string name="no_offer">No Offers</string>
 
-    <!-- Reservation strings -->
+    <!-- ReservationActivity strings -->
     <string name="table_section">Table</string>
     <string name="takeaway_section">Take Away</string>
     <string name="reservation_people">People</string>
@@ -175,4 +176,12 @@
     <string name="price_range">Price range</string>
     <string name="restaurant_type">Restaurant type</string>
     <string name="time">Time</string>
+    <string name="menu">Menu</string>
+    <string name="title_activity_add_review">Add a review</string>
+    <string name="comment">Add a Comment</string>
+    <string name="title_activity_gallery_view">Gallery</string>
+    <string name="title_activity_my_reviews">MyReviewsActivity</string>
+
+    <!-- Takeaway Activity -->
+    <string name="next">Next</string>
 </resources>

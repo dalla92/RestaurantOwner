@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:layout_margin="5dp">
+
+    <TextView
+        android:id="@+id/offer_name"
+        android:text="Offer 1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        />
+
+    <TextView
+        android:id="@+id/offer_desc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:text="50% discount on all menu"
+        android:paddingTop="4dp"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/from"
+            android:textSize="14sp"
+            android:layout_marginEnd="4dp"
+            />
+
+        <TextView
+            android:id="@+id/offer_from"
+            android:text="22/10/2016"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/to"
+            android:textSize="14sp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="4dp"
+            />
+
+        <TextView
+            android:id="@+id/offer_to"
+            android:layout_width="wrap_content"
+            android:text="22/10/2016"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/offer_validity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Valid for Lunch/Dinner"
+        android:textSize="14sp"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/colorPrimaryDark"
+        />
+
+</LinearLayout>
