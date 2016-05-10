@@ -85,14 +85,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.UserRestaurantActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.AddReviewActivity"
             android:label="@string/title_activity_add_review"
@@ -101,6 +94,15 @@
             android:name=".user.restaurant_page.gallery.GalleryViewActivity"
             android:label="@string/title_activity_gallery_view"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".user.restaurant_page.UserRestaurantGallery" />
+        <activity
+            android:name=".user.takeaway.TakeawayActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".user.restaurant_page.gallery.FullScreenGalleryActivity"
