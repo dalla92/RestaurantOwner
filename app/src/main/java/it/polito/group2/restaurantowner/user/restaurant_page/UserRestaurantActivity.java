@@ -311,7 +311,7 @@ public class UserRestaurantActivity extends AppCompatActivity {
     private void setUserReviews() {
         TextView reviews_num = (TextView) findViewById(R.id.user_restaurant_num_reviews);
         reviews_num.setText(""+reviews.size());
-        RecyclerView reviewList = (RecyclerView) findViewById(R.id.user_review_list);
+        RecyclerView reviewList = (RecyclerView) findViewById(R.id.user_restaurant_review_list);
         assert reviewList != null;
         reviewList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         reviewList.setNestedScrollingEnabled(false);

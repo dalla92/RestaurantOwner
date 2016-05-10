@@ -173,6 +173,7 @@
     <string name="title_activity_add_review">Add a review</string>
     <string name="comment">Add a Comment</string>
     <string name="title_activity_gallery_view">Gallery</string>
+    <string name="title_activity_my_reviews">MyReviewsActivity</string>
 
     <!-- Takeaway Activity -->
     <string name="next">Next</string>

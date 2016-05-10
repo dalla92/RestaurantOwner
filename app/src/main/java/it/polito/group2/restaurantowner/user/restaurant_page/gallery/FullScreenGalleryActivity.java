@@ -6,19 +6,11 @@ package it.polito.group2.restaurantowner.user.restaurant_page.gallery;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.ViewTreeObserver;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-
-import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -26,7 +18,7 @@ import it.polito.group2.restaurantowner.R;
 
 public class FullScreenGalleryActivity extends AppCompatActivity {
     private static final int ANIM_DURATION = 600;
-    private TouchImageView imageView;
+    private PinchToZoomImageView imageView;
 
     private int mLeftDelta;
     private int mTopDelta;
@@ -40,7 +32,7 @@ public class FullScreenGalleryActivity extends AppCompatActivity {
     private int thumbnailWidth;
     private int thumbnailHeight;
 
-    private FullScreenImageAdapter adapter;
+    private FullScreenGalleryAdapter adapter;
     private ViewPager viewPager;
     private ArrayList<GalleryViewItem> mGridData;
 
@@ -66,7 +58,7 @@ public class FullScreenGalleryActivity extends AppCompatActivity {
         Intent i = getIntent();
         int position = i.getIntExtra("position", 0);
 
-        adapter = new FullScreenImageAdapter(this, mGridData);
+        adapter = new FullScreenGalleryAdapter(this, mGridData);
 
         viewPager.setAdapter(adapter);
 

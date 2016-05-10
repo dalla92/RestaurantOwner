@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:id="@+id/main_background">
 
-    <it.polito.group2.restaurantowner.user.restaurant_page.gallery.TouchImageView
+    <it.polito.group2.restaurantowner.user.restaurant_page.gallery.PinchToZoomImageView
         android:id="@+id/gallery_item_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

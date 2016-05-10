@@ -11,7 +11,7 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.ImageView;
 
-public class TouchImageView extends ImageView {
+public class PinchToZoomImageView extends ImageView {
 
     Matrix matrix;
 
@@ -38,12 +38,12 @@ public class TouchImageView extends ImageView {
 
     Context context;
 
-    public TouchImageView(Context context) {
+    public PinchToZoomImageView(Context context) {
         super(context);
         sharedConstructing(context);
     }
 
-    public TouchImageView(Context context, AttributeSet attrs) {
+    public PinchToZoomImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         sharedConstructing(context);
     }

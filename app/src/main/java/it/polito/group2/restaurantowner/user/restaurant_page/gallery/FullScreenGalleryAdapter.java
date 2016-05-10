@@ -13,13 +13,13 @@ import com.bumptech.glide.Glide;
 
 import it.polito.group2.restaurantowner.R;
 
-public class FullScreenImageAdapter extends PagerAdapter {
+public class FullScreenGalleryAdapter extends PagerAdapter {
 
     private Activity activity;
     private ArrayList<GalleryViewItem> mGridData;
 
     // constructor
-    public FullScreenImageAdapter(Activity activity, ArrayList<GalleryViewItem> mGridData) {
+    public FullScreenGalleryAdapter(Activity activity, ArrayList<GalleryViewItem> mGridData) {
         this.activity = activity;
         this.mGridData = mGridData;
     }
@@ -36,12 +36,12 @@ public class FullScreenImageAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        TouchImageView imgDisplay;
+        PinchToZoomImageView imgDisplay;
 
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewLayout = inflater.inflate(R.layout.full_screen_gallery_item, container, false);
 
-        imgDisplay = (TouchImageView) viewLayout.findViewById(R.id.gallery_item_image);
+        imgDisplay = (PinchToZoomImageView) viewLayout.findViewById(R.id.gallery_item_image);
 
         Glide.with(activity.getApplicationContext()).load(mGridData.get(position).getImage()).into(imgDisplay);
 
