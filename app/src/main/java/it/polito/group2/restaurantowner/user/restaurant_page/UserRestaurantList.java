@@ -51,9 +51,9 @@ import java.util.HashMap;
 import java.util.Set;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.owner.JSONUtil;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
-import it.polito.group2.restaurantowner.owner.Restaurant;
 import it.polito.group2.restaurantowner.owner.RestaurantPreviewAdapter;
 
 public class UserRestaurantList extends AppCompatActivity
