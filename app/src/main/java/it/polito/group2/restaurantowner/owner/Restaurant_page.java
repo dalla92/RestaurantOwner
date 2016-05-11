@@ -45,11 +45,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Review;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
@@ -68,7 +71,7 @@ public class Restaurant_page extends AppCompatActivity
     public int REQUEST_TAKE_PHOTO = 1;
     public int MODIFY_INFO = 4;
     public String photouri = null;
-    public ArrayList<Comment> comments = new ArrayList<>();
+    public ArrayList<Review> reviews = new ArrayList<>();
     public Restaurant my_restaurant = null;
 
     /*private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -97,7 +100,7 @@ public class Restaurant_page extends AppCompatActivity
             e.printStackTrace();
         }
         try {
-            comments = readJSONComList();
+            reviews = readJSONComList();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -518,7 +521,7 @@ public class Restaurant_page extends AppCompatActivity
     */
 
     private void initializeAdapterComments(){
-        Adapter_Comments adapter = new Adapter_Comments(comments, this.getApplicationContext());
+        Adapter_Comments adapter = new Adapter_Comments(reviews, this.getApplicationContext());
         rv.setAdapter(adapter);
     }
 
@@ -528,21 +531,21 @@ public class Restaurant_page extends AppCompatActivity
         final int original_comment_height=comment.getMeasuredHeight();
         int i;
         String comment_start = comment.getText().toString().substring(0, 7);
-        for(i=0; i<comments.size(); i++){
-            if(comment_start.equals(comments.get(i).comment.substring(0, 7)))
+        for(i=0; i< reviews.size(); i++){
+            if(comment_start.equals(reviews.get(i).getComment().substring(0, 7)))
                 break;
         }
         if(!card_view_clicked) {
             card_view_clicked=true;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, 300, 1f);
             comment.setMaxLines(Integer.MAX_VALUE);
-            comment.setText(comments.get(i).comment);
+            comment.setText(reviews.get(i).getComment());
             comment.setLayoutParams(lp);
         }
         else {
             card_view_clicked=false;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, v.getLayoutParams().height, 1f);
-            String comment_ell = comments.get(i).comment.substring(0, 7);
+            String comment_ell = reviews.get(i).getComment().substring(0, 7);
             comment_ell = comment_ell + getResources().getString(R.string.show_more);
             comment.setText(comment_ell);
             comment.setMaxLines(2);
@@ -616,8 +619,8 @@ public class Restaurant_page extends AppCompatActivity
         return resList;
     }
 
-    public ArrayList<Comment> readJSONComList() throws JSONException {
-        comments = new ArrayList<>();
+    public ArrayList<Review> readJSONComList() throws JSONException {
+        reviews = new ArrayList<>();
         String json = null;
         FileInputStream fis = null;
         String FILENAME = "commentList.json";
@@ -630,7 +633,7 @@ public class Restaurant_page extends AppCompatActivity
             json = new String(buffer, "UTF-8");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return comments;
+            return reviews;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -639,18 +642,26 @@ public class Restaurant_page extends AppCompatActivity
         //Iterate the jsonArray and print the info of JSONObjects
         for(int i=0; i < jsonArray.length(); i++){
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            Comment com = new Comment();
+            Review com = new Review();
             if(jsonObject.optString("RestaurantId").equals(restaurant_id)){ //I read only the comments of my restaurant
                 com.setRestaurantId(jsonObject.optString("RestaurantId")); //optInt or optString?
-                com.setDate(jsonObject.optString("Date"));
+                SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy");
+                Calendar date = Calendar.getInstance();
+                try {
+                    date.setTime(format.parse(jsonObject.optString("Date")));
+                    com.setDate(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
                 com.setStars_number(jsonObject.optInt("StarsNumber")); //optInt or optString?
                 com.setComment(jsonObject.optString("Comment"));
-                com.setPhotoId(jsonObject.optString("UserPhoto"));
-                com.setUsername(jsonObject.optString("Username"));
-                comments.add(com);
+                com.setUserphoto(jsonObject.optString("UserPhoto"));
+                com.setUserID(jsonObject.optString("Username"));
+                reviews.add(com);
             }
         }
-        return comments;
+        return reviews;
     }
 
     public void saveJSONResList() throws JSONException {
@@ -695,14 +706,14 @@ public class Restaurant_page extends AppCompatActivity
     public void saveJSONComList() throws JSONException {
         String FILENAME = "commentList.json";
         JSONArray jarray = new JSONArray();
-        for(Comment com : comments){
+        for(Review com : reviews){
             JSONObject jres = new JSONObject();
             jres.put("RestaurantId",com.getRestaurantId());
             jres.put("Date",com.getDate());
             jres.put("StarsNumber",com.getStars_number());
             jres.put("Comment",com.getComment());
-            jres.put("UserPhoto",com.userphoto());
-            jres.put("Username",com.getUsername());
+            jres.put("UserPhoto",com.getUserphoto());
+            jres.put("Username",com.getUserID());
             jarray.put(jres);
         }
         JSONObject resObj = new JSONObject();
@@ -720,37 +731,37 @@ public class Restaurant_page extends AppCompatActivity
     }
 
     public void addComments(String restaurant_id){
-        Comment c1 = new Comment();
-        c1.setUsername("Salvatore Grasso");
+        Review c1 = new Review();
+        c1.setUserID("Salvatore Grasso");
         c1.setRestaurantId(restaurant_id);
         c1.setComment("Mi è piaciuto tanto");
-        c1.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
+        c1.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c1.setStars_number(4);
-        comments.add(c1);
+        reviews.add(c1);
 
-        Comment c2 = new Comment();
-        c2.setUsername("Karl");
+        Review c2 = new Review();
+        c2.setUserID("Karl");
         c2.setRestaurantId(restaurant_id);
         c2.setComment("Non ho visto di meglio.............................................");
-        c2.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
+        c2.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c2.setStars_number(5);
-        comments.add(c2);
+        reviews.add(c2);
 
-        Comment c3 = new Comment();
-        c3.setUsername("Angelo Spada");
+        Review c3 = new Review();
+        c3.setUserID("Angelo Spada");
         c3.setRestaurantId(restaurant_id);
         c3.setComment("Non siti cosa");
-        c3.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
+        c3.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c3.setStars_number(1);
-        comments.add(c3);
+        reviews.add(c3);
 
-        Comment c4 = new Comment();
-        c4.setUsername("Pina");
+        Review c4 = new Review();
+        c4.setUserID("Pina");
         c4.setRestaurantId(restaurant_id);
         c4.setComment("Pessimo");
-        c4.setPhotoId(getResources().getResourceName(R.mipmap.ic_launcher));
+        c4.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c4.setStars_number(0);
-        comments.add(c4);
+        reviews.add(c4);
     }
 
     public void addRestaurants(){

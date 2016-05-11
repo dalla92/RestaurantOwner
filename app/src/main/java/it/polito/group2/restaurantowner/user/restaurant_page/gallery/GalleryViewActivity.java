@@ -1,13 +1,22 @@
 package it.polito.group2.restaurantowner.user.restaurant_page.gallery;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.TypedValue;
+import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -28,6 +37,8 @@ import it.polito.group2.restaurantowner.R;
 
 public class GalleryViewActivity extends AppCompatActivity {
 
+    private static final int NUM_OF_COLUMNS = 3;
+    private static final int GRID_PADDING = 8;
     private ProgressBar mProgressBar;
 
     private GalleryViewAdapter mGridAdapter;
@@ -47,6 +58,8 @@ public class GalleryViewActivity extends AppCompatActivity {
 
         GridView mGridView = (GridView) findViewById(R.id.gridView);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
+
+        // Initilizing Grid View
 
         /*Firebase firebase = new Firebase("https://have-break.firebaseio.com/images");
         Firebase imageRef = firebase.push();
@@ -83,9 +96,16 @@ public class GalleryViewActivity extends AppCompatActivity {
                         putExtra("position", position).
                         putExtra("image", item.getImage());
 
+                Bundle b = null;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                    Bitmap bitmap = Bitmap.createBitmap(imageView.getWidth(), imageView.getHeight(), Bitmap.Config.ARGB_8888);
+                    //bitmap.eraseColor(colour);
+                    b = ActivityOptionsCompat.makeThumbnailScaleUpAnimation(imageView, bitmap, 0, 0).toBundle();
+                }
+
                 //Start details activity
-                startActivity(intent);
-                overridePendingTransition(0,0);
+                startActivity(intent, b);
+                //overridePendingTransition(0,0);
             }
         });
 
@@ -118,8 +138,9 @@ public class GalleryViewActivity extends AppCompatActivity {
             GalleryViewItem item = new GalleryViewItem();
             item.setImage(R.drawable.image);
             GalleryViewItem item2 = new GalleryViewItem();
-            item2.setImage(R.drawable.img);
+            item2.setImage(R.drawable.image);
             mGridData.add(item);
+            mGridData.add(item2);
             mGridData.add(item2);
             return 1;
             /*Integer result = 0;

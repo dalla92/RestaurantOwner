@@ -45,11 +45,6 @@ public class FullScreenGalleryAdapter extends PagerAdapter {
 
         Glide.with(activity.getApplicationContext()).load(mGridData.get(position).getImage()).into(imgDisplay);
 
-        /*BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = BitmapFactory.decodeFile(mGridData.get(position), options);
-        imgDisplay.setImageBitmap(bitmap);*/
-
         container.addView(viewLayout);
 
         return viewLayout;

@@ -16,9 +16,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Review;
 
 public class ReviewsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -30,7 +33,7 @@ public class ReviewsActivity extends AppCompatActivity
     private RecyclerView.LayoutManager rvLayoutManager;
 
     private String restaurantID = "0"; //restaurant reference
-    private ArrayList<Comment> commentList = new ArrayList<Comment>();
+    private ArrayList<Review> reviewList = new ArrayList<Review>();
 
     private Menu menu;
     private boolean card_view_clicked=false;
@@ -91,23 +94,25 @@ public class ReviewsActivity extends AppCompatActivity
         }
         */
 
-        Comment comment;
+        Review review;
         for(int i=0;i<10;i++) {
-            comment = new Comment();
-            comment.setDate("1" + i + "/03/2016 1" + i + ":30");
-            comment.setComment("Commento dell'utente");
-            comment.setCommentID(UUID.randomUUID().toString());
-            comment.setStars_number(4);
-            comment.setUsername("Utente " + i);
-            comment.setRestaurantId("");
-            commentList.add(comment);
+            review = new Review();
+            Calendar date = Calendar.getInstance();
+            date.set(Calendar.HOUR_OF_DAY, i+1);
+            review.setDate(date);
+            review.setComment("Commento dell'utente");
+            review.setReviewID(UUID.randomUUID().toString());
+            review.setStars_number(4);
+            review.setUserID("Utente " + i);
+            review.setRestaurantId("");
+            reviewList.add(review);
         }
 
     }
 
 
     private void initializeAdapterReviews(){
-        Adapter_Reviews adapter = new Adapter_Reviews(commentList, this.getApplicationContext());
+        Adapter_Reviews adapter = new Adapter_Reviews(reviewList, this.getApplicationContext());
         rv.setAdapter(adapter);
     }
 
@@ -146,21 +151,21 @@ public class ReviewsActivity extends AppCompatActivity
         final int original_comment_height=comment.getMeasuredHeight();
         int i;
         String comment_start = comment.getText().toString().substring(0, 7);
-        for(i=0; i<commentList.size(); i++){
-            if(comment_start.equals(commentList.get(i).comment.substring(0, 7)))
+        for(i=0; i< reviewList.size(); i++){
+            if(comment_start.equals(reviewList.get(i).getComment().substring(0, 7)))
                 break;
         }
         if(!card_view_clicked) {
             card_view_clicked=true;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, 300, 1f);
             comment.setMaxLines(Integer.MAX_VALUE);
-            comment.setText(commentList.get(i).comment);
+            comment.setText(reviewList.get(i).getComment());
             comment.setLayoutParams(lp);
         }
         else {
             card_view_clicked=false;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, v.getLayoutParams().height, 1f);
-            String comment_ell = commentList.get(i).comment.substring(0, 7);
+            String comment_ell = reviewList.get(i).getComment().substring(0, 7);
             comment_ell = comment_ell + getResources().getString(R.string.show_more);
             comment.setText(comment_ell);
             comment.setMaxLines(2);

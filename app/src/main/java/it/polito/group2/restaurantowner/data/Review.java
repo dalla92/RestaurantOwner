@@ -6,21 +6,19 @@ import java.util.Calendar;
 import java.util.Comparator;
 
 public class Review implements Comparable<Review>{
-    private String restaurantId, username, comment, reviewID;
+    private String restaurantId, userID, comment, reviewID, userphoto;
     private Calendar date;
     private float stars_number;
-    private Bitmap picture;
 
     public Review() {
     }
 
-    public Review(String restaurantId, String username, Calendar date, String comment, String reviewID, Bitmap picture, float stars_number) {
+    public Review(String restaurantId, String userID, Calendar date, String comment, String reviewID, Bitmap picture, float stars_number) {
         this.restaurantId = restaurantId;
-        this.username = username;
+        this.userID = userID;
         this.date = date;
         this.comment = comment;
         this.reviewID = reviewID;
-        this.picture = picture;
         this.stars_number = stars_number;
     }
 
@@ -28,8 +26,8 @@ public class Review implements Comparable<Review>{
         return restaurantId;
     }
 
-    public String getUsername() {
-        return username;
+    public String getUserID() {
+        return userID;
     }
 
     public Calendar getDate() {
@@ -44,12 +42,40 @@ public class Review implements Comparable<Review>{
         return reviewID;
     }
 
-    public Bitmap getPicture() {
-        return picture;
-    }
-
     public float getStars_number() {
         return stars_number;
+    }
+
+    public String getUserphoto() {
+        return userphoto;
+    }
+
+    public void setUserphoto(String userphoto) {
+        this.userphoto = userphoto;
+    }
+
+    public void setStars_number(float stars_number) {
+        this.stars_number = stars_number;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public void setReviewID(String reviewID) {
+        this.reviewID = reviewID;
+    }
+
+    public void setDate(Calendar date) {
+        this.date = date;
     }
 
     @Override

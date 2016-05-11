@@ -63,15 +63,13 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     @Override
     public void onBindViewHolder(ReviewViewHolder holder, int position) {
-        holder.username.setText(reviews.get(position).getUsername());
+        holder.username.setText(reviews.get(position).getUserID());
         holder.stars.setRating(reviews.get(position).getStars_number());
         SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
         holder.date.setText(format.format(reviews.get(position).getDate().getTime()));
-        Bitmap picture = reviews.get(position).getPicture();
-        if(picture == null)
-            holder.picture.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.blank_profile_thumb));
-        else
-            holder.picture.setImageBitmap(picture);
+
+        //TODO get the user picture with the UserID
+        holder.picture.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.blank_profile_thumb));
 
         if(reviews.get(position).getComment().equals(""))
             holder.comment.setVisibility(View.GONE);

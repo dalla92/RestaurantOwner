@@ -16,13 +16,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import it.polito.group2.restaurantowner.data.Offer;
-import it.polito.group2.restaurantowner.data.OpenTime;
-import it.polito.group2.restaurantowner.data.OrderedMeal;
-import it.polito.group2.restaurantowner.data.Restaurant;
-import it.polito.group2.restaurantowner.data.TableReservation;
-import it.polito.group2.restaurantowner.data.TakeAwayReservation;
-import it.polito.group2.restaurantowner.owner.Comment;
 import it.polito.group2.restaurantowner.owner.RestaurantService;
 
 /**
@@ -671,10 +664,10 @@ public class JSONUtil {
     }
 
     /* Filippo edits start */
-    public static ArrayList<Comment> readJsonReviewList(Context mContext, String restaurantID)
+    public static ArrayList<Review> readJsonReviewList(Context mContext, String restaurantID)
             throws JSONException {
         String json = null;
-        ArrayList<Comment> commentList = new ArrayList<>();
+        ArrayList<Review> reviewList = new ArrayList<>();
         FileInputStream fis = null;
         String FILENAME = "commentList.json";
         try {
@@ -686,25 +679,32 @@ public class JSONUtil {
             json = new String(buffer, "UTF-8");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return commentList;
+            return reviewList;
         } catch (IOException e) {
             e.printStackTrace();
         }
         JSONObject jobj = new JSONObject(json);
         JSONArray jsonArray = jobj.optJSONArray("Comments");
-        Comment comment;
+        Review review;
 
         //Iterate the jsonArray and print the info of JSONObjects
         for(int i=0; i < jsonArray.length(); i++){
 
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             if(jsonObject.optString("RestaurantID").equals(restaurantID)) {
-                comment = new Comment();
-                comment.setDate(jsonObject.optString("Date") + " " + jsonObject.optString("Time"));
-                commentList.add(comment);
+                review = new Review();
+                SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy HH:mm");
+                Calendar date = Calendar.getInstance();
+                try {
+                    date.setTime(format.parse(jsonObject.optString("Date") + " " + jsonObject.optString("Time")));
+                    review.setDate(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                reviewList.add(review);
             }
         }
-        return commentList;
+        return reviewList;
     }
     /* Filippo edits stop */
 

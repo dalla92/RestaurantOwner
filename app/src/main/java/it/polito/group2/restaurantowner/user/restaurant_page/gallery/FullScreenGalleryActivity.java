@@ -39,11 +39,10 @@ public class FullScreenGalleryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //Setting details screen layout
-        //setContentView(R.layout.full_screen_gallery_item);
-
         setContentView(R.layout.activity_fullscreen_gallery);
+
+        Intent i = getIntent();
+        int position = i.getIntExtra("position", 0);
 
         GalleryViewItem item = new GalleryViewItem();
         item.setImage(R.drawable.image);
@@ -52,22 +51,14 @@ public class FullScreenGalleryActivity extends AppCompatActivity {
         mGridData = new ArrayList<>();
         mGridData.add(item);
         mGridData.add(item2);
+        mGridData.add(item2);
 
         viewPager = (ViewPager) findViewById(R.id.pager);
-
-        Intent i = getIntent();
-        int position = i.getIntExtra("position", 0);
-
         adapter = new FullScreenGalleryAdapter(this, mGridData);
-
         viewPager.setAdapter(adapter);
-
-        // displaying selected image first
         viewPager.setCurrentItem(position);
 
         //colorDrawable = new ColorDrawable(Color.WHITE);
-        /*ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();*/
 
         //retrieves the thumbnail data
         Bundle bundle = getIntent().getExtras();
@@ -81,7 +72,7 @@ public class FullScreenGalleryActivity extends AppCompatActivity {
 
         //Set image url
 
-        /*imageView = (TouchImageView) findViewById(R.id.gallery_item_image);
+        /*imageView = (PinchToZoomImageView) findViewById(R.id.gallery_item_image);
         Glide.with(this).load(image).into(imageView);*/
 
         //Set the background color to black
