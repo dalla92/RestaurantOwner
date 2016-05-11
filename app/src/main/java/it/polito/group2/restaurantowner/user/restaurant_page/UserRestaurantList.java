@@ -20,43 +20,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.firebase.client.AuthData;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 import com.firebase.geofire.GeoQuery;
-import com.firebase.geofire.GeoQueryEventListener;
-import com.firebase.ui.auth.core.AuthProviderType;
-import com.firebase.ui.auth.core.FirebaseLoginBaseActivity;
-import com.firebase.ui.auth.core.FirebaseLoginError;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
-import it.polito.group2.restaurantowner.owner.RestaurantPreviewAdapter;
-import it.polito.group2.restaurantowner.user.MyReviewsActivity;
+import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 
 public class UserRestaurantList extends AppCompatActivity
 //      FirebaseLoginBaseActivity
@@ -311,7 +294,7 @@ public class UserRestaurantList extends AppCompatActivity
         } else if(id==R.id.nav_my_profile) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    UserProfile.class);
                 Bundle b1 = new Bundle();
                 b1.putString("user_id", user_id);
                 intent1.putExtras(b1);
@@ -344,7 +327,7 @@ public class UserRestaurantList extends AppCompatActivity
                 intent3.putExtras(b3);
                 startActivity(intent3);
             return true;
-        } else if(id==R.id.nav_my_favorites){
+        } else if(id==R.id.nav_my_favourites){
             Intent intent3 = new Intent(
                     getApplicationContext(),
                     UserRestaurantList.class);

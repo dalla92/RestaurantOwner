@@ -198,5 +198,12 @@
     <string name="order_addtocart">Add</string>
     <string name="order_mealquantity">Add quantity</string>
     <string name="order_mealnote">Additional note</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_password">Password</string>
+    <string name="profile_first_name">First name</string>
+    <string name="profile_last_name">Last name</string>
+    <string name="profile_phone_number">Telephone number</string>
+    <string name="profile_vat_number">VAT Number</string>
+    <string name="action_cancel">Cancel</string>
 
 </resources>

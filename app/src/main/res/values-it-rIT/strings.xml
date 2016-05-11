@@ -191,4 +191,9 @@
     <string name="my_profile">Mio Profilo</string>
     <string name="my_orders">Miei Ordini</string>
     <string name="my_reviews">Miei Commenti</string>
+    <string name="profile_first_name">Nome</string>
+    <string name="profile_last_name">Cognome</string>
+    <string name="profile_phone_number">Numero di telefono</string>
+    <string name="profile_vat_number">Numero VAT</string>
+    <string name="action_cancel">Annulla</string>
 </resources>

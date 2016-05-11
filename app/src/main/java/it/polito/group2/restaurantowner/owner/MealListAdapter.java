@@ -33,7 +33,7 @@ public class MealListAdapter extends ArrayAdapter<OrderMeal> {
         TextView meal_name = (TextView) convertView.findViewById(R.id.meal_name);
         TextView meal_quantity = (TextView) convertView.findViewById(R.id.meal_quantity);
 
-        meal_name.setText(meal.getMeal_name());
+        meal_name.setText(meal.getMeal().getMeal_name());
         meal_quantity.setText(String.format("%d", meal.getQuantity()));
         return convertView;
     }

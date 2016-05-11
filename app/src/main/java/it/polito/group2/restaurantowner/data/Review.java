@@ -32,6 +32,15 @@ public class Review implements Comparable<Review>{
         this.stars_number = stars_number;
     }
 
+    public Review(String restaurantId, String userID, Calendar date, String comment, String reviewID, String picture, float stars_number) {
+        this.restaurantId = restaurantId;
+        this.userID = userID;
+        this.date = date;
+        this.comment = comment;
+        this.reviewID = reviewID;
+        this.stars_number = stars_number;
+    }
+
     public String getRestaurantId() {
         return restaurantId;
     }

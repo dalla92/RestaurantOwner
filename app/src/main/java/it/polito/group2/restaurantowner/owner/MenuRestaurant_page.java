@@ -42,9 +42,10 @@ import java.io.File;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Addition;
+import it.polito.group2.restaurantowner.data.MealAddition;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.data.MealAddition;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
@@ -55,8 +56,8 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
     private Adapter_Meals adapter;
     private String restaurant_id = "0";
     private ArrayList<Meal> meals = new ArrayList<>();
-    private ArrayList<Addition> meals_additions = new ArrayList<>();
-    private ArrayList<Addition> meals_categories = new ArrayList<>();
+    private ArrayList<MealAddition> meals_additions = new ArrayList<>();
+    private ArrayList<MealAddition> meals_categories = new ArrayList<>();
     public RecyclerView rv;
     public int index_position;
     Meal meal_to_delete;
@@ -99,7 +100,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         File file = getFileStreamPath(FILENAME);
         if(!file.exists()){
             addMeal(restaurant_id);
-            addAddition(restaurant_id);
+            addMealAddition(restaurant_id);
             addCategory(restaurant_id);
             try {
                 saveJSONMeList();
@@ -508,10 +509,10 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         for( Meal m : meals) {
             meals.add(m);
         }
-        for( Addition a : meals_additions) {
+        for( MealAddition a : meals_additions) {
             meals_additions.add(a);
         }
-        for( Addition a : meals_categories) {
+        for( MealAddition a : meals_categories) {
             meals_categories.add(a);
         }
      }
@@ -558,10 +559,10 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             if(me.getRestaurantId().equals(restaurant_id))
                     meals.add(me);
         }
-        //mealAdditions.json
+        //mealMealAdditions.json
         String json2 = null;
         FileInputStream fis2 = null;
-        String FILENAME2 = "mealAddition.json";
+        String FILENAME2 = "mealMealAddition.json";
         try {
             fis2 = openFileInput(FILENAME2);
             int size2 = fis2.available();
@@ -575,16 +576,16 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             e.printStackTrace();
         }
         JSONObject jobj2 = new JSONObject(json2);
-        JSONArray jsonArray2 = jobj2.optJSONArray("MealsAdditions");
+        JSONArray jsonArray2 = jobj2.optJSONArray("MealsMealAdditions");
         for (int i = 0; i < jsonArray2.length(); i++) {
             JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
-            Addition ad = new Addition();
+            MealAddition ad = new MealAddition();
             if (jsonObject2.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
                 ad.setmeal_id(jsonObject2.optString("MealId"));
-                ad.setName(jsonObject2.optString("AdditionName"));
-                ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
-                ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
+                ad.setName(jsonObject2.optString("MealAdditionName"));
+                ad.setSelected(jsonObject2.getBoolean("MealAdditionSelected"));
+                ad.setPrice(jsonObject2.optDouble("MealAdditionPrice"));
                 meals_additions.add(ad);
             }
         }
@@ -608,7 +609,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         JSONArray jsonArray3 = jobj3.optJSONArray("MealsCategories");
         for (int i = 0; i < jsonArray3.length(); i++) {
             JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
-            Addition ad = new Addition();
+            MealAddition ad = new MealAddition();
             if (jsonObject3.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
                 ad.setmeal_id(jsonObject3.optString("MealId"));
@@ -656,19 +657,19 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             e.printStackTrace();
         }
         //additions writing
-        String FILENAME2 = "mealAddition.json";
+        String FILENAME2 = "mealMealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (Addition ad : meals_additions) {
+        for (MealAddition ad : meals_additions) {
             JSONObject jres2 = new JSONObject();
             jres2.put("RestaurantId", ad.getRestaurant_id());
             jres2.put("MealId", ad.getmeal_id());
-            jres2.put("AdditionName", ad.getName());
-            jres2.put("AdditionSelected", ad.isSelected());
-            jres2.put("AdditionPrice", ad.getPrice());
+            jres2.put("MealAdditionName", ad.getName());
+            jres2.put("MealAdditionSelected", ad.isSelected());
+            jres2.put("MealAdditionPrice", ad.getPrice());
             jarray2.put(jres2);
         }
         JSONObject resObj2 = new JSONObject();
-        resObj2.put("MealsAdditions", jarray2);
+        resObj2.put("MealsMealAdditions", jarray2);
         FileOutputStream fos2 = null;
         try {
             fos2 = openFileOutput(FILENAME2, Context.MODE_PRIVATE);
@@ -682,7 +683,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //categories writing
         String FILENAME3 = "mealCategory.json";
         JSONArray jarray3 = new JSONArray();
-        for (Addition ad : meals_categories) {
+        for (MealAddition ad : meals_categories) {
                 JSONObject jres3 = new JSONObject();
                 jres3.put("RestaurantId", ad.getRestaurant_id());
                 jres3.put("MealId", ad.getmeal_id());
@@ -742,19 +743,19 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             e.printStackTrace();
         }
         //additions writing
-        String FILENAME2 = "mealAddition.json";
+        String FILENAME2 = "mealMealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (Addition ad : meals_additions) {
+        for (MealAddition ad : meals_additions) {
             JSONObject jres2 = new JSONObject();
             jres2.put("RestaurantId", ad.getRestaurant_id());
             jres2.put("MealId", ad.getmeal_id());
-            jres2.put("AdditionName", ad.getName());
-            jres2.put("AdditionSelected", ad.isSelected());
-            jres2.put("AdditionPrice", ad.getPrice());
+            jres2.put("MealAdditionName", ad.getName());
+            jres2.put("MealAdditionSelected", ad.isSelected());
+            jres2.put("MealAdditionPrice", ad.getPrice());
             jarray2.put(jres2);
         }
         JSONObject resObj2 = new JSONObject();
-        resObj2.put("MealsAdditions", jarray2);
+        resObj2.put("MealsMealAdditions", jarray2);
         FileOutputStream fos2 = null;
         try {
             fos2 = openFileOutput(FILENAME2, Context.MODE_PRIVATE);
@@ -768,7 +769,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //categories writing
         String FILENAME3 = "mealCategory.json";
         JSONArray jarray3 = new JSONArray();
-        for (Addition ad : meals_categories) {
+        for (MealAddition ad : meals_categories) {
             JSONObject jres3 = new JSONObject();
             jres3.put("RestaurantId", ad.getRestaurant_id());
             jres3.put("MealId", ad.getmeal_id());
@@ -809,15 +810,15 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         meals.add(m);
     }
 
-    public void addAddition(String restaurant_id){
-        Addition a1 = new Addition();
+    public void addMealAddition(String restaurant_id){
+        MealAddition a1 = new MealAddition();
         a1.setName("Basilicò");
         a1.setPrice(0.50);
         a1.setmeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
-        Addition a2 = new Addition();
+        MealAddition a2 = new MealAddition();
         a2.setName("Peperoncino");
         a2.setPrice(0.20);
         a2.setmeal_id("0");
@@ -828,19 +829,19 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         meals_additions.add(a2);
 
         Log.d("ccc", "ADDITIONS:");
-        for(Addition a : meals_additions){
+        for(MealAddition a : meals_additions){
             Log.d("ccc", a.getName() + " " + a.getmeal_id());
         }
     }
 
     public void addCategory(String restaurant_id){
-        Addition a1 = new Addition();
+        MealAddition a1 = new MealAddition();
         a1.setName("Pasta");
         a1.setmeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
-        Addition a2 = new Addition();
+        MealAddition a2 = new MealAddition();
         a2.setName("Piccante");
         a2.setmeal_id("0");
         a2.setSelected(true);
@@ -850,7 +851,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         meals_categories.add(a2);
 
         Log.d("ccc", "CATEGORIES:");
-        for(Addition a : meals_categories){
+        for(MealAddition a : meals_categories){
             Log.d("ccc", a.getName() + " " + a.getmeal_id());
         }
     }

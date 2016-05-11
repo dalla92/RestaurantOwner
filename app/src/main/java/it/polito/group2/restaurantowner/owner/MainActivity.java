@@ -25,6 +25,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -181,7 +182,7 @@ public class MainActivity extends AppCompatActivity
         if(id==R.id.action_user_part) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantActivity.class);
+                    UserRestaurantList.class);
             startActivity(intent1);
             return true;
         } else if (id == R.id.nav_logout) {

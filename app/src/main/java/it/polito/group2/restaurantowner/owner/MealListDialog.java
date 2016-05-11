@@ -15,6 +15,7 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.OrderMeal;
+import it.polito.group2.restaurantowner.data.OrderedMeal;
 
 /**
  * Created by TheChuck on 14/04/2016.
@@ -23,7 +24,7 @@ public class MealListDialog extends DialogFragment {
 
     private ListView list_view;
 
-    public static MealListDialog newInstance(ArrayList<OrderMeal> ordered_meals) {
+    public static MealListDialog newInstance(ArrayList<OrderedMeal> ordered_meals) {
         MealListDialog dialog = new MealListDialog();
         Bundle args = new Bundle();
         args.putSerializable("data", ordered_meals);

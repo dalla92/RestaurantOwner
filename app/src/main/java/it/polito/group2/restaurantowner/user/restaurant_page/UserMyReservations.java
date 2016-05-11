@@ -1,12 +1,8 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -19,44 +15,27 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.AbsListView;
-import android.widget.Button;
-import android.widget.CalendarView;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.json.JSONException;
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.data.TableReservation;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.owner.MainActivity;
-import it.polito.group2.restaurantowner.user.MyReviewsActivity;
-
-import com.squareup.timessquare.CalendarCellDecorator;
-import com.squareup.timessquare.CalendarPickerView;
+import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 
 /**
  * Created by Alessio on 27/04/2016.
@@ -87,7 +66,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
             current_username = (String) intent.getExtras().get("user_id");
 
         try {
-            all_table_reservations = JSONUtil.readJSONTableResList_user(context, current_username);
+            all_table_reservations = JSONUtil.readJSONTableResList(context, current_username);
         } catch (JSONException e) {
             Log.e("EXCEPTION", "EXCETPION IN READING THE FILE IN onCreate");
         }
@@ -174,7 +153,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         } else if(id==R.id.nav_my_profile) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    UserProfile.class);
             Bundle b1 = new Bundle();
             b1.putString("user_id", user_id);
             intent1.putExtras(b1);
@@ -207,7 +186,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
-        } else if(id==R.id.nav_my_favorites){
+        } else if(id==R.id.nav_my_favourites){
             Intent intent3 = new Intent(
                     getApplicationContext(),
                     UserRestaurantList.class);

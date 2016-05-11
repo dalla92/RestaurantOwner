@@ -11,8 +11,15 @@ public class OrderMeal {
     private String note;
     private MenuCategory category;
     private ArrayList<OrderMealAddition> additionList = new ArrayList<OrderMealAddition>();
+    private String name;
 
     public OrderMeal() {
+    }
+
+    public OrderMeal(String name, Integer quantity, String orderMealID){
+        this.name = name;
+        this.quantity = quantity;
+        this.orderMealID = orderMealID;
     }
 
     public OrderMeal(String orderMealID, String orderID, Meal meal, Integer quantity, String note,

@@ -23,6 +23,118 @@ import it.polito.group2.restaurantowner.owner.RestaurantService;
  */
 public class JSONUtil {
 
+    public static void saveJSONReviewList(ArrayList<Review> comments, Context context) throws JSONException {
+        String FILENAME = "commentList.json";
+        JSONArray jarray = new JSONArray();
+        for(Review com : comments){
+            JSONObject jres = new JSONObject();
+            jres.put("RestaurantId",com.getRestaurantId());
+            jres.put("Date",com.getDate());
+            jres.put("StarsNumber",com.getStars_number());
+            jres.put("Comment",com.getComment());
+            jres.put("UserPhoto",com.getUserphoto());
+            jres.put("UserId",com.getUserID());
+            jres.put("ReviewId",com.getReviewID());
+            jarray.put(jres);
+        }
+        JSONObject resObj = new JSONObject();
+        resObj.put("Comments", jarray);
+        FileOutputStream fos = null;
+        try {
+            fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(resObj.toString().getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ArrayList<User> readJSONUsersList(Context context, String usermail) throws JSONException {
+        ArrayList<User> users = new ArrayList<>();
+        String json = null;
+        FileInputStream fis = null;
+        String FILENAME = "usersList.json";
+        try {
+            fis = context.openFileInput(FILENAME);
+            int size = fis.available();
+            byte[] buffer = new byte[size];
+            fis.read(buffer);
+            fis.close();
+            json = new String(buffer, "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return users;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        JSONObject jobj = new JSONObject(json);
+        JSONArray jsonArray = jobj.optJSONArray("Users"); //root tag?
+        //Iterate the jsonArray and print the info of JSONObjects
+        for(int i=0; i < jsonArray.length(); i++){
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+            User us = new User();
+            if(usermail!=null) {
+                if (jsonObject.optString("Usermail").equals(usermail)) {
+                    //us.setUsername(jsonObject.optString("Username"));
+                    us.setPassword(jsonObject.optString("Password"));
+                    us.setFirst_name(jsonObject.optString("FirstName"));
+                    us.setLast_name(jsonObject.optString("LastName"));
+                    us.setEmail(jsonObject.optString("Usermail"));
+                    us.setPhone_number(jsonObject.optString("PhoneNum"));
+                    us.setVat_number(jsonObject.optString("VatNum"));
+                    //photo?
+                    us.setIsOwner(jsonObject.optBoolean("IsOwner"));
+                    users.add(us);
+                }
+            }
+            else{
+                //us.setUsername(jsonObject.optString("Username"));
+                us.setPassword(jsonObject.optString("Password"));
+                us.setFirst_name(jsonObject.optString("FirstName"));
+                us.setLast_name(jsonObject.optString("LastName"));
+                us.setEmail(jsonObject.optString("Usermail"));
+                us.setPhone_number(jsonObject.optString("PhoneNum"));
+                us.setVat_number(jsonObject.optString("VatNum"));
+                //photo?
+                us.setIsOwner(jsonObject.optBoolean("IsOwner"));
+                users.add(us);
+            }
+        }
+        return users;
+    }
+
+    public static void saveJSONUsersList(ArrayList<User> users, Context context) throws JSONException {
+        String FILENAME = "usersList.json";
+        JSONArray jarray = new JSONArray();
+        for(User us : users){
+            JSONObject jres = new JSONObject();
+            //jres.put("Username",us.getUsername());
+            jres.put("Password",us.getPassword());
+            jres.put("FirstName",us.getFirst_name());
+            jres.put("LastName",us.getLast_name());
+            jres.put("Usermail",us.getEmail());
+            jres.put("PhoneNum",us.getPhone_number());
+            jres.put("VatNum",us.getVat_number());
+            //photo?
+            jres.put("IsOwner",us.getIsOwner());
+            jarray.put(jres);
+        }
+        JSONObject resObj = new JSONObject();
+        resObj.put("Users", jarray);
+        FileOutputStream fos = null;
+        try {
+            fos = context.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(resObj.toString().getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void saveJSONResList(Context mContext, ArrayList<Restaurant> resList) throws JSONException {
         String FILENAME = "restaurantList.json";
         JSONArray jarray = new JSONArray();
@@ -277,7 +389,7 @@ public class JSONUtil {
             String reviewID = jsonObject.optString("Id");
             String username = jsonObject.optString("UserID");
 
-            Review review = new Review(restaurantId, username, reviewDate, comment, reviewID, null, starsNumber);
+            Review review = new Review(restaurantId, username, date, comment, reviewID, null, starsNumber);
             reviewList.add(review);
         }
 
@@ -338,6 +450,83 @@ public class JSONUtil {
             tableResList.add(table_res);
         }
         return tableResList;
+    }
+
+    public static ArrayList<TableReservation> readJSONTableResList(Context mContext, String targetRestaurantId) throws JSONException{
+        String json = null;
+        ArrayList<TableReservation> tableResList = new ArrayList<>();
+        FileInputStream fis = null;
+        String FILENAME = "tableReservation.json";
+        try {
+            fis = mContext.openFileInput(FILENAME);
+            int size = fis.available();
+            byte[] buffer = new byte[size];
+            fis.read(buffer);
+            fis.close();
+            json = new String(buffer, "UTF-8");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return tableResList;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        JSONObject jobj = new JSONObject(json);
+        JSONArray jsonArray = jobj.optJSONArray("TableReservations");
+        //Iterate the jsonArray and print the info of JSONObjects
+        for(int i=0; i < jsonArray.length(); i++){
+            JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+            String restaurantId = jsonObject.optString("RestaurantID");
+            if(!restaurantId.equals(targetRestaurantId))
+                continue;
+
+            String date = jsonObject.optString("Date");
+            SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+            Calendar c = Calendar.getInstance();
+            try {
+                c.setTime(timeFormat.parse(date));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            String username = jsonObject.optString("Username");
+            String notes = jsonObject.optString("Notes");
+            String tableReservationId = jsonObject.optString("TableReservationID");
+            int seatReserved = jsonObject.optInt("SeatReserved");
+
+            TableReservation table_res = new TableReservation(username, seatReserved, c, notes, restaurantId, tableReservationId);
+            tableResList.add(table_res);
+        }
+        return tableResList;
+    }
+
+    public static void saveJSONTableResList(Context mContext, ArrayList<TableReservation> reservations) throws JSONException {
+        String FILENAME = "tableReservation.json";
+        JSONArray jarray = new JSONArray();
+        SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+        for (TableReservation res : reservations) {
+            JSONObject jres = new JSONObject();
+            jres.put("RestaurantID", res.getRestaurantId());
+            jres.put("Date", timeFormat.format(res.getDate().getTime()));
+            jres.put("Username", res.getUsername());
+            jres.put("Notes", res.getNotes());
+            jres.put("SeatReserved", res.getN_people());
+            jres.put("TableReservationID", res.getTableReservationId());
+            jarray.put(jres);
+        }
+        JSONObject resObj = new JSONObject();
+        resObj.put("TableReservations", jarray);
+        FileOutputStream fos = null;
+        try {
+            fos = mContext.openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(resObj.toString().getBytes());
+            fos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void saveJSONTakeAwayResList(Context mContext, ArrayList<TakeAwayReservation> reservations) throws JSONException {

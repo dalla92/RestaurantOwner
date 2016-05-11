@@ -40,7 +40,7 @@ import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.Offer;
 import it.polito.group2.restaurantowner.owner.MainActivity;
-import it.polito.group2.restaurantowner.user.MyReviewsActivity;
+import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.gallery.GalleryViewActivity;
 
 public class UserRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -181,7 +181,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         } else if(id==R.id.nav_my_profile) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    UserProfile.class);
             Bundle b1 = new Bundle();
             b1.putString("user_id", user_id);
             intent1.putExtras(b1);
@@ -214,7 +214,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
-        } else if(id==R.id.nav_my_favorites){
+        } else if(id==R.id.nav_my_favourites){
             Intent intent3 = new Intent(
                     getApplicationContext(),
                     UserRestaurantList.class);
@@ -442,12 +442,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 timesList.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 int targetHeight = timesList.getMeasuredHeight();
                 ValueAnimator slideAnimator;
-                if(!clicked) {
+                if (!clicked) {
                     timesText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_time_18dp, 0, R.drawable.ic_arrow_up_18dp, 0);
                     slideAnimator = ValueAnimator.ofInt(0, targetHeight).setDuration(300);
                     clicked = true;
-                }
-                else{
+                } else {
                     timesText.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_time_18dp, 0, R.drawable.ic_arrow_down_18dp, 0);
                     slideAnimator = ValueAnimator.ofInt(targetHeight, 0).setDuration(300);
                     clicked = false;

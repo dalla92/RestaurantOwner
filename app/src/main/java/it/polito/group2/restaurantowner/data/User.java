@@ -9,7 +9,6 @@ import java.sql.Blob;
  */
 public class User {
     private String id;
-    private String username;
     private String password; //mandatory field
     private String first_name; //mandatory field
     private String last_name; //mandatory field
@@ -46,14 +45,6 @@ public class User {
 
     public Boolean getOwner() {
         return isOwner;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {

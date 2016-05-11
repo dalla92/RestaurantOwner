@@ -42,7 +42,7 @@
             android:label="@string/title_activity_add_restaurant"
             android:parentActivityName=".owner.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden" >
+            android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".owner.MainActivity" />
@@ -96,13 +96,16 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.UserRestaurantActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".user.restaurant_page.UserRestaurantList"
             android:label="@string/title_activity_user_restaurant_list"
-            android:theme="@style/AppTheme.NoActionBar" >
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".user.restaurant_page.UserTableReservationActivity"
@@ -117,8 +120,7 @@
         <activity
             android:name=".user.restaurant_page.gallery.GalleryViewActivity"
             android:label="@string/title_activity_gallery_view"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".user.restaurant_page.gallery.FullScreenGalleryActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -126,30 +128,22 @@
         <activity
             android:name=".user.my_reviews.MyReviewsActivity"
             android:label="@string/title_activity_my_reviews"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".user.restaurant_page.AddReviewActivity"
             android:label="@string/title_activity_add_reviews"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.Filter"
-            android:parentActivityName=".user.restaurant_page.UserRestaurantList"
             android:label="@string/filter"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:parentActivityName=".user.restaurant_page.UserRestaurantList"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".user.restaurant_page.FilterCategory"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
-
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".user.order.OrderActivity"
-            android:theme="@style/AppTheme.NoActionBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
         <meta-data
@@ -159,6 +153,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyALrSmimC0G6n0AKkouBalM-ZbargnPxZ4" />
 
+        <activity android:name=".user.restaurant_page.UserProfile"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

@@ -1,11 +1,17 @@
 package it.polito.group2.restaurantowner.user.my_reviews;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.MenuItem;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -13,14 +19,18 @@ import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.Review;
+import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.SimpleItemTouchHelperCallback;
-import it.polito.group2.restaurantowner.user.my_reviews.MyReviewAdapter;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
 
-public class MyReviewsActivity extends AppCompatActivity {
+public class MyReviewsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private String userID;
     private MyReviewAdapter adapter;
     private ArrayList<Review> myReviews;
+    private String user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +55,111 @@ public class MyReviewsActivity extends AppCompatActivity {
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(reviewList);
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        //TODO decomment handle logged/not logged user
+        /*
+        if(user_id==null){ //not logged
+            Menu nav_Menu = navigationView.getMenu();
+            nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
+            nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
+            nav_Menu.findItem(R.id.nav_my_reservations).setVisible(false);
+            nav_Menu.findItem(R.id.nav_my_reviews).setVisible(false);
+            nav_Menu.findItem(R.id.nav_my_favorites).setVisible(false);
+        }
+        else{ //logged
+            //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
+        }
+        */
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(id==R.id.nav_owner){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    MainActivity.class);
+            Bundle b1 = new Bundle();
+            b1.putString("user_id", user_id);
+            intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        }
+        else if(id==R.id.nav_home){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+            Bundle b1 = new Bundle();
+            b1.putString("user_id", user_id);
+            intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        }
+        else if(id==R.id.nav_login){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.nav_my_profile) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserProfile.class);
+            Bundle b1 = new Bundle();
+            b1.putString("user_id", user_id);
+            intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.nav_my_orders) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+            Bundle b1 = new Bundle();
+            b1.putString("user_id", user_id);
+            intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.nav_my_reservations){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    UserMyReservations.class);
+            Bundle b3 = new Bundle();
+            b3.putString("user_id", user_id);
+            intent3.putExtras(b3);
+            startActivity(intent3);
+            return true;
+        } else if(id==R.id.nav_my_reviews){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    MyReviewsActivity.class);
+            Bundle b3 = new Bundle();
+            b3.putString("user_id", user_id);
+            intent3.putExtras(b3);
+            startActivity(intent3);
+            return true;
+        } else if(id==R.id.nav_my_favourites){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+            Bundle b3 = new Bundle();
+            b3.putString("user_id", user_id);
+            intent3.putExtras(b3);
+            startActivity(intent3);
+            return true;
+        }
+
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     private ArrayList<Review> getReviewsJson() {
