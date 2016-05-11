@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.takeaway;
+package it.polito.group2.restaurantowner.user.order;
 
 /**
  * Created by Filippo on 10/05/2016.

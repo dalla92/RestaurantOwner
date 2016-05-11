@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.takeaway;
+package it.polito.group2.restaurantowner.user.order;
 
 import android.content.Context;
 import android.net.Uri;
@@ -65,7 +65,7 @@ public class CartFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_takeaway_cart, container, false);
+        return inflater.inflate(R.layout.fragment_order_cart, container, false);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

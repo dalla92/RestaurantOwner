@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.takeaway;
+package it.polito.group2.restaurantowner.user.order;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;

@@ -2,11 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="it.polito.group2.restaurantowner.user.takeaway.InfoFragment">
+    tools:context=".user.order.AdditionFragment">
 
     <item
-        android:id="@+id/action_add"
-        android:title="@string/takeaway_addtocart"
+        android:id="@+id/action_next"
+        android:title="@string/order_nextstep"
         app:showAsAction="ifRoom"
         />
 </menu>

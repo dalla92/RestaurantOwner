@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.takeaway;
+package it.polito.group2.restaurantowner.user.order;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -49,7 +49,7 @@ public class AdditionFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_takeaway_addition, container, false);
+        View view = inflater.inflate(R.layout.fragment_order_addition, container, false);
         return view;
     }
 
@@ -115,7 +115,7 @@ public class AdditionFragment extends ListFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_takeaway_addition, menu);
+        inflater.inflate(R.menu.menu_order_addition, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

@@ -1,7 +1,6 @@
-package it.polito.group2.restaurantowner.user.takeaway;
+package it.polito.group2.restaurantowner.user.order;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +22,7 @@ public class AdditionArrayAdapter extends ArrayAdapter<AdditionModel> {
     private final Activity context;
 
     public AdditionArrayAdapter(Activity context, List<AdditionModel> list) {
-        super(context, R.layout.fragment_takeaway_addition_item, list);
+        super(context, R.layout.fragment_order_addition_item, list);
         this.context = context;
         this.list = list;
     }
@@ -38,7 +37,7 @@ public class AdditionArrayAdapter extends ArrayAdapter<AdditionModel> {
         View view = null;
         if (convertView == null) {
             LayoutInflater inflator = context.getLayoutInflater();
-            view = inflator.inflate(R.layout.fragment_takeaway_addition_item, null);
+            view = inflator.inflate(R.layout.fragment_order_addition_item, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
             viewHolder.checkbox = (CheckBox) view.findViewById(R.id.check);

@@ -1,7 +1,6 @@
-package it.polito.group2.restaurantowner.user.takeaway;
+package it.polito.group2.restaurantowner.user.order;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,7 +9,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -48,7 +46,7 @@ public class InfoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_takeaway_info, container, false);
+        View view = inflater.inflate(R.layout.fragment_order_info, container, false);
         return view;
     }
 
@@ -76,7 +74,7 @@ public class InfoFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_takeaway_addition, menu);
+        inflater.inflate(R.menu.menu_order_addition, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

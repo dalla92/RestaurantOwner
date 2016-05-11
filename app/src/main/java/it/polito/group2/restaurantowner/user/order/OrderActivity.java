@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.takeaway;
+package it.polito.group2.restaurantowner.user.order;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -9,13 +9,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 
-public class TakeawayActivity extends AppCompatActivity
+public class OrderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MenuCategoryFragment.OnMenuCategorySelectedListener,
         MealFragment.OnMealSelectedListener,
@@ -28,7 +27,7 @@ public class TakeawayActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_takeaway);
+        setContentView(R.layout.activity_order);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -140,6 +139,6 @@ public class TakeawayActivity extends AppCompatActivity
 
     public void onAddClicked(String restaurantID, String menuCategoryID,
                              String mealID, ArrayList<String> listAdditionID) {
-        //Toast.makeText(TakeawayActivity.this, "Ciao", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(OrderActivity.this, "Ciao", Toast.LENGTH_SHORT).show();
     }
 }

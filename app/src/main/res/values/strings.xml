@@ -182,13 +182,10 @@
     <string name="title_activity_gallery_view">Gallery</string>
     <string name="title_activity_my_reviews">MyReviewsActivity</string>
 
-    <!-- Takeaway Activity -->
-    <string name="takeaway_nextstep">Next</string>
-    <string name="takeaway_addtocart">Add</string>
-    <string name="takeaway_mealquantity">Add quantity</string>
-    <string name="takeaway_mealnote">Additional note</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Order Activity -->
+    <string name="order_nextstep">Next</string>
+    <string name="order_addtocart">Add</string>
+    <string name="order_mealquantity">Add quantity</string>
+    <string name="order_mealnote">Additional note</string>
 
 </resources>

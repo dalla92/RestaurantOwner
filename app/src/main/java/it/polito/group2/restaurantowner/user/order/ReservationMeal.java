@@ -1,6 +1,4 @@
-package it.polito.group2.restaurantowner.user.takeaway;
-
-import android.graphics.Bitmap;
+package it.polito.group2.restaurantowner.user.order;
 
 import java.util.ArrayList;
 

@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_gravity="center_horizontal|top"
-    tools:context="it.polito.group2.restaurantowner.user.takeaway.InfoFragment">
+    tools:context="it.polito.group2.restaurantowner.user.order.InfoFragment">
 
     <EditText
-        android:hint="@string/takeaway_mealquantity"
+        android:hint="@string/order_mealquantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="number"
@@ -16,7 +16,7 @@
         android:layout_gravity="center"/>
 
     <EditText
-        android:hint="@string/takeaway_mealnote"
+        android:hint="@string/order_mealnote"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"

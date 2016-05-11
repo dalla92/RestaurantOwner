@@ -1,17 +1,13 @@
-package it.polito.group2.restaurantowner.user.takeaway;
+package it.polito.group2.restaurantowner.user.order;
 
-import android.app.Activity;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.MenuCategory;
@@ -41,7 +37,7 @@ public class MenuCategoryFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_takeaway_menucategory, container, false);
+        View view = inflater.inflate(R.layout.fragment_order_menucategory, container, false);
         return view;
     }
 
