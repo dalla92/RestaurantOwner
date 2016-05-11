@@ -7,6 +7,10 @@ public class Offer {
     private Calendar from, to;
     private boolean lunch,dinner;
 
+    public Offer(){
+
+    }
+
     public Offer(String offerId, String restaurantId, String name, String description, Calendar from, Calendar to, boolean lunch, boolean dinner) {
         this.name = name;
         this.description = description;
@@ -17,6 +21,8 @@ public class Offer {
         this.offerId = offerId;
         this.restaurantId = restaurantId;
     }
+
+
 
     public String getOfferId() {
         return offerId;
@@ -48,5 +54,37 @@ public class Offer {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setOfferId(String offerId) {
+        this.offerId = offerId;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
+    public void setFrom(Calendar from) {
+        this.from = from;
+    }
+
+    public void setTo(Calendar to) {
+        this.to = to;
+    }
+
+    public void setLunch(boolean lunch) {
+        this.lunch = lunch;
+    }
+
+    public void setDinner(boolean dinner) {
+        this.dinner = dinner;
     }
 }

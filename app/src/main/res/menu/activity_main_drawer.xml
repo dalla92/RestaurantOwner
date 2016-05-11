@@ -4,6 +4,11 @@
     <group android:checkableBehavior="single">
 
         <item
+            android:id="@+id/action_user_part"
+            android:title="@string/action_user_part"
+            android:icon="@drawable/blank_profile" />
+
+        <item
             android:id="@+id/nav_logout"
             android:icon="@drawable/ic_menu_share"
             android:title="Logout" />

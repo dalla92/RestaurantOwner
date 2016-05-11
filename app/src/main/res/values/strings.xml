@@ -182,6 +182,17 @@
     <string name="title_activity_gallery_view">Gallery</string>
     <string name="title_activity_my_reviews">MyReviewsActivity</string>
 
+    <!-- Takeaway Activity -->
+    <string name="next">Next</string>
+    <string name="action_my_restaurants">My Restaurants</string>
+    <string name="action_gallery">Gallery</string>
+    <string name="action_user_part">User Part</string>
+    <string name="title_activity_add_reviews">Add a review</string>
+    <string name="my_profile">My Profile</string>
+    <string name="my_orders">My Orders</string>
+    <string name="my_reviews">My Reviews</string>
+    <string name="my_reservations">My Reservations</string>
+    <string name="my_favourites">My Favourites</string>
     <!-- Order Activity -->
     <string name="order_nextstep">Next</string>
     <string name="order_addtocart">Add</string>

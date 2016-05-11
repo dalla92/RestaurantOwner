@@ -53,8 +53,10 @@ import java.util.Set;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
 import it.polito.group2.restaurantowner.owner.RestaurantPreviewAdapter;
+import it.polito.group2.restaurantowner.user.MyReviewsActivity;
 
 public class UserRestaurantList extends AppCompatActivity
 //      FirebaseLoginBaseActivity
@@ -73,12 +75,20 @@ public class UserRestaurantList extends AppCompatActivity
     private GeoFire geoFire;
     private GeoQuery geoQuery;
     HashMap<String,GeoLocation> resNearby = new HashMap<>();
+    private String user_id;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_restaurant_list);
+
+        //get data
+        Intent intent = getIntent();
+        if(intent.getExtras()!=null && intent.getExtras().get("user_id")!=null)
+            user_id = (String) intent.getExtras().get("user_id");
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -130,14 +140,29 @@ public class UserRestaurantList extends AppCompatActivity
         mAdapter = new UserRestaurantPreviewAdapter(getData(), this);
         mRecyclerView.setAdapter(mAdapter);
 
+        //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        //TODO decomment handle logged/not logged user
+        /*
+        if(user_id==null){ //not logged
+            Menu nav_Menu = navigationView.getMenu();
+            nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
+            nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
+            nav_Menu.findItem(R.id.nav_my_reservations).setVisible(false);
+            nav_Menu.findItem(R.id.nav_my_reviews).setVisible(false);
+            nav_Menu.findItem(R.id.nav_my_favorites).setVisible(false);
+        }
+        else{ //logged
+            //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
+        }
+        */
+
     }
 
     @Override
@@ -199,39 +224,39 @@ public class UserRestaurantList extends AppCompatActivity
     }
 
 
-/*    @Override
-    protected Firebase getFirebaseRef() {
-        Firebase rootRef = new Firebase("https://flickering-fire-455.firebaseio.com/my/data");
-        // TODO: Return your Firebase ref
-        return rootRef;
-    }
+    /*    @Override
+        protected Firebase getFirebaseRef() {
+            Firebase rootRef = new Firebase("https://flickering-fire-455.firebaseio.com/my/data");
+            // TODO: Return your Firebase ref
+            return rootRef;
+        }
 
-    @Override
-    protected void onFirebaseLoginProviderError(FirebaseLoginError firebaseLoginError) {
-        // TODO: Handle an error from the authentication provider
-    }
+        @Override
+        protected void onFirebaseLoginProviderError(FirebaseLoginError firebaseLoginError) {
+            // TODO: Handle an error from the authentication provider
+        }
 
-    @Override
-    protected void onFirebaseLoginUserError(FirebaseLoginError firebaseLoginError) {
-        // TODO: Handle an error from the user
-    }
+        @Override
+        protected void onFirebaseLoginUserError(FirebaseLoginError firebaseLoginError) {
+            // TODO: Handle an error from the user
+        }
 
-    @Override
-    public void onFirebaseLoggedIn(AuthData authData) {
-        // TODO: Handle successful login displaying user info in the drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        TextView username = (TextView) drawer.findViewById(R.id.navHeaderUsername);
-        TextView email = (TextView) drawer.findViewById(R.id.navHeaderEmail);
-        username.setText(authData.getUid());
+        @Override
+        public void onFirebaseLoggedIn(AuthData authData) {
+            // TODO: Handle successful login displaying user info in the drawer
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            TextView username = (TextView) drawer.findViewById(R.id.navHeaderUsername);
+            TextView email = (TextView) drawer.findViewById(R.id.navHeaderEmail);
+            username.setText(authData.getUid());
 
-    }
+        }
 
-    @Override
-    public void onFirebaseLoggedOut() {
-        // TODO: Handle logout
-    }
+        @Override
+        public void onFirebaseLoggedOut() {
+            // TODO: Handle logout
+        }
 
-*/
+    */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
@@ -256,12 +281,80 @@ public class UserRestaurantList extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.nav_login) {
-//            showFirebaseLoginPrompt();
-        } else if (id == R.id.nav_manage) {
-        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(id==R.id.nav_owner){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    MainActivity.class);
+            Bundle b1 = new Bundle();
+            b1.putString("user_id", user_id);
+            intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        }
+        else if(id==R.id.nav_home){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+                Bundle b1 = new Bundle();
+                b1.putString("user_id", user_id);
+                intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        }
+        else if(id==R.id.nav_login){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.nav_my_profile) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+                Bundle b1 = new Bundle();
+                b1.putString("user_id", user_id);
+                intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.nav_my_orders) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+                Bundle b1 = new Bundle();
+                b1.putString("user_id", user_id);
+                intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.nav_my_reservations){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    UserMyReservations.class);
+            Bundle b3 = new Bundle();
+                b3.putString("user_id", user_id);
+                intent3.putExtras(b3);
+                startActivity(intent3);
+            return true;
+        } else if(id==R.id.nav_my_reviews){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    MyReviewsActivity.class);
+            Bundle b3 = new Bundle();
+                b3.putString("user_id", user_id);
+                intent3.putExtras(b3);
+                startActivity(intent3);
+            return true;
+        } else if(id==R.id.nav_my_favorites){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+            Bundle b3 = new Bundle();
+                b3.putString("user_id", user_id);
+                intent3.putExtras(b3);
+                startActivity(intent3);
+            return true;
+        }
+
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -277,16 +370,16 @@ public class UserRestaurantList extends AppCompatActivity
         return resList;
     }
 
-/*    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        Set<String> keySet = resNearby.keySet();
-        for(String key : keySet){
-            map.addMarker(new MarkerOptions()
-                    .position(new LatLng(resNearby.get(key).latitude, resNearby.get(key).longitude))
-                    .title(key));
+    /*    @Override
+        public void onMapReady(GoogleMap googleMap) {
+            Set<String> keySet = resNearby.keySet();
+            for(String key : keySet){
+                map.addMarker(new MarkerOptions()
+                        .position(new LatLng(resNearby.get(key).latitude, resNearby.get(key).longitude))
+                        .title(key));
+            }
         }
-    }
-*/
+    */
     @Override
     public void onConnected(Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -340,40 +433,40 @@ public class UserRestaurantList extends AppCompatActivity
                 .show();
     }
 
-/*    @Override
-    public void onKeyEntered(String key, GeoLocation location) {
-        //TODO search for the restaurant
-        resNearby.put(key,location);
+    /*    @Override
+        public void onKeyEntered(String key, GeoLocation location) {
+            //TODO search for the restaurant
+            resNearby.put(key,location);
 
-    }
+        }
 
-    @Override
-    public void onKeyExited(String key) {
-        //TODO remove restaurant from the adapter
-        resNearby.remove(key);
-    }
+        @Override
+        public void onKeyExited(String key) {
+            //TODO remove restaurant from the adapter
+            resNearby.remove(key);
+        }
 
-    @Override
-    public void onKeyMoved(String key, GeoLocation location) {
+        @Override
+        public void onKeyMoved(String key, GeoLocation location) {
 
-    }
+        }
 
-    @Override
-    public void onGeoQueryReady() {
-        //TODO query the Firebase database with resNearby
-    }
+        @Override
+        public void onGeoQueryReady() {
+            //TODO query the Firebase database with resNearby
+        }
 
-    @Override
-    public void onGeoQueryError(FirebaseError error) {
-        new AlertDialog.Builder(this)
-                .setTitle("Error")
-                .setMessage("There was an unexpected error querying GeoFire: " + error.getMessage())
-                .setPositiveButton(android.R.string.ok, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
+        @Override
+        public void onGeoQueryError(FirebaseError error) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Error")
+                    .setMessage("There was an unexpected error querying GeoFire: " + error.getMessage())
+                    .setPositiveButton(android.R.string.ok, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
 
-    }
-*/
+        }
+    */
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 
         private int spanCount;

@@ -4,15 +4,24 @@
     <group android:checkableBehavior="single">
 
         <item
-            android:id="@+id/action_edit_cover"
-            android:title="@string/action_edit_cover"
-            android:icon="@drawable/ic_menu_gallery" />
+            android:id="@+id/action_my_restaurants"
+            android:title="@string/action_my_restaurants"
+            android:icon="@mipmap/ic_forks" />
 
         <item
             android:id="@+id/action_edit"
             android:title="@string/action_edit"
             android:icon="@drawable/ic_edit_primary_24dp"/>
 
+        <item
+            android:id="@+id/action_edit_cover"
+            android:title="@string/action_edit_cover"
+            android:icon="@drawable/ic_menu_camera" />
+
+        <item
+            android:id="@+id/action_gallery"
+            android:title="@string/action_gallery"
+            android:icon="@drawable/ic_menu_gallery" />
 
         <item
             android:id="@+id/action_menu"

@@ -2,6 +2,8 @@ package it.polito.group2.restaurantowner.data;
 
 import android.graphics.Bitmap;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
 
@@ -13,10 +15,18 @@ public class Review implements Comparable<Review>{
     public Review() {
     }
 
-    public Review(String restaurantId, String userID, Calendar date, String comment, String reviewID, Bitmap picture, float stars_number) {
+    public Review(String restaurantId, String userID, String date, String comment, String reviewID, String picture, float stars_number) {
         this.restaurantId = restaurantId;
         this.userID = userID;
-        this.date = date;
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
+        try {
+            c.setTime(format.parse(date));
+        }
+        catch(ParseException e){
+            e.printStackTrace();
+        }
+        this.date = c;
         this.comment = comment;
         this.reviewID = reviewID;
         this.stars_number = stars_number;

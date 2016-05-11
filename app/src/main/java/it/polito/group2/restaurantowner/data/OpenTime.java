@@ -11,6 +11,10 @@ public class OpenTime {
     private String openHour;
     private String closeHour;
 
+    public OpenTime(){
+
+    }
+
     public String getRestaurantId() {
         return restaurantId;
     }
@@ -59,4 +63,7 @@ public class OpenTime {
         this.closeHour = closeHour;
     }
 
+    public void setOpen(boolean open) {
+        isOpen = open;
+    }
 }

@@ -7,7 +7,10 @@ public class TableReservation {
     private int n_people;
     private Calendar date;
 
-    public TableReservation(String username, int n_people, Calendar date, String notes, String restaurantId, String tableReservationId) {
+    public TableReservation() {
+    }
+
+        public TableReservation(String username, int n_people, Calendar date, String notes, String restaurantId, String tableReservationId) {
         this.username = username;
         this.notes = notes;
         this.n_people = n_people;
@@ -39,4 +42,29 @@ public class TableReservation {
     public Calendar getDate() {
         return date;
     }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public void setRestaurantId(String restaurantId) {
+        this.restaurantId = restaurantId;
+    }
+
+    public void setTableReservationId(String tableReservationId) {
+        this.tableReservationId = tableReservationId;
+    }
+
+    public void setN_people(int n_people) {
+        this.n_people = n_people;
+    }
+
+    public void setDate(Calendar date) {
+        this.date = date;
+    }
+
 }

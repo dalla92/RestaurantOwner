@@ -45,17 +45,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Review;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.data.Review;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class Restaurant_page extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -71,8 +70,9 @@ public class Restaurant_page extends AppCompatActivity
     public int REQUEST_TAKE_PHOTO = 1;
     public int MODIFY_INFO = 4;
     public String photouri = null;
-    public ArrayList<Review> reviews = new ArrayList<>();
+    public ArrayList<Review> comments = new ArrayList<>();
     public Restaurant my_restaurant = null;
+    public Context context;
 
     /*private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int SELECT_PICTURE = 2;
@@ -83,24 +83,26 @@ public class Restaurant_page extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_page);
 
+        context = this;
+
         //get the right restaurant
         Bundle b = getIntent().getExtras();
         if(b!=null)
             restaurant_id = b.getString("RestaurantId");
         //get data
         try {
-            resList = readJSONResList();
+            resList = JSONUtil.readJSONResList(context);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        addComments(restaurant_id);
+        addReviews(restaurant_id);
         try {
-            saveJSONComList();
+            JSONUtil.saveJSONReviewList(comments, context);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         try {
-            reviews = readJSONComList();
+            comments = JSONUtil.readJSONReviewList(context, restaurant_id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -139,12 +141,12 @@ public class Restaurant_page extends AppCompatActivity
         if(my_restaurant !=null && my_restaurant.getPhoneNum()!=null)
             edit_restaurant_telephone_number.setText(my_restaurant.getPhoneNum());
 
-        //navigation drawer
+        //toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle(my_restaurant.getName());
 
-
+        //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -179,7 +181,7 @@ public class Restaurant_page extends AppCompatActivity
         LinearLayoutManager llm = new LinearLayoutManager(this);
         rv.setLayoutManager(llm);
         rv.setHasFixedSize(true);
-        initializeAdapterComments();
+        initializeAdapterReviews();
         final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
         NestedScrollView scroll = (NestedScrollView) findViewById(R.id.parent_scroll);
         scroll.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
@@ -234,8 +236,7 @@ public class Restaurant_page extends AppCompatActivity
                                 intent.setAction(Intent.ACTION_GET_CONTENT);
                                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
                                 return true;
-                            }
-                            else {
+                            } else {
                                 return true;
                             }
                         }
@@ -277,7 +278,7 @@ public class Restaurant_page extends AppCompatActivity
     public void onPause() {
         super.onPause();  // Always call the superclass method first
         try {
-            saveJSONResList();
+            JSONUtil.saveJSONResList(context, resList);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -324,7 +325,29 @@ public class Restaurant_page extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id == R.id.action_menu) {
+        if(id==R.id.action_user_part) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantActivity.class);
+            startActivity(intent1);
+            return true;
+        }
+        else if(id==R.id.action_my_restaurants){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    MainActivity.class);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_gallery) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    GalleryActivity.class);
+            Bundle b = new Bundle();
+            b.putString("restaurant_id", restaurant_id);
+            intent1.putExtras(b);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_menu) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
                     MenuRestaurant_page.class);
@@ -415,7 +438,7 @@ public class Restaurant_page extends AppCompatActivity
                 my_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
             }
             try {
-                saveJSONResList();
+                JSONUtil.saveJSONResList(context, resList);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -448,7 +471,7 @@ public class Restaurant_page extends AppCompatActivity
                 Log.d("aaa", "MY RESTAURANT IS NULL");
             my_restaurant.setPhotoUri(photouri);
             try {
-                saveJSONResList();
+                JSONUtil.saveJSONResList(context, resList);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -511,17 +534,17 @@ public class Restaurant_page extends AppCompatActivity
     }
 
     /*
-    private void initializeComments(){
+    private void initializeReviews(){
         comments = new ArrayList<>();
-        comments.add(new Comment("0", "Turi Lecce", "01/02/2003", 1, "@mipmap/ic_launcher", "Ah chi ni sacciu mba")); //or int photoId R.mipmap.ic_launcher
-        comments.add(new Comment("0", "Iaffiu u cuttu", "11/06/2002", 2.7, "@mipmap/money_icon", "Cosa assai"));
-        comments.add(new Comment("0", "Iano Papale", "21/12/2001", 5, "@mipmap/image_preview_black", "Fussi pi mia ci tunnassi, ma appi problemi cu me soggira ca ogni bota si lassa curriri de scali, iu no sacciu va."));
-        comments.add(new Comment("0", "Tano Sghei", "22/05/2000", 3.4, "@mipmap/image_preview_black", "M'uccullassi n'autra vota. Turi ci emu?"));
+        comments.add(new Review("0", "Turi Lecce", "01/02/2003", 1, "@mipmap/ic_launcher", "Ah chi ni sacciu mba")); //or int photoId R.mipmap.ic_launcher
+        comments.add(new Review("0", "Iaffiu u cuttu", "11/06/2002", 2.7, "@mipmap/money_icon", "Cosa assai"));
+        comments.add(new Review("0", "Iano Papale", "21/12/2001", 5, "@mipmap/image_preview_black", "Fussi pi mia ci tunnassi, ma appi problemi cu me soggira ca ogni bota si lassa curriri de scali, iu no sacciu va."));
+        comments.add(new Review("0", "Tano Sghei", "22/05/2000", 3.4, "@mipmap/image_preview_black", "M'uccullassi n'autra vota. Turi ci emu?"));
     }
     */
 
-    private void initializeAdapterComments(){
-        Adapter_Comments adapter = new Adapter_Comments(reviews, this.getApplicationContext());
+    private void initializeAdapterReviews(){
+        Adapter_Reviews adapter = new Adapter_Reviews(comments, this.getApplicationContext());
         rv.setAdapter(adapter);
     }
 
@@ -531,21 +554,21 @@ public class Restaurant_page extends AppCompatActivity
         final int original_comment_height=comment.getMeasuredHeight();
         int i;
         String comment_start = comment.getText().toString().substring(0, 7);
-        for(i=0; i< reviews.size(); i++){
-            if(comment_start.equals(reviews.get(i).getComment().substring(0, 7)))
+        for(i=0; i<comments.size(); i++){
+            if(comment_start.equals(comments.get(i).getComment().substring(0, 7)))
                 break;
         }
         if(!card_view_clicked) {
             card_view_clicked=true;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, 300, 1f);
             comment.setMaxLines(Integer.MAX_VALUE);
-            comment.setText(reviews.get(i).getComment());
+            comment.setText(comments.get(i).getComment());
             comment.setLayoutParams(lp);
         }
         else {
             card_view_clicked=false;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, v.getLayoutParams().height, 1f);
-            String comment_ell = reviews.get(i).getComment().substring(0, 7);
+            String comment_ell = comments.get(i).getComment().substring(0, 7);
             comment_ell = comment_ell + getResources().getString(R.string.show_more);
             comment.setText(comment_ell);
             comment.setMaxLines(2);
@@ -572,172 +595,14 @@ public class Restaurant_page extends AppCompatActivity
         button_choose_photo2.setVisibility(View.GONE);
     }
 
-    public ArrayList<Restaurant> readJSONResList() throws JSONException {
-        resList = new ArrayList<>();
-        String json = null;
-        FileInputStream fis = null;
-        String FILENAME = "restaurantList.json";
-        try {
-            fis = openFileInput(FILENAME);
-            int size = fis.available();
-            byte[] buffer = new byte[size];
-            fis.read(buffer);
-            fis.close();
-            json = new String(buffer, "UTF-8");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return resList;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        JSONObject jobj = new JSONObject(json);
-        JSONArray jsonArray = jobj.optJSONArray("Restaurants");
-        //Iterate the jsonArray and print the info of JSONObjects
-        for(int i=0; i < jsonArray.length(); i++){
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            Restaurant res = new Restaurant();
-            res.setRestaurantId(jsonObject.optString("RestaurantId"));
-            res.setPhotoUri(jsonObject.optString("Photo"));
-            res.setAddress(jsonObject.optString("Address"));
-            res.setCategory(jsonObject.optString("Category"));
-            res.setClosestBus(jsonObject.optString("ClosestBus"));
-            res.setClosestMetro(jsonObject.optString("ClosestMetro"));
-            res.setFidelity(jsonObject.getBoolean("Fidelity"));
-            res.setName(jsonObject.optString("Name"));
-            res.setOrdersPerHour(jsonObject.optString("OrdersPerHour"));
-            res.setPhoneNum(jsonObject.optString("PhoneNum"));
-            res.setRating(jsonObject.optString("Rating"));
-            res.setReservationNumber(jsonObject.optString("ReservationNumber"));
-            res.setReservedPercentage(jsonObject.optString("ReservationPercentage"));
-            res.setSquaredMeters(jsonObject.optString("SquaredMeters"));
-            res.setTableReservation(jsonObject.getBoolean("TableReservation"));
-            res.setTableNum(jsonObject.optString("TableNum"));
-            res.setTakeAway(jsonObject.getBoolean("TakeAway"));
-            res.setUserId(jsonObject.optString("UserId"));
-            resList.add(res);
-        }
-        return resList;
-    }
-
-    public ArrayList<Review> readJSONComList() throws JSONException {
-        reviews = new ArrayList<>();
-        String json = null;
-        FileInputStream fis = null;
-        String FILENAME = "commentList.json";
-        try {
-            fis = openFileInput(FILENAME);
-            int size = fis.available();
-            byte[] buffer = new byte[size];
-            fis.read(buffer);
-            fis.close();
-            json = new String(buffer, "UTF-8");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return reviews;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        JSONObject jobj = new JSONObject(json);
-        JSONArray jsonArray = jobj.optJSONArray("Comments"); //root tag?
-        //Iterate the jsonArray and print the info of JSONObjects
-        for(int i=0; i < jsonArray.length(); i++){
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            Review com = new Review();
-            if(jsonObject.optString("RestaurantId").equals(restaurant_id)){ //I read only the comments of my restaurant
-                com.setRestaurantId(jsonObject.optString("RestaurantId")); //optInt or optString?
-                SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy");
-                Calendar date = Calendar.getInstance();
-                try {
-                    date.setTime(format.parse(jsonObject.optString("Date")));
-                    com.setDate(date);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                com.setStars_number(jsonObject.optInt("StarsNumber")); //optInt or optString?
-                com.setComment(jsonObject.optString("Comment"));
-                com.setUserphoto(jsonObject.optString("UserPhoto"));
-                com.setUserID(jsonObject.optString("Username"));
-                reviews.add(com);
-            }
-        }
-        return reviews;
-    }
-
-    public void saveJSONResList() throws JSONException {
-        String FILENAME = "restaurantList.json";
-        JSONArray jarray = new JSONArray();
-        for(Restaurant res : resList){
-            JSONObject jres = new JSONObject();
-            jres.put("RestaurantId",res.getRestaurantId());
-            jres.put("Photo",res.getPhotoUri());
-            jres.put("Address",res.getAddress());
-            jres.put("Category",res.getCategory());
-            jres.put("ClosestBus",res.getClosestBus());
-            jres.put("ClosestMetro",res.getClosestMetro());
-            jres.put("Fidelity",res.isFidelity());
-            jres.put("Name",res.getName());
-            jres.put("OrdersPerHour",res.getOrdersPerHour());
-            jres.put("PhoneNum",res.getPhoneNum());
-            jres.put("Rating",res.getRating());
-            jres.put("ReservationNumber",res.getReservationNumber());
-            jres.put("ReservationPercentage",res.getReservedPercentage());
-            jres.put("SquaredMeters",res.getSquaredMeters());
-            jres.put("TableReservation",res.isTableReservation());
-            jres.put("TableNum",res.getTableNum());
-            jres.put("TakeAway",res.isTakeAway());
-            jres.put("UserId",res.getUserId());
-            jarray.put(jres);
-        }
-        JSONObject resObj = new JSONObject();
-        resObj.put("Restaurants", jarray);
-        FileOutputStream fos = null;
-        try {
-            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            fos.write(resObj.toString().getBytes());
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void saveJSONComList() throws JSONException {
-        String FILENAME = "commentList.json";
-        JSONArray jarray = new JSONArray();
-        for(Review com : reviews){
-            JSONObject jres = new JSONObject();
-            jres.put("RestaurantId",com.getRestaurantId());
-            jres.put("Date",com.getDate());
-            jres.put("StarsNumber",com.getStars_number());
-            jres.put("Comment",com.getComment());
-            jres.put("UserPhoto",com.getUserphoto());
-            jres.put("Username",com.getUserID());
-            jarray.put(jres);
-        }
-        JSONObject resObj = new JSONObject();
-        resObj.put("Comments", jarray);
-        FileOutputStream fos = null;
-        try {
-            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            fos.write(resObj.toString().getBytes());
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void addComments(String restaurant_id){
+    public void addReviews(String restaurant_id){
         Review c1 = new Review();
         c1.setUserID("Salvatore Grasso");
         c1.setRestaurantId(restaurant_id);
         c1.setComment("Mi è piaciuto tanto");
         c1.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c1.setStars_number(4);
-        reviews.add(c1);
+        comments.add(c1);
 
         Review c2 = new Review();
         c2.setUserID("Karl");
@@ -745,7 +610,7 @@ public class Restaurant_page extends AppCompatActivity
         c2.setComment("Non ho visto di meglio.............................................");
         c2.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c2.setStars_number(5);
-        reviews.add(c2);
+        comments.add(c2);
 
         Review c3 = new Review();
         c3.setUserID("Angelo Spada");
@@ -753,7 +618,7 @@ public class Restaurant_page extends AppCompatActivity
         c3.setComment("Non siti cosa");
         c3.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c3.setStars_number(1);
-        reviews.add(c3);
+        comments.add(c3);
 
         Review c4 = new Review();
         c4.setUserID("Pina");
@@ -761,7 +626,7 @@ public class Restaurant_page extends AppCompatActivity
         c4.setComment("Pessimo");
         c4.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c4.setStars_number(0);
-        reviews.add(c4);
+        comments.add(c4);
     }
 
     public void addRestaurants(){

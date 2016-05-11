@@ -26,6 +26,9 @@ public class Restaurant implements Serializable{
     private String reservedPercentage;
     private String priceRange;
 
+
+    public Restaurant(){ }
+
     @Override
     public String toString() {
         return "Restaurant{" +
@@ -50,7 +53,6 @@ public class Restaurant implements Serializable{
                 '}';
     }
 
-    public Restaurant(){ }
 
     public String getName() {
         return name;
@@ -123,6 +125,8 @@ public class Restaurant implements Serializable{
     public void setTableReservation(boolean tableReservation) {
         this.tableReservation = tableReservation;
     }
+
+
 
     public boolean isTakeAway() {
         return takeAway;

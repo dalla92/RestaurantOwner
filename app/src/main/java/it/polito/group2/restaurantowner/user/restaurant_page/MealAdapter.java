@@ -1,9 +1,6 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
-import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +10,6 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.Meal;
-import it.polito.group2.restaurantowner.data.MenuCategory;
 
 /**
  * Created by TheChuck on 07/05/2016.

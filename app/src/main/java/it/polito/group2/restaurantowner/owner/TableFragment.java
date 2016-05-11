@@ -73,7 +73,7 @@ public class TableFragment extends Fragment {
 
                 SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 TextView text_client_name = (TextView) convertView.findViewById(R.id.reservation_client);
-                TextView text_time = (TextView) convertView.findViewById(R.id.reservation_time);
+                TextView text_time = (TextView) convertView.findViewById(R.id.table_reservation_time);
                 TextView text_people = (TextView) convertView.findViewById(R.id.reservation_people);
                 TextView text_notes = (TextView) convertView.findViewById(R.id.reservation_notes);
 

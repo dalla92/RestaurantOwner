@@ -29,8 +29,8 @@
         android:layout_gravity="center_horizontal"
         android:stepSize="0.5"
         android:rating="0.0"
-        android:theme="@style/RatingBar"
         />
+    <!-- android:theme="@style/RatingBar" -->
 
     <EditText
         android:id="@+id/edit_review_comment"

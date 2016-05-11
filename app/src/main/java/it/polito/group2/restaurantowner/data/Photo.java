@@ -14,6 +14,10 @@ public class Photo {
     private String uploadTime;
     private Restaurant photoOwner;
 
+    public Photo(){
+
+    }
+
     public Photo(String imageByte) {
         byte[] b = Base64.decode(imageByte, Base64.DEFAULT);
         bitmap = BitmapFactory.decodeByteArray(b, 0, b.length);
@@ -22,6 +26,7 @@ public class Photo {
         uploadTime = "";
         photoOwner = null;
     }
+
 
     public Photo(Bitmap image) {
         bitmap = image;

@@ -91,6 +91,8 @@ public class Meal implements Serializable{
         this.meal_categories = meal_categories;
     }
 
+
+
     public boolean isTake_away() {
         return take_away;
     }

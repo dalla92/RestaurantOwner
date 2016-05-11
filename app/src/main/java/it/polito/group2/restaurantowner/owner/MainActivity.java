@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -119,6 +120,8 @@ public class MainActivity extends AppCompatActivity
                 startActivityForResult(intent, ACTION_ADD);
                 return true;
 
+
+
             default:
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
@@ -175,7 +178,13 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_logout) {
+        if(id==R.id.action_user_part) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantActivity.class);
+            startActivity(intent1);
+            return true;
+        } else if (id == R.id.nav_logout) {
             // TODO Handle the logout action
         } else if (id == R.id.nav_manage) {
             // TODO Handle the manage action

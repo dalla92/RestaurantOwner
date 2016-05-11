@@ -1,8 +1,14 @@
 package it.polito.group2.restaurantowner.owner;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -22,15 +28,25 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import android.support.v7.widget.Toolbar;
 
+import org.json.JSONException;
+
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.TableReservation;
-import it.polito.group2.restaurantowner.data.Order;
+import it.polito.group2.restaurantowner.data.TakeAwayReservation;
+import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class StatisticsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
-    private int restaurantID;
+    private String restaurantID;
     private DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    public ArrayList<Restaurant> all_restaurants = new ArrayList<Restaurant>();
+    public Restaurant current_restaurant;
+    public Context context;
+    public int MODIFY_INFO = 4;
 
     private Menu menu;
 
@@ -44,7 +60,7 @@ public class StatisticsActivity extends AppCompatActivity
         //get the restaurant obj
         Bundle b = getIntent().getExtras();
         if(b!=null) {
-            restaurantID = b.getInt("restaurantID");
+            restaurantID = b.getString("restaurantID");
             LineData data = new LineData(getDataName(), getDataSet());
             chart.setData(data);
             chart.setDescription(getString(R.string.statistics_chart_title));
@@ -55,14 +71,36 @@ public class StatisticsActivity extends AppCompatActivity
             //error on restaurant id
         }
 
+        context = this;
+        try {
+            all_restaurants = JSONUtil.readJSONResList(context);
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        for(Restaurant r : all_restaurants){
+            if(r.getRestaurantId().equals(restaurantID)){
+                current_restaurant = r;
+                break;
+            }
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
     }
 
     private ArrayList<LineDataSet> getDataSet() {
         ArrayList<TableReservation> bookingList = new ArrayList<>();
-        ArrayList<Order> orderList = new ArrayList<>();
+        ArrayList<TakeAwayReservation> orderList = new ArrayList<>();
 
         /*
         try {
@@ -482,30 +520,116 @@ public class StatisticsActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_reviews, menu);
-        this.menu = menu;
+        //getMenuInflater().inflate(R.menu.main_restaurant, menu);
+        //this.menu = menu;
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        return true;
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
-        /*
         int id = item.getItemId();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(id==R.id.action_user_part) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantActivity.class);
+            startActivity(intent1);
+            return true;
+        }
+        else if(id==R.id.action_my_restaurants){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    MainActivity.class);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_gallery) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    GalleryActivity.class);
+            Bundle b = new Bundle();
+            b.putString("restaurant_id", restaurantID);
+            intent1.putExtras(b);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_menu) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    MenuRestaurant_page.class);
+            Bundle b = new Bundle();
+            b.putString("restaurant_id", restaurantID);
+            intent1.putExtras(b);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_offers) {
+            Intent intent2 = new Intent(
+                    getApplicationContext(),
+                    OfferListActivity.class);
+            Bundle b2 = new Bundle();
+            b2.putString("restaurant_id", restaurantID);
+            intent2.putExtras(b2);
+            startActivity(intent2);
+            return true;
+        } else if(id==R.id.action_reservations){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    ReservationActivity.class);
+            Bundle b3 = new Bundle();
+            b3.putString("restaurant_id", restaurantID);
+            intent3.putExtras(b3);
+            startActivity(intent3);
+            return true;
+        } else if(id==R.id.action_reviews){
+            Intent intent4 = new Intent(
+                    getApplicationContext(),
+                    ReviewsActivity.class); //here Filippo must insert his class name
+            Bundle b4 = new Bundle();
+            b4.putString("restaurant_id", restaurantID);
+            intent4.putExtras(b4);
+            startActivity(intent4);
+            return true;
+        } else if(id==R.id.action_statistics){
+            Intent intent5 = new Intent(
+                    getApplicationContext(),
+                    StatisticsActivity.class); //here Filippo must insert his class name
+            Bundle b5 = new Bundle();
+            b5.putString("restaurant_id", restaurantID);
+            intent5.putExtras(b5);
+            startActivity(intent5);
+            return true;
+        } else if(id==R.id.action_edit){
+            Intent intent6 = new Intent(
+                    getApplicationContext(),
+                    AddRestaurantActivity.class);
+            intent6.putExtra("Restaurant", current_restaurant);
+            final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
+            appbar.setExpanded(false);
+            startActivityForResult(intent6, MODIFY_INFO);
+            return true;
+        }
         if (id == R.id.nav_logout) {
             // TODO Handle the logout action
         } else if (id == R.id.nav_manage) {
             // TODO Handle the manage action
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         drawer.closeDrawer(GravityCompat.START);
-        */
         return true;
     }
 }

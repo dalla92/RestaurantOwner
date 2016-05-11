@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,8 +42,12 @@ import java.io.File;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.MealAddition;
+import it.polito.group2.restaurantowner.data.Addition;
+import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class MenuRestaurant_page extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private Menu menu;
@@ -50,15 +55,19 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
     private Adapter_Meals adapter;
     private String restaurant_id = "0";
     private ArrayList<Meal> meals = new ArrayList<>();
-    private ArrayList<MealAddition> meals_Meal_additions = new ArrayList<>();
-    private ArrayList<MealAddition> meals_categories = new ArrayList<>();
+    private ArrayList<Addition> meals_additions = new ArrayList<>();
+    private ArrayList<Addition> meals_categories = new ArrayList<>();
     public RecyclerView rv;
     public int index_position;
     Meal meal_to_delete;
     Meal current_meal = null;
     public final int MODIFY_MEAL = 1;
+    public int MODIFY_INFO = 4;
     public Swipe_Detector s_d = null;
-    private  RecyclerView  mRecyclerView;
+    private RecyclerView  mRecyclerView;
+    public ArrayList<Restaurant> all_restaurants = new ArrayList<Restaurant>();
+    public Restaurant current_restaurant;
+    public Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +78,21 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         Bundle b = getIntent().getExtras();
         if(b!=null)
             restaurant_id = b.getString("restaurant_id");
+
+        context = this;
+        try {
+            all_restaurants = JSONUtil.readJSONResList(context);
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        for(Restaurant r : all_restaurants){
+            if(r.getRestaurantId().equals(restaurant_id)){
+                current_restaurant = r;
+                break;
+            }
+        }
+
 
         Log.d("aaa", "SIZE1: " + meals.size());
         String FILENAME = "mealList.json";
@@ -95,9 +119,11 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //remove duplicates
         //remove_duplicates();
 
-        //navigation drawer
+        //toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -186,6 +212,18 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
     */
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        //getMenuInflater().inflate(R.menu.main_restaurant, menu);
+        //this.menu = menu;
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -195,33 +233,88 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_restaurant_page, menu);
-        this.menu = menu;
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(id==R.id.action_my_restaurants){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    MainActivity.class);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_gallery) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    GalleryActivity.class);
+            Bundle b = new Bundle();
+            b.putString("restaurant_id", restaurant_id);
+            intent1.putExtras(b);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_menu) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    MenuRestaurant_page.class);
+            Bundle b = new Bundle();
+            b.putString("restaurant_id", restaurant_id);
+            intent1.putExtras(b);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_offers) {
+            Intent intent2 = new Intent(
+                    getApplicationContext(),
+                    OfferListActivity.class);
+            Bundle b2 = new Bundle();
+            b2.putString("restaurant_id", restaurant_id);
+            intent2.putExtras(b2);
+            startActivity(intent2);
+            return true;
+        } else if(id==R.id.action_reservations){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    ReservationActivity.class);
+            Bundle b3 = new Bundle();
+            b3.putString("restaurant_id", restaurant_id);
+            intent3.putExtras(b3);
+            startActivity(intent3);
+            return true;
+        } else if(id==R.id.action_reviews){
+            Intent intent4 = new Intent(
+                    getApplicationContext(),
+                    ReviewsActivity.class); //here Filippo must insert his class name
+            Bundle b4 = new Bundle();
+            b4.putString("restaurant_id", restaurant_id);
+            intent4.putExtras(b4);
+            startActivity(intent4);
+            return true;
+        } else if(id==R.id.action_statistics){
+            Intent intent5 = new Intent(
+                    getApplicationContext(),
+                    StatisticsActivity.class); //here Filippo must insert his class name
+            Bundle b5 = new Bundle();
+            b5.putString("restaurant_id", restaurant_id);
+            intent5.putExtras(b5);
+            startActivity(intent5);
+            return true;
+        } else if(id==R.id.action_edit){
+            Intent intent6 = new Intent(
+                    getApplicationContext(),
+                    AddRestaurantActivity.class);
+            intent6.putExtra("Restaurant", current_restaurant);
+            final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
+            appbar.setExpanded(false);
+            startActivityForResult(intent6, MODIFY_INFO);
+            return true;
+        }
         if (id == R.id.nav_logout) {
             // TODO Handle the logout action
         } else if (id == R.id.nav_manage) {
             // TODO Handle the manage action
         }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -415,10 +508,10 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         for( Meal m : meals) {
             meals.add(m);
         }
-        for( MealAddition a : meals_Meal_additions) {
-            meals_Meal_additions.add(a);
+        for( Addition a : meals_additions) {
+            meals_additions.add(a);
         }
-        for( MealAddition a : meals_categories) {
+        for( Addition a : meals_categories) {
             meals_categories.add(a);
         }
      }
@@ -427,7 +520,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         Log.d("aaa", "CALLED READ");
         //mealList.json
         meals = new ArrayList<>();
-        meals_Meal_additions = new ArrayList<>();
+        meals_additions = new ArrayList<>();
         meals_categories = new ArrayList<>();
         String json = null;
         FileInputStream fis = null;
@@ -485,14 +578,14 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         JSONArray jsonArray2 = jobj2.optJSONArray("MealsAdditions");
         for (int i = 0; i < jsonArray2.length(); i++) {
             JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
-            MealAddition ad = new MealAddition();
+            Addition ad = new Addition();
             if (jsonObject2.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
                 ad.setmeal_id(jsonObject2.optString("MealId"));
                 ad.setName(jsonObject2.optString("AdditionName"));
                 ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                 ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
-                meals_Meal_additions.add(ad);
+                meals_additions.add(ad);
             }
         }
         //mealCategories.json
@@ -515,7 +608,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         JSONArray jsonArray3 = jobj3.optJSONArray("MealsCategories");
         for (int i = 0; i < jsonArray3.length(); i++) {
             JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
-            MealAddition ad = new MealAddition();
+            Addition ad = new Addition();
             if (jsonObject3.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
                 ad.setmeal_id(jsonObject3.optString("MealId"));
@@ -565,7 +658,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //additions writing
         String FILENAME2 = "mealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (MealAddition ad : meals_Meal_additions) {
+        for (Addition ad : meals_additions) {
             JSONObject jres2 = new JSONObject();
             jres2.put("RestaurantId", ad.getRestaurant_id());
             jres2.put("MealId", ad.getmeal_id());
@@ -589,7 +682,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //categories writing
         String FILENAME3 = "mealCategory.json";
         JSONArray jarray3 = new JSONArray();
-        for (MealAddition ad : meals_categories) {
+        for (Addition ad : meals_categories) {
                 JSONObject jres3 = new JSONObject();
                 jres3.put("RestaurantId", ad.getRestaurant_id());
                 jres3.put("MealId", ad.getmeal_id());
@@ -651,7 +744,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //additions writing
         String FILENAME2 = "mealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (MealAddition ad : meals_Meal_additions) {
+        for (Addition ad : meals_additions) {
             JSONObject jres2 = new JSONObject();
             jres2.put("RestaurantId", ad.getRestaurant_id());
             jres2.put("MealId", ad.getmeal_id());
@@ -675,7 +768,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //categories writing
         String FILENAME3 = "mealCategory.json";
         JSONArray jarray3 = new JSONArray();
-        for (MealAddition ad : meals_categories) {
+        for (Addition ad : meals_categories) {
             JSONObject jres3 = new JSONObject();
             jres3.put("RestaurantId", ad.getRestaurant_id());
             jres3.put("MealId", ad.getmeal_id());
@@ -717,37 +810,37 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
     }
 
     public void addAddition(String restaurant_id){
-        MealAddition a1 = new MealAddition();
+        Addition a1 = new Addition();
         a1.setName("Basilicò");
         a1.setPrice(0.50);
         a1.setmeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
-        MealAddition a2 = new MealAddition();
+        Addition a2 = new Addition();
         a2.setName("Peperoncino");
         a2.setPrice(0.20);
         a2.setmeal_id("0");
         a2.setSelected(true);
         a2.setRestaurant_id(restaurant_id);
 
-        meals_Meal_additions.add(a1);
-        meals_Meal_additions.add(a2);
+        meals_additions.add(a1);
+        meals_additions.add(a2);
 
         Log.d("ccc", "ADDITIONS:");
-        for(MealAddition a : meals_Meal_additions){
+        for(Addition a : meals_additions){
             Log.d("ccc", a.getName() + " " + a.getmeal_id());
         }
     }
 
     public void addCategory(String restaurant_id){
-        MealAddition a1 = new MealAddition();
+        Addition a1 = new Addition();
         a1.setName("Pasta");
         a1.setmeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
-        MealAddition a2 = new MealAddition();
+        Addition a2 = new Addition();
         a2.setName("Piccante");
         a2.setmeal_id("0");
         a2.setSelected(true);
@@ -757,7 +850,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         meals_categories.add(a2);
 
         Log.d("ccc", "CATEGORIES:");
-        for(MealAddition a : meals_categories){
+        for(Addition a : meals_categories){
             Log.d("ccc", a.getName() + " " + a.getmeal_id());
         }
     }

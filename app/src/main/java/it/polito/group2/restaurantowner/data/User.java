@@ -8,24 +8,44 @@ import java.sql.Blob;
  * Created by Filippo on 12/04/2016.
  */
 public class User {
-    private int id;
+    private String id;
     private String username;
-    private String password;
-    private String first_name;
-    private String last_name;
-    private String email;
+    private String password; //mandatory field
+    private String first_name; //mandatory field
+    private String last_name; //mandatory field
+    private String email; //mandatory field
     private String phone_number;
     private String vat_number;
     private Bitmap photo;
-
     private Boolean isOwner = false;
+    private int fidelity_points = 0;
 
-    public int getId() {
+    public User(){
+
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
+    }
+
+    public int getFidelity_points() {
+        return fidelity_points;
+    }
+
+    public void setFidelity_points(int fidelity_points) {
+        this.fidelity_points = fidelity_points;
+    }
+
+    public void setOwner(Boolean owner) {
+        isOwner = owner;
+    }
+
+    public Boolean getOwner() {
+        return isOwner;
     }
 
     public String getUsername() {
