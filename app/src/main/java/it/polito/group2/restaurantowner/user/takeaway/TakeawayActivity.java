@@ -9,13 +9,18 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 
 public class TakeawayActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         MenuCategoryFragment.OnMenuCategorySelectedListener,
-        MealFragment.OnMealSelectedListener {
+        MealFragment.OnMealSelectedListener,
+        AdditionFragment.OnNextClickedListener,
+        InfoFragment.OnAddClickedListener {
 
     //private String restaurantID;
 
@@ -115,5 +120,26 @@ public class TakeawayActivity extends AppCompatActivity
         transaction.replace(R.id.fragment_container, additionFragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void onNextClicked(String restaurantID, String menuCategoryID, String mealID,
+                              ArrayList<String> listAdditionID) {
+        InfoFragment infoFragment = new InfoFragment();
+        Bundle args = new Bundle();
+        args.putString(InfoFragment.MENUCATEGORY_ID, menuCategoryID);
+        args.putString(InfoFragment.RESTAURANT_ID, restaurantID);
+        args.putString(InfoFragment.MEAL_ID, mealID);
+        args.putStringArrayList(InfoFragment.LIST_ADDITION_ID, listAdditionID);
+        infoFragment.setArguments(args);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, infoFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    public void onAddClicked(String restaurantID, String menuCategoryID,
+                             String mealID, ArrayList<String> listAdditionID) {
+        //Toast.makeText(TakeawayActivity.this, "Ciao", Toast.LENGTH_SHORT).show();
     }
 }

@@ -55,7 +55,6 @@ public class MealFragment extends ListFragment {
         MealArrayAdapter adapter = new MealArrayAdapter(getActivity(),
                 android.R.layout.simple_list_item_1, getItemList(listMeal));
         setListAdapter(adapter);
-
     }
 
     @Override

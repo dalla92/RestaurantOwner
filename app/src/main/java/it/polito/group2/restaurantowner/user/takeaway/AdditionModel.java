@@ -4,20 +4,30 @@ package it.polito.group2.restaurantowner.user.takeaway;
  * Created by Filippo on 10/05/2016.
  */
 public class AdditionModel {
-    private String name;
+    private String additionName;
+    private String additionID;
     private boolean selected;
 
-    public AdditionModel(String name) {
-        this.name = name;
+    public AdditionModel(String name, String id) {
+        this.additionName = name;
+        this.additionID = id;
         selected = false;
     }
 
     public String getName() {
-        return name;
+        return additionName;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.additionName = name;
+    }
+
+    public String getAdditionID() {
+        return additionID;
+    }
+
+    public void setAdditionID(String additionID) {
+        this.additionID = additionID;
     }
 
     public boolean isSelected() {

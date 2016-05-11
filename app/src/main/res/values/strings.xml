@@ -183,5 +183,12 @@
     <string name="title_activity_my_reviews">MyReviewsActivity</string>
 
     <!-- Takeaway Activity -->
-    <string name="next">Next</string>
+    <string name="takeaway_nextstep">Next</string>
+    <string name="takeaway_addtocart">Add</string>
+    <string name="takeaway_mealquantity">Add quantity</string>
+    <string name="takeaway_mealnote">Additional note</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>

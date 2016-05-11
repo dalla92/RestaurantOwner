@@ -42,6 +42,8 @@ public class AdditionFragment extends ListFragment {
     private String meal_id;
 
     private ArrayList<Addition> listAddition;
+    private ArrayList<AdditionModel> listModel;
+    private OnNextClickedListener mCallback;
 
     public AdditionFragment() {}
 
@@ -54,6 +56,7 @@ public class AdditionFragment extends ListFragment {
             meal_id = getArguments().getString(MEAL_ID);
         }
         listAddition = getAdditionList(restaurant_id, menucategory_id, meal_id);
+        listModel = getModel(listAddition);
         setHasOptionsMenu(true);
     }
 
@@ -68,9 +71,8 @@ public class AdditionFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        AdditionArrayAdapter adapter = new AdditionArrayAdapter(getActivity(), getModel(listAddition));
+        AdditionArrayAdapter adapter = new AdditionArrayAdapter(getActivity(), listModel);
         setListAdapter(adapter);
-
     }
 
     /*
@@ -81,10 +83,33 @@ public class AdditionFragment extends ListFragment {
     }
     */
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnNextClickedListener) {
+            mCallback = (OnNextClickedListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnNextSelectedListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mCallback = null;
+    }
+
+    public interface OnNextClickedListener {
+        public void onNextClicked(String restaurantID, String menuCategoryID,
+                                  String mealID, ArrayList<String> listAdditionID);
+    }
+
     private ArrayList<AdditionModel> getModel(ArrayList<Addition> objList) {
         ArrayList<AdditionModel> list = new ArrayList<AdditionModel>();
         for (int i = 0; i < objList.size(); ++i) {
-            list.add(new AdditionModel(objList.get(i).getName()));
+            AdditionModel am = new AdditionModel(objList.get(i).getName(), objList.get(i).getAddition_id());
+            list.add(am);
         }
         return list;
     }
@@ -116,8 +141,18 @@ public class AdditionFragment extends ListFragment {
         int id = item.getItemId();
 
         if(id == R.id.action_next){
-            //TODO farlo
-            Toast.makeText(getContext(), "fatto", Toast.LENGTH_SHORT).show();
+            // Send the Additions to the host activity
+            ArrayList<String> additionList = new ArrayList<String>();
+            for(AdditionModel am : listModel) {
+                if(am.isSelected()) {
+                    additionList.add(am.getAdditionID());
+                }
+            }
+            mCallback.onNextClicked(
+                    restaurant_id,
+                    menucategory_id,
+                    meal_id,
+                    additionList);
             return true;
         }
 
@@ -127,15 +162,6 @@ public class AdditionFragment extends ListFragment {
     /////////////////////////////////////////////////////////////////////////////////////
 
     /*
-
-    private OnFragmentInteractionListener mListener;
-
-    public AdditionFragment() {
-        // Required empty public constructor
-    }
-
-
-    // TODO: Rename and change types and number of parameters
     public static AdditionFragment newInstance(String param1, String param2) {
         AdditionFragment fragment = new AdditionFragment();
         Bundle args = new Bundle();
@@ -143,35 +169,6 @@ public class AdditionFragment extends ListFragment {
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_takeaway_addition, container, false);
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
     */
 }
