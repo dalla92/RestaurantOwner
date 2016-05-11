@@ -10,4 +10,15 @@
         <item>Hamburger</item>
         <item>Greek Restaurant</item>
     </string-array>
+    <string-array name="filter_categories_array">
+        <item>Every category</item>
+        <item>Italian Restaurant</item>
+        <item>Cafè</item>
+        <item>Japanese Restaurant</item>
+        <item>Kebab</item>
+        <item>Fast food</item>
+        <item>Pub</item>
+        <item>Hamburger</item>
+        <item>Greek Restaurant</item>
+    </string-array>
 </resources>

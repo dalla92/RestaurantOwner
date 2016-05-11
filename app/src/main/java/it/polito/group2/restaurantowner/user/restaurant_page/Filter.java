@@ -72,7 +72,7 @@ public class Filter extends AppCompatActivity {
 
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.categories_array, android.R.layout.simple_spinner_item);
+                R.array.filter_categories_array, android.R.layout.simple_spinner_item);
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
@@ -102,8 +102,17 @@ public class Filter extends AppCompatActivity {
             intent.putExtra("FourEuro", CBFourEuro.isChecked());
             if(CBtime.isChecked())
                 intent.putExtra("Time", CBtime.getText().toString());
-            intent.putExtra("Category", String.valueOf(category.getSelectedItem()));
+            if(category.getSelectedItemPosition()==0)
+                intent.putExtra("Category", "0");
+            else
+                intent.putExtra("Category", String.valueOf(category.getSelectedItem()));
             setResult(RESULT_OK, intent);
+            finish();//finishing activity
+            return true;
+        }
+        if (item.getItemId() == android.R.id.home) {
+            Intent intent = new Intent();
+            setResult(RESULT_CANCELED, intent);
             finish();//finishing activity
             return true;
         }

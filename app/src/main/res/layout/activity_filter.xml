@@ -48,7 +48,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView2"
         android:layout_alignParentStart="true"
-        android:id="@+id/linearLayout">
+        android:id="@+id/linearLayout"
+        android:paddingTop="4dp">
 
         <CheckBox
             android:layout_weight="1"
@@ -89,14 +90,16 @@
         android:text="@string/restaurant_type"
         android:id="@+id/textView4"
         android:layout_below="@+id/linearLayout"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:paddingTop="6dp" />
 
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/spinner"
         android:layout_below="@+id/textView4"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:paddingTop="4dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -105,7 +108,8 @@
         android:text="@string/time"
         android:id="@+id/textView6"
         android:layout_below="@+id/spinner"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:paddingTop="6dp"/>
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -113,7 +117,8 @@
         android:text="Set time"
         android:id="@+id/checkBoxTime"
         android:layout_below="@+id/textView6"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:paddingTop="4dp"/>
 
 </RelativeLayout>
 

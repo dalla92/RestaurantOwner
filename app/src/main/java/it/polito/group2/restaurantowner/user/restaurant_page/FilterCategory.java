@@ -29,7 +29,7 @@ public class FilterCategory extends AppCompatActivity {
         setSupportActionBar(toolbar);
         ListView listView = (ListView) findViewById(R.id.listViewFilter);
 
-        String[] values = getResources().getStringArray(R.array.categories_array);
+        String[] values = getResources().getStringArray(R.array.filter_categories_array);
 
         final ArrayList<String> list = new ArrayList<String>();
         for (int i = 0; i < values.length; ++i) {

@@ -39,6 +39,8 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         protected int filter(String category, String time, boolean price1, boolean price2, boolean price3, boolean price4) {
                 //filter by category
                 List<Restaurant> nResList = new ArrayList<Restaurant>();
+            if(category.equals("0"))
+                nResList = mDataset;
 
                 for (Restaurant r : mDataset) {
                     if (r.getCategory().equals(category))
