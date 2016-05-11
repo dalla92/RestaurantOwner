@@ -103,11 +103,7 @@
             android:name=".user.restaurant_page.UserRestaurantList"
             android:label="@string/title_activity_user_restaurant_list"
             android:theme="@style/AppTheme.NoActionBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".user.restaurant_page.AddReviewActivity"
@@ -123,9 +119,16 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/MyFullscreenTheme" />
         <activity
-            android:name=".user.MyReviewsActivity"
+            android:name=".user.my_reviews.MyReviewsActivity"
             android:label="@string/title_activity_my_reviews"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".user.restaurant_page.Filter"
             android:parentActivityName=".user.restaurant_page.UserRestaurantList"

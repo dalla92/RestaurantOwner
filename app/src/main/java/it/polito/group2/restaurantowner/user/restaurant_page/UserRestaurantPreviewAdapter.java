@@ -127,6 +127,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             reservationNumber = (TextView) v.findViewById(R.id.textViewReservationNumber);
             distance = (TextView) v.findViewById(R.id.textViewDistance);
         }
+
         public void setData(Restaurant obj, int position){
            /* TODO if(obj.getPhotoUri()!="") {
                 Uri imageUri = Uri.parse(obj.getPhotoUri());

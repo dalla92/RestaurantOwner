@@ -1,9 +1,8 @@
-package it.polito.group2.restaurantowner.user;
+package it.polito.group2.restaurantowner.user.my_reviews;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
