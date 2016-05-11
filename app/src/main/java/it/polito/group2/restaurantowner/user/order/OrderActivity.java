@@ -56,8 +56,8 @@ public class OrderActivity extends AppCompatActivity
             }
 
             //TODO: verificare che il parametro viene passato con questo nome
-            String restaurantID = getIntent().getExtras().getString("restaurant_id");
-            String userID = getIntent().getExtras().getString("user_id");
+            String restaurantID = "resID0";//getIntent().getExtras().getString("restaurant_id");
+            String userID = "userID0";//getIntent().getExtras().getString("user_id");
             order = new Order(restaurantID, userID);
             CategoryFragment categoryFragment = CategoryFragment.
                     newInstance(restaurantID);
