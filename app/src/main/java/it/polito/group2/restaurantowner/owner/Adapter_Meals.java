@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Addition;
+import it.polito.group2.restaurantowner.data.MealAddition;
 import it.polito.group2.restaurantowner.data.Meal;
 
 /**
@@ -184,7 +184,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         String FILENAME2 = "mealAddition.json";
         JSONArray jarray2 = new JSONArray();
         for (Meal me : meals) {
-            for (Addition ad : me.getMeal_additions()) {
+            for (MealAddition ad : me.getMeal_Meal_additions()) {
                 JSONObject jres2 = new JSONObject();
                 jres2.put("RestaurantId", ad.getRestaurant_id());
                 jres2.put("MealId", ad.getmeal_id());
@@ -210,7 +210,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         String FILENAME3 = "mealCategory.json";
         JSONArray jarray3 = new JSONArray();
         for (Meal me : meals) {
-            for (Addition ad : me.getMeal_categories()) {
+            for (MealAddition ad : me.getMeal_categories()) {
                 JSONObject jres3 = new JSONObject();
                 jres3.put("RestaurantId", ad.getRestaurant_id());
                 jres3.put("MealId", ad.getmeal_id());

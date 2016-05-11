@@ -10,21 +10,21 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.OrderedMeal;
+import it.polito.group2.restaurantowner.data.OrderMeal;
 
 /**
  * Created by TheChuck on 14/04/2016.
  */
-public class MealListAdapter extends ArrayAdapter<OrderedMeal> {
+public class MealListAdapter extends ArrayAdapter<OrderMeal> {
 
-    public MealListAdapter(Context context, ArrayList<OrderedMeal> ordered_meals) {
+    public MealListAdapter(Context context, ArrayList<OrderMeal> ordered_meals) {
         super(context, 0, ordered_meals);
     }
 
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        OrderedMeal meal = getItem(position);
+        OrderMeal meal = getItem(position);
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.meal_item, parent, false);

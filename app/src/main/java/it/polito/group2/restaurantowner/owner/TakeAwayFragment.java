@@ -24,12 +24,12 @@ import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.OrderedMeal;
-import it.polito.group2.restaurantowner.data.TakeAwayReservation;
+import it.polito.group2.restaurantowner.data.OrderMeal;
+import it.polito.group2.restaurantowner.data.Order;
 
 public class TakeAwayFragment extends Fragment {
 
-    private ArrayList<TakeAwayReservation> reservation_list;
+    private ArrayList<Order> reservation_list;
     private BaseAdapter adapter;
 
     @Override
@@ -82,7 +82,7 @@ public class TakeAwayFragment extends Fragment {
                 TextView text_time = (TextView) convertView.findViewById(R.id.reservation_time);
                 TextView text_notes = (TextView) convertView.findViewById(R.id.reservation_notes);
 
-                TakeAwayReservation reservation = reservation_list.get(position);
+                Order reservation = reservation_list.get(position);
                 text_client_name.setText(reservation.getUsername());
                 text_time.setText(timeFormat.format(reservation.getDate().getTime()));
                 text_notes.setText(reservation.getNotes());
@@ -91,7 +91,7 @@ public class TakeAwayFragment extends Fragment {
                 list.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ArrayList<OrderedMeal> ordered_meals = reservation_list.get(position).getOrdered_meals();
+                        ArrayList<OrderMeal> ordered_meals = reservation_list.get(position).getOrdered_meals();
                         MealListDialog dialog = MealListDialog.newInstance(ordered_meals);
                         dialog.show(getActivity().getFragmentManager(), null);
                     }
@@ -149,30 +149,30 @@ public class TakeAwayFragment extends Fragment {
     }
 
     private void createFakeData(Calendar date, String restaurantId) {
-        ArrayList<TakeAwayReservation> reservations = new ArrayList<>();
+        ArrayList<Order> reservations = new ArrayList<>();
         Calendar today = Calendar.getInstance();
         Calendar tomorrow = Calendar.getInstance();
         tomorrow.set(Calendar.DAY_OF_MONTH, today.get(Calendar.DAY_OF_MONTH) + 1);
         String id1 = UUID.randomUUID().toString();
         String id2 = UUID.randomUUID().toString();
         String id3 = UUID.randomUUID().toString();
-        ArrayList<OrderedMeal> mealOrdered1 = new ArrayList<>();
-        mealOrdered1.add(new OrderedMeal("Spaghetti alla carbonara", 2, id1));
-        mealOrdered1.add(new OrderedMeal("Pizza Margerita", 3, id1));
-        mealOrdered1.add(new OrderedMeal("Antipasto di mare", 2, id1));
-        mealOrdered1.add(new OrderedMeal("Heineken", 5, id1));
-        TakeAwayReservation res1 = new TakeAwayReservation("Andrea Cuiuli", mealOrdered1, date, "Una persona allergica alle noci", restaurantId, id1);
+        ArrayList<OrderMeal> mealOrdered1 = new ArrayList<>();
+        mealOrdered1.add(new OrderMeal("Spaghetti alla carbonara", 2, id1));
+        mealOrdered1.add(new OrderMeal("Pizza Margerita", 3, id1));
+        mealOrdered1.add(new OrderMeal("Antipasto di mare", 2, id1));
+        mealOrdered1.add(new OrderMeal("Heineken", 5, id1));
+        Order res1 = new Order("Andrea Cuiuli", mealOrdered1, date, "Una persona allergica alle noci", restaurantId, id1);
 
-        ArrayList<OrderedMeal> mealOrdered2 = new ArrayList<>();
-        mealOrdered2.add(new OrderedMeal("Linguine allo scoglio", 2, id2));
-        mealOrdered2.add(new OrderedMeal("Pizza Napoletana", 3, id2));
-        TakeAwayReservation res2 = new TakeAwayReservation("Andrea Cuiuli", mealOrdered2, date, "Una persona allergica alle noci", restaurantId, id2);
+        ArrayList<OrderMeal> mealOrdered2 = new ArrayList<>();
+        mealOrdered2.add(new OrderMeal("Linguine allo scoglio", 2, id2));
+        mealOrdered2.add(new OrderMeal("Pizza Napoletana", 3, id2));
+        Order res2 = new Order("Andrea Cuiuli", mealOrdered2, date, "Una persona allergica alle noci", restaurantId, id2);
 
-        ArrayList<OrderedMeal> mealOrdered3 = new ArrayList<>();
-        mealOrdered3.add(new OrderedMeal("Antipasto Rustico", 1, id3));
-        mealOrdered3.add(new OrderedMeal("Vino della casa", 1, id3));
-        mealOrdered3.add(new OrderedMeal("Carpaccio di manzo", 1, id3));
-        TakeAwayReservation res3 = new TakeAwayReservation("Andrea Cuiuli", mealOrdered3 , date, "Una persona allergica alle noci", restaurantId, id3);
+        ArrayList<OrderMeal> mealOrdered3 = new ArrayList<>();
+        mealOrdered3.add(new OrderMeal("Antipasto Rustico", 1, id3));
+        mealOrdered3.add(new OrderMeal("Vino della casa", 1, id3));
+        mealOrdered3.add(new OrderMeal("Carpaccio di manzo", 1, id3));
+        Order res3 = new Order("Andrea Cuiuli", mealOrdered3 , date, "Una persona allergica alle noci", restaurantId, id3);
 
         reservations.add(res1);
         reservations.add(res2);
@@ -185,7 +185,7 @@ public class TakeAwayFragment extends Fragment {
         }
     }
 
-    private void saveDataToJson(ArrayList<TakeAwayReservation> reservations) {
+    private void saveDataToJson(ArrayList<Order> reservations) {
         try {
             JSONUtil.saveJSONTakeAwayResList(getActivity(), reservations);
         } catch (JSONException e) {
@@ -193,7 +193,7 @@ public class TakeAwayFragment extends Fragment {
         }
     }
 
-    private ArrayList<TakeAwayReservation> getDataJson(Calendar date, String restaurantId) {
+    private ArrayList<Order> getDataJson(Calendar date, String restaurantId) {
 
         try {
             return JSONUtil.readJSONTakeAwayResList(getActivity(), date, restaurantId);

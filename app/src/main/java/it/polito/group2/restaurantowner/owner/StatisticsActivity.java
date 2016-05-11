@@ -24,7 +24,7 @@ import android.support.v7.widget.Toolbar;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.TableReservation;
-import it.polito.group2.restaurantowner.data.TakeAwayReservation;
+import it.polito.group2.restaurantowner.data.Order;
 
 public class StatisticsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -62,7 +62,7 @@ public class StatisticsActivity extends AppCompatActivity
 
     private ArrayList<LineDataSet> getDataSet() {
         ArrayList<TableReservation> bookingList = new ArrayList<>();
-        ArrayList<TakeAwayReservation> orderList = new ArrayList<>();
+        ArrayList<Order> orderList = new ArrayList<>();
 
         /*
         try {

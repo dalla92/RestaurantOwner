@@ -41,7 +41,7 @@ import java.io.File;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Addition;
+import it.polito.group2.restaurantowner.data.MealAddition;
 import it.polito.group2.restaurantowner.data.Meal;
 
 public class MenuRestaurant_page extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -50,8 +50,8 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
     private Adapter_Meals adapter;
     private String restaurant_id = "0";
     private ArrayList<Meal> meals = new ArrayList<>();
-    private ArrayList<Addition> meals_additions = new ArrayList<>();
-    private ArrayList<Addition> meals_categories = new ArrayList<>();
+    private ArrayList<MealAddition> meals_Meal_additions = new ArrayList<>();
+    private ArrayList<MealAddition> meals_categories = new ArrayList<>();
     public RecyclerView rv;
     public int index_position;
     Meal meal_to_delete;
@@ -415,10 +415,10 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         for( Meal m : meals) {
             meals.add(m);
         }
-        for( Addition a : meals_additions) {
-            meals_additions.add(a);
+        for( MealAddition a : meals_Meal_additions) {
+            meals_Meal_additions.add(a);
         }
-        for( Addition a : meals_categories) {
+        for( MealAddition a : meals_categories) {
             meals_categories.add(a);
         }
      }
@@ -427,7 +427,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         Log.d("aaa", "CALLED READ");
         //mealList.json
         meals = new ArrayList<>();
-        meals_additions = new ArrayList<>();
+        meals_Meal_additions = new ArrayList<>();
         meals_categories = new ArrayList<>();
         String json = null;
         FileInputStream fis = null;
@@ -485,14 +485,14 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         JSONArray jsonArray2 = jobj2.optJSONArray("MealsAdditions");
         for (int i = 0; i < jsonArray2.length(); i++) {
             JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
-            Addition ad = new Addition();
+            MealAddition ad = new MealAddition();
             if (jsonObject2.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
                 ad.setmeal_id(jsonObject2.optString("MealId"));
                 ad.setName(jsonObject2.optString("AdditionName"));
                 ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                 ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
-                meals_additions.add(ad);
+                meals_Meal_additions.add(ad);
             }
         }
         //mealCategories.json
@@ -515,7 +515,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         JSONArray jsonArray3 = jobj3.optJSONArray("MealsCategories");
         for (int i = 0; i < jsonArray3.length(); i++) {
             JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
-            Addition ad = new Addition();
+            MealAddition ad = new MealAddition();
             if (jsonObject3.optString("RestaurantId").equals(restaurant_id)) {
                 ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
                 ad.setmeal_id(jsonObject3.optString("MealId"));
@@ -565,7 +565,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //additions writing
         String FILENAME2 = "mealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (Addition ad : meals_additions) {
+        for (MealAddition ad : meals_Meal_additions) {
             JSONObject jres2 = new JSONObject();
             jres2.put("RestaurantId", ad.getRestaurant_id());
             jres2.put("MealId", ad.getmeal_id());
@@ -589,7 +589,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //categories writing
         String FILENAME3 = "mealCategory.json";
         JSONArray jarray3 = new JSONArray();
-        for (Addition ad : meals_categories) {
+        for (MealAddition ad : meals_categories) {
                 JSONObject jres3 = new JSONObject();
                 jres3.put("RestaurantId", ad.getRestaurant_id());
                 jres3.put("MealId", ad.getmeal_id());
@@ -651,7 +651,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //additions writing
         String FILENAME2 = "mealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (Addition ad : meals_additions) {
+        for (MealAddition ad : meals_Meal_additions) {
             JSONObject jres2 = new JSONObject();
             jres2.put("RestaurantId", ad.getRestaurant_id());
             jres2.put("MealId", ad.getmeal_id());
@@ -675,7 +675,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //categories writing
         String FILENAME3 = "mealCategory.json";
         JSONArray jarray3 = new JSONArray();
-        for (Addition ad : meals_categories) {
+        for (MealAddition ad : meals_categories) {
             JSONObject jres3 = new JSONObject();
             jres3.put("RestaurantId", ad.getRestaurant_id());
             jres3.put("MealId", ad.getmeal_id());
@@ -717,37 +717,37 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
     }
 
     public void addAddition(String restaurant_id){
-        Addition a1 = new Addition();
+        MealAddition a1 = new MealAddition();
         a1.setName("Basilicò");
         a1.setPrice(0.50);
         a1.setmeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
-        Addition a2 = new Addition();
+        MealAddition a2 = new MealAddition();
         a2.setName("Peperoncino");
         a2.setPrice(0.20);
         a2.setmeal_id("0");
         a2.setSelected(true);
         a2.setRestaurant_id(restaurant_id);
 
-        meals_additions.add(a1);
-        meals_additions.add(a2);
+        meals_Meal_additions.add(a1);
+        meals_Meal_additions.add(a2);
 
         Log.d("ccc", "ADDITIONS:");
-        for(Addition a : meals_additions){
+        for(MealAddition a : meals_Meal_additions){
             Log.d("ccc", a.getName() + " " + a.getmeal_id());
         }
     }
 
     public void addCategory(String restaurant_id){
-        Addition a1 = new Addition();
+        MealAddition a1 = new MealAddition();
         a1.setName("Pasta");
         a1.setmeal_id("0");
         a1.setSelected(true);
         a1.setRestaurant_id(restaurant_id);
 
-        Addition a2 = new Addition();
+        MealAddition a2 = new MealAddition();
         a2.setName("Piccante");
         a2.setmeal_id("0");
         a2.setSelected(true);
@@ -757,7 +757,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         meals_categories.add(a2);
 
         Log.d("ccc", "CATEGORIES:");
-        for(Addition a : meals_categories){
+        for(MealAddition a : meals_categories){
             Log.d("ccc", a.getName() + " " + a.getmeal_id());
         }
     }

@@ -1,33 +1,19 @@
 package it.polito.group2.restaurantowner.user.takeaway;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.RatingBar;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Addition;
-import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.data.MealAddition;
 
 public class AdditionFragment extends ListFragment {
 
@@ -41,7 +27,7 @@ public class AdditionFragment extends ListFragment {
     private String menucategory_id;
     private String meal_id;
 
-    private ArrayList<Addition> listAddition;
+    private ArrayList<MealAddition> listMealAddition;
     private ArrayList<AdditionModel> listModel;
     private OnNextClickedListener mCallback;
 
@@ -55,8 +41,8 @@ public class AdditionFragment extends ListFragment {
             menucategory_id = getArguments().getString(MENUCATEGORY_ID);
             meal_id = getArguments().getString(MEAL_ID);
         }
-        listAddition = getAdditionList(restaurant_id, menucategory_id, meal_id);
-        listModel = getModel(listAddition);
+        listMealAddition = getAdditionList(restaurant_id, menucategory_id, meal_id);
+        listModel = getModel(listMealAddition);
         setHasOptionsMenu(true);
     }
 
@@ -105,7 +91,7 @@ public class AdditionFragment extends ListFragment {
                                   String mealID, ArrayList<String> listAdditionID);
     }
 
-    private ArrayList<AdditionModel> getModel(ArrayList<Addition> objList) {
+    private ArrayList<AdditionModel> getModel(ArrayList<MealAddition> objList) {
         ArrayList<AdditionModel> list = new ArrayList<AdditionModel>();
         for (int i = 0; i < objList.size(); ++i) {
             AdditionModel am = new AdditionModel(objList.get(i).getName(), objList.get(i).getAddition_id());
@@ -114,17 +100,17 @@ public class AdditionFragment extends ListFragment {
         return list;
     }
 
-    private ArrayList<Addition> getAdditionList(String restaurant_id, String menucategory_id, String meal_id) {
-        ArrayList<Addition> additionList = new ArrayList<Addition>();
+    private ArrayList<MealAddition> getAdditionList(String restaurant_id, String menucategory_id, String meal_id) {
+        ArrayList<MealAddition> mealAdditionList = new ArrayList<MealAddition>();
 
         for(int i=0; i<10; i++) {
-            Addition a = new Addition();
-            a.setName("Addition " + i);
+            MealAddition a = new MealAddition();
+            a.setName("MealAddition " + i);
             a.setAddition_id("addID" + i);
-            additionList.add(a);
+            mealAdditionList.add(a);
         }
 
-        return additionList;
+        return mealAdditionList;
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * Created by Alessio on 08/04/2016.
  */
-public class Addition implements Serializable {
+public class MealAddition implements Serializable {
 
     //String code = null;
     String addition_id;
@@ -19,7 +19,7 @@ public class Addition implements Serializable {
     boolean selected = false;
 
     //TODO aggiungere addition_id al costruttore
-    public Addition(String restaurant_id, String meal_id, String name, double price, boolean selected) {
+    public MealAddition(String restaurant_id, String meal_id, String name, double price, boolean selected) {
         super();
         //this.code = code;
         this.restaurant_id = restaurant_id;
@@ -29,7 +29,7 @@ public class Addition implements Serializable {
         this.selected = selected;
     }
 
-    public Addition(){
+    public MealAddition(){
 
     }
 
@@ -86,7 +86,7 @@ public class Addition implements Serializable {
 
 
 /*
-    protected Addition(Parcel in) {
+    protected MealAddition(Parcel in) {
         restaurant_id = in.readString();
         meal_id = in.readString();
         name = in.readString();
@@ -109,15 +109,15 @@ public class Addition implements Serializable {
     }
 
     @SuppressWarnings("unused")
-    public static final Parcelable.Creator<Addition> CREATOR = new Parcelable.Creator<Addition>() {
+    public static final Parcelable.Creator<MealAddition> CREATOR = new Parcelable.Creator<MealAddition>() {
         @Override
-        public Addition createFromParcel(Parcel in) {
-            return new Addition(in);
+        public MealAddition createFromParcel(Parcel in) {
+            return new MealAddition(in);
         }
 
         @Override
-        public Addition[] newArray(int size) {
-            return new Addition[size];
+        public MealAddition[] newArray(int size) {
+            return new MealAddition[size];
         }
     };
 

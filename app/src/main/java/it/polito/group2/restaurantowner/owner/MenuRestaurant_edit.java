@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Addition;
+import it.polito.group2.restaurantowner.data.MealAddition;
 import it.polito.group2.restaurantowner.data.Meal;
 
 /**
@@ -114,10 +114,10 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     }
 
     @Override
-    public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<Addition> additions, ArrayList<Addition> categories) {
+    public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealAddition> categories) {
         current_meal.setDescription(meal_description);
         current_meal.setCooking_time(cooking_time);
-        current_meal.setMeal_additions(additions);
+        current_meal.setMeal_Meal_additions(mealAdditions);
         current_meal.setMeal_categories(categories);
         try {
             saveJSONMeList();
@@ -230,7 +230,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         //additions writing
         String FILENAME2 = "mealAddition.json";
         JSONArray jarray2 = new JSONArray();
-        for (Addition ad : current_meal.getMeal_additions()) {
+        for (MealAddition ad : current_meal.getMeal_Meal_additions()) {
             JSONObject jres2 = new JSONObject();
             jres2.put("RestaurantId", ad.getRestaurant_id());
             jres2.put("MealId", ad.getmeal_id());
@@ -254,7 +254,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         //categories writing
         String FILENAME3 = "mealCategory.json";
         JSONArray jarray3 = new JSONArray();
-        for (Addition ad : current_meal.getMeal_categories()) {
+        for (MealAddition ad : current_meal.getMeal_categories()) {
             JSONObject jres3 = new JSONObject();
             jres3.put("RestaurantId", ad.getRestaurant_id());
             jres3.put("MealId", ad.getmeal_id());

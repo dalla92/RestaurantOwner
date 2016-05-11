@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Addition;
+import it.polito.group2.restaurantowner.data.MealAddition;
 import it.polito.group2.restaurantowner.data.Meal;
 
 /**
@@ -39,16 +39,16 @@ public class FragmentOtherInfo extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     String selectedCategory = null;
     onOtherInfoPass dataPasser;
-    //ArrayList<Addition> additions = new ArrayList<Addition>();
-    //ArrayList<Addition> categories = new ArrayList<Addition>();
+    //ArrayList<MealAddition> additions = new ArrayList<MealAddition>();
+    //ArrayList<MealAddition> categories = new ArrayList<MealAddition>();
     public View rootView = null;
     private EditText meal_description;
     private NumberPicker cooking_time;
     public int time = 0;
     public static String parentAddition;
     public static String parentCategory;
-    public static ArrayList<Addition> childAdditions = new ArrayList<Addition>();
-    public static ArrayList<Addition> childCategories = new ArrayList<Addition>();
+    public static ArrayList<MealAddition> childMealAdditions = new ArrayList<MealAddition>();
+    public static ArrayList<MealAddition> childCategories = new ArrayList<MealAddition>();
     public static MyExpandableAdapter additions_adapter;
     public static MyExpandableAdapter categories_adapter;
     public static ExpandableListView additions;
@@ -89,11 +89,11 @@ public class FragmentOtherInfo extends Fragment {
     */
 
     public void passData() {
-        dataPasser.onOtherInfoPass(meal_description.getText().toString(), time, childAdditions, childCategories);
+        dataPasser.onOtherInfoPass(meal_description.getText().toString(), time, childMealAdditions, childCategories);
     }
 
     public interface onOtherInfoPass {
-        public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<Addition> additions, ArrayList<Addition> categories);
+        public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealAddition> categories);
     }
 
 
@@ -126,10 +126,10 @@ public class FragmentOtherInfo extends Fragment {
             }
         });
         //expandable additions
-        childAdditions = current_meal.getMeal_additions();
+        childMealAdditions = current_meal.getMeal_Meal_additions();
         parentAddition = "Meal additions";
         additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
-        additions_adapter = new MyExpandableAdapter(parentAddition, childAdditions);
+        additions_adapter = new MyExpandableAdapter(parentAddition, childMealAdditions);
         additions.setAdapter(additions_adapter);
         additions.setDividerHeight(5);
         additions.setGroupIndicator(null);
@@ -148,9 +148,9 @@ public class FragmentOtherInfo extends Fragment {
         addition_add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                childAdditions = additions_adapter.getChildItems();
-                childAdditions.add(new Addition(current_meal.getRestaurantId(),current_meal.getMealId(), getResources().getText(R.string.meal_add_new_addition).toString(), 0, false));
-                additions_adapter.setChildItems(childAdditions);
+                childMealAdditions = additions_adapter.getChildItems();
+                childMealAdditions.add(new MealAddition(current_meal.getRestaurantId(),current_meal.getMealId(), getResources().getText(R.string.meal_add_new_addition).toString(), 0, false));
+                additions_adapter.setChildItems(childMealAdditions);
                 additions.expandGroup(0);
 
             }
@@ -160,7 +160,7 @@ public class FragmentOtherInfo extends Fragment {
             @Override
             public void onClick(View v) {
                 childCategories = categories_adapter.getChildItems();
-                childCategories.add(new Addition(current_meal.getRestaurantId(),current_meal.getMealId(),getResources().getText(R.string.meal_add_new_category).toString(), 0, false));
+                childCategories.add(new MealAddition(current_meal.getRestaurantId(),current_meal.getMealId(),getResources().getText(R.string.meal_add_new_category).toString(), 0, false));
                 categories_adapter.setChildItems(childCategories);
                 categories.expandGroup(0);
             }
@@ -180,24 +180,24 @@ public class FragmentOtherInfo extends Fragment {
 
     public class MyExpandableAdapter extends BaseExpandableListAdapter {
         private Activity activity;
-        private ArrayList<Addition> childItems;
+        private ArrayList<MealAddition> childItems;
         private LayoutInflater inflater;
         private String parentItem;
         //private ArrayList<String> child;
         EditText userInput_price;
         View promptsView;
 
-        public MyExpandableAdapter(String parent, ArrayList<Addition> children) {
+        public MyExpandableAdapter(String parent, ArrayList<MealAddition> children) {
             this.parentItem = parent;
             this.childItems = children;
             inflater = LayoutInflater.from(context);
         }
 
-        public ArrayList<Addition> getChildItems(){
+        public ArrayList<MealAddition> getChildItems(){
             return this.childItems;
         }
 
-        public void setChildItems(ArrayList<Addition> new_list){
+        public void setChildItems(ArrayList<MealAddition> new_list){
             this.childItems = new_list;
             notifyDataSetChanged();
             notifyDataSetInvalidated();
@@ -229,7 +229,7 @@ public class FragmentOtherInfo extends Fragment {
                     notifyDataSetInvalidated();
                     /*
                         if (parentItem.equals("Meal additions"))
-                            current_meal.setMeal_additions(childItems);
+                            current_meal.setMeal_Meal_additions(childItems);
                         else
                             current_meal.setMeal_categories(childItems);
                     */
@@ -267,7 +267,7 @@ public class FragmentOtherInfo extends Fragment {
                                             }
                                             /*
                                                 if (parentItem.equals("Meal additions"))
-                                                    current_meal.setMeal_additions(childItems);
+                                                    current_meal.setMeal_Meal_additions(childItems);
                                                 else
                                                     current_meal.setMeal_categories(childItems);
                                             */
@@ -303,7 +303,7 @@ public class FragmentOtherInfo extends Fragment {
         }
 
         @Override
-        public Addition getChild(int groupPosition, int childPosition) {
+        public MealAddition getChild(int groupPosition, int childPosition) {
             return null;
         }
 
@@ -314,12 +314,12 @@ public class FragmentOtherInfo extends Fragment {
 
         @Override
         public int getChildrenCount(int groupPosition) {
-            //return ((ArrayList<Addition>) childItems.get(groupPosition)).size();
+            //return ((ArrayList<MealAddition>) childItems.get(groupPosition)).size();
             return childItems.size();
         }
 
         @Override
-        public Addition getGroup(int groupPosition) {
+        public MealAddition getGroup(int groupPosition) {
             return null;
         }
 
@@ -398,7 +398,7 @@ public class FragmentOtherInfo extends Fragment {
                 meals.add(me);
         }
         */
-        childAdditions = new ArrayList<>();
+        childMealAdditions = new ArrayList<>();
         childCategories = new ArrayList<>();
         //mealAdditions.json
         String json2 = null;
@@ -420,14 +420,14 @@ public class FragmentOtherInfo extends Fragment {
         JSONArray jsonArray2 = jobj2.optJSONArray("MealsAdditions");
         for (int i = 0; i < jsonArray2.length(); i++) {
             JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
-            Addition ad = new Addition();
+            MealAddition ad = new MealAddition();
             if (jsonObject2.optString("MealId").equals(meal_id)) {
                 ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
                 ad.setmeal_id(jsonObject2.optString("MealId"));
                 ad.setName(jsonObject2.optString("AdditionName"));
                 ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
                 ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
-                childAdditions.add(ad);
+                childMealAdditions.add(ad);
             }
         }
         //mealCategories.json
@@ -450,7 +450,7 @@ public class FragmentOtherInfo extends Fragment {
         JSONArray jsonArray3 = jobj3.optJSONArray("MealsCategories");
         for (int i = 0; i < jsonArray3.length(); i++) {
             JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
-            Addition ad = new Addition();
+            MealAddition ad = new MealAddition();
             if (jsonObject3.optString("MealId").equals(meal_id)) {
                 ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
                 ad.setmeal_id(jsonObject3.optString("MealId"));
