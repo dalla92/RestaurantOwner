@@ -96,14 +96,10 @@ public class Filter extends AppCompatActivity {
 
         if (id == R.id.action_save) {
             Intent intent = new Intent();
-            if(CBOneEuro.isChecked())
-                intent.putExtra("OneEuro", true);
-            if(CBTwoEuro.isChecked())
-                intent.putExtra("TwoEuro", true);
-            if(CBThreeEuro.isChecked())
-                intent.putExtra("ThreeEuro", true);
-            if(CBFourEuro.isChecked())
-                intent.putExtra("FourEuro", true);
+            intent.putExtra("OneEuro", CBOneEuro.isChecked());
+            intent.putExtra("TwoEuro", CBTwoEuro.isChecked());
+            intent.putExtra("ThreeEuro", CBThreeEuro.isChecked());
+            intent.putExtra("FourEuro", CBFourEuro.isChecked());
             if(CBtime.isChecked())
                 intent.putExtra("Time", CBtime.getText().toString());
             intent.putExtra("Category", String.valueOf(category.getSelectedItem()));

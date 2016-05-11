@@ -240,9 +240,13 @@ public class UserRestaurantList extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 mAdapter = new UserRestaurantPreviewAdapter(resList, this);
                 mRecyclerView.setAdapter(mAdapter);
-                //TODO filter by price range and time are missing, but in the intent the values are present (need to add to restaurant a price range)
                 String cat = (String) data.getExtras().get("Category");
-                mAdapter.getFilter().filter(cat);
+                String time = (String) data.getExtras().get("Time");
+                boolean price1 = (boolean) data.getExtras().get("OneEuro");
+                boolean price2 = (boolean) data.getExtras().get("TwoEuro");
+                boolean price3 = (boolean) data.getExtras().get("ThreeEuro");
+                boolean price4 = (boolean) data.getExtras().get("FourEuro");
+                mAdapter.filter(cat,time, price1, price2, price3, price4);
             }
         }
     }

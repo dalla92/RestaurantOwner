@@ -24,6 +24,7 @@ public class Restaurant implements Serializable{
     private String rating;
     private String reservationNumber;
     private String reservedPercentage;
+    private String priceRange;
 
     @Override
     public String toString() {
@@ -193,5 +194,13 @@ public class Restaurant implements Serializable{
 
     public void setReservedPercentage(String reservedPercentage) {
         this.reservedPercentage = reservedPercentage;
+    }
+
+    public String getPriceRange() {
+        return priceRange;
+    }
+
+    public void setPriceRange(String priceRange) {
+        this.priceRange = priceRange;
     }
 }

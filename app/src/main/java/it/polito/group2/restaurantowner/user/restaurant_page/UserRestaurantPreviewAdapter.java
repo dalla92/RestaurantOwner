@@ -14,68 +14,95 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONException;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.data.Restaurant;
 
 /**
  * Created by Daniele on 05/04/2016.
  */
-public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder> implements Filterable {
+public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder>{
     private List<Restaurant> mDataset;
     private static Context mContext;
-    private CategoryFilter categoryFilter;
 
-    @Override
-    public Filter getFilter() {
-        if (categoryFilter == null)
-            categoryFilter = new CategoryFilter(this);
-
-        return categoryFilter;
-    }
-
-    public class CategoryFilter extends Filter{
-
-        private UserRestaurantPreviewAdapter pAdapter;
-
-        public CategoryFilter(UserRestaurantPreviewAdapter pAd){
-            pAdapter = pAd;
-        }
-
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
-            FilterResults results = new FilterResults();
-            if (constraint == null || constraint.length() == 0) {
-                results.values = mDataset;
-                results.count = mDataset.size();
-            }
-            else {
-// We perform filtering operation
+        protected int filter(String category, String time, boolean price1, boolean price2, boolean price3, boolean price4) {
+                //filter by category
                 List<Restaurant> nResList = new ArrayList<Restaurant>();
 
                 for (Restaurant r : mDataset) {
-                    if (r.getCategory().equals(constraint.toString()))
+                    if (r.getCategory().equals(category))
                         nResList.add(r);
                 }
-
-                results.values = nResList;
-                results.count = nResList.size();
+            //filter by time
+            List<Restaurant> n2ResList = new ArrayList<Restaurant>();
+            if(time!=null) {
+                try {
+                    String timeFormat = new String("HH:mm");
+                    SimpleDateFormat sdf = new SimpleDateFormat(timeFormat, Locale.US);
+                    Date filterTime = sdf.parse(time);
+                    ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(mContext);
+                    for(Restaurant r: nResList) {
+                        Calendar calendar = Calendar.getInstance();
+                        int day = calendar.get(Calendar.DAY_OF_WEEK);
+                        for (OpenTime ot : otList) {
+                            if (ot.getRestaurantId().equals(r.getRestaurantId()) && ot.getDayOfWeek() == day) {
+                                Date openTime = sdf.parse(ot.getOpenHour());
+                                Date closeTime = sdf.parse(ot.getCloseHour());
+                                if (openTime.before(filterTime) && closeTime.after(filterTime)) {
+                                    n2ResList.add(r);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
             }
-            return results;
+            else
+                n2ResList = nResList;
+            //filter by price
+            List<Restaurant> n3ResList = new ArrayList<Restaurant>();
+            for(Restaurant r : n2ResList){
+                if(price1 && r.getPriceRange().equals("1")) {
+                    n3ResList.add(r);
+                    continue;
+                }
+                if(price2 && r.getPriceRange().equals("2")) {
+                    n3ResList.add(r);
+                    continue;
+                }
+                if(price3 && r.getPriceRange().equals("3")) {
+                    n3ResList.add(r);
+                    continue;
+                }
+                if(price4 && r.getPriceRange().equals("4")) {
+                    n3ResList.add(r);
+                    continue;
+                }
+            }
+
+            int size = mDataset.size();
+            mDataset = n3ResList;
+            notifyDataSetChanged();
+            notifyItemRangeChanged(0,size);
+            return 1;
         }
 
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            // Now we have to inform the adapter about the new list filtered
-                int size = mDataset.size();
-                mDataset = (List<Restaurant>) results.values;
-                notifyDataSetChanged();
-            notifyItemRangeChanged(0,size);
-        }
-    }
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -126,9 +153,16 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                         this.image.setImageURI(photouri);
                 }
             }
+
+
+            //TODO remember to take out, hust for testing purpose
+            obj.setPriceRange("2");
+
+
+
             this.resName.setText(obj.getName());
             this.rating.setText(obj.getRating());
-            this.reservationNumber.setText(obj.getReservationNumber());
+            this.reservationNumber.setText("€€€");
             //TODO calculate distance form current location
             this.distance.setText("23 KM");
             this.position = position;
