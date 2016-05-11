@@ -36,6 +36,11 @@ public class OrderActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
 
+        //TODO: verificare che il parametro viene passato con questo nome
+        String restaurantID = "resID0";//getIntent().getExtras().getString("restaurant_id");
+        String userID = "userID0";//getIntent().getExtras().getString("user_id");
+        order = new Order(restaurantID, userID);
+
         //Toolbar setting
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -54,11 +59,6 @@ public class OrderActivity extends AppCompatActivity
             if (savedInstanceState != null) {
                 return;
             }
-
-            //TODO: verificare che il parametro viene passato con questo nome
-            String restaurantID = "resID0";//getIntent().getExtras().getString("restaurant_id");
-            String userID = "userID0";//getIntent().getExtras().getString("user_id");
-            order = new Order(restaurantID, userID);
             CategoryFragment categoryFragment = CategoryFragment.
                     newInstance(restaurantID);
             getSupportFragmentManager().beginTransaction().
@@ -138,7 +138,15 @@ public class OrderActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAddClicked() {
-        //Toast.makeText(OrderActivity.this, "Ciao", Toast.LENGTH_SHORT).show();
+    public void onAddClicked(Integer quantity, String note) {
+        this.meal.setQuantity(quantity);
+        this.meal.setNote(note);
+        this.order.getMealList().add(meal);
+
+        CartFragment cartFragment = new CartFragment();
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, cartFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }
