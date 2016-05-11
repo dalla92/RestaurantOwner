@@ -9,6 +9,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 
@@ -51,39 +52,25 @@ public class InfoFragment extends Fragment {
     }
 
     public interface OnAddClickedListener {
-        public void onAddClicked();
+        public void onAddClicked(Integer quantity, String note);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_order_addition, menu);
+        inflater.inflate(R.menu.menu_order_info, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         if(id == R.id.action_add){
-            // Send the Additions to the host activity
-            mCallback.onAddClicked();
+            EditText qty = (EditText)getView().findViewById(R.id.meal_quantity);
+            EditText note = (EditText)getView().findViewById(R.id.meal_note);
+            mCallback.onAddClicked(Integer.parseInt(qty.getText().toString()),note.getText().toString());
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    /*
-    public static InfoFragment newInstance(String param1, String param2) {
-        InfoFragment fragment = new InfoFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-    */
 }
