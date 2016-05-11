@@ -17,32 +17,29 @@ import it.polito.group2.restaurantowner.data.MealAddition;
 
 public class AdditionFragment extends ListFragment {
 
-    //parameter's names
-    public static final String RESTAURANT_ID = "restaurant_id";
-    public static final String MENUCATEGORY_ID = "menucategory_id";
-    public static final String MEAL_ID = "meal_id";
+    public static final String MEAL = "mealID";
+    private String mealID;
 
-    //paramter's values
-    private String restaurant_id;
-    private String menucategory_id;
-    private String meal_id;
-
-    private ArrayList<MealAddition> listMealAddition;
-    private ArrayList<AdditionModel> listModel;
+    private ArrayList<AdditionModel> modelList;
     private OnNextClickedListener mCallback;
 
     public AdditionFragment() {}
+
+    public static AdditionFragment newInstance(String mealID) {
+        AdditionFragment fragment = new AdditionFragment();
+        Bundle args = new Bundle();
+        args.putString(MEAL, mealID);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            restaurant_id = getArguments().getString(RESTAURANT_ID);
-            menucategory_id = getArguments().getString(MENUCATEGORY_ID);
-            meal_id = getArguments().getString(MEAL_ID);
+            mealID = getArguments().getString(MEAL);
         }
-        listMealAddition = getAdditionList(restaurant_id, menucategory_id, meal_id);
-        listModel = getModel(listMealAddition);
+        modelList = getModel(mealID);
         setHasOptionsMenu(true);
     }
 
@@ -56,18 +53,9 @@ public class AdditionFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        AdditionArrayAdapter adapter = new AdditionArrayAdapter(getActivity(), listModel);
+        AdditionAdapter adapter = new AdditionAdapter(getActivity(), modelList);
         setListAdapter(adapter);
     }
-
-    /*
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        String item = (String) l.getItemAtPosition(position);
-        //listMeal.get(position).getCategoryID()
-    }
-    */
 
     @Override
     public void onAttach(Context context) {
@@ -87,30 +75,7 @@ public class AdditionFragment extends ListFragment {
     }
 
     public interface OnNextClickedListener {
-        public void onNextClicked(String restaurantID, String menuCategoryID,
-                                  String mealID, ArrayList<String> listAdditionID);
-    }
-
-    private ArrayList<AdditionModel> getModel(ArrayList<MealAddition> objList) {
-        ArrayList<AdditionModel> list = new ArrayList<AdditionModel>();
-        for (int i = 0; i < objList.size(); ++i) {
-            AdditionModel am = new AdditionModel(objList.get(i).getName(), objList.get(i).getAddition_id());
-            list.add(am);
-        }
-        return list;
-    }
-
-    private ArrayList<MealAddition> getAdditionList(String restaurant_id, String menucategory_id, String meal_id) {
-        ArrayList<MealAddition> mealAdditionList = new ArrayList<MealAddition>();
-
-        for(int i=0; i<10; i++) {
-            MealAddition a = new MealAddition();
-            a.setName("MealAddition " + i);
-            a.setAddition_id("addID" + i);
-            mealAdditionList.add(a);
-        }
-
-        return mealAdditionList;
+        public void onNextClicked(ArrayList<MealAddition> additionList);
     }
 
     @Override
@@ -121,40 +86,45 @@ public class AdditionFragment extends ListFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         if(id == R.id.action_next){
             // Send the Additions to the host activity
-            ArrayList<String> additionList = new ArrayList<String>();
-            for(AdditionModel am : listModel) {
+            ArrayList<MealAddition> additionList = new ArrayList<MealAddition>();
+            for(AdditionModel am : modelList) {
                 if(am.isSelected()) {
-                    additionList.add(am.getAdditionID());
+                    additionList.add(am.getAddition());
                 }
             }
-            mCallback.onNextClicked(
-                    restaurant_id,
-                    menucategory_id,
-                    meal_id,
-                    additionList);
+            mCallback.onNextClicked(additionList);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////
-
-    /*
-    public static AdditionFragment newInstance(String param1, String param2) {
-        AdditionFragment fragment = new AdditionFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    private ArrayList<AdditionModel> getModel(String mealID) {
+        ArrayList<AdditionModel> list = new ArrayList<AdditionModel>();
+        ArrayList<MealAddition> mealAdditions = getAdditionList(mealID);
+        for(MealAddition ma : mealAdditions) {
+            AdditionModel model = new AdditionModel(ma.getAddition_id(), ma.getName(), false, ma);
+            list.add(model);
+        }
+        return list;
     }
-    */
+
+    /////////////////////////////////////////////////////////////////////////////////////
+    //GENERATE DATAS
+    //TODO change this method to get data from firebase
+    private ArrayList<MealAddition> getAdditionList(String mealID) {
+        ArrayList<MealAddition> mealAdditionList = new ArrayList<MealAddition>();
+        for(int i=0; i<10; i++) {
+            MealAddition a = new MealAddition();
+            a.setmeal_id(mealID);
+            a.setName("Addition " + i);
+            a.setAddition_id("addID" + i);
+            mealAdditionList.add(a);
+        }
+        return mealAdditionList;
+    }
 }

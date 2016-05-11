@@ -16,12 +16,12 @@ import it.polito.group2.restaurantowner.R;
 /**
  * Created by Filippo on 10/05/2016.
  */
-public class AdditionArrayAdapter extends ArrayAdapter<AdditionModel> {
+public class AdditionAdapter extends ArrayAdapter<AdditionModel> {
 
     private final List<AdditionModel> list;
     private final Activity context;
 
-    public AdditionArrayAdapter(Activity context, List<AdditionModel> list) {
+    public AdditionAdapter(Activity context, List<AdditionModel> list) {
         super(context, R.layout.fragment_order_addition_item, list);
         this.context = context;
         this.list = list;

@@ -13,15 +13,22 @@ import android.view.MenuItem;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.data.MealAddition;
+import it.polito.group2.restaurantowner.data.MenuCategory;
+import it.polito.group2.restaurantowner.data.Order;
+import it.polito.group2.restaurantowner.data.OrderMeal;
+import it.polito.group2.restaurantowner.data.OrderMealAddition;
 
 public class OrderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        MenuCategoryFragment.OnMenuCategorySelectedListener,
+        CategoryFragment.OnCategorySelectedListener,
         MealFragment.OnMealSelectedListener,
         AdditionFragment.OnNextClickedListener,
         InfoFragment.OnAddClickedListener {
 
-    //private String restaurantID;
+    private Order order;
+    private OrderMeal meal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,33 +36,33 @@ public class OrderActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
 
+        //Toolbar setting
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //Navigation drawer setting
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //Fragment loader
         if(findViewById(R.id.fragment_container) != null) {
-
-            // However, if we're being restored from a previous state,
-            // then we don't need to do anything and should return or else
-            // we could end up with overlapping fragments.
             if (savedInstanceState != null) {
                 return;
             }
 
-            //restaurantID = getIntent().getExtras().getString("restaurant_id");
-            MenuCategoryFragment firstFragment = new MenuCategoryFragment();
-            firstFragment.setArguments(getIntent().getExtras());
-
-            // Add the fragment to the 'fragment_container' FrameLayout
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, firstFragment).commit();
+            //TODO: verificare che il parametro viene passato con questo nome
+            String restaurantID = "resID0";//getIntent().getExtras().getString("restaurant_id");
+            String userID = "userID0";//getIntent().getExtras().getString("user_id");
+            order = new Order(restaurantID, userID);
+            CategoryFragment categoryFragment = CategoryFragment.
+                    newInstance(restaurantID);
+            getSupportFragmentManager().beginTransaction().
+                    add(R.id.fragment_container, categoryFragment).commit();
         }
     }
 
@@ -95,12 +102,10 @@ public class OrderActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMenuCategorySelected(String restaurantID, String menuCategoryID) {
-        MealFragment mealFragment = new MealFragment();
-        Bundle args = new Bundle();
-        args.putString(MealFragment.MENUCATEGORY_ID, menuCategoryID);
-        args.putString(MealFragment.RESTAURANT_ID, restaurantID);
-        mealFragment.setArguments(args);
+    public void onCategorySelected(MenuCategory category) {
+        this.meal = new OrderMeal();
+        this.meal.setCategory(category);
+        MealFragment mealFragment = MealFragment.newInstance(category.getCategoryID());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, mealFragment);
         transaction.addToBackStack(null);
@@ -108,13 +113,9 @@ public class OrderActivity extends AppCompatActivity
     }
 
     @Override
-    public void onMealSelected(String restaurantID, String menuCategoryID, String mealID) {
-        AdditionFragment additionFragment = new AdditionFragment();
-        Bundle args = new Bundle();
-        args.putString(AdditionFragment.MENUCATEGORY_ID, menuCategoryID);
-        args.putString(AdditionFragment.RESTAURANT_ID, restaurantID);
-        args.putString(AdditionFragment.MEAL_ID, mealID);
-        additionFragment.setArguments(args);
+    public void onMealSelected(Meal meal) {
+        this.meal.setMeal(meal);
+        AdditionFragment additionFragment = AdditionFragment.newInstance(meal.getMealId());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, additionFragment);
         transaction.addToBackStack(null);
@@ -122,23 +123,22 @@ public class OrderActivity extends AppCompatActivity
     }
 
     @Override
-    public void onNextClicked(String restaurantID, String menuCategoryID, String mealID,
-                              ArrayList<String> listAdditionID) {
+    public void onNextClicked(ArrayList<MealAddition> additionList) {
+        for(MealAddition ma : additionList) {
+            OrderMealAddition addition = new OrderMealAddition();
+            addition.setAddition(ma);
+            this.meal.getAdditionList().add(addition);
+        }
+
         InfoFragment infoFragment = new InfoFragment();
-        Bundle args = new Bundle();
-        args.putString(InfoFragment.MENUCATEGORY_ID, menuCategoryID);
-        args.putString(InfoFragment.RESTAURANT_ID, restaurantID);
-        args.putString(InfoFragment.MEAL_ID, mealID);
-        args.putStringArrayList(InfoFragment.LIST_ADDITION_ID, listAdditionID);
-        infoFragment.setArguments(args);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, infoFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
 
-    public void onAddClicked(String restaurantID, String menuCategoryID,
-                             String mealID, ArrayList<String> listAdditionID) {
+    @Override
+    public void onAddClicked() {
         //Toast.makeText(OrderActivity.this, "Ciao", Toast.LENGTH_SHORT).show();
     }
 }
