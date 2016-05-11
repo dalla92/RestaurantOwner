@@ -26,4 +26,16 @@ public class MenuCategory {
     public String getName() {
         return name;
     }
+
+    public void setCategoryID(String categoryID) {
+        this.categoryID = categoryID;
+    }
+
+    public void setRestaurantID(String restaurantID) {
+        this.restaurantID = restaurantID;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

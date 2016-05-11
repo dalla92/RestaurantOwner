@@ -15,27 +15,29 @@ import it.polito.group2.restaurantowner.data.Meal;
 
 public class MealFragment extends ListFragment {
 
-    //parameter's names
-    public static final String RESTAURANT_ID = "restaurant_id";
-    public static final String MENUCATEGORY_ID = "menucategory_id";
+    public static final String CATEGORY = "categoryID";
+    private String categoryID;
 
-    //paramter's values
-    private String restaurant_id;
-    private String menucategory_id;
-
-    private ArrayList<Meal> listMeal;
+    private ArrayList<MealModel> modelList;
     private OnMealSelectedListener mCallback;
 
     public MealFragment() {}
+
+    public static MealFragment newInstance(String catID) {
+        MealFragment fragment = new MealFragment();
+        Bundle args = new Bundle();
+        args.putString(CATEGORY, catID);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            restaurant_id = getArguments().getString(RESTAURANT_ID);
-            menucategory_id = getArguments().getString(MENUCATEGORY_ID);
+            categoryID = getArguments().getString(CATEGORY);
         }
-        listMeal = getMealList(restaurant_id, menucategory_id);
+        modelList = getModel(categoryID);
     }
 
     @Override
@@ -48,18 +50,13 @@ public class MealFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        MealArrayAdapter adapter = new MealArrayAdapter(getActivity(),
-                android.R.layout.simple_list_item_1, getItemList(listMeal));
+        MealAdapter adapter = new MealAdapter(getActivity(), modelList);
         setListAdapter(adapter);
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        // Send the MealID to the host activity
-        mCallback.onMealSelected(restaurant_id,
-                menucategory_id,
-                listMeal.get(position).getMealId());
+        mCallback.onMealSelected(modelList.get(position).getMeal());
     }
 
     @Override
@@ -80,48 +77,33 @@ public class MealFragment extends ListFragment {
     }
 
     public interface OnMealSelectedListener {
-        public void onMealSelected(String restaurantID, String menuCategoryID, String mealID);
+        public void onMealSelected(Meal meal);
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////
-    // GETTING DATAS
-    private ArrayList<String> getItemList(ArrayList<Meal> objList) {
-        ArrayList<String> list = new ArrayList<String>();
-        for (int i = 0; i < objList.size(); ++i) {
-            list.add(objList.get(i).getMeal_name());
+    private ArrayList<MealModel> getModel(String categoryID) {
+        ArrayList<MealModel> list = new ArrayList<MealModel>();
+        ArrayList<Meal> categoryMeals = getMealList(categoryID);
+        for(Meal m : categoryMeals) {
+            MealModel model = new MealModel(m.getMealId(), m.getMeal_name(), m);
+            list.add(model);
         }
         return list;
     }
 
-    private ArrayList<Meal> getMealList(String restaurant_id, String menucategory_id) {
+    /////////////////////////////////////////////////////////////////////////////////////
+    //GENERATE DATAS
+    //TODO change this method to get data from firebase
+    private ArrayList<Meal> getMealList(String categoryID) {
         ArrayList<Meal> mealList = new ArrayList<Meal>();
-
         for(int i=0; i<10; i++) {
             Meal m = new Meal();
+            m.setRestaurantId("ResID0");
+            m.setCategory(categoryID);
             m.setMeal_name("meal "+i);
             m.setMealId("mealID"+i);
             mealList.add(m);
         }
-
         return mealList;
     }
 
-    /////////////////////////////////////////////////////////////////////////////////
-
-
-    /*
-
-
-
-    // TODO: Rename and change types and number of parameters
-    public static MealFragment newInstance(String param1, String param2) {
-        MealFragment fragment = new MealFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    */
 }

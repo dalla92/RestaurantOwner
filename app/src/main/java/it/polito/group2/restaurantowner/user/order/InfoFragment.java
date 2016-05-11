@@ -15,17 +15,6 @@ import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
 
 public class InfoFragment extends Fragment {
-    //parameter's names
-    public static final String RESTAURANT_ID = "restaurant_id";
-    public static final String MENUCATEGORY_ID = "menucategory_id";
-    public static final String MEAL_ID = "meal_id";
-    public static final String LIST_ADDITION_ID = "list_addition_id";
-
-    //paramter's values
-    private String restaurant_id;
-    private String menucategory_id;
-    private String meal_id;
-    private ArrayList<String> list_addition_id;
 
     private OnAddClickedListener mCallback;
 
@@ -34,12 +23,6 @@ public class InfoFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            restaurant_id = getArguments().getString(RESTAURANT_ID);
-            menucategory_id = getArguments().getString(MENUCATEGORY_ID);
-            meal_id = getArguments().getString(MEAL_ID);
-            list_addition_id = getArguments().getStringArrayList(LIST_ADDITION_ID);
-        }
         setHasOptionsMenu(true);
     }
 
@@ -68,8 +51,7 @@ public class InfoFragment extends Fragment {
     }
 
     public interface OnAddClickedListener {
-        public void onAddClicked(String restaurantID, String menuCategoryID,
-                                  String mealID, ArrayList<String> listAdditionID);
+        public void onAddClicked();
     }
 
     @Override
@@ -87,11 +69,7 @@ public class InfoFragment extends Fragment {
 
         if(id == R.id.action_add){
             // Send the Additions to the host activity
-            mCallback.onAddClicked(
-                    restaurant_id,
-                    menucategory_id,
-                    meal_id,
-                    list_addition_id);
+            mCallback.onAddClicked();
             return true;
         }
 

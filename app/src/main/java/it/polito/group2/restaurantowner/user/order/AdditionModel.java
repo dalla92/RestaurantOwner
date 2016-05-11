@@ -1,33 +1,37 @@
 package it.polito.group2.restaurantowner.user.order;
 
+import it.polito.group2.restaurantowner.data.MealAddition;
+
 /**
  * Created by Filippo on 10/05/2016.
  */
 public class AdditionModel {
-    private String additionName;
-    private String additionID;
+    private String id;
+    private String name;
     private boolean selected;
+    private MealAddition addition;
 
-    public AdditionModel(String name, String id) {
-        this.additionName = name;
-        this.additionID = id;
-        selected = false;
+    public AdditionModel(String id, String name, boolean selected, MealAddition addition) {
+        this.id = id;
+        this.name = name;
+        this.selected = selected;
+        this.addition = addition;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
-        return additionName;
+        return name;
     }
 
     public void setName(String name) {
-        this.additionName = name;
-    }
-
-    public String getAdditionID() {
-        return additionID;
-    }
-
-    public void setAdditionID(String additionID) {
-        this.additionID = additionID;
+        this.name = name;
     }
 
     public boolean isSelected() {
@@ -37,4 +41,13 @@ public class AdditionModel {
     public void setSelected(boolean selected) {
         this.selected = selected;
     }
+
+    public MealAddition getAddition() {
+        return addition;
+    }
+
+    public void setAddition(MealAddition addition) {
+        this.addition = addition;
+    }
+
 }
