@@ -209,7 +209,7 @@
     <string name="order_category_title">What do you want to eat?</string>
     <string name="order_meal_title">Select it</string>
     <string name="order_addition_title">Any additions?</string>
-    <string name="order_cart_title">That\'s your order:</string>
+    <string name="order_cart_title">Here\'s your order:</string>
     <string name="order_cart_btn_confirm">Confirm order</string>
     <string name="order_cart_btn_continue">Continue order</string>
     <string name="order_cart_hint_note">Additional order info</string>
@@ -220,6 +220,30 @@
 
 
     <string name="title_activity_my_orders">My Orders</string>
+    <string name="call_confirmation">Call confirmation</string>
+    <string name="call_confirmation_message">Sure to call the restaurant?</string>
+    <string name="calendar">Calendar</string>
+    <string name="insert_date">Please, insert a date</string>
+    <string name="insert_time">Please, insert time</string>
+    <string name="invalid_or_incomplete_data">Data not valid or incomplete. Check again.</string>
+    <string name="no_table_reservation_service">This restaurant does not allow to reserve tables.</string>
+    <string name="notes">Notes</string>
+    <string name="no">No</string>
+    <string name="ok">OK</string>
+    <string name="reservationConfirmation">Confirm reservation</string>
+    <string name="reservation_date">Choose a date</string>
+    <string name="reservation_guests_number">Guests</string>
+    <string name="reservation_time">Pick a time</string>
+    <string name="reserve">Reserve</string>
+    <string name="set_date_first">Set date first</string>
+    <string name="set_time_first">Set time first</string>
+    <string name="table_reservation_confirmation">Reservation confirmation</string>
+    <string name="table_reservation_confirmation_message">Do you really want to book?</string>
+    <string name="table_reservation_confirmation_message2">You booked successfully</string>
+    <string name="telephone_number_not_provided">The restaurant did not provide telephone number</string>
+    <string name="title_activity_my_reservation">My Reservations</string>
+    <string name="title_table_reservation_activity">Reservation</string>
+    <string name="yes">Yes</string>
 
 
 </resources>
