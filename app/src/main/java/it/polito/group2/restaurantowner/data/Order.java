@@ -10,7 +10,7 @@ public class Order {
     private String userID;
     private Calendar timestamp;
     private String note;
-    private ArrayList<OrderMeal> mealList = new ArrayList<OrderMeal>();
+    private ArrayList<OrderMeal> mealList = new ArrayList<>();
 
     public Order() {
     }

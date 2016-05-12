@@ -34,7 +34,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.TableReservation;
-import it.polito.group2.restaurantowner.data.TakeAwayReservation;
+import it.polito.group2.restaurantowner.data.Order;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
@@ -100,7 +100,7 @@ public class StatisticsActivity extends AppCompatActivity
 
     private ArrayList<LineDataSet> getDataSet() {
         ArrayList<TableReservation> bookingList = new ArrayList<>();
-        ArrayList<TakeAwayReservation> orderList = new ArrayList<>();
+        ArrayList<Order> orderList = new ArrayList<>();
 
         /*
         try {

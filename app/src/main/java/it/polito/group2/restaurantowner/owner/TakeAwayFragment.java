@@ -26,12 +26,10 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.OrderMeal;
 import it.polito.group2.restaurantowner.data.Order;
-import it.polito.group2.restaurantowner.data.OrderedMeal;
-import it.polito.group2.restaurantowner.data.TakeAwayReservation;
 
 public class TakeAwayFragment extends Fragment {
 
-    private ArrayList<TakeAwayReservation> reservation_list;
+    private ArrayList<Order> reservation_list;
     private BaseAdapter adapter;
 
     @Override
@@ -81,27 +79,27 @@ public class TakeAwayFragment extends Fragment {
 
                 SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
                 TextView text_client_name = (TextView) convertView.findViewById(R.id.reservation_client);
-                TextView text_time = (TextView) convertView.findViewById(R.id.table_reservation_time);
+                TextView text_time = (TextView) convertView.findViewById(R.id.reservation_time);
                 TextView text_notes = (TextView) convertView.findViewById(R.id.reservation_notes);
 
                 Order reservation = reservation_list.get(position);
-                text_client_name.setText(reservation.getUsername());
-                text_time.setText(timeFormat.format(reservation.getDate().getTime()));
-                text_notes.setText(reservation.getNotes());
+                text_client_name.setText(reservation.getUserID());
+                text_time.setText(timeFormat.format(reservation.getTimestamp().getTime()));
+                text_notes.setText(reservation.getNote());
 
                 LinearLayout list = (LinearLayout) convertView.findViewById(R.id.takeaway_reservation_list);
                 list.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ArrayList<OrderMeal> ordered_meals = reservation_list.get(position).getOrdered_meals();
+                        ArrayList<OrderMeal> ordered_meals = reservation_list.get(position).getMealList();
                         MealListDialog dialog = MealListDialog.newInstance(ordered_meals);
                         dialog.show(getActivity().getFragmentManager(), null);
                     }
                 });
 
-                ImageView delete = (ImageView) convertView.findViewById(R.id.table_reservation_delete);
+                ImageView delete = (ImageView) convertView.findViewById(R.id.reservation_delete);
                 Calendar today = Calendar.getInstance();
-                Calendar target = reservation.getDate();
+                Calendar target = reservation.getTimestamp();
                 if(target.after(today.getTime()) ||
                         (target.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
                                 target.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
@@ -151,8 +149,8 @@ public class TakeAwayFragment extends Fragment {
     }
 
     private void createFakeData(Calendar date, String restaurantId) {
-        ArrayList<TakeAwayReservation> reservations = new ArrayList<>();
-        Calendar today = Calendar.getInstance();
+        ArrayList<Order> reservations = new ArrayList<>();
+        /*Calendar today = Calendar.getInstance();
         Calendar tomorrow = Calendar.getInstance();
         tomorrow.set(Calendar.DAY_OF_MONTH, today.get(Calendar.DAY_OF_MONTH) + 1);
         String id1 = UUID.randomUUID().toString();
@@ -184,10 +182,10 @@ public class TakeAwayFragment extends Fragment {
             JSONUtil.saveJSONTakeAwayResList(getActivity(), reservations);
         } catch (JSONException e) {
             Log.d("failed", "problema nel createFakeData delle takeAwayReservations");
-        }
+        }*/
     }
 
-    private void saveDataToJson(ArrayList<TakeAwayReservation> reservations) {
+    private void saveDataToJson(ArrayList<Order> reservations) {
         try {
             JSONUtil.saveJSONTakeAwayResList(getActivity(), reservations);
         } catch (JSONException e) {
@@ -195,7 +193,7 @@ public class TakeAwayFragment extends Fragment {
         }
     }
 
-    private ArrayList<TakeAwayReservation> getDataJson(Calendar date, String restaurantId) {
+    private ArrayList<Order> getDataJson(Calendar date, String restaurantId) {
 
         try {
             return JSONUtil.readJSONTakeAwayResList(getActivity(), date, restaurantId);

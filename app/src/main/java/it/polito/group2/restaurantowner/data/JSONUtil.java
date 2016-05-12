@@ -529,18 +529,18 @@ public class JSONUtil {
         }
     }
 
-    public static void saveJSONTakeAwayResList(Context mContext, ArrayList<TakeAwayReservation> reservations) throws JSONException {
+    public static void saveJSONTakeAwayResList(Context mContext, ArrayList<Order> reservations) throws JSONException {
         String FILENAME = "takeAwayReservation.json";
         JSONArray jarray = new JSONArray();
         SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-        for (TakeAwayReservation res : reservations) {
+        for (Order res : reservations) {
             JSONObject jres = new JSONObject();
-            jres.put("RestaurantID", res.getRestaurantId());
-            jres.put("Date", timeFormat.format(res.getDate().getTime()));
-            jres.put("Username", res.getUsername());
-            jres.put("Notes", res.getNotes());
-            jres.put("TakeAwayReservationID", res.getTakeAwayReservationId());
-            saveJSONOrderedMeal(mContext, res.getOrdered_meals());
+            jres.put("RestaurantID", res.getRestaurantID());
+            jres.put("Date", timeFormat.format(res.getTimestamp().getTime()));
+            jres.put("Username", res.getUserID());
+            jres.put("Notes", res.getNote());
+            jres.put("TakeAwayReservationID", res.getOrderID());
+            saveJSONOrderedMeal(mContext, res.getMealList());
             jarray.put(jres);
         }
         JSONObject resObj = new JSONObject();
@@ -557,9 +557,9 @@ public class JSONUtil {
         }
     }
 
-    public static ArrayList<TakeAwayReservation> readJSONTakeAwayResList(Context mContext, Calendar targetDate, String targetRestaurantId) throws JSONException{
+    public static ArrayList<Order> readJSONTakeAwayResList(Context mContext, Calendar targetDate, String targetRestaurantId) throws JSONException{
         String json = null;
-        ArrayList<TakeAwayReservation> takeAwayResList = new ArrayList<>();
+        ArrayList<Order> takeAwayResList = new ArrayList<>();
         FileInputStream fis = null;
         String FILENAME = "takeAwayReservation.json";
         try {
@@ -603,23 +603,23 @@ public class JSONUtil {
             String username = jsonObject.optString("Username");
             String notes = jsonObject.optString("Notes");
             String takeAwayReservationId = jsonObject.optString("TakeAwayReservationID");
-            ArrayList<OrderedMeal> orderedMeals = readJSONOrderedMeal(mContext, takeAwayReservationId);
+            ArrayList<OrderMeal> orderedMeals = readJSONOrderedMeal(mContext, takeAwayReservationId);
 
-            TakeAwayReservation takeAwayRes = new TakeAwayReservation(username, orderedMeals, c, notes, restaurantId, takeAwayReservationId);
-            takeAwayResList.add(takeAwayRes);
+            //Order takeAwayRes = new Order(username, orderedMeals, c, notes, restaurantId, takeAwayReservationId);
+            //takeAwayResList.add(takeAwayRes);
         }
         return takeAwayResList;
     }
 
-    private static void saveJSONOrderedMeal(Context mContext, ArrayList<OrderedMeal> ordered_meals) throws JSONException {
+    private static void saveJSONOrderedMeal(Context mContext, ArrayList<OrderMeal> ordered_meals) throws JSONException {
         String FILENAME = "orderedMeal.json";
         JSONArray jarray = new JSONArray();
-        ArrayList<OrderedMeal> orderedMealComplete = readJSONOrderedMealFull(mContext);
+        ArrayList<OrderMeal> orderedMealComplete = readJSONOrderedMealFull(mContext);
         orderedMealComplete.addAll(ordered_meals);
-        for (OrderedMeal meal : orderedMealComplete) {
+        for (OrderMeal meal : orderedMealComplete) {
             JSONObject jres = new JSONObject();
-            jres.put("TakeAwayReservationID", meal.getTakeAwayReservationId());
-            jres.put("MealName",meal.getMeal_name());
+            jres.put("TakeAwayReservationID", meal.getOrderID());
+            jres.put("MealName",meal.getMeal().getMeal_name());
             jres.put("quantity", meal.getQuantity());
             jarray.put(jres);
         }
@@ -637,9 +637,9 @@ public class JSONUtil {
         }
     }
 
-    private static ArrayList<OrderedMeal> readJSONOrderedMeal(Context mContext, String targetTakeAwayReservationId) throws JSONException {
+    private static ArrayList<OrderMeal> readJSONOrderedMeal(Context mContext, String targetTakeAwayReservationId) throws JSONException {
         String json = null;
-        ArrayList<OrderedMeal> orderedMealList = new ArrayList<>();
+        ArrayList<OrderMeal> orderedMealList = new ArrayList<>();
         FileInputStream fis = null;
         String FILENAME = "orderedMeal.json";
         try {
@@ -668,15 +668,15 @@ public class JSONUtil {
 
             String mealName = jsonObject.optString("MealName");
             int quantity = jsonObject.optInt("quantity");
-            OrderedMeal orderedMeal = new OrderedMeal(mealName, quantity, takeAwayReservationId);
+            OrderMeal orderedMeal = new OrderMeal(mealName, quantity, takeAwayReservationId);
             orderedMealList.add(orderedMeal);
         }
         return orderedMealList;
     }
 
-    private static ArrayList<OrderedMeal> readJSONOrderedMealFull(Context mContext) throws JSONException {
+    private static ArrayList<OrderMeal> readJSONOrderedMealFull(Context mContext) throws JSONException {
         String json = null;
-        ArrayList<OrderedMeal> orderedMealList = new ArrayList<>();
+        ArrayList<OrderMeal> orderedMealList = new ArrayList<>();
         FileInputStream fis = null;
         String FILENAME = "orderedMeal.json";
         try {
@@ -702,7 +702,7 @@ public class JSONUtil {
             String takeAwayReservationId = jsonObject.optString("TakeAwayReservationID");
             String mealName = jsonObject.optString("MealName");
             int quantity = jsonObject.optInt("quantity");
-            OrderedMeal orderedMeal = new OrderedMeal(mealName, quantity, takeAwayReservationId);
+            OrderMeal orderedMeal = new OrderMeal(mealName, quantity, takeAwayReservationId);
             orderedMealList.add(orderedMeal);
         }
         return orderedMealList;
