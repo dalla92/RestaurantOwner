@@ -5,9 +5,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import java.util.ArrayList;
 
@@ -42,12 +44,33 @@ public class CartFragment extends ListFragment {
             order = (Order)getArguments().getSerializable(ORDER);
         }
         modelList = getModel();
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().
+                getResources().getString(R.string.order_cart_title));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_order_cart, container, false);
+
+        Button confirm_btn = (Button) view.findViewById(R.id.confirm_order);
+        Button continue_btn = (Button) view.findViewById(R.id.continue_order);
+
+        continue_btn.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                mCallback.onContinueOrderClicked(order);
+            }
+        });
+
+        confirm_btn.setOnClickListener(new View.OnClickListener()
+        {
+            public void onClick(View v)
+            {
+                mCallback.onConfirmOrderClicked(order);
+            }
+        });
         return view;
     }
 
@@ -77,8 +100,8 @@ public class CartFragment extends ListFragment {
     }
 
     public interface OnActionListener {
-        public void onConfirmOrderClicked();
-        public void onContinueOrderClicked();
+        public void onConfirmOrderClicked(Order order);
+        public void onContinueOrderClicked(Order order);
     }
 
     private ArrayList<MealModel> getModel() {

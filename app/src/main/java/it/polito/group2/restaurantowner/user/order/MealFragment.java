@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner.user.order;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,8 @@ public class MealFragment extends ListFragment {
             categoryID = getArguments().getString(CATEGORY);
         }
         modelList = getModel(categoryID);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().
+                getResources().getString(R.string.order_meal_title));
     }
 
     @Override

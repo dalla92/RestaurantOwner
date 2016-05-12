@@ -151,12 +151,13 @@ public class OrderActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConfirmOrderClicked(){
+    public void onConfirmOrderClicked(Order order){
         //new fragment confirmFragment
     }
 
     @Override
-    public void onContinueOrderClicked(){
+    public void onContinueOrderClicked(Order order){
+        this.order = order;
         CategoryFragment categoryFragment = CategoryFragment.newInstance(this.order.getRestaurantID());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, categoryFragment);

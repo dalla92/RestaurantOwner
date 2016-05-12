@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner.user.order;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -59,6 +60,8 @@ public class InfoFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_order_info, menu);
         super.onCreateOptionsMenu(menu, inflater);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().
+                getResources().getString(R.string.order_info_title));
     }
 
     @Override

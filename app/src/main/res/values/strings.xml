@@ -206,10 +206,13 @@
     <string name="order_addtocart">Add</string>
     <string name="order_mealquantity">Add quantity</string>
     <string name="order_mealnote">Additional note</string>
-    <string name="order_category_select">What do you want to eat?</string>
-    <string name="order_meal_select">Select our meal...</string>
-    <string name="order_addition_select">Do you want to add something?</string>
+    <string name="order_category_title">What do you want to eat?</string>
+    <string name="order_meal_title">Select it</string>
+    <string name="order_addition_title">Any additions?</string>
     <string name="order_cart_title">That\'s your order:</string>
+    <string name="order_cart_buttonconfirm">Confirm order</string>
+    <string name="order_cart_buttoncontinue">Continue order</string>
+    <string name="order_info_title">How many?</string>
 
 
 </resources>

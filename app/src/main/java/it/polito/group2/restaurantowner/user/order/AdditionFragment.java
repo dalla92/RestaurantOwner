@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner.user.order;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,8 @@ public class AdditionFragment extends ListFragment {
         }
         modelList = getModel(mealID);
         setHasOptionsMenu(true);
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().
+                getResources().getString(R.string.order_addition_title));
     }
 
     @Override
