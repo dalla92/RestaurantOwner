@@ -18,7 +18,6 @@ public class MealAddition implements Serializable {
     double price = 0.0;
     boolean selected = false;
 
-    //TODO aggiungere addition_id al costruttore
     public MealAddition(String restaurant_id, String meal_id, String name, double price, boolean selected) {
         super();
         //this.code = code;

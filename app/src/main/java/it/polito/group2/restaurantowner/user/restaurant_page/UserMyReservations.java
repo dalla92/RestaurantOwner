@@ -189,7 +189,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         } else if(id==R.id.nav_my_favourites){
             Intent intent3 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    UserMyFavourites.class);
             Bundle b3 = new Bundle();
             b3.putString("user_id", user_id);
             intent3.putExtras(b3);

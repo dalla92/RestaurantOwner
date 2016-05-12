@@ -21,6 +21,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.Review;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.SimpleItemTouchHelperCallback;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
@@ -63,20 +64,6 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        //TODO decomment handle logged/not logged user
-        /*
-        if(user_id==null){ //not logged
-            Menu nav_Menu = navigationView.getMenu();
-            nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reservations).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reviews).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_favorites).setVisible(false);
-        }
-        else{ //logged
-            //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
-        }
-        */
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -150,7 +137,7 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
         } else if(id==R.id.nav_my_favourites){
             Intent intent3 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    UserMyFavourites.class);
             Bundle b3 = new Bundle();
             b3.putString("user_id", user_id);
             intent3.putExtras(b3);

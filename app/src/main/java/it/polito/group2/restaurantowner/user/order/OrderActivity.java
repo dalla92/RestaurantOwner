@@ -21,7 +21,13 @@ import it.polito.group2.restaurantowner.data.MenuCategory;
 import it.polito.group2.restaurantowner.data.Order;
 import it.polito.group2.restaurantowner.data.OrderMeal;
 import it.polito.group2.restaurantowner.data.OrderMealAddition;
+import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
+import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
 
 public class OrderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -33,6 +39,8 @@ public class OrderActivity extends AppCompatActivity
 
     private Order order;
     private OrderMeal meal;
+    private String user_id;
+    private String restaurant_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,10 +48,16 @@ public class OrderActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order_activity);
 
-        //TODO: verificare che il parametro viene passato con questo nome
-        String restaurantID = "resID0";//getIntent().getExtras().getString("restaurant_id");
-        String userID = "userID0";//getIntent().getExtras().getString("user_id");
-        order = new Order(restaurantID, userID);
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null)
+            restaurant_id = getIntent().getExtras().getString("restaurant_id");
+        else
+            restaurant_id = "resID0";
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null)
+            user_id = getIntent().getExtras().getString("user_id");
+        else
+            user_id = "userID0";
+
+        order = new Order(restaurant_id, user_id);
 
         //Toolbar setting
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -64,7 +78,7 @@ public class OrderActivity extends AppCompatActivity
                 return;
             }
             CategoryFragment categoryFragment = CategoryFragment.
-                    newInstance(restaurantID);
+                    newInstance(restaurant_id);
             getSupportFragmentManager().beginTransaction().
                     add(R.id.fragment_container, categoryFragment).commit();
         }
@@ -85,26 +99,83 @@ public class OrderActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(id==R.id.nav_owner){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    MainActivity.class);
+            Bundle b1 = new Bundle();
+            b1.putString("user_id", user_id);
+            intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        }
+        else if(id==R.id.nav_home){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+            Bundle b1 = new Bundle();
+            b1.putString("user_id", user_id);
+            intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        }
+        else if(id==R.id.nav_login){
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.nav_my_profile) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserProfile.class);
+            Bundle b1 = new Bundle();
+            b1.putString("user_id", user_id);
+            intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.nav_my_orders) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantList.class);
+            Bundle b1 = new Bundle();
+            b1.putString("user_id", user_id);
+            intent1.putExtras(b1);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.nav_my_reservations){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    UserMyReservations.class);
+            Bundle b3 = new Bundle();
+            b3.putString("user_id", user_id);
+            intent3.putExtras(b3);
+            startActivity(intent3);
+            return true;
+        } else if(id==R.id.nav_my_reviews){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    MyReviewsActivity.class);
+            Bundle b3 = new Bundle();
+            b3.putString("user_id", user_id);
+            intent3.putExtras(b3);
+            startActivity(intent3);
+            return true;
+        } else if(id==R.id.nav_my_favourites){
+            Intent intent3 = new Intent(
+                    getApplicationContext(),
+                    UserMyFavourites.class);
+            Bundle b3 = new Bundle();
+            b3.putString("user_id", user_id);
+            intent3.putExtras(b3);
+            startActivity(intent3);
+            return true;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
     @Override
     public void onCategorySelected(MenuCategory category) {
         this.meal = new OrderMeal();

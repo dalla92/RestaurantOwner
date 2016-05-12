@@ -185,10 +185,6 @@ public class MainActivity extends AppCompatActivity
                     UserRestaurantList.class);
             startActivity(intent1);
             return true;
-        } else if (id == R.id.nav_logout) {
-            // TODO Handle the logout action
-        } else if (id == R.id.nav_manage) {
-            // TODO Handle the manage action
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

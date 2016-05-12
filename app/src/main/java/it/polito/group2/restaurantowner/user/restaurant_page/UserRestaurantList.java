@@ -114,7 +114,8 @@ public class UserRestaurantList extends AppCompatActivity
                     public void onItemClick(View view, int position) {
                         Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
                         String id = resList.get(position).getRestaurantId();
-                        mIntent.putExtra("RestaurantId", id);
+                        mIntent.putExtra("restaurant_id", id);
+                        mIntent.putExtra("user_id", id);
                         startActivity(mIntent);
                     }
                 })
@@ -330,7 +331,7 @@ public class UserRestaurantList extends AppCompatActivity
         } else if(id==R.id.nav_my_favourites){
             Intent intent3 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    UserMyFavourites.class);
             Bundle b3 = new Bundle();
                 b3.putString("user_id", user_id);
                 intent3.putExtras(b3);

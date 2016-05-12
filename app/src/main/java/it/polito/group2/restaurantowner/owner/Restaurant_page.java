@@ -406,11 +406,6 @@ public class Restaurant_page extends AppCompatActivity
             show();
             return true;
         }
-        if (id == R.id.nav_logout) {
-            // TODO Handle the logout action
-        } else if (id == R.id.nav_manage) {
-            // TODO Handle the manage action
-        }
 
         drawer.closeDrawer(GravityCompat.START);
         return true;

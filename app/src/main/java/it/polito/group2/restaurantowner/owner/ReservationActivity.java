@@ -196,11 +196,6 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
             startActivityForResult(intent6, MODIFY_INFO);
             return true;
         }
-        if (id == R.id.nav_logout) {
-            // TODO Handle the logout action
-        } else if (id == R.id.nav_manage) {
-            // TODO Handle the manage action
-        }
 
         drawer.closeDrawer(GravityCompat.START);
         return true;

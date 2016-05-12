@@ -26,6 +26,7 @@ import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.Meal;
 import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.data.Restaurant;
 
@@ -35,8 +36,10 @@ import it.polito.group2.restaurantowner.data.Restaurant;
 public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder>{
     private List<Restaurant> mDataset;
     private static Context mContext;
+    private float PRICE_BOUNDARY_1 = 5;
+    private float PRICE_BOUNDARY_2 = 10;
 
-        protected int filter(String category, String time, boolean price1, boolean price2, boolean price3, boolean price4) {
+    protected int filter(String category, String time, boolean price1, boolean price2, boolean price3, boolean price4) {
                 //filter by category
                 List<Restaurant> nResList = new ArrayList<Restaurant>();
             if(category.equals("0"))
@@ -157,11 +160,9 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                 }
             }
 
-
-            //TODO remember to take out, hust for testing purpose
+            //TODO remember to take out, just for testing purpose
+            //obj.setPriceRange(calculate_range(obj));
             obj.setPriceRange("2");
-
-
 
             this.resName.setText(obj.getName());
             this.rating.setText(obj.getRating());
@@ -212,6 +213,40 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         notifyItemRangeChanged(position, mDataset.size());
     }
 
+    public int calculate_range(Restaurant r){
+        ArrayList<Meal> meals = null;
+        try{
+            meals = JSONUtil.readJSONMeList(mContext, r.getRestaurantId());
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        int meals_number = meals.size();
+
+        if(meals_number==0)
+            return 1;
+
+        double meals_price_sum=0;
+        for(Meal m : meals){
+            meals_price_sum += m.getMeal_price();
+        }
+
+        double ratio=0;
+
+        if(meals_price_sum==0)
+            return 1;
+
+        ratio = meals_price_sum/meals_number;
+
+        if(ratio <= PRICE_BOUNDARY_1)
+            return 1;
+        if(ratio > PRICE_BOUNDARY_1 && ratio < PRICE_BOUNDARY_2)
+            return 2;
+
+        return 3;
+
+    }
 
 
 }

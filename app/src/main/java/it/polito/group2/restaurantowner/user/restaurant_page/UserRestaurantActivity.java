@@ -5,6 +5,7 @@ import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
@@ -36,17 +37,20 @@ import android.widget.TextView;
 
 import org.json.JSONException;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.Bookmark;
 import it.polito.group2.restaurantowner.data.MenuCategory;
 import it.polito.group2.restaurantowner.data.Review;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.Offer;
+import it.polito.group2.restaurantowner.data.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.gallery.GalleryViewActivity;
@@ -61,6 +65,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private Restaurant targetRestaurant;
     private ReviewAdapter reviewAdapter;
     private String user_id;
+    private String restaurant_id;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +74,15 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         setContentView(R.layout.activity_user_restaurant);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        context = this;
+
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
+            restaurant_id = getIntent().getExtras().getString("restaurant_id");
+        }
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
+            user_id = getIntent().getExtras().getString("user_id");
+        }
 
         final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
 
@@ -240,7 +255,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         } else if(id==R.id.nav_my_favourites){
             Intent intent3 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    UserMyFavourites.class);
             Bundle b3 = new Bundle();
             b3.putString("user_id", user_id);
             intent3.putExtras(b3);
@@ -535,7 +550,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
             @Override
             public TimesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-               View itemView = LayoutInflater.from(parent.getContext())
+                View itemView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.time_item, parent, false);
                 return new TimesViewHolder(itemView);
             }
@@ -645,11 +660,35 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    Bookmark user_bookmark = new Bookmark();
+                    if(restaurant_id!=null)
+                        user_bookmark.setRestaurant_id(restaurant_id);
+                    if(user_id!=null)
+                        user_bookmark.setRestaurant_id(user_id);
+                    ArrayList<Bookmark> bookmarks_temp = new ArrayList<Bookmark>();
                     if(!isBookmark()) {
+                        //read, add and write
                         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_on_24dp));
+                        try {
+                            bookmarks_temp = JSONUtil.readBookmarkList(context, null);
+                            bookmarks_temp.add(user_bookmark);
+                            JSONUtil.saveBookmarksList(context, bookmarks_temp);
+                        }
+                        catch(JSONException e){
+                            e.printStackTrace();
+                        }
                     }
                     else{
+                        //read, remove and write
                         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this,R.drawable.ic_star_off_24dp));
+                        try {
+                            bookmarks_temp = JSONUtil.readBookmarkList(context, null);
+                            bookmarks_temp.remove(user_bookmark);
+                            JSONUtil.saveBookmarksList(context, bookmarks_temp);
+                        }
+                        catch(JSONException e){
+                            e.printStackTrace();
+                        }
                     }
                 }
             });

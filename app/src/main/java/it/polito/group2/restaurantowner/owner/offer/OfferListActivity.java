@@ -315,11 +315,6 @@ public class OfferListActivity extends AppCompatActivity implements NavigationVi
             startActivityForResult(intent, ADD_REQUEST);
             return true;
         }
-        if (id == R.id.nav_logout) {
-            // TODO Handle the logout action
-        } else if (id == R.id.nav_manage) {
-            // TODO Handle the manage action
-        }
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
