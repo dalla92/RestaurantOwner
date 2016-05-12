@@ -1,5 +1,7 @@
 package it.polito.group2.restaurantowner.user.order;
 
+import java.util.ArrayList;
+
 import it.polito.group2.restaurantowner.data.Meal;
 
 /**
@@ -10,6 +12,7 @@ public class MealModel {
     private String id;
     private String name;
     private Meal meal;
+    private ArrayList<AdditionModel> additionModel = new ArrayList<AdditionModel>();
 
     public MealModel(String id, String name, Meal meal) {
         this.id = id;
@@ -39,5 +42,13 @@ public class MealModel {
 
     public void setMeal(Meal meal) {
         this.meal = meal;
+    }
+
+    public ArrayList<AdditionModel> getAdditionModel() {
+        return additionModel;
+    }
+
+    public void setAdditionModel(ArrayList<AdditionModel> additionModel) {
+        this.additionModel = additionModel;
     }
 }

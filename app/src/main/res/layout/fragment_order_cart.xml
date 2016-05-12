@@ -2,12 +2,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="it.polito.group2.restaurantowner.user.order.CartFragment">
+    tools:context=".user.order.CartFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="test" />
+        android:layout_height="wrap_content"
+        android:text="@string/order_cart_title"
+        android:textSize="20dp"/>
+
+    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"/>
 
 </FrameLayout>

@@ -1,9 +1,10 @@
 package it.polito.group2.restaurantowner.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-public class Order {
+public class Order implements Serializable {
 
     private String orderID;
     private String restaurantID;

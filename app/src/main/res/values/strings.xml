@@ -209,6 +209,7 @@
     <string name="order_category_select">What do you want to eat?</string>
     <string name="order_meal_select">Select our meal...</string>
     <string name="order_addition_select">Do you want to add something?</string>
+    <string name="order_cart_title">That\'s your order:</string>
 
 
 </resources>

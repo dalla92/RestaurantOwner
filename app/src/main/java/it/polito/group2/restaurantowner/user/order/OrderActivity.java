@@ -25,7 +25,8 @@ public class OrderActivity extends AppCompatActivity
         CategoryFragment.OnCategorySelectedListener,
         MealFragment.OnMealSelectedListener,
         AdditionFragment.OnNextClickedListener,
-        InfoFragment.OnAddClickedListener {
+        InfoFragment.OnAddClickedListener,
+        CartFragment.OnActionListener {
 
     private Order order;
     private OrderMeal meal;
@@ -142,10 +143,23 @@ public class OrderActivity extends AppCompatActivity
         this.meal.setQuantity(quantity);
         this.meal.setNote(note);
         this.order.getMealList().add(meal);
-
-        CartFragment cartFragment = new CartFragment();
+        CartFragment cartFragment = CartFragment.newInstance(this.order);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, cartFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    @Override
+    public void onConfirmOrderClicked(){
+        //new fragment confirmFragment
+    }
+
+    @Override
+    public void onContinueOrderClicked(){
+        CategoryFragment categoryFragment = CategoryFragment.newInstance(this.order.getRestaurantID());
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, categoryFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
