@@ -2,6 +2,7 @@
 <it.polito.group2.restaurantowner.user.restaurant_page.InterceptTouchCardView
     android:id="@+id/user_restaurant_menu_layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_marginTop="10dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 

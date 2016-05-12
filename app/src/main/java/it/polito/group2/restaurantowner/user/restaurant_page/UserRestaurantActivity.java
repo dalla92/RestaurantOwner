@@ -6,13 +6,20 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,6 +42,7 @@ import java.util.Collections;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.MenuCategory;
 import it.polito.group2.restaurantowner.data.Review;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
@@ -49,7 +57,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private String userID, restaurantID;
     private ArrayList<Review> reviews;
     private ArrayList<Offer> offers;
-    //private ArrayList<MenuCategory> categories;
+    private ArrayList<MenuCategory> categories;
     private Restaurant targetRestaurant;
     private ReviewAdapter reviewAdapter;
     private String user_id;
@@ -61,7 +69,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
+        final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
 
         /*Firebase firebase = new Firebase("https://have-break.firebaseio.com/restaurants");
         Firebase restaurantRef = firebase.push();
@@ -88,12 +96,12 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         });*/
 
 
-        //getRestaurantAndSetButtons();
+        getRestaurantAndSetButtons();
 
 
-        //collapsing.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
+        collapsing.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
 
-        /*
+
         ImageView image = (ImageView) findViewById(R.id.user_restaurant_image);
         Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
@@ -106,22 +114,26 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 collapsing.setStatusBarScrimColor(palette.getDarkVibrantColor(primaryDark));
             }
         });
-        */
 
         reviews = getReviewsJson();
         Collections.sort(reviews);
         offers = getOffersJSON();
-        //categories = getCategoriesJson();
+        categories = getCategoriesJson();
 
-        //setBookmarkButton();
-        //addInfoExpandAnimation();
-        //addTimesExpandAnimation();
-        //setTimesList();
-        //setCallAction();
-        //setUserReviews();
-        //setRestaurantOffers();
-        //setRestaurantMenu();
+        setBookmarkButton();
+        addInfoExpandAnimation();
+        addTimesExpandAnimation();
+        setTimesList();
+        setCallAction();
+        setUserReviews();
+        setRestaurantOffers();
+        setRestaurantMenu();
+        setDrawer(toolbar);
 
+
+    }
+
+    private void setDrawer(Toolbar toolbar) {
         //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -144,6 +156,17 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
         }
         */
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -234,8 +257,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         assert menu != null;
         menu.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         menu.setNestedScrollingEnabled(false);
-        //MenuAdapter adapter = new MenuAdapter(categories, this);
-        //menu.setAdapter(adapter);
+        MenuAdapter adapter = new MenuAdapter(categories, this);
+        menu.setAdapter(adapter);
 
         menu.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         final int targetHeight = menu.getMeasuredHeight();
@@ -409,12 +432,18 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     private void setRestaurantOffers() {
-        RecyclerView offerList = (RecyclerView) findViewById(R.id.user_offer_list);
-        assert offerList != null;
-        offerList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        offerList.setNestedScrollingEnabled(false);
-        OfferAdapter adapter = new OfferAdapter(offers, this);
-        offerList.setAdapter(adapter);
+        if(offers.isEmpty()){
+            /*CardView cardOffers = (CardView) findViewById(R.id.restaurant_offers);
+            cardOffers.setVisibility(View.GONE);*/
+        }
+        else {
+            RecyclerView offerList = (RecyclerView) findViewById(R.id.user_offer_list);
+            assert offerList != null;
+            offerList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+            offerList.setNestedScrollingEnabled(false);
+            OfferAdapter adapter = new OfferAdapter(offers, this);
+            offerList.setAdapter(adapter);
+        }
     }
 
     private void setUserReviews() {
@@ -608,11 +637,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         });
     }
 
-/*
+
     private void setBookmarkButton() {
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.bookmark_fab);
         if (fab != null) {
-            fab.setBackgroundTintList(ColorStateList.valueOf( ContextCompat.getColor(this, android.R.color.white)));
+            fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, android.R.color.white)));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -626,16 +655,16 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             });
         }
     }
-*/
+
 
     public void cycleTextViewExpansion(View v){
         TextView tv = (TextView) findViewById(R.id.user_review_comment);
         assert tv != null;
-        //int collapsedMaxLines = 2;
+        int collapsedMaxLines = 2;
         tv.setMaxLines(5);
-        /*ObjectAnimator animation = ObjectAnimator.ofInt(tv, "maxLines",
+        ObjectAnimator animation = ObjectAnimator.ofInt(tv, "maxLines",
                 tv.getMaxLines() == collapsedMaxLines? tv.getLineCount() : collapsedMaxLines);
-        animation.setDuration(200).start();*/
+        animation.setDuration(200).start();
     }
 
     private ArrayList<Review> getReviewsJson() {
@@ -678,7 +707,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         return reviews;
     }
 
-    /*
+
     private ArrayList<MenuCategory> getCategoriesJson() {
         ArrayList<MenuCategory> categories = new ArrayList<>();
         MenuCategory c1 = new MenuCategory("ciao", "Primi Piatti", restaurantID);
@@ -692,7 +721,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         return categories;
     }
-    */
 
 
     private ArrayList<Offer> getOffersJSON(){
