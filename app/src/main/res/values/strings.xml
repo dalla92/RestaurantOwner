@@ -182,7 +182,6 @@
     <string name="title_activity_gallery_view">Gallery</string>
     <string name="title_activity_my_reviews">MyReviewsActivity</string>
 
-    <!-- Takeaway Activity -->
     <string name="next">Next</string>
     <string name="action_my_restaurants">My Restaurants</string>
     <string name="action_gallery">Gallery</string>
@@ -193,11 +192,6 @@
     <string name="my_reviews">My Reviews</string>
     <string name="my_reservations">My Reservations</string>
     <string name="my_favourites">My Favourites</string>
-    <!-- Order Activity -->
-    <string name="order_nextstep">Next</string>
-    <string name="order_addtocart">Add</string>
-    <string name="order_mealquantity">Add quantity</string>
-    <string name="order_mealnote">Additional note</string>
     <string name="profile_email">Email</string>
     <string name="profile_password">Password</string>
     <string name="profile_first_name">First name</string>
@@ -205,5 +199,16 @@
     <string name="profile_phone_number">Telephone number</string>
     <string name="profile_vat_number">VAT Number</string>
     <string name="action_cancel">Cancel</string>
+
+
+    <!-- Order Activity -->
+    <string name="order_nextstep">Next</string>
+    <string name="order_addtocart">Add</string>
+    <string name="order_mealquantity">Add quantity</string>
+    <string name="order_mealnote">Additional note</string>
+    <string name="order_category_select">What do you want to eat?</string>
+    <string name="order_meal_select">Select our meal...</string>
+    <string name="order_addition_select">Do you want to add something?</string>
+
 
 </resources>
