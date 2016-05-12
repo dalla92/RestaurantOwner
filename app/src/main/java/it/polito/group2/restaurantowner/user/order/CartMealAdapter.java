@@ -1,6 +1,8 @@
 package it.polito.group2.restaurantowner.user.order;
 
 import android.app.Activity;
+import android.content.SyncStatusObserver;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +50,6 @@ public class CartMealAdapter extends ArrayAdapter<MealModel> {
         holder.text.setText(modelList.get(position).getName());
         CartAdditionAdapter adapter = new CartAdditionAdapter(((Activity)context),modelList.get(position).getAdditionModel());
         holder.list.setAdapter(adapter);
-
         return view;
     }
 }

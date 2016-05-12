@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +39,12 @@ public class CategoryFragment extends ListFragment {
             restaurantID = getArguments().getString(RESTAURANT);
         }
         modelList = getModel(restaurantID);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().
-                getResources().getString(R.string.order_category_title));
+        try {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
+                    getResources().getString(R.string.order_category_title));
+        } catch (Exception e) {
+            Log.d("FILIPPO", e.getMessage());
+        }
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +25,12 @@ public class InfoFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        try {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
+                    getResources().getString(R.string.order_info_title));
+        } catch (Exception e) {
+            Log.d("FILIPPO", e.getMessage());
+        }
     }
 
     @Override
@@ -58,8 +65,6 @@ public class InfoFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.order_fragment_info_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().
-                getResources().getString(R.string.order_info_title));
     }
 
     @Override
