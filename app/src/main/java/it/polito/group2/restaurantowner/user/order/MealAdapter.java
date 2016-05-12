@@ -1,7 +1,6 @@
 package it.polito.group2.restaurantowner.user.order;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +20,7 @@ public class MealAdapter extends ArrayAdapter<MealModel> {
     private final Activity context;
 
     public MealAdapter(Activity context, List<MealModel> list) {
-        super(context, R.layout.fragment_order_meal_item, list);
+        super(context, R.layout.order_fragment_meal_item, list);
         this.context = context;
         this.modelList = list;
     }
@@ -35,7 +34,7 @@ public class MealAdapter extends ArrayAdapter<MealModel> {
         View view = null;
         if (convertView == null) {
             LayoutInflater inflator = context.getLayoutInflater();
-            view = inflator.inflate(R.layout.fragment_order_meal_item, null);
+            view = inflator.inflate(R.layout.order_fragment_meal_item, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
             view.setTag(viewHolder);

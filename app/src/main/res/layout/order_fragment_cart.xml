@@ -11,6 +11,14 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"/>
 
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/order_cart_hint_note"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/ordernote" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -19,13 +27,13 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/order_cart_buttonconfirm"
+            android:text="@string/order_cart_btn_confirm"
             android:id="@+id/confirm_order" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/order_cart_buttoncontinue"
+            android:text="@string/order_cart_btn_continue"
             android:id="@+id/continue_order" />
     </LinearLayout>
 

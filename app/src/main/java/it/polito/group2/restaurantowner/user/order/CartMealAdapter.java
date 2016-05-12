@@ -21,7 +21,7 @@ public class CartMealAdapter extends ArrayAdapter<MealModel> {
     private final Activity context;
 
     public CartMealAdapter(Activity context, List<MealModel> list) {
-        super(context, R.layout.fragment_order_cart_meal, list);
+        super(context, R.layout.order_fragment_cart_meal, list);
         this.context = context;
         this.modelList = list;
     }
@@ -36,7 +36,7 @@ public class CartMealAdapter extends ArrayAdapter<MealModel> {
         View view = null;
         if (convertView == null) {
             LayoutInflater inflator = context.getLayoutInflater();
-            view = inflator.inflate(R.layout.fragment_order_cart_meal, null);
+            view = inflator.inflate(R.layout.order_fragment_cart_meal, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
             viewHolder.list = (ListView) view.findViewById(R.id.list_addition);

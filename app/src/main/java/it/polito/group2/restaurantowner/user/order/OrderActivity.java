@@ -1,5 +1,7 @@
 package it.polito.group2.restaurantowner.user.order;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -19,6 +21,7 @@ import it.polito.group2.restaurantowner.data.MenuCategory;
 import it.polito.group2.restaurantowner.data.Order;
 import it.polito.group2.restaurantowner.data.OrderMeal;
 import it.polito.group2.restaurantowner.data.OrderMealAddition;
+import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 
 public class OrderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -35,7 +38,7 @@ public class OrderActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_order);
+        setContentView(R.layout.order_activity);
 
         //TODO: verificare che il parametro viene passato con questo nome
         String restaurantID = "resID0";//getIntent().getExtras().getString("restaurant_id");
@@ -152,7 +155,10 @@ public class OrderActivity extends AppCompatActivity
 
     @Override
     public void onConfirmOrderClicked(Order order){
-        //new fragment confirmFragment
+        this.order = order;
+        //TODO bisogna salvare su firebase l'ordine
+        Intent intent = new Intent(this, MyOrdersActivity.class);
+        startActivity(intent);
     }
 
     @Override

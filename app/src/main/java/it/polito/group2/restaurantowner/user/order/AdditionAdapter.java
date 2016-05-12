@@ -22,7 +22,7 @@ public class AdditionAdapter extends ArrayAdapter<AdditionModel> {
     private final Activity context;
 
     public AdditionAdapter(Activity context, List<AdditionModel> list) {
-        super(context, R.layout.fragment_order_addition_item, list);
+        super(context, R.layout.order_fragment_addition_item, list);
         this.context = context;
         this.list = list;
     }
@@ -37,7 +37,7 @@ public class AdditionAdapter extends ArrayAdapter<AdditionModel> {
         View view = null;
         if (convertView == null) {
             LayoutInflater inflator = context.getLayoutInflater();
-            view = inflator.inflate(R.layout.fragment_order_addition_item, null);
+            view = inflator.inflate(R.layout.order_fragment_addition_item, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
             viewHolder.checkbox = (CheckBox) view.findViewById(R.id.check);

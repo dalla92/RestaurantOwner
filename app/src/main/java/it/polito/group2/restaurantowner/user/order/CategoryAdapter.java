@@ -1,13 +1,10 @@
 package it.polito.group2.restaurantowner.user.order;
 
 import android.app.Activity;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.List;
@@ -23,7 +20,7 @@ public class CategoryAdapter extends ArrayAdapter<CategoryModel> {
     private final Activity context;
 
     public CategoryAdapter(Activity context, List<CategoryModel> list) {
-        super(context, R.layout.fragment_order_category_item, list);
+        super(context, R.layout.order_fragment_category_item, list);
         this.context = context;
         this.modelList = list;
     }
@@ -37,7 +34,7 @@ public class CategoryAdapter extends ArrayAdapter<CategoryModel> {
         View view = null;
         if (convertView == null) {
             LayoutInflater inflator = context.getLayoutInflater();
-            view = inflator.inflate(R.layout.fragment_order_category_item, null);
+            view = inflator.inflate(R.layout.order_fragment_category_item, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
             view.setTag(viewHolder);

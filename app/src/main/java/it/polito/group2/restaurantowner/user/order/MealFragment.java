@@ -46,7 +46,7 @@ public class MealFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_order_meal, container, false);
+        View view = inflater.inflate(R.layout.order_fragment_meal, container, false);
         return view;
     }
 

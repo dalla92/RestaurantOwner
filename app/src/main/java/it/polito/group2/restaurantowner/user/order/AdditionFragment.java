@@ -49,7 +49,7 @@ public class AdditionFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_order_addition, container, false);
+        View view = inflater.inflate(R.layout.order_fragment_addition, container, false);
         return view;
     }
 
@@ -83,7 +83,7 @@ public class AdditionFragment extends ListFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_order_addition, menu);
+        inflater.inflate(R.menu.order_fragment_addition_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

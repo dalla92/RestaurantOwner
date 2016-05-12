@@ -1,9 +1,11 @@
 package it.polito.group2.restaurantowner.data;
 
+import java.io.Serializable;
+
 /**
  * Created by TheChuck on 07/05/2016.
  */
-public class MenuCategory {
+public class MenuCategory implements Serializable {
     private String categoryID, restaurantID, name;
 
     public MenuCategory(String categoryID, String name, String restaurantID) {

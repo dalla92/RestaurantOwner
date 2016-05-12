@@ -5,8 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import java.util.List;
@@ -22,7 +20,7 @@ public class CartAdditionAdapter extends ArrayAdapter<AdditionModel> {
     private final Activity context;
 
     public CartAdditionAdapter(Activity context, List<AdditionModel> list) {
-        super(context, R.layout.fragment_order_cart_meal_addition, list);
+        super(context, R.layout.order_fragment_cart_meal_addition, list);
         this.context = context;
         this.list = list;
     }
@@ -36,7 +34,7 @@ public class CartAdditionAdapter extends ArrayAdapter<AdditionModel> {
         View view = null;
         if (convertView == null) {
             LayoutInflater inflator = context.getLayoutInflater();
-            view = inflator.inflate(R.layout.fragment_order_addition_item, null);
+            view = inflator.inflate(R.layout.order_fragment_addition_item, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
             view.setTag(viewHolder);

@@ -45,7 +45,7 @@ public class CategoryFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_order_category, container, false);
+        View view = inflater.inflate(R.layout.order_fragment_category, container, false);
         return view;
     }
 

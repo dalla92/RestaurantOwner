@@ -1,9 +1,11 @@
 package it.polito.group2.restaurantowner.data;
 
+import java.io.Serializable;
+
 /**
  * Created by Filippo on 11/05/2016.
  */
-public class OrderMealAddition {
+public class OrderMealAddition implements Serializable {
 
     private String orderMealAdditionID;
     private String orderMealID;

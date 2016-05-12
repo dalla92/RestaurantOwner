@@ -210,9 +210,16 @@
     <string name="order_meal_title">Select it</string>
     <string name="order_addition_title">Any additions?</string>
     <string name="order_cart_title">That\'s your order:</string>
-    <string name="order_cart_buttonconfirm">Confirm order</string>
-    <string name="order_cart_buttoncontinue">Continue order</string>
+    <string name="order_cart_btn_confirm">Confirm order</string>
+    <string name="order_cart_btn_continue">Continue order</string>
+    <string name="order_cart_hint_note">Additional order info</string>
     <string name="order_info_title">How many?</string>
+    <string name="order_confirm_title">Order confirm</string>
+    <string name="order_confirm_message">Are you sure to confirm your order?</string>
+
+
+
+    <string name="title_activity_my_orders">My Orders</string>
 
 
 </resources>

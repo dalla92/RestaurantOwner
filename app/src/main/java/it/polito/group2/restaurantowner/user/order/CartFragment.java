@@ -1,20 +1,20 @@
 package it.polito.group2.restaurantowner.user.order;
 
 import android.content.Context;
-import android.net.Uri;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Meal;
 import it.polito.group2.restaurantowner.data.Order;
 import it.polito.group2.restaurantowner.data.OrderMeal;
 import it.polito.group2.restaurantowner.data.OrderMealAddition;
@@ -51,7 +51,11 @@ public class CartFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_order_cart, container, false);
+        final View view = inflater.inflate(R.layout.order_fragment_cart, container, false);
+        if(order.getNote() != null && order.getNote() != "") {
+            EditText note = (EditText) view.findViewById(R.id.ordernote);
+            note.setText(order.getNote());
+        }
 
         Button confirm_btn = (Button) view.findViewById(R.id.confirm_order);
         Button continue_btn = (Button) view.findViewById(R.id.continue_order);
@@ -60,6 +64,8 @@ public class CartFragment extends ListFragment {
         {
             public void onClick(View v)
             {
+                EditText note = (EditText) view.findViewById(R.id.ordernote);
+                order.setNote(note.getText().toString());
                 mCallback.onContinueOrderClicked(order);
             }
         });
@@ -68,7 +74,17 @@ public class CartFragment extends ListFragment {
         {
             public void onClick(View v)
             {
-                mCallback.onConfirmOrderClicked(order);
+                new AlertDialog.Builder(getContext())
+                        .setTitle(getContext().getResources().getString(R.string.order_confirm_title))
+                        .setMessage(getContext().getResources().getString(R.string.order_confirm_message))
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                EditText note = (EditText) view.findViewById(R.id.ordernote);
+                                order.setNote(note.getText().toString());
+                                mCallback.onConfirmOrderClicked(order);
+                            }})
+                        .setNegativeButton(android.R.string.no, null).show();
             }
         });
         return view;

@@ -12,8 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import java.util.ArrayList;
-
 import it.polito.group2.restaurantowner.R;
 
 public class InfoFragment extends Fragment {
@@ -31,7 +29,7 @@ public class InfoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_order_info, container, false);
+        View view = inflater.inflate(R.layout.order_fragment_info, container, false);
         return view;
     }
 
@@ -58,7 +56,7 @@ public class InfoFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_order_info, menu);
+        inflater.inflate(R.menu.order_fragment_info_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
         ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().
                 getResources().getString(R.string.order_info_title));

@@ -1,8 +1,9 @@
 package it.polito.group2.restaurantowner.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class OrderMeal {
+public class OrderMeal implements Serializable {
 
     private String orderMealID;
     private String orderID;
