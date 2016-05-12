@@ -15,13 +15,13 @@ public class Review implements Comparable<Review>{
     public Review() {
     }
 
-    public Review(String restaurantId, String userID, String date, String comment, String reviewID, String picture, float stars_number) {
+    public Review(String restaurantId, String userID, String dateString, String comment, String reviewID, String picture, float stars_number) {
         this.restaurantId = restaurantId;
         this.userID = userID;
         Calendar c = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
         try {
-            c.setTime(format.parse(date));
+            c.setTime(format.parse(dateString));
         }
         catch(ParseException e){
             e.printStackTrace();
