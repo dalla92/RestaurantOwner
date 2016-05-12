@@ -52,6 +52,7 @@ import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.Offer;
 import it.polito.group2.restaurantowner.data.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
+import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.gallery.GalleryViewActivity;
 import android.content.Intent;
@@ -86,12 +87,14 @@ import java.util.Date;
 
 public class UserMyFavourites extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
-    private Context context;
     private String user_id;
     private ListView listView;
     private ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
     private ArrayList<Restaurant> bookmarked_restaurants = new ArrayList<Restaurant>();
     private ArrayList<Restaurant> all_restaurants = new ArrayList<Restaurant>();
+    private ArrayList<User> users = new ArrayList<User>();
+    private Context context;
+    public User current_user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,25 +133,23 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
         listView = (ListView) findViewById(R.id.list);
         BookmarkAdapter adapter = new BookmarkAdapter (this, R.layout.bookmark_layout, bookmarked_restaurants);
         listView.setAdapter(adapter);
+        //TODO Decomment
         /*
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-
-                // ListView Clicked item index
-                int itemPosition     = position;
-
                 // ListView Clicked item value
-                String  itemValue    = (String) listView.getItemAtPosition(position);
-
-                // Show Alert
-                Toast.makeText(getApplicationContext(),
-                        "Position :"+itemPosition+"  ListItem : " +itemValue , Toast.LENGTH_LONG)
-                        .show();
-
+                Restaurant  itemValue    = (Restaurant) listView.getItemAtPosition(position);
+                Intent intent3 = new Intent(
+                        getApplicationContext(),
+                        UserMyFavourites.class);
+                Bundle b3 = new Bundle();
+                b3.putString("user_id", user_id);
+                b3.putString("restaurant_id", itemValue.getRestaurantId());
+                intent3.putExtras(b3);
+                startActivity(intent3);
             }
-
         });
         */
 
@@ -176,6 +177,45 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
             //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
         }
         */
+        //TODO Rearrange the following code
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
+            user_id = getIntent().getExtras().getString("user_id");
+            try {
+                users = JSONUtil.readJSONUsersList(context, null);
+            }
+            catch(JSONException e){
+                e.printStackTrace();
+            }
+            for(User u : users){
+                if(u.getId().equals(user_id)){
+                    current_user = u;
+                    break;
+                }
+            }
+        }
+        else{
+            current_user = new User();
+            current_user.setEmail("jkjs@dskj");
+            //current_user.setFidelity_points(110);
+            current_user.setFirst_name("Alex");
+            current_user.setIsOwner(true);
+            current_user.setPassword("tipiacerebbe");
+            current_user.setPhone_number("0989897879789");
+            current_user.setVat_number("sw8d9wd8w9d8w9d9");
+        }
+        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+        if(current_user.getFirst_name()!=null && current_user.getLast_name()==null)
+            nav_username.setText(current_user.getFirst_name());
+        else if(current_user.getFirst_name()==null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getLast_name());
+        else if(current_user.getFirst_name()!=null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
+        if(current_user.getEmail()!=null)
+            nav_email.setText(current_user.getEmail());
+        if(current_user.getPhoto()!=null)
+            nav_photo.setImageBitmap(current_user.getPhoto());
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -222,7 +262,7 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
         } else if(id==R.id.nav_my_orders) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    MyOrdersActivity.class);
             Bundle b1 = new Bundle();
             b1.putString("user_id", user_id);
             intent1.putExtras(b1);

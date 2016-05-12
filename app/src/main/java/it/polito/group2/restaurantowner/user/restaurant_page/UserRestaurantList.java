@@ -1,11 +1,13 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
@@ -20,6 +22,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
+import it.polito.group2.restaurantowner.R;
 
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
@@ -34,11 +39,12 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.data.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
+import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 
 public class UserRestaurantList extends AppCompatActivity
@@ -59,7 +65,9 @@ public class UserRestaurantList extends AppCompatActivity
     private GeoQuery geoQuery;
     HashMap<String,GeoLocation> resNearby = new HashMap<>();
     private String user_id;
-
+    private ArrayList<User> users = new ArrayList<User>();
+    private Context context;
+    public User current_user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,7 +154,45 @@ public class UserRestaurantList extends AppCompatActivity
             //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
         }
         */
-
+        //TODO Rearrange the following code
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
+            user_id = getIntent().getExtras().getString("user_id");
+            try {
+                users = JSONUtil.readJSONUsersList(context, null);
+            }
+            catch(JSONException e){
+                e.printStackTrace();
+            }
+            for(User u : users){
+                if(u.getId().equals(user_id)){
+                    current_user = u;
+                    break;
+                }
+            }
+        }
+        else{
+            current_user = new User();
+            current_user.setEmail("jkjs@dskj");
+            //current_user.setFidelity_points(110);
+            current_user.setFirst_name("Alex");
+            current_user.setIsOwner(true);
+            current_user.setPassword("tipiacerebbe");
+            current_user.setPhone_number("0989897879789");
+            current_user.setVat_number("sw8d9wd8w9d8w9d9");
+        }
+        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+        if(current_user.getFirst_name()!=null && current_user.getLast_name()==null)
+            nav_username.setText(current_user.getFirst_name());
+        else if(current_user.getFirst_name()==null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getLast_name());
+        else if(current_user.getFirst_name()!=null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
+        if(current_user.getEmail()!=null)
+            nav_email.setText(current_user.getEmail());
+        if(current_user.getPhoto()!=null)
+            nav_photo.setImageBitmap(current_user.getPhoto());
     }
 
     @Override
@@ -304,7 +350,7 @@ public class UserRestaurantList extends AppCompatActivity
         } else if(id==R.id.nav_my_orders) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    MyOrdersActivity.class);
                 Bundle b1 = new Bundle();
                 b1.putString("user_id", user_id);
                 intent1.putExtras(b1);

@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,7 +35,9 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.TableReservation;
 import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.data.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
+import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 
 /**
@@ -43,14 +46,15 @@ import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 public class UserMyReservations extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     Toolbar toolbar;
-    private Context context;
     private String current_username;
     ArrayList<TableReservation> all_table_reservations = new ArrayList<TableReservation>();
     private My_Reservations_Adapter adapter;
     List<Restaurant> resList = new ArrayList<Restaurant>();
     private String restaurant_number;
     private String user_id;
-
+    private ArrayList<User> users = new ArrayList<User>();
+    private Context context;
+    public User current_user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +113,45 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
             //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
         }
         */
+        //TODO Rearrange the following code
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
+            user_id = getIntent().getExtras().getString("user_id");
+            try {
+                users = JSONUtil.readJSONUsersList(context, null);
+            }
+            catch(JSONException e){
+                e.printStackTrace();
+            }
+            for(User u : users){
+                if(u.getId().equals(user_id)){
+                    current_user = u;
+                    break;
+                }
+            }
+        }
+        else{
+            current_user = new User();
+            current_user.setEmail("jkjs@dskj");
+            //current_user.setFidelity_points(110);
+            current_user.setFirst_name("Alex");
+            current_user.setIsOwner(true);
+            current_user.setPassword("tipiacerebbe");
+            current_user.setPhone_number("0989897879789");
+            current_user.setVat_number("sw8d9wd8w9d8w9d9");
+        }
+        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+        if(current_user.getFirst_name()!=null && current_user.getLast_name()==null)
+            nav_username.setText(current_user.getFirst_name());
+        else if(current_user.getFirst_name()==null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getLast_name());
+        else if(current_user.getFirst_name()!=null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
+        if(current_user.getEmail()!=null)
+            nav_email.setText(current_user.getEmail());
+        if(current_user.getPhoto()!=null)
+            nav_photo.setImageBitmap(current_user.getPhoto());
     }
 
     public void initToolBar() {
@@ -162,7 +205,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         } else if(id==R.id.nav_my_orders) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
-                    UserRestaurantList.class);
+                    MyOrdersActivity.class);
             Bundle b1 = new Bundle();
             b1.putString("user_id", user_id);
             intent1.putExtras(b1);

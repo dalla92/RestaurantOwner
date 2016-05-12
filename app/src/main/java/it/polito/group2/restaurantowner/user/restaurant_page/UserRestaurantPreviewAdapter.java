@@ -29,6 +29,7 @@ import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Meal;
 import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.data.TableReservation;
 
 /**
  * Created by Daniele on 05/04/2016.
@@ -36,8 +37,8 @@ import it.polito.group2.restaurantowner.data.Restaurant;
 public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder>{
     private List<Restaurant> mDataset;
     private static Context mContext;
-    private float PRICE_BOUNDARY_1 = 5;
-    private float PRICE_BOUNDARY_2 = 10;
+    private static float PRICE_BOUNDARY_1 = 5;
+    private static float PRICE_BOUNDARY_2 = 10;
 
     protected int filter(String category, String time, boolean price1, boolean price2, boolean price3, boolean price4) {
                 //filter by category
@@ -161,12 +162,19 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             }
 
             //TODO remember to take out, just for testing purpose
-            //obj.setPriceRange(calculate_range(obj));
+            //obj.setPriceRange(String.valueOf(calculate_range(obj)));
             obj.setPriceRange("2");
 
             this.resName.setText(obj.getName());
             this.rating.setText(obj.getRating());
+
+            //TODO remember to take out, just for testing purpose2
+            /*
+            String seats = String.valueOf(calculate_reservations_number(obj)) + "/" + obj.getTableNum();
+            //this.reservationNumber.setText(seats);
+            */
             this.reservationNumber.setText("€€€");
+
             //TODO calculate distance form current location
             this.distance.setText("23 KM");
             this.position = position;
@@ -213,7 +221,19 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         notifyItemRangeChanged(position, mDataset.size());
     }
 
-    public int calculate_range(Restaurant r){
+    public static int calculate_reservations_number(Restaurant r) {
+        Calendar c = Calendar.getInstance();
+        ArrayList<TableReservation> today_reservations = null;
+        try{
+            today_reservations = JSONUtil.readJSONTableResList(mContext, c, r.getRestaurantId());
+        }
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        return today_reservations.size();
+    }
+
+    public static int calculate_range(Restaurant r){
         ArrayList<Meal> meals = null;
         try{
             meals = JSONUtil.readJSONMeList(mContext, r.getRestaurantId());
@@ -245,7 +265,6 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             return 2;
 
         return 3;
-
     }
 
 

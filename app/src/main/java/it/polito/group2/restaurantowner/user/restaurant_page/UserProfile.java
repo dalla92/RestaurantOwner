@@ -48,6 +48,7 @@ import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.Offer;
 import it.polito.group2.restaurantowner.data.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
+import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.gallery.GalleryViewActivity;
 import android.content.Intent;
@@ -98,6 +99,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
 
         context = this;
 
+        //TODO Rearrange the following code
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
             user_id = getIntent().getExtras().getString("user_id");
             try {
@@ -123,7 +125,6 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
             current_user.setPhone_number("0989897879789");
             current_user.setVat_number("sw8d9wd8w9d8w9d9");
         }
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //navigation drawer
@@ -148,6 +149,19 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
             //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
         }
         */
+        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+        if(current_user.getFirst_name()!=null && current_user.getLast_name()==null)
+            nav_username.setText(current_user.getFirst_name());
+        else if(current_user.getFirst_name()==null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getLast_name());
+        else if(current_user.getFirst_name()!=null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
+        if(current_user.getEmail()!=null)
+            nav_email.setText(current_user.getEmail());
+        if(current_user.getPhoto()!=null)
+            nav_photo.setImageBitmap(current_user.getPhoto());
 
         load_saved_data();
 
@@ -534,7 +548,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
             } else if(id==R.id.nav_my_orders) {
                 Intent intent1 = new Intent(
                         getApplicationContext(),
-                        UserRestaurantList.class);
+                        MyOrdersActivity.class);
                 Bundle b1 = new Bundle();
                 b1.putString("user_id", user_id);
                 intent1.putExtras(b1);
