@@ -34,7 +34,7 @@ public class CartAdditionAdapter extends ArrayAdapter<AdditionModel> {
         View view = null;
         if (convertView == null) {
             LayoutInflater inflator = context.getLayoutInflater();
-            view = inflator.inflate(R.layout.order_fragment_addition_item, null);
+            view = inflator.inflate(R.layout.order_fragment_cart_meal_addition, null);
             final ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) view.findViewById(R.id.label);
             view.setTag(viewHolder);

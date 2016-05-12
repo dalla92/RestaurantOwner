@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,8 +45,12 @@ public class CartFragment extends ListFragment {
             order = (Order)getArguments().getSerializable(ORDER);
         }
         modelList = getModel();
-        ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(getActivity().
-                getResources().getString(R.string.order_cart_title));
+        try {
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
+                    getResources().getString(R.string.order_cart_title));
+        } catch (Exception e) {
+            Log.d("FILIPPO", e.getMessage());
+        }
     }
 
     @Override
@@ -93,8 +98,7 @@ public class CartFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        //TODO implementa il modello
-        MealAdapter adapter = new MealAdapter(getActivity(), modelList);
+        CartMealAdapter adapter = new CartMealAdapter(getActivity(), modelList);
         setListAdapter(adapter);
     }
 

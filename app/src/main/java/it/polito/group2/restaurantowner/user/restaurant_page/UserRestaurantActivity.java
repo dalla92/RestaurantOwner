@@ -35,6 +35,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import org.json.JSONException;
 
 import java.lang.reflect.Array;
@@ -116,7 +118,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         getRestaurantAndSetButtons();
 
-
         collapsing.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
 
 
@@ -132,6 +133,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 collapsing.setStatusBarScrimColor(palette.getDarkVibrantColor(primaryDark));
             }
         });
+
+        Glide.with(this).load(targetRestaurant.getPhotoUri()).into(image);
 
         reviews = getReviewsJson();
         Collections.sort(reviews);
@@ -706,7 +709,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         user_bookmark.setRestaurant_id(restaurant_id);
                     if(user_id!=null)
                         user_bookmark.setRestaurant_id(user_id);
-                    ArrayList<Bookmark> bookmarks_temp = new ArrayList<Bookmark>();
+                    ArrayList<Bookmark> bookmarks_temp;
                     if(!isBookmark()) {
                         //read, add and write
                         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_on_24dp));
@@ -756,29 +759,26 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         ArrayList<Review> reviews = new ArrayList<>();
 
-        String comment = "Commento a caso";
-        int starNumber = 3;
-
         String c1 = "Davvero un bel locale, personale accogliente e mangiare davvero sopra la media. I prezzi sono accessibile e data la qualità del cibo sono più che giusti.";
         Calendar date1 = Calendar.getInstance();
         date1.set(Calendar.HOUR_OF_DAY, 12);
-        Review r1 =new Review(restaurantID, "dss", "Wed 20 Oct 2006 'at' 20:03", comment, UUID.randomUUID().toString(), null, starNumber);
+        Review r1 =new Review(restaurantID, "Paola C.", "Wed 20 Oct 2006 'at' 20:03", c1, UUID.randomUUID().toString(), null, 3.5f);
 
-        String c2 = "Think of Recyclerview not as a ListView 1:1 replacement but rather as a more flexible component for complex use cases. And as you say, your solution is what google expected of you.";
+        String c2 = "Abbiamo preso la pizza da un metro e dobbiamo dare un giudizio più che positivo! Se il locale fosse un po più grande sicuramente farebbe concorrenza a parecchi grandi nomi!";
         Calendar date2 = Calendar.getInstance();
         date2.set(Calendar.HOUR_OF_DAY, 10);
-        Review r2 =new Review(restaurantID, "wewe", "Thu 13 Jul 1993 'at' 21:03", comment, UUID.randomUUID().toString(), null, starNumber);
+        Review r2 =new Review(restaurantID, "Mario R.", "Thu 13 Jul 2106 'at' 21:03", c2, UUID.randomUUID().toString(), null, 3f);
 
 
         Calendar date3 = Calendar.getInstance();
         date3.set(Calendar.HOUR_OF_DAY, 8);
-        Review r3 =new Review(restaurantID, "grg", "Sun 10 Jan 1997 'at' 20:30", comment, UUID.randomUUID().toString(), null, starNumber);
+        Review r3 =new Review(restaurantID, "Giovanni C.", "Sun 10 Jan 1997 'at' 20:30", "", UUID.randomUUID().toString(), null, 4.5f);
 
-        String c4 = "Now look into that last piece of code: onCreateViewHolder(ViewGroup parent, int viewType) the signature already suggest different view types.";
+        String c4 = "Sono andata a cena il mio ragazzo e siamo rimasti molto sazi e contenti. Abbiamo preso le chiacchiere al crudo ed erano veramente buone! La pizza era molto buona, una delle più buone mangiate a Torino.";
         Calendar date4 = Calendar.getInstance();
         date4.set(Calendar.HOUR_OF_DAY, 12);
         date4.set(Calendar.MINUTE, 30);
-        Review r4 =new Review(restaurantID, "klkl", "Wed 28 Sep 2005 'at' 22:03", comment, UUID.randomUUID().toString(), null, starNumber);
+        Review r4 =new Review(restaurantID, "Francesco G.", "Wed 28 Sep 2005 'at' 22:03", c4, UUID.randomUUID().toString(), null, 3.5f);
 
         reviews.add(r1);
         reviews.add(r2);
