@@ -23,7 +23,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/user_restaurant_menu"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="10dp">
 
         </android.support.v7.widget.RecyclerView>
@@ -34,7 +34,6 @@
             android:layout_height="wrap_content"
             android:src="@drawable/ic_expand_24dp"
             android:layout_gravity="center|bottom"
-            android:visibility="gone"
             />
 
     </LinearLayout>

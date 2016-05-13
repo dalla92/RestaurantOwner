@@ -142,7 +142,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user!=null) {
+        if(current_user != null) {
             if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
                 nav_username.setText(current_user.getFirst_name());
             else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
@@ -333,7 +333,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
             Log.e("EXCEPTION", "SDF.PARSE RAISED AN EXCEPTION IN onOptionsItemSelected");
         }
         for(TableReservation tr : all_table_reservations){
-            if(tr.getUsername().equals(current_username)) {
+            if(tr.getUserID().equals(current_username)) {
                     if (tr.getRestaurantId().equals(res_id))
                         if (tr.getDate().YEAR==date.YEAR && tr.getDate().MONTH==date.MONTH && tr.getDate().DAY_OF_MONTH==date.DAY_OF_MONTH && tr.getDate().MINUTE==date.MINUTE && tr.getDate().HOUR==date.HOUR)
                             return tr;

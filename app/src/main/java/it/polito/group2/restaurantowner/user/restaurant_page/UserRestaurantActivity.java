@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -56,6 +57,7 @@ import it.polito.group2.restaurantowner.data.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
+import it.polito.group2.restaurantowner.user.order.OrderActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.gallery.GalleryViewActivity;
 
 public class UserRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -67,9 +69,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private ArrayList<MenuCategory> categories;
     private Restaurant targetRestaurant;
     private ReviewAdapter reviewAdapter;
-    private String user_id;
-    private String restaurant_id;
-    private ArrayList<User> users = new ArrayList<User>();
+    private ArrayList<User> users = new ArrayList<>();
     private Context context;
     public User current_user;
 
@@ -83,10 +83,10 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         context = this;
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
-            restaurant_id = getIntent().getExtras().getString("restaurant_id");
+            restaurantID = getIntent().getExtras().getString("restaurant_id");
         }
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            user_id = getIntent().getExtras().getString("user_id");
+            userID = getIntent().getExtras().getString("user_id");
         }
 
         final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
@@ -153,7 +153,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         //TODO Rearrange the following code
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            user_id = getIntent().getExtras().getString("user_id");
+            userID = getIntent().getExtras().getString("user_id");
             try {
                 users = JSONUtil.readJSONUsersList(context, null);
             }
@@ -161,7 +161,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 e.printStackTrace();
             }
             for(User u : users){
-                if(u.getId().equals(user_id)){
+                if(u.getId().equals(userID)){
                     current_user = u;
                     break;
                 }
@@ -190,7 +190,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         navigationView.setNavigationItemSelectedListener(this);
         //TODO decomment handle logged/not logged user
         /*
-        if(user_id==null){ //not logged
+        if(userID==null){ //not logged
             Menu nav_Menu = navigationView.getMenu();
             nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
             nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
@@ -205,7 +205,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user!=null) {
+        if(current_user != null) {
             if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
                 nav_username.setText(current_user.getFirst_name());
             else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
@@ -241,7 +241,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     getApplicationContext(),
                     MainActivity.class);
             Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
+            b1.putString("user_id", userID);
             intent1.putExtras(b1);
             startActivity(intent1);
             return true;
@@ -251,7 +251,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     getApplicationContext(),
                     UserRestaurantList.class);
             Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
+            b1.putString("user_id", userID);
             intent1.putExtras(b1);
             startActivity(intent1);
             return true;
@@ -267,7 +267,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     getApplicationContext(),
                     UserProfile.class);
             Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
+            b1.putString("user_id", userID);
             intent1.putExtras(b1);
             startActivity(intent1);
             return true;
@@ -276,7 +276,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     getApplicationContext(),
                     MyOrdersActivity.class);
             Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
+            b1.putString("user_id", userID);
             intent1.putExtras(b1);
             startActivity(intent1);
             return true;
@@ -285,7 +285,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     getApplicationContext(),
                     UserMyReservations.class);
             Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
+            b3.putString("user_id", userID);
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
@@ -294,7 +294,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     getApplicationContext(),
                     MyReviewsActivity.class);
             Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
+            b3.putString("user_id", userID);
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
@@ -303,7 +303,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     getApplicationContext(),
                     UserMyFavourites.class);
             Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
+            b3.putString("user_id", userID);
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
@@ -324,80 +324,73 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         menu.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         final int targetHeight = menu.getMeasuredHeight();
 
-        if(targetHeight > 600){
-            menu.getLayoutParams().height = 600;
-            menu.requestLayout();
-            final ImageView iconExpand = (ImageView) findViewById(R.id.user_restaurant_menu_icon_expand);
-            assert iconExpand != null;
-            iconExpand.setVisibility(View.VISIBLE);
+        final ImageView iconExpand = (ImageView) findViewById(R.id.user_restaurant_menu_icon_expand);
+        assert iconExpand != null;
+        CardView menuLayout = (CardView) findViewById(R.id.user_restaurant_menu_layout);
+        assert menuLayout != null;
+        menuLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentHeight, newHeight;
 
-            CardView menuLayout = (CardView) findViewById(R.id.user_restaurant_menu_layout);
-            assert menuLayout != null;
-            menuLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.d("prova", "clicked");
-                    int currentHeight, newHeight;
+                if (iconExpand.getVisibility() == View.VISIBLE) {
+                    currentHeight = 0;
+                    newHeight = targetHeight;
+                } else {
+                    currentHeight = targetHeight;
+                    newHeight = 0;
+                }
 
-                    if (iconExpand.getVisibility() == View.VISIBLE) {
-                        currentHeight = 600;
-                        newHeight = targetHeight;
-                    } else {
-                        currentHeight = targetHeight;
-                        newHeight = 600;
+                ValueAnimator slideAnimator = ValueAnimator.ofInt(currentHeight, newHeight).setDuration(300);
+                slideAnimator.addListener(new Animator.AnimatorListener() {
+                    boolean modified = false;
+
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        if (iconExpand.getVisibility() == View.VISIBLE) {
+                            iconExpand.setVisibility(View.INVISIBLE);
+                            modified = true;
+                        }
                     }
 
-                    ValueAnimator slideAnimator = ValueAnimator.ofInt(currentHeight, newHeight).setDuration(300);
-                    slideAnimator.addListener(new Animator.AnimatorListener() {
-                        boolean modified = false;
-
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            if (iconExpand.getVisibility() == View.VISIBLE) {
-                                iconExpand.setVisibility(View.INVISIBLE);
-                                modified = true;
-                            }
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (iconExpand.getVisibility() == View.INVISIBLE && !modified) {
+                            iconExpand.setVisibility(View.VISIBLE);
+                            modified = false;
                         }
+                    }
 
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            if (iconExpand.getVisibility() == View.INVISIBLE && !modified) {
-                                iconExpand.setVisibility(View.VISIBLE);
-                                modified = false;
-                            }
-                        }
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
 
-                        @Override
-                        public void onAnimationCancel(Animator animation) {
+                    }
 
-                        }
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
 
-                        @Override
-                        public void onAnimationRepeat(Animator animation) {
+                    }
+                });
 
-                        }
-                    });
+                slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        // get the value the interpolator is at
+                        Integer value = (Integer) animation.getAnimatedValue();
+                        // I'm going to set the layout's height 1:1 to the tick
+                        menu.getLayoutParams().height = value.intValue();
+                        // force all layouts to see which ones are affected by
+                        // this layouts height change
+                        menu.requestLayout();
+                    }
+                });
+                AnimatorSet set = new AnimatorSet();
+                set.play(slideAnimator);
+                set.setInterpolator(new AccelerateDecelerateInterpolator());
+                set.start();
+            }
+        });
 
-                    slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            // get the value the interpolator is at
-                            Integer value = (Integer) animation.getAnimatedValue();
-                            // I'm going to set the layout's height 1:1 to the tick
-                            menu.getLayoutParams().height = value.intValue();
-                            // force all layouts to see which ones are affected by
-                            // this layouts height change
-                            menu.requestLayout();
-                        }
-                    });
-                    AnimatorSet set = new AnimatorSet();
-                    set.play(slideAnimator);
-                    set.setInterpolator(new AccelerateDecelerateInterpolator());
-                    set.start();
-                }
-            });
-
-        }
     }
 
     public void addReview(View v){
@@ -447,29 +440,32 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         targetRestaurant = resList.get(0); //I overwrite the actual restaurantID
         userID = "0";
 
-        /*Button orders_button = (Button) findViewById(R.id.orders_button);
+        Button orders_button = (Button) findViewById(R.id.order_button);
+        assert orders_button != null;
         orders_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(
                         getApplicationContext(),
-                        UserTableReservationActivity.class);
-                intent.putExtra("Restaurant", current_restaurant);
+                        OrderActivity.class);
+                intent.putExtra("Restaurant", targetRestaurant);
                 startActivity(intent);
             }
         });
 
-        Button reservations_button = (Button) findViewById(R.id.reservations_button);
+        Button reservations_button = (Button) findViewById(R.id.reservation_button);
+        assert reservations_button != null;
         reservations_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(
                         getApplicationContext(),
-                        UserMyReservations.class);
-                intent.putExtra("Username", username);
+                        UserTableReservationActivity.class);
+                intent.putExtra("userID", userID);
+                intent.putExtra("Restaurant", targetRestaurant);
                 startActivity(intent);
             }
-        });*/
+        });
     }
 
     /*private void setRestaurantInfo() {
@@ -494,8 +490,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
     private void setRestaurantOffers() {
         if(offers.isEmpty()){
-            /*CardView cardOffers = (CardView) findViewById(R.id.restaurant_offers);
-            cardOffers.setVisibility(View.GONE);*/
+            CardView cardOffers = (CardView) findViewById(R.id.restaurant_offers);
+            cardOffers.setVisibility(View.GONE);
         }
         else {
             RecyclerView offerList = (RecyclerView) findViewById(R.id.user_offer_list);
@@ -702,15 +698,15 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private void setBookmarkButton() {
         final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.bookmark_fab);
         if (fab != null) {
-            fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, android.R.color.white)));
+            //fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, android.R.color.white)));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Bookmark user_bookmark = new Bookmark();
-                    if(restaurant_id!=null)
-                        user_bookmark.setRestaurant_id(restaurant_id);
-                    if(user_id!=null)
-                        user_bookmark.setRestaurant_id(user_id);
+                    if(restaurantID!=null)
+                        user_bookmark.setRestaurant_id(restaurantID);
+                    if(userID!=null)
+                        user_bookmark.setRestaurant_id(userID);
                     ArrayList<Bookmark> bookmarks_temp;
                     if(!isBookmark()) {
                         //read, add and write

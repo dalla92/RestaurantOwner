@@ -1,28 +1,23 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
-import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.CalendarView;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.TextView;
@@ -30,7 +25,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import org.json.JSONException;
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,7 +54,7 @@ public class UserTableReservationActivity extends AppCompatActivity implements V
     private String chosen_year, chosen_month, chosen_day, chosen_hour, chosen_minute, chosen_weekday;
     Button timepicker_button;
     Button datepicker_button;
-    String current_username = null;
+    private String userID;
     private NumberPicker guests_number;
     private EditText notes = null;
     private CalendarView calendar_view = null;
@@ -89,6 +83,7 @@ public class UserTableReservationActivity extends AppCompatActivity implements V
         //get data
         Intent intent = getIntent();
         current_restaurant = (Restaurant) intent.getExtras().get("Restaurant");
+        userID = intent.getExtras().getString("userID");
         try {
             open_times = JSONUtil.readJSONOpenTimeList(this, current_restaurant.getRestaurantId());
         }
@@ -122,12 +117,11 @@ public class UserTableReservationActivity extends AppCompatActivity implements V
             current_restaurant.setTableNum("100");
             //initialization
             current_table_reservation = new TableReservation();
-            current_username = "0";
             notes = (EditText) findViewById(R.id.table_reservation_notes);
             try {
                 current_table_reservation.setRestaurantId(current_restaurant.getRestaurantId());
                 current_table_reservation.setTableReservationId(UUID.randomUUID().toString());
-                current_table_reservation.setUsername(current_username);
+                current_table_reservation.setUserID(userID);
             } catch (NullPointerException e) {
                 Log.e("EXCEPTION", "I DETECTED A NULL POINTER EXCEPTION IN ON CREATE");
             }
@@ -436,7 +430,7 @@ public class UserTableReservationActivity extends AppCompatActivity implements V
                                                 && current_table_reservation.getN_people() !=0
                                                 && current_table_reservation.getRestaurantId() != null
                                                 && current_table_reservation.getTableReservationId() != null
-                                                && current_table_reservation.getUsername() != null
+                                                && current_table_reservation.getUserID() != null
                                                 && chosen_hour != null
                                                 && chosen_minute !=null) {
 

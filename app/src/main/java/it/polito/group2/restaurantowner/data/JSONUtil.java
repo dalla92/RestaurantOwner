@@ -1,7 +1,6 @@
 package it.polito.group2.restaurantowner.data;
 
 import android.content.Context;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,7 +56,7 @@ public class JSONUtil {
         JSONArray jarray = new JSONArray();
         for (User us : users) {
             JSONObject jres = new JSONObject();
-            //jres.put("Username",us.getUsername());
+            //jres.put("Username",us.getUserID());
             jres.put("Password", us.getPassword());
             jres.put("FirstName", us.getFirst_name());
             jres.put("LastName", us.getLast_name());
@@ -150,7 +149,7 @@ public class JSONUtil {
             User us = new User();
             if (usermail != null) {
                 if (jsonObject.optString("Usermail").equals(usermail)) {
-                    //us.setUsername(jsonObject.optString("Username"));
+                    //us.setUserID(jsonObject.optString("Username"));
                     us.setPassword(jsonObject.optString("Password"));
                     us.setId(jsonObject.optString("UserId"));
                     us.setFirst_name(jsonObject.optString("FirstName"));
@@ -163,7 +162,7 @@ public class JSONUtil {
                     users.add(us);
                 }
             } else {
-                //us.setUsername(jsonObject.optString("Username"));
+                //us.setUserID(jsonObject.optString("Username"));
                 us.setPassword(jsonObject.optString("Password"));
                 us.setId(jsonObject.optString("UserId"));
                 us.setFirst_name(jsonObject.optString("FirstName"));
@@ -571,7 +570,7 @@ public class JSONUtil {
             JSONObject jres = new JSONObject();
             jres.put("RestaurantID", res.getRestaurantId());
             jres.put("Date", timeFormat.format(res.getDate().getTime()));
-            jres.put("Username", res.getUsername());
+            jres.put("Username", res.getUserID());
             jres.put("Notes", res.getNotes());
             jres.put("SeatReserved", res.getN_people());
             jres.put("TableReservationID", res.getTableReservationId());

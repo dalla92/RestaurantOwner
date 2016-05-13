@@ -3,8 +3,8 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="coloPrimaryLight">#3F81B5</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorAccentOpaque">#AAFF4081</color>
+    <color name="colorAccent">#F50057</color>
+    <color name="colorAccentOpaque">#FF80AB</color>
     <color name="divider">#8c8c8c</color>
     <color name="black">#000000</color>
     <color name="transparent">@android:color/transparent</color>

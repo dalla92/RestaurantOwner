@@ -78,7 +78,7 @@ public class TableFragment extends Fragment {
                 TextView text_notes = (TextView) convertView.findViewById(R.id.reservation_notes);
 
                 TableReservation reservation = reservation_list.get(position);
-                text_client_name.setText(reservation.getUsername());
+                text_client_name.setText(reservation.getUserID());
                 text_time.setText(timeFormat.format(reservation.getDate().getTime()));
                 text_people.setText(String.format("%d %s", reservation.getN_people(), getString(R.string.reservation_people)));
                 text_notes.setText(reservation.getNotes());

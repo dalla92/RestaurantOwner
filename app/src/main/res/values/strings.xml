@@ -181,7 +181,8 @@
     <string name="comment">Add a Comment</string>
     <string name="title_activity_gallery_view">Gallery</string>
     <string name="title_activity_my_reviews">MyReviewsActivity</string>
-
+    <string name="make_an_order">Order</string>
+    <string name="make_a_reservation">Book Table</string>
     <string name="next">Next</string>
     <string name="action_my_restaurants">My Restaurants</string>
     <string name="action_gallery">Gallery</string>
