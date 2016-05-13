@@ -34,7 +34,7 @@ public class OrderActivity extends AppCompatActivity
         CategoryFragment.OnActionListener,
         MealFragment.OnActionListener,
         AdditionFragment.OnActionListener,
-        InfoFragment.OnAddClickedListener,
+        InfoFragment.OnActionListener,
         CartFragment.OnActionListener {
 
     private Order order;

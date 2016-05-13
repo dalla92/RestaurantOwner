@@ -143,6 +143,7 @@
         <activity
             android:name=".user.order.OrderActivity"
             android:theme="@style/AppTheme.NoActionBar">
+
         </activity>
 
         <meta-data

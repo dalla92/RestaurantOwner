@@ -17,7 +17,7 @@ import it.polito.group2.restaurantowner.R;
 
 public class InfoFragment extends Fragment {
 
-    private OnAddClickedListener mCallback;
+    private OnActionListener mCallback;
 
     public InfoFragment() {}
 
@@ -43,8 +43,8 @@ public class InfoFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnAddClickedListener) {
-            mCallback = (OnAddClickedListener) context;
+        if (context instanceof OnActionListener) {
+            mCallback = (OnActionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnAddClickedListener");
@@ -57,8 +57,9 @@ public class InfoFragment extends Fragment {
         mCallback = null;
     }
 
-    public interface OnAddClickedListener {
+    public interface OnActionListener {
         public void onAddClicked(Integer quantity, String note);
+        public void onCartClicked();
     }
 
     @Override
@@ -74,6 +75,10 @@ public class InfoFragment extends Fragment {
             EditText qty = (EditText)getView().findViewById(R.id.meal_quantity);
             EditText note = (EditText)getView().findViewById(R.id.meal_note);
             mCallback.onAddClicked(Integer.parseInt(qty.getText().toString()),note.getText().toString());
+            return true;
+        }
+        if(id == R.id.goto_cart){
+            mCallback.onCartClicked();
             return true;
         }
         return super.onOptionsItemSelected(item);

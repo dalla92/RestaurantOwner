@@ -47,6 +47,7 @@ public class CartFragment extends ListFragment {
             order = (Order)getArguments().getSerializable(ORDER);
         }
         modelList = getModel();
+
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
                     getResources().getString(R.string.order_cart_title));
@@ -77,24 +78,28 @@ public class CartFragment extends ListFragment {
             }
         });
 
-        confirm_btn.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
-                new AlertDialog.Builder(getContext())
-                        .setTitle(getContext().getResources().getString(R.string.order_confirm_title))
-                        .setMessage(getContext().getResources().getString(R.string.order_confirm_message))
-                        .setIcon(android.R.drawable.ic_dialog_info)
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int whichButton) {
-                                EditText note = (EditText) view.findViewById(R.id.ordernote);
-                                order.setNote(note.getText().toString());
-                                order.setTimestamp(Calendar.getInstance());
-                                mCallback.onConfirmOrderClicked(order);
-                            }})
-                        .setNegativeButton(android.R.string.no, null).show();
-            }
-        });
+        if(order.getMealList().size() == 0) {
+            confirm_btn.setVisibility(View.INVISIBLE);
+        } else {
+            confirm_btn.setVisibility(View.INVISIBLE);
+            confirm_btn.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    new AlertDialog.Builder(getContext())
+                            .setTitle(getContext().getResources().getString(R.string.order_confirm_title))
+                            .setMessage(getContext().getResources().getString(R.string.order_confirm_message))
+                            .setIcon(android.R.drawable.ic_dialog_info)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    EditText note = (EditText) view.findViewById(R.id.ordernote);
+                                    order.setNote(note.getText().toString());
+                                    order.setTimestamp(Calendar.getInstance());
+                                    mCallback.onConfirmOrderClicked(order);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null).show();
+                }
+            });
+        }
         return view;
     }
 
