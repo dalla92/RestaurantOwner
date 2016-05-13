@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.user.order;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -77,10 +78,11 @@ public class OrderActivity extends AppCompatActivity
             if (savedInstanceState != null) {
                 return;
             }
-            CategoryFragment categoryFragment = CategoryFragment.
-                    newInstance(restaurant_id);
-            getSupportFragmentManager().beginTransaction().
-                    add(R.id.fragment_container, categoryFragment).commit();
+
+            CategoryFragment categoryFragment = CategoryFragment.newInstance(restaurant_id);
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.add(R.id.fragment_container, categoryFragment, "CATEGORY");
+            transaction.commit();
         }
     }
 
@@ -90,8 +92,13 @@ public class OrderActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            CategoryFragment categoryFragment = CategoryFragment.newInstance(this.order.getRestaurantID());
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
+            transaction.addToBackStack(null);
+            transaction.commit();
         }
+
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -182,7 +189,7 @@ public class OrderActivity extends AppCompatActivity
         this.meal.setCategory(category);
         MealFragment mealFragment = MealFragment.newInstance(category.getCategoryID());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, mealFragment);
+        transaction.replace(R.id.fragment_container, mealFragment, "MEAL");
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -191,7 +198,7 @@ public class OrderActivity extends AppCompatActivity
     public void onCartClicked() {
         CartFragment cartFragment = CartFragment.newInstance(this.order);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, cartFragment);
+        transaction.replace(R.id.fragment_container, cartFragment, "CART");
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -201,7 +208,7 @@ public class OrderActivity extends AppCompatActivity
         this.meal.setMeal(meal);
         AdditionFragment additionFragment = AdditionFragment.newInstance(meal.getMealId());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, additionFragment);
+        transaction.replace(R.id.fragment_container, additionFragment, "ADDITION");
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -216,7 +223,7 @@ public class OrderActivity extends AppCompatActivity
 
         InfoFragment infoFragment = new InfoFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, infoFragment);
+        transaction.replace(R.id.fragment_container, infoFragment, "INFO");
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -228,7 +235,7 @@ public class OrderActivity extends AppCompatActivity
         this.order.getMealList().add(meal);
         CartFragment cartFragment = CartFragment.newInstance(this.order);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, cartFragment);
+        transaction.replace(R.id.fragment_container, cartFragment, "CART");
         transaction.addToBackStack(null);
         transaction.commit();
     }
@@ -246,7 +253,7 @@ public class OrderActivity extends AppCompatActivity
         this.order = order;
         CategoryFragment categoryFragment = CategoryFragment.newInstance(this.order.getRestaurantID());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, categoryFragment);
+        transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
         transaction.addToBackStack(null);
         transaction.commit();
     }

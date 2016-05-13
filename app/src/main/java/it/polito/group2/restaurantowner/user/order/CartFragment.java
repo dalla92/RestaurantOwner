@@ -7,6 +7,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,7 +82,7 @@ public class CartFragment extends ListFragment {
         if(order.getMealList().size() == 0) {
             confirm_btn.setVisibility(View.INVISIBLE);
         } else {
-            confirm_btn.setVisibility(View.INVISIBLE);
+            confirm_btn.setVisibility(View.VISIBLE);
             confirm_btn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     new AlertDialog.Builder(getContext())
