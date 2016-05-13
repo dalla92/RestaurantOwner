@@ -465,7 +465,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         }
 
-        targetRestaurant = resList.get(0); //I overwrite the actual restaurantID
+        for(int i=0; i<resList.size(); i++){
+            if(resList.get(i).getRestaurantId().equals(restaurantID))
+                targetRestaurant = resList.get(i); //I overwrite the actual restaurantID
+        }
+
         userID = "0";
 
         Button orders_button = (Button) findViewById(R.id.order_button);

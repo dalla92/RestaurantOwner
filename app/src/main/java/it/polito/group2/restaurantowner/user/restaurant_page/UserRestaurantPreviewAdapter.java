@@ -154,8 +154,8 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             */
             SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);
             if(userDetails != null) {
-                if (userDetails.getString(obj.getRestaurantId(), null) != null) {
-                    Uri photouri = Uri.parse(userDetails.getString(obj.getRestaurantId(), null));
+                if (userDetails.getString(obj.getPhotoUri(), null) != null) {
+                    Uri photouri = Uri.parse(userDetails.getString(obj.getPhotoUri(), null));
                     if (photouri != null)
                         this.image.setImageURI(photouri);
                 }
