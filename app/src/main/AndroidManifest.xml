@@ -154,7 +154,8 @@
 
         <activity
             android:name=".user.restaurant_page.UserProfile"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden"/>
         <activity
             android:name=".user.restaurant_page.UserMyFavourites"
             android:theme="@style/AppTheme.NoActionBar" />
