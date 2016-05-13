@@ -44,6 +44,7 @@ public class InfoFragment extends Fragment {
         View view = inflater.inflate(R.layout.order_fragment_info, container, false);
         NumberPicker qty = (NumberPicker)view.findViewById(R.id.meal_quantity);
         qty.setMinValue(1);
+        qty.setMaxValue(30);
         qty.setWrapSelectorWheel(false);
         return view;
     }
