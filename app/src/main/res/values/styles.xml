@@ -72,4 +72,8 @@
         <item name="android:background">@color/black_overlay</item>
     </style>
 
+    <style name="RatingBar" parent="Theme.AppCompat">
+        <item name="colorControlNormal">@color/colorAccent</item>
+    </style>
+
 </resources>

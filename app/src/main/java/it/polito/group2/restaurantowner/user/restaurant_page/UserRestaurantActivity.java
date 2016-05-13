@@ -139,7 +139,10 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
-        Glide.with(this).load(targetRestaurant.getPhotoUri()).into(image);
+        if(targetRestaurant.getPhotoUri() == null)
+            Glide.with(this).load(R.drawable.no_image).into(image);
+        else
+            Glide.with(this).load(targetRestaurant.getPhotoUri()).into(image);
 
         reviews = getReviewsJson();
         Collections.sort(reviews);
