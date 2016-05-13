@@ -457,7 +457,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
                 Calendar date = Calendar.getInstance();
                 //"EEE dd MMM yyyy 'at' HH:mm
-                Review review =new Review(restaurantID, "djskdj", "Wed 16 Oct 1992 'at' 20:03", comment, UUID.randomUUID().toString(), null, starNumber);
+                Review review =new Review(restaurantID, "djskdj", date, comment, UUID.randomUUID().toString(), null, starNumber);
                 reviews.add(review);
                 Collections.sort(reviews);
                 reviewAdapter.notifyDataSetChanged();
@@ -817,23 +817,23 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         String c1 = "Davvero un bel locale, personale accogliente e mangiare davvero sopra la media. I prezzi sono accessibile e data la qualità del cibo sono più che giusti.";
         Calendar date1 = Calendar.getInstance();
         date1.set(Calendar.HOUR_OF_DAY, 12);
-        Review r1 =new Review(restaurantID, "Paola C.", "Wed 20 Oct 2006 'at' 20:03", c1, UUID.randomUUID().toString(), null, 3.5f);
+        Review r1 =new Review(restaurantID, "Paola C.", "03/12/2016 20:30", c1, UUID.randomUUID().toString(), null, 3.5f);
 
         String c2 = "Abbiamo preso la pizza da un metro e dobbiamo dare un giudizio più che positivo! Se il locale fosse un po più grande sicuramente farebbe concorrenza a parecchi grandi nomi!";
         Calendar date2 = Calendar.getInstance();
         date2.set(Calendar.HOUR_OF_DAY, 10);
-        Review r2 =new Review(restaurantID, "Mario R.", "Thu 13 Jul 2106 'at' 21:03", c2, UUID.randomUUID().toString(), null, 3f);
+        Review r2 =new Review(restaurantID, "Mario R.",  "01/20/2016 12:30", c2, UUID.randomUUID().toString(), null, 3f);
 
 
         Calendar date3 = Calendar.getInstance();
         date3.set(Calendar.HOUR_OF_DAY, 8);
-        Review r3 =new Review(restaurantID, "Giovanni C.", "Sun 10 Jan 1997 'at' 20:30", "", UUID.randomUUID().toString(), null, 4.5f);
+        Review r3 =new Review(restaurantID, "Giovanni C.",  "02/14/2016 17:00", "", UUID.randomUUID().toString(), null, 4.5f);
 
         String c4 = "Sono andata a cena il mio ragazzo e siamo rimasti molto sazi e contenti. Abbiamo preso le chiacchiere al crudo ed erano veramente buone! La pizza era molto buona, una delle più buone mangiate a Torino.";
         Calendar date4 = Calendar.getInstance();
         date4.set(Calendar.HOUR_OF_DAY, 12);
         date4.set(Calendar.MINUTE, 30);
-        Review r4 =new Review(restaurantID, "Francesco G.", "Wed 28 Sep 2005 'at' 22:03", c4, UUID.randomUUID().toString(), null, 3.5f);
+        Review r4 =new Review(restaurantID, "Francesco G.",  "10/20/2016 20:30", c4, UUID.randomUUID().toString(), null, 3.5f);
 
         reviews.add(r1);
         reviews.add(r2);

@@ -14,6 +14,8 @@ import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import org.json.JSONException;
 
 import java.text.ParseException;
@@ -132,26 +134,14 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             distance = (TextView) v.findViewById(R.id.textViewDistance);
         }
 
-        public void setData(Restaurant obj, int position){
-           /* TODO if(obj.getPhotoUri()!="") {
-                Uri imageUri = Uri.parse(obj.getPhotoUri());
-                InputStream imageStream = null;
-                try {
-                    imageStream = mContext.getContentResolver().openInputStream(imageUri);
-                    this.image.setImageBitmap(BitmapFactory.decodeStream(imageStream));
-                } catch (FileNotFoundException e) {
-                    // Handle the error
-                } finally {
-                    if (imageStream != null) {
-                        try {
-                            imageStream.close();
-                        } catch (IOException e) {
-                            // Ignore the exception
-                        }
-                    }
-                }
-            }
-            */
+        public void setData(Restaurant restaurant, int position){
+
+            if(restaurant.getPhotoUri() == null || restaurant.getPhotoUri().equals(""))
+                Glide.with(mContext).load(R.drawable.no_image).into(this.image);
+            else
+                Glide.with(mContext).load(restaurant.getPhotoUri()).into(this.image);
+
+            /*
             SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);
             if(userDetails != null) {
                 if (userDetails.getString(obj.getPhotoUri(), null) != null) {
@@ -159,14 +149,14 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                     if (photouri != null)
                         this.image.setImageURI(photouri);
                 }
-            }
+            }*/
 
             //TODO remember to take out, just for testing purpose
             //obj.setPriceRange(String.valueOf(calculate_range(obj)));
-            obj.setPriceRange("2");
+            restaurant.setPriceRange("2");
 
-            this.resName.setText(obj.getName());
-            this.rating.setText(obj.getRating());
+            this.resName.setText(restaurant.getName());
+            this.rating.setText(restaurant.getRating());
 
             //TODO remember to take out, just for testing purpose2
             /*
@@ -178,7 +168,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             //TODO calculate distance form current location
             this.distance.setText("23 KM");
             this.position = position;
-            this.current = obj;
+            this.current = restaurant;
         }
     }
 

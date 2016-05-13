@@ -19,7 +19,7 @@ public class Review implements Comparable<Review>{
         this.restaurantId = restaurantId;
         this.userID = userID;
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
+        SimpleDateFormat format = new SimpleDateFormat("MM/DD/yyyy HH:mm");
         try {
             c.setTime(format.parse(dateString));
         }
