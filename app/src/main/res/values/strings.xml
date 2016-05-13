@@ -214,11 +214,17 @@
     <string name="order_cart_title">Here\'s your order:</string>
     <string name="order_cart_btn_confirm">Confirm order</string>
     <string name="order_cart_btn_continue">Continue order</string>
+    <string name="order_cart_btn_cancel">Cancel order</string>
     <string name="order_cart_hint_note">Additional order info</string>
     <string name="order_info_title">How many?</string>
     <string name="order_confirm_title">Order confirm</string>
     <string name="order_confirm_message">Are you sure to confirm your order?</string>
-
+    <string name="order_info_alert_title">Attention!</string>
+    <string name="order_info_alert_message">You must enter the quantity to add the meal to the cart.</string>
+    <string name="order_cancel_title">Attention!</string>
+    <string name="order_cancel_message">Do you want to delete the order?</string>
+    <string name="order_cart_deltitle">Delete meal</string>
+    <string name="order_cart_delmessage">Do you want to delete this meal?</string>
 
 
     <string name="title_activity_my_orders">My Orders</string>

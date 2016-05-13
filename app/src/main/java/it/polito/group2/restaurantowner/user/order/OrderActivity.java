@@ -1,8 +1,6 @@
 package it.polito.group2.restaurantowner.user.order;
 
-import android.app.Fragment;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
@@ -28,6 +26,7 @@ import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
 
 public class OrderActivity extends AppCompatActivity
@@ -256,5 +255,30 @@ public class OrderActivity extends AppCompatActivity
         transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void onMealDeleted(Order order, String mealID) {
+        this.order = order;
+        for(int i=0; i<this.order.getMealList().size(); i++) {
+            if(this.order.getMealList().get(i).getMeal().getMealId().equals(mealID)) {
+                this.order.getMealList().remove(i);
+                break;
+            }
+        }
+        CartFragment cartFragment = CartFragment.newInstance(this.order);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, cartFragment, "CART");
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    @Override
+    public void onCancelOrderClicked() {
+        this.order = null;
+        Intent intent = new Intent(this, UserRestaurantActivity.class);
+        intent.putExtra("restaurant_id", restaurant_id);
+        intent.putExtra("user_id", user_id);
+        startActivity(intent);
     }
 }

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -68,6 +69,7 @@ public class CartFragment extends ListFragment {
 
         Button confirm_btn = (Button) view.findViewById(R.id.confirm_order);
         Button continue_btn = (Button) view.findViewById(R.id.continue_order);
+        Button cancel_btn = (Button) view.findViewById(R.id.cancel_order);
 
         continue_btn.setOnClickListener(new View.OnClickListener()
         {
@@ -101,6 +103,21 @@ public class CartFragment extends ListFragment {
                 }
             });
         }
+
+        cancel_btn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                new AlertDialog.Builder(getContext())
+                        .setTitle(getContext().getResources().getString(R.string.order_cancel_title))
+                        .setMessage(getContext().getResources().getString(R.string.order_cancel_message))
+                        .setIcon(android.R.drawable.ic_dialog_info)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                mCallback.onCancelOrderClicked();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null).show();
+            }
+        });
         return view;
     }
 
@@ -109,6 +126,20 @@ public class CartFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         CartMealAdapter adapter = new CartMealAdapter(getActivity(), modelList);
         setListAdapter(adapter);
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, final int position, long id) {
+        new AlertDialog.Builder(getContext())
+                .setTitle(getContext().getResources().getString(R.string.order_cart_deltitle))
+                .setMessage(getContext().getResources().getString(R.string.order_cart_delmessage))
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        mCallback.onMealDeleted(order, modelList.get(position).getId());
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null).show();
     }
 
     @Override
@@ -131,6 +162,8 @@ public class CartFragment extends ListFragment {
     public interface OnActionListener {
         public void onConfirmOrderClicked(Order order);
         public void onContinueOrderClicked(Order order);
+        public void onCancelOrderClicked();
+        public void onMealDeleted(Order order, String mealID);
     }
 
     private ArrayList<MealModel> getModel() {

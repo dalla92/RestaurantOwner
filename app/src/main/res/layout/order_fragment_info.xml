@@ -6,12 +6,9 @@
     android:layout_gravity="center_horizontal|top"
     tools:context="it.polito.group2.restaurantowner.user.order.InfoFragment">
 
-    <EditText
-        android:hint="@string/order_mealquantity"
+    <NumberPicker
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
         android:id="@+id/meal_quantity"
         android:layout_gravity="center"/>
 

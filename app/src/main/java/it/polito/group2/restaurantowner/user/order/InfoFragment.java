@@ -1,8 +1,10 @@
 package it.polito.group2.restaurantowner.user.order;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.NumberPicker;
+
+import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
 
@@ -37,6 +42,9 @@ public class InfoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.order_fragment_info, container, false);
+        NumberPicker qty = (NumberPicker)view.findViewById(R.id.meal_quantity);
+        qty.setMinValue(1);
+        qty.setWrapSelectorWheel(false);
         return view;
     }
 
@@ -72,9 +80,10 @@ public class InfoFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if(id == R.id.action_add){
-            EditText qty = (EditText)getView().findViewById(R.id.meal_quantity);
+
+            NumberPicker qty = (NumberPicker)getView().findViewById(R.id.meal_quantity);
             EditText note = (EditText)getView().findViewById(R.id.meal_note);
-            mCallback.onAddClicked(Integer.parseInt(qty.getText().toString()),note.getText().toString());
+            mCallback.onAddClicked(qty.getValue(), note.getText().toString());
             return true;
         }
         if(id == R.id.goto_cart){

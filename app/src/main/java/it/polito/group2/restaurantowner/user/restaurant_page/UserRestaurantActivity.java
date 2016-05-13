@@ -483,7 +483,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 Intent intent = new Intent(
                         getApplicationContext(),
                         OrderActivity.class);
-                intent.putExtra("Restaurant", targetRestaurant);
+                intent.putExtra("restaurant_id", targetRestaurant.getRestaurantId());
+                intent.putExtra("user_id", userID);
                 startActivity(intent);
             }
         });
