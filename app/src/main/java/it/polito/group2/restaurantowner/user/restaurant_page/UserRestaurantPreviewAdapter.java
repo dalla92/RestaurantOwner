@@ -152,7 +152,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             }*/
 
             //TODO remember to take out, just for testing purpose
-            //obj.setPriceRange(String.valueOf(calculate_range(obj)));
+            //restaurant.setPriceRange(String.valueOf(calculate_range(restaurant)));
             restaurant.setPriceRange("2");
 
             this.resName.setText(restaurant.getName());
@@ -160,7 +160,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
 
             //TODO remember to take out, just for testing purpose2
             /*
-            String seats = String.valueOf(calculate_reservations_number(obj)) + "/" + obj.getTableNum();
+            String seats = String.valueOf(calculate_reservations_number(restaurant)) + "/" + restaurant.getTableNum();
             //this.reservationNumber.setText(seats);
             */
             this.reservationNumber.setText("20/100");
