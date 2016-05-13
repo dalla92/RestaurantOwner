@@ -19,22 +19,16 @@
         android:ems="10"
         android:id="@+id/ordernote" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:text="@string/order_cart_btn_confirm"
+        android:id="@+id/confirm_order" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/order_cart_btn_confirm"
-            android:id="@+id/confirm_order" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/order_cart_btn_continue"
-            android:id="@+id/continue_order" />
-    </LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/order_cart_btn_continue"
+        android:id="@+id/continue_order" />
 
 </LinearLayout>
