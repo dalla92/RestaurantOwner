@@ -276,6 +276,11 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onCancelOrderClicked() {
         this.order = null;
+        CategoryFragment categoryFragment = CategoryFragment.newInstance(restaurant_id);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
+        transaction.addToBackStack(null);
+        transaction.commit();
         Intent intent = new Intent(this, UserRestaurantActivity.class);
         intent.putExtra("restaurant_id", restaurant_id);
         intent.putExtra("user_id", user_id);
