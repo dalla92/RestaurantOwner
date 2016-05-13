@@ -23,7 +23,7 @@ public class AdditionFragment extends ListFragment {
     private String mealID;
 
     private ArrayList<AdditionModel> modelList;
-    private OnNextClickedListener mCallback;
+    private OnActionListener mCallback;
 
     public AdditionFragment() {}
 
@@ -68,11 +68,11 @@ public class AdditionFragment extends ListFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnNextClickedListener) {
-            mCallback = (OnNextClickedListener) context;
+        if (context instanceof OnActionListener) {
+            mCallback = (OnActionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnNextSelectedListener");
+                    + " must implement OnActionListener");
         }
     }
 
@@ -82,8 +82,9 @@ public class AdditionFragment extends ListFragment {
         mCallback = null;
     }
 
-    public interface OnNextClickedListener {
+    public interface OnActionListener {
         public void onNextClicked(ArrayList<MealAddition> additionList);
+        public void onCartClicked();
     }
 
     @Override
@@ -105,6 +106,11 @@ public class AdditionFragment extends ListFragment {
                 }
             }
             mCallback.onNextClicked(additionList);
+            return true;
+        }
+
+        if(id == R.id.goto_cart){
+            mCallback.onCartClicked();
             return true;
         }
 

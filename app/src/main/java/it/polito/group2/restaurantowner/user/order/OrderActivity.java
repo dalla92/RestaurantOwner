@@ -33,7 +33,7 @@ public class OrderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         CategoryFragment.OnActionListener,
         MealFragment.OnActionListener,
-        AdditionFragment.OnNextClickedListener,
+        AdditionFragment.OnActionListener,
         InfoFragment.OnAddClickedListener,
         CartFragment.OnActionListener {
 

@@ -5,6 +5,13 @@
     tools:context=".user.order.AdditionFragment">
 
     <item
+        android:id="@+id/goto_cart"
+        android:title="@string/order_cart_button"
+        android:icon="@drawable/ic_cart_white_24dp"
+        app:showAsAction="ifRoom"
+        />
+
+    <item
         android:id="@+id/action_next"
         android:title="@string/order_nextstep"
         app:showAsAction="ifRoom"
