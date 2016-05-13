@@ -31,8 +31,8 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
 
 public class OrderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
-        CategoryFragment.OnCategorySelectedListener,
-        MealFragment.OnMealSelectedListener,
+        CategoryFragment.OnActionListener,
+        MealFragment.OnActionListener,
         AdditionFragment.OnNextClickedListener,
         InfoFragment.OnAddClickedListener,
         CartFragment.OnActionListener {
@@ -183,6 +183,15 @@ public class OrderActivity extends AppCompatActivity
         MealFragment mealFragment = MealFragment.newInstance(category.getCategoryID());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, mealFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    @Override
+    public void onCartClicked() {
+        CartFragment cartFragment = CartFragment.newInstance(this.order);
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragment_container, cartFragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }

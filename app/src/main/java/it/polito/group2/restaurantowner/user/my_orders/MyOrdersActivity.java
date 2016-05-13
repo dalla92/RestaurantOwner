@@ -56,6 +56,11 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.myorders_activity);
+        modelList = getModel();
+        OrderAdapter adapter = new OrderAdapter(this, modelList);
+        ListView list = (ListView) findViewById(R.id.list_order);
+        list.setAdapter(adapter);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -96,23 +101,16 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user != null) {
-            if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
-                nav_username.setText(current_user.getFirst_name());
-            else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getLast_name());
-            else if (current_user.getFirst_name() != null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
-            if (current_user.getEmail() != null)
-                nav_email.setText(current_user.getEmail());
-            if (current_user.getPhoto() != null)
-                nav_photo.setImageBitmap(current_user.getPhoto());
-        }
-
-        modelList = getModel();
-        final ListView listview = (ListView) findViewById(R.id.list_order);
-        OrderAdapter adapter = new OrderAdapter(this, modelList);
-        listview.setAdapter(adapter);
+        if(current_user.getFirst_name()!=null && current_user.getLast_name()==null)
+            nav_username.setText(current_user.getFirst_name());
+        else if(current_user.getFirst_name()==null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getLast_name());
+        else if(current_user.getFirst_name()!=null && current_user.getLast_name()!=null)
+            nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
+        if(current_user.getEmail()!=null)
+            nav_email.setText(current_user.getEmail());
+        if(current_user.getPhoto()!=null)
+            nav_photo.setImageBitmap(current_user.getPhoto());
     }
 
     @Override

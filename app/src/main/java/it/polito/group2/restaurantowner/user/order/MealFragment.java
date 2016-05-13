@@ -6,6 +6,9 @@ import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -21,7 +24,7 @@ public class MealFragment extends ListFragment {
     private String categoryID;
 
     private ArrayList<MealModel> modelList;
-    private OnMealSelectedListener mCallback;
+    private OnActionListener mCallback;
 
     public MealFragment() {}
 
@@ -40,6 +43,7 @@ public class MealFragment extends ListFragment {
             categoryID = getArguments().getString(CATEGORY);
         }
         modelList = getModel(categoryID);
+        setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
                     getResources().getString(R.string.order_meal_title));
@@ -70,11 +74,11 @@ public class MealFragment extends ListFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnMealSelectedListener) {
-            mCallback = (OnMealSelectedListener) context;
+        if (context instanceof OnActionListener) {
+            mCallback = (OnActionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnMealSelectedListener");
+                    + " must implement OnActionListener");
         }
     }
 
@@ -84,8 +88,27 @@ public class MealFragment extends ListFragment {
         mCallback = null;
     }
 
-    public interface OnMealSelectedListener {
+    public interface OnActionListener {
         public void onMealSelected(Meal meal);
+        public void onCartClicked();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.order_fragment_meal_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.goto_cart){
+            mCallback.onCartClicked();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private ArrayList<MealModel> getModel(String categoryID) {

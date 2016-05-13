@@ -6,12 +6,16 @@ import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.MealAddition;
 import it.polito.group2.restaurantowner.data.MenuCategory;
 
 public class CategoryFragment extends ListFragment {
@@ -20,7 +24,7 @@ public class CategoryFragment extends ListFragment {
     private String restaurantID;
 
     private ArrayList<CategoryModel> modelList;
-    private OnCategorySelectedListener mCallback;
+    private OnActionListener mCallback;
 
     public CategoryFragment() {}
 
@@ -39,6 +43,7 @@ public class CategoryFragment extends ListFragment {
             restaurantID = getArguments().getString(RESTAURANT);
         }
         modelList = getModel(restaurantID);
+        setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
                     getResources().getString(R.string.order_category_title));
@@ -69,11 +74,11 @@ public class CategoryFragment extends ListFragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnCategorySelectedListener) {
-            mCallback = (OnCategorySelectedListener) context;
+        if (context instanceof OnActionListener) {
+            mCallback = (OnActionListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnCategorySelectedListener");
+                    + " must implement OnActionListener");
         }
     }
 
@@ -83,8 +88,27 @@ public class CategoryFragment extends ListFragment {
         mCallback = null;
     }
 
-    public interface OnCategorySelectedListener {
+    public interface OnActionListener {
         public void onCategorySelected(MenuCategory category);
+        public void onCartClicked();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.order_fragment_category_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if(id == R.id.goto_cart){
+            mCallback.onCartClicked();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private ArrayList<CategoryModel> getModel(String restaurantID) {

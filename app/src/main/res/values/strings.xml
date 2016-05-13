@@ -210,6 +210,7 @@
     <string name="order_category_title">What do you want to eat?</string>
     <string name="order_meal_title">Select it</string>
     <string name="order_addition_title">Any additions?</string>
+    <string name="order_cart_button">Cart</string>
     <string name="order_cart_title">Here\'s your order:</string>
     <string name="order_cart_btn_confirm">Confirm order</string>
     <string name="order_cart_btn_continue">Continue order</string>
