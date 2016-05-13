@@ -91,11 +91,20 @@ public class OrderActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            CategoryFragment categoryFragment = CategoryFragment.newInstance(this.order.getRestaurantID());
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
-            transaction.addToBackStack(null);
-            transaction.commit();
+            if(getSupportFragmentManager().findFragmentByTag("CART") != null){
+                CategoryFragment categoryFragment = CategoryFragment.newInstance(this.order.getRestaurantID());
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
+                transaction.addToBackStack(null);
+                transaction.commit();
+            } else if(getSupportFragmentManager().findFragmentByTag("CATEGORY") != null) {
+                Intent intent = new Intent(this, UserRestaurantActivity.class);
+                intent.putExtra("restaurant_id", restaurant_id);
+                intent.putExtra("user_id", user_id);
+                startActivity(intent);
+            } else {
+                super.onBackPressed();
+            }
         }
 
     }
