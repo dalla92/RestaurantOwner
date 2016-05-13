@@ -7,7 +7,6 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -25,7 +24,6 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -40,7 +38,6 @@ import com.bumptech.glide.Glide;
 
 import org.json.JSONException;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -58,7 +55,7 @@ import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.order.OrderActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.gallery.GalleryViewActivity;
+import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 
 public class UserRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -484,7 +481,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
     public void openGallery(View v){
         Intent intent = new Intent(this, GalleryViewActivity.class);
-        intent.putExtra("restaurantID", restaurantID);
+        intent.putExtra("restaurant_id", restaurantID);
         startActivity(intent);
     }
 

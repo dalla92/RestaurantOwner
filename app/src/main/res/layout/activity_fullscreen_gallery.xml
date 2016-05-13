@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    tools:context="it.polito.group2.restaurantowner.user.restaurant_page.gallery.FullscreenGalleryActivity">
+    tools:context=".gallery.FullscreenGalleryActivity">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"

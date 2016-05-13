@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.restaurant_page.gallery;
+package it.polito.group2.restaurantowner.gallery;
 
 /**
  * Created by TheChuck on 09/05/2016.

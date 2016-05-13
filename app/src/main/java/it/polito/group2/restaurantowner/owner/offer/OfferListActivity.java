@@ -38,13 +38,12 @@ import it.polito.group2.restaurantowner.data.Offer;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.owner.AddRestaurantActivity;
-import it.polito.group2.restaurantowner.owner.GalleryActivity;
+import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
 import it.polito.group2.restaurantowner.owner.ReservationActivity;
 import it.polito.group2.restaurantowner.owner.ReviewsActivity;
 import it.polito.group2.restaurantowner.owner.StatisticsActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class OfferListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -250,7 +249,7 @@ public class OfferListActivity extends AppCompatActivity implements NavigationVi
         } else if(id==R.id.action_gallery) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
-                    GalleryActivity.class);
+                    GalleryViewActivity.class);
             Bundle b = new Bundle();
             b.putString("restaurant_id", restaurantId);
             intent1.putExtras(b);

@@ -1,28 +1,18 @@
-package it.polito.group2.restaurantowner.user.restaurant_page.gallery;
-import android.content.Context;
-import android.content.DialogInterface;
+package it.polito.group2.restaurantowner.gallery;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.TypedValue;
-import android.view.Display;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -54,7 +44,7 @@ public class GalleryViewActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Bundle bundle = getIntent().getExtras();
-        restaurantID = bundle.getString("restaurantID");
+        restaurantID = bundle.getString("restaurant_id");
 
         GridView mGridView = (GridView) findViewById(R.id.gridView);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);

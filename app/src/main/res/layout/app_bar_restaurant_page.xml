@@ -47,7 +47,7 @@
                     android:layout_marginStart="20dp"
                     android:layout_marginLeft="20dp"
                     android:layout_marginBottom="50dp"
-                    android:src="@drawable/no_image"/>
+                    android:src="@drawable/ic_insert_photo"/>
         </FrameLayout>
 
             <android.support.v7.widget.Toolbar

@@ -26,8 +26,8 @@ import java.util.Calendar;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class ReservationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -135,7 +135,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
         } else if(id==R.id.action_gallery) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
-                    GalleryActivity.class);
+                    GalleryViewActivity.class);
             Bundle b = new Bundle();
             b.putString("restaurant_id", restaurantId);
             intent1.putExtras(b);

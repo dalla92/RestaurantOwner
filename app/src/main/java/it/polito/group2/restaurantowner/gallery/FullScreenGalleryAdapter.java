@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.restaurant_page.gallery;
+package it.polito.group2.restaurantowner.gallery;
 
 import java.util.ArrayList;
 import android.app.Activity;

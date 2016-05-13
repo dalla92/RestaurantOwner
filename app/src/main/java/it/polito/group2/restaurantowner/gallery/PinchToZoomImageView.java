@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.restaurant_page.gallery;
+package it.polito.group2.restaurantowner.gallery;
 
 import android.content.Context;
 import android.graphics.Matrix;
