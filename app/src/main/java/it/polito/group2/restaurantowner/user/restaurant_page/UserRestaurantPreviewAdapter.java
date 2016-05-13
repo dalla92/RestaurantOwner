@@ -173,7 +173,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             String seats = String.valueOf(calculate_reservations_number(obj)) + "/" + obj.getTableNum();
             //this.reservationNumber.setText(seats);
             */
-            this.reservationNumber.setText("€€€");
+            this.reservationNumber.setText("20/100");
 
             //TODO calculate distance form current location
             this.distance.setText("23 KM");

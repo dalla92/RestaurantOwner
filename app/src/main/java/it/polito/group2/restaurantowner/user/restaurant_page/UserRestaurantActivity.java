@@ -146,16 +146,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         offers = getOffersJSON();
         categories = getCategoriesJson();
 
-        setBookmarkButton();
-        addInfoExpandAnimation();
-        addTimesExpandAnimation();
-        setTimesList();
-        setCallAction();
-        setUserReviews();
-        setRestaurantOffers();
-        setRestaurantMenu();
-        setDrawer(toolbar);
-
         //TODO Rearrange the following code
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
             userID = getIntent().getExtras().getString("user_id");
@@ -182,6 +172,18 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             current_user.setPhone_number("0989897879789");
             current_user.setVat_number("sw8d9wd8w9d8w9d9");
         }
+
+        setBookmarkButton();
+        addInfoExpandAnimation();
+        addTimesExpandAnimation();
+        setTimesList();
+        setCallAction();
+        setUserReviews();
+        setRestaurantOffers();
+        setRestaurantMenu();
+        setDrawer(toolbar);
+
+
     }
 
     private void setDrawer(Toolbar toolbar) {

@@ -163,7 +163,7 @@ public class UserRestaurantList extends AppCompatActivity
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
             user_id = getIntent().getExtras().getString("user_id");
             try {
-                users = JSONUtil.readJSONUsersList(context, null);
+                users = JSONUtil.readJSONUsersList(this, null);
             }
             catch(JSONException e){
                 e.printStackTrace();
