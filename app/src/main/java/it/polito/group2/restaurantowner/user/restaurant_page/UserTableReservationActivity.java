@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -211,20 +212,20 @@ public class UserTableReservationActivity extends AppCompatActivity implements V
         decoratorList = new ArrayList<>();
         decoratorList.add(new MonthDecorator_CalendarPicker(closing_days, today));
         calendar.setDecorators(decoratorList);
-        calendar.setBackgroundResource(R.color.coloPrimaryLight);
+        calendar.setBackgroundColor(Color.WHITE);
         calendar.setOnScrollListener(new AbsListView.OnScrollListener() {
-                                         @Override
-                                         public void onScrollStateChanged(AbsListView view, int scrollState) {
-                                            //calendar.setDecorators(decoratorList);
-                                             //view.invalidate();
-                                         }
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+                //calendar.setDecorators(decoratorList);
+                //view.invalidate();
+            }
 
-                                         @Override
-                                         public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-                                             //calendar.setDecorators(decoratorList);
-                                             //view.invalidate();
-                                         }
-                                     });
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                //calendar.setDecorators(decoratorList);
+                //view.invalidate();
+            }
+        });
         mMinDate = new Date(System.currentTimeMillis() - 1000);
         calendar.setOnDateSelectedListener(new CalendarPickerView.OnDateSelectedListener() {
             @Override

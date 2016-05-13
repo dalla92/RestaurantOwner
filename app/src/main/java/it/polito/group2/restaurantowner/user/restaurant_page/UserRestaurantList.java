@@ -188,6 +188,10 @@ public class UserRestaurantList extends AppCompatActivity
         }
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+        /*
+        BorderedTextView nav_username = (BorderedTextView) nav_email_textview;
+        BorderedTextView nav_email = (BorderedTextView) nav_email_textview;
+        */
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
         if(current_user!=null) {
             if (current_user.getFirst_name() != null && current_user.getLast_name() == null)

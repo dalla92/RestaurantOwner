@@ -13,9 +13,8 @@
 
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         />
 
     <TextView
@@ -25,10 +24,11 @@
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:textColor="#FFFFFF"
         android:text="Username"
-        android:textSize="17dp"
-        android:shadowDx="10"
-        android:shadowDy="10"
-        android:shadowColor="#909090"
+        android:textSize="18dp"
+        android:shadowColor="#000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
         android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:gravity="center_horizontal" />
@@ -38,10 +38,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:textSize="17dp"
-        android:shadowDx="50"
-        android:shadowDy="50"
-        android:shadowColor="#909090"
+        android:textSize="13dp"
+        android:shadowColor="#000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="#FFFFFF"
         android:text="email@email.com" />
 

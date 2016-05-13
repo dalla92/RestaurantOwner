@@ -513,7 +513,7 @@ public class JSONUtil {
         return tableResList;
     }
 
-    public static ArrayList<TableReservation> readJSONTableResList(Context mContext, String targetRestaurantId) throws JSONException {
+    public static ArrayList<TableReservation> readJSONTableResUsList(Context mContext, String targetRestaurantId, String userId) throws JSONException {
         String json = null;
         ArrayList<TableReservation> tableResList = new ArrayList<>();
         FileInputStream fis = null;
@@ -539,8 +539,9 @@ public class JSONUtil {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
 
             String restaurantId = jsonObject.optString("RestaurantID");
-            if (!restaurantId.equals(targetRestaurantId))
-                continue;
+            if(targetRestaurantId!=null)
+                if (!restaurantId.equals(targetRestaurantId))
+                    continue;
 
             String date = jsonObject.optString("Date");
             SimpleDateFormat timeFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -551,7 +552,10 @@ public class JSONUtil {
                 e.printStackTrace();
             }
 
-            String username = jsonObject.optString("Username");
+            String username = jsonObject.optString("UserId");
+            if(userId!=null)
+                if (!username.equals(userId))
+                    continue;
             String notes = jsonObject.optString("Notes");
             String tableReservationId = jsonObject.optString("TableReservationID");
             int seatReserved = jsonObject.optInt("SeatReserved");
@@ -570,7 +574,7 @@ public class JSONUtil {
             JSONObject jres = new JSONObject();
             jres.put("RestaurantID", res.getRestaurantId());
             jres.put("Date", timeFormat.format(res.getDate().getTime()));
-            jres.put("Username", res.getUserID());
+            jres.put("UserId", res.getUserID());
             jres.put("Notes", res.getNotes());
             jres.put("SeatReserved", res.getN_people());
             jres.put("TableReservationID", res.getTableReservationId());

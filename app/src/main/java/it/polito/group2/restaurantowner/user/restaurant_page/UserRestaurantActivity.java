@@ -151,10 +151,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         paintBorder.setShadowLayer(4.0f, 0.0f, 2.0f, Color.BLACK);
 
 
-        if(targetRestaurant.getPhotoUri() == null || targetRestaurant.getPhotoUri().equals(""))
-            Glide.with(this).load(R.drawable.no_image).into(image);
-        else
-            Glide.with(this).load(targetRestaurant.getPhotoUri()).into(image);
+        if(targetRestaurant!=null)
+            if(targetRestaurant.getPhotoUri() == null || targetRestaurant.getPhotoUri().equals(""))
+                Glide.with(this).load(R.drawable.no_image).into(image);
+            else
+                Glide.with(this).load(targetRestaurant.getPhotoUri()).into(image);
 
         reviews = getReviewsJson();
         Collections.sort(reviews);

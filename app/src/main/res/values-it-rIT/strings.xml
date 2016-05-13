@@ -182,7 +182,7 @@
     <string name="action_my_restaurants">I miei Ristoranti</string>
     <string name="action_gallery">Galleria</string>
     <string name="action_user_part">Parte User</string>
-    <string name="filter">Filter the restaurant list</string>
+    <string name="filter">Filtra lista ristoranti</string>
     <string name="distance">Distance</string>
     <string name="price_range">Price range</string>
     <string name="restaurant_type">Restaurant type</string>
@@ -229,4 +229,7 @@
     <string name="title_activity_my_reviews">Miei Commenti</string>
     <string name="title_activity_user_restaurant"></string>
     <string name="valid_for">Valido per</string>
+    <string name="make_a_reservation">Prenota Tavolo</string>
+    <string name="make_an_order">Ordina Piatto</string>
+    <string name="order_cart_button">Carrello</string>
 </resources>

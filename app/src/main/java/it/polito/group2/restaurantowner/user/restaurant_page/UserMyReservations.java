@@ -51,7 +51,6 @@ import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 public class UserMyReservations extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     Toolbar toolbar;
-    private String current_username;
     ArrayList<TableReservation> all_table_reservations = new ArrayList<TableReservation>();
     private My_Reservations_Adapter adapter;
     List<Restaurant> resList = new ArrayList<Restaurant>();
@@ -73,10 +72,10 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         //get data
         Intent intent = getIntent();
         if(intent.getExtras().get("user_id")!=null)
-            current_username = (String) intent.getExtras().get("user_id");
+            user_id = (String) intent.getExtras().get("user_id");
 
         try {
-            all_table_reservations = JSONUtil.readJSONTableResList(context, current_username);
+            all_table_reservations = JSONUtil.readJSONTableResUsList(context, null, user_id);
         } catch (JSONException e) {
             Log.e("EXCEPTION", "EXCETPION IN READING THE FILE IN onCreate");
         }
@@ -367,7 +366,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
             Log.e("EXCEPTION", "SDF.PARSE RAISED AN EXCEPTION IN onOptionsItemSelected");
         }
         for(TableReservation tr : all_table_reservations){
-            if(tr.getUserID().equals(current_username)) {
+            if(tr.getUserID().equals(user_id)) {
                     if (tr.getRestaurantId().equals(res_id))
                         if (tr.getDate().YEAR==date.YEAR && tr.getDate().MONTH==date.MONTH && tr.getDate().DAY_OF_MONTH==date.DAY_OF_MONTH && tr.getDate().MINUTE==date.MINUTE && tr.getDate().HOUR==date.HOUR)
                             return tr;
