@@ -48,6 +48,7 @@
                         app:layout_collapseMode="parallax"/>
 
                     <ImageView
+                        android:id="@+id/icon_gallery"
                         android:onClick="openGallery"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

@@ -243,7 +243,7 @@ public class JSONUtil {
     public static boolean isBookmark(Context mContext, String targetUsername, String targetRestaurantId) throws JSONException {
         String json = null;
         FileInputStream fis = null;
-        String FILENAME = "bookmarks.json";
+        String FILENAME = "bookmarkList.json";
         try {
             fis = mContext.openFileInput(FILENAME);
             int size = fis.available();

@@ -11,8 +11,11 @@ import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -77,6 +80,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private ArrayList<User> users = new ArrayList<>();
     private Context context;
     public User current_user;
+    private boolean bookmark = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,7 +143,14 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
-        if(targetRestaurant.getPhotoUri() == null)
+        ImageView icon_gallery = (ImageView) findViewById(R.id.icon_gallery);
+        Paint paintBorder = new Paint();
+        paintBorder.setAntiAlias(true);
+        icon_gallery.setLayerType(View.LAYER_TYPE_SOFTWARE, paintBorder);
+        paintBorder.setShadowLayer(4.0f, 0.0f, 2.0f, Color.BLACK);
+
+
+        if(targetRestaurant.getPhotoUri() == null || targetRestaurant.getPhotoUri().equals(""))
             Glide.with(this).load(R.drawable.no_image).into(image);
         else
             Glide.with(this).load(targetRestaurant.getPhotoUri()).into(image);
@@ -153,7 +164,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
             userID = getIntent().getExtras().getString("user_id");
             try {
-                users = JSONUtil.readJSONUsersList(context, null);
+                users = JSONUtil.readJSONUsersList(this, null);
             }
             catch(JSONException e){
                 e.printStackTrace();
@@ -744,9 +755,10 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     if(userID!=null)
                         user_bookmark.setRestaurant_id(userID);
                     ArrayList<Bookmark> bookmarks_temp;
-                    if(!isBookmark()) {
+                    if(!bookmark) {
                         //read, add and write
                         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_on_24dp));
+                        bookmark = true;
                         try {
                             bookmarks_temp = JSONUtil.readBookmarkList(context, null);
                             bookmarks_temp.add(user_bookmark);
@@ -759,6 +771,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     else{
                         //read, remove and write
                         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this,R.drawable.ic_star_off_24dp));
+                        bookmark = false;
                         try {
                             bookmarks_temp = JSONUtil.readBookmarkList(context, null);
                             bookmarks_temp.remove(user_bookmark);
@@ -848,8 +861,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
     private boolean isBookmark() {
         try {
-            JSONUtil.isBookmark(this, userID, restaurantID);
-            return true;
+            return JSONUtil.isBookmark(this, userID, restaurantID);
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
