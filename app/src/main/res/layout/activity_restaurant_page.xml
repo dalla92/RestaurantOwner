@@ -20,8 +20,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
+        app:itemIconTint="@color/colorAccent"
+        app:itemTextColor="@color/gray"
         app:headerLayout="@layout/nav_header_main"
-        app:itemTextColor="@color/colorPrimary"
         app:menu="@menu/restaurant_page_drawer" />
 
 
