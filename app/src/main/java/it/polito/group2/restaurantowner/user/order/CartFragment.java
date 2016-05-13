@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.Order;
@@ -87,6 +89,7 @@ public class CartFragment extends ListFragment {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 EditText note = (EditText) view.findViewById(R.id.ordernote);
                                 order.setNote(note.getText().toString());
+                                order.setTimestamp(Calendar.getInstance());
                                 mCallback.onConfirmOrderClicked(order);
                             }})
                         .setNegativeButton(android.R.string.no, null).show();

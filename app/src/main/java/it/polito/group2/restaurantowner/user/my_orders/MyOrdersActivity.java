@@ -15,10 +15,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ListView;
 
 import org.json.JSONException;
 
 import java.util.ArrayList;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Random;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
@@ -29,6 +34,14 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
+import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.data.MealAddition;
+import it.polito.group2.restaurantowner.data.MenuCategory;
+import it.polito.group2.restaurantowner.data.Order;
+import it.polito.group2.restaurantowner.data.OrderMeal;
+import it.polito.group2.restaurantowner.data.OrderMealAddition;
+import it.polito.group2.restaurantowner.user.order.AdditionModel;
+import it.polito.group2.restaurantowner.user.order.MealModel;
 
 public class MyOrdersActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -36,6 +49,8 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
     private Context context;
     public User current_user;
     private String user_id;
+
+    private ArrayList<OrderModel> modelList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,6 +189,85 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
+
+        modelList = getModel();
+        final ListView listview = (ListView) findViewById(R.id.list_order);
+        OrderAdapter adapter = new OrderAdapter(this, modelList);
+        listview.setAdapter(adapter);
+    }
+
+    private ArrayList<OrderModel> getModel() {
+        ArrayList<OrderModel> list = new ArrayList<OrderModel>();
+        ArrayList<Order> myorders = getMyOrders();
+
+        for(Order o : myorders) {
+            ArrayList<MealModel> mealList = new ArrayList<MealModel>();
+            for(OrderMeal m : o.getMealList()) {
+                ArrayList<AdditionModel> additionList = new ArrayList<AdditionModel>();
+                for(OrderMealAddition a : m.getAdditionList()) {
+                    AdditionModel aModel = new AdditionModel(a.getAddition().getAddition_id(),
+                            a.getAddition().getName(),true, a.getAddition());
+                    aModel.setSelected(true);
+                    additionList.add(aModel);
+                }
+                MealModel mModel = new MealModel(m.getMeal().getMealId(),m.getMeal().getMeal_name(),m.getMeal());
+                mModel.setAdditionModel(additionList);
+                mealList.add(mModel);
+            }
+            OrderModel oMod = new OrderModel(o.getOrderID(),o,mealList);
+            list.add(oMod);
+        }
+        return list;
+    }
+
+    private ArrayList<Order> getMyOrders() {
+        //TODO modificare il metodo per prendere i dati da firebase
+        ArrayList<Order> myorders = new ArrayList<Order>();
+
+        Random randomGenerator = new Random();
+        for(int i=0; i<(randomGenerator.nextInt(5)+3); i++) {
+            Order o = new Order();
+            o.setNote("Test note " + i);
+            o.setRestaurantID("restID0");
+            o.setUserID("userID0");
+            o.setOrderID("orderID" + i);
+            o.setTimestamp(Calendar.getInstance());
+            for(int j=0; j<(randomGenerator.nextInt(5)+2); j++){
+                OrderMeal om = new OrderMeal();
+                om.setNote("meal note");
+                om.setOrderID("orderID" + i);
+                om.setQuantity((randomGenerator.nextInt(3) + 1));
+                om.setOrderMealID("ordermealID" + j);
+                Meal m = new Meal();
+                m.setMeal_name("Meal " + j);
+                m.setMealId("mealID" + j);
+                m.setCategory("CAT0");
+                m.setDescription("Example description");
+                m.setMeal_price(5.2);
+                om.setMeal(m);
+                MenuCategory cat = new MenuCategory();
+                cat.setName("CAT0");
+                cat.setCategoryID("CAT0");
+                om.setCategory(cat);
+
+                for(int k=0; k<(randomGenerator.nextInt(2)+2); k++) {
+                    OrderMealAddition oam = new OrderMealAddition();
+                    oam.setOrderID("orderID" + i);
+                    oam.setOrderMealID("ordermealID" + j);
+                    oam.setOrderMealAdditionID("orderadditionID" + k);
+                    MealAddition ma = new MealAddition();
+                    ma.setName("add "+k);
+                    ma.setAddition_id("addID"+k);
+                    ma.setPrice(0.5);
+                    oam.setAddition(ma);
+                    om.getAdditionList().add(oam);
+                }
+
+                o.getMealList().add(om);
+            }
+            myorders.add(o);
+        }
+        return myorders;
     }
 
 }
