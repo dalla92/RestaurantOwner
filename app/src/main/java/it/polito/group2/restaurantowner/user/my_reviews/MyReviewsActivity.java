@@ -49,6 +49,7 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
     private ArrayList<User> users = new ArrayList<User>();
     private Context context;
     public User current_user;
+    private Drawable d;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,7 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
             user_id = getIntent().getExtras().getString("user_id");
             try {
-                users = JSONUtil.readJSONUsersList(context, null);
+                users = JSONUtil.readJSONUsersList(this, null);
             }
             catch(JSONException e){
                 e.printStackTrace();
@@ -144,6 +145,13 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
             int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             return cursor.getString(idx);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        d = null;
+        System.gc();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

@@ -55,6 +55,7 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
     private Context context;
     public User current_user;
     private String user_id;
+    private Drawable d;
 
     private ArrayList<OrderModel> modelList;
 
@@ -140,6 +141,13 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
             int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             return cursor.getString(idx);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        d = null;
+        System.gc();
     }
 
 

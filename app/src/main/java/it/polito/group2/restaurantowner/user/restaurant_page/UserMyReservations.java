@@ -60,6 +60,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
     private ArrayList<User> users = new ArrayList<User>();
     private Context context;
     public User current_user;
+    public Drawable d;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -182,6 +183,12 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        d = null;
+        System.gc();
+    }
 
     public void initToolBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);

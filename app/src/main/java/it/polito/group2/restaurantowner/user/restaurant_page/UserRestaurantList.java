@@ -73,6 +73,7 @@ public class UserRestaurantList extends AppCompatActivity
     private ArrayList<User> users = new ArrayList<User>();
     private Context context;
     public User current_user;
+    private Drawable d;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,11 +206,18 @@ public class UserRestaurantList extends AppCompatActivity
         if(userDetails.getString("photouri", null)!=null) {
             photouri = Uri.parse(userDetails.getString("photouri", null));
             File f = new File(getRealPathFromURI(photouri));
-            Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+            d = Drawable.createFromPath(f.getAbsolutePath());
             navigationView.getHeaderView(0).setBackground(d);
         }
         else
             nav_photo.setImageResource(R.drawable.blank_profile);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        d = null;
+        System.gc();
     }
 
     private String getRealPathFromURI(Uri contentURI) {

@@ -25,7 +25,10 @@
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:textColor="#FFFFFF"
         android:text="Username"
-        android:textSize="27dp"
+        android:textSize="17dp"
+        android:shadowDx="10"
+        android:shadowDy="10"
+        android:shadowColor="#909090"
         android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:gravity="center_horizontal" />
@@ -35,7 +38,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:textSize="20dp"
+        android:textSize="17dp"
+        android:shadowDx="50"
+        android:shadowDy="50"
+        android:shadowColor="#909090"
         android:textColor="#FFFFFF"
         android:text="email@email.com" />
 

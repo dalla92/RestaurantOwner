@@ -22,7 +22,6 @@
         android:paddingRight="4dp"
         android:paddingEnd="4dp"
         android:clickable="true"
-
         />
 
 </LinearLayout>

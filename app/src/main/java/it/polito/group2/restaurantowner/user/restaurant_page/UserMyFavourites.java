@@ -96,6 +96,7 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
     private ArrayList<User> users = new ArrayList<User>();
     private Context context;
     public User current_user;
+    public Drawable d;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,6 +230,13 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
         }
         else
             nav_photo.setImageResource(R.drawable.blank_profile);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        d = null;
+        System.gc();
     }
 
     private String getRealPathFromURI(Uri contentURI) {

@@ -81,6 +81,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private Context context;
     public User current_user;
     private boolean bookmark = false;
+    private Drawable d;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -261,6 +262,12 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        d = null;
+        System.gc();
+    }
 
     @Override
     public void onBackPressed() {

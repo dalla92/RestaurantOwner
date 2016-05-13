@@ -56,6 +56,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
     public User current_user;
     private Context context;
     private ArrayList<User> users = new ArrayList<User>();
+    private Drawable d;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,6 +201,13 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
             int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             return cursor.getString(idx);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        d = null;
+        System.gc();
     }
 
     /*
