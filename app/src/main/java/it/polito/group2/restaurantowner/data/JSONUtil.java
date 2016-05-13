@@ -62,6 +62,7 @@ public class JSONUtil {
             jres.put("FirstName", us.getFirst_name());
             jres.put("LastName", us.getLast_name());
             jres.put("Usermail", us.getEmail());
+            jres.put("UserId", us.getId());
             jres.put("PhoneNum", us.getPhone_number());
             jres.put("VatNum", us.getVat_number());
             //photo?
@@ -151,6 +152,7 @@ public class JSONUtil {
                 if (jsonObject.optString("Usermail").equals(usermail)) {
                     //us.setUsername(jsonObject.optString("Username"));
                     us.setPassword(jsonObject.optString("Password"));
+                    us.setId(jsonObject.optString("UserId"));
                     us.setFirst_name(jsonObject.optString("FirstName"));
                     us.setLast_name(jsonObject.optString("LastName"));
                     us.setEmail(jsonObject.optString("Usermail"));
@@ -163,6 +165,7 @@ public class JSONUtil {
             } else {
                 //us.setUsername(jsonObject.optString("Username"));
                 us.setPassword(jsonObject.optString("Password"));
+                us.setId(jsonObject.optString("UserId"));
                 us.setFirst_name(jsonObject.optString("FirstName"));
                 us.setLast_name(jsonObject.optString("LastName"));
                 us.setEmail(jsonObject.optString("Usermail"));

@@ -100,30 +100,74 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         context = this;
 
         //TODO Rearrange the following code
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            user_id = getIntent().getExtras().getString("user_id");
-            try {
-                users = JSONUtil.readJSONUsersList(context, null);
-            }
-            catch(JSONException e){
-                e.printStackTrace();
-            }
-            for(User u : users){
-                if(u.getId().equals(user_id)){
-                    current_user = u;
-                    break;
-                }
-            }
+        try {
+            users = JSONUtil.readJSONUsersList(context, null);
         }
-        else{
+        catch(JSONException e){
+            e.printStackTrace();
+        }
+        if(users==null){
             current_user = new User();
             current_user.setEmail("jkjs@dskj");
+            current_user.setId("d48jd48d48j");
             //current_user.setFidelity_points(110);
             current_user.setFirst_name("Alex");
             current_user.setIsOwner(true);
             current_user.setPassword("tipiacerebbe");
             current_user.setPhone_number("0989897879789");
             current_user.setVat_number("sw8d9wd8w9d8w9d9");
+            users.add(current_user);
+            try{
+                JSONUtil.saveJSONUsersList(users, context);
+            }
+            catch(JSONException e){
+                e.printStackTrace();
+            }
+            try {
+                users = JSONUtil.readJSONUsersList(context, null);
+            }
+            catch(JSONException e){
+                e.printStackTrace();
+            }
+        }
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
+            user_id = getIntent().getExtras().getString("user_id");
+            for(User u : users){
+                if(u.getId().equals(user_id)){
+                    current_user = u;
+                    break;
+                }
+            }
+            if(current_user==null){
+                for(User u : users){
+                    if(u.getId()!=null)
+                    if(u.getId().equals("d48jd48d48j")){
+                        current_user = u;
+                        break;
+                    }
+                }
+            }
+        }
+        if(current_user==null){
+            for(User u : users){
+                if(u.getId()!=null)
+                    if(u.getId().equals("d48jd48d48j")){
+                        current_user = u;
+                        break;
+                    }
+            }
+        }
+        if(current_user==null){
+            current_user = new User();
+            current_user.setEmail("jkjs@dskj");
+            current_user.setId("d48jd48d48j");
+            //current_user.setFidelity_points(110);
+            current_user.setFirst_name("Alex");
+            current_user.setIsOwner(true);
+            current_user.setPassword("tipiacerebbe");
+            current_user.setPhone_number("0989897879789");
+            current_user.setVat_number("sw8d9wd8w9d8w9d9");
+            users.add(current_user);
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -152,17 +196,18 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user.getFirst_name()!=null && current_user.getLast_name()==null)
-            nav_username.setText(current_user.getFirst_name());
-        else if(current_user.getFirst_name()==null && current_user.getLast_name()!=null)
-            nav_username.setText(current_user.getLast_name());
-        else if(current_user.getFirst_name()!=null && current_user.getLast_name()!=null)
-            nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
-        if(current_user.getEmail()!=null)
-            nav_email.setText(current_user.getEmail());
-        if(current_user.getPhoto()!=null)
-            nav_photo.setImageBitmap(current_user.getPhoto());
-
+        if(current_user!=null) {
+            if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
+                nav_username.setText(current_user.getFirst_name());
+            else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
+                nav_username.setText(current_user.getLast_name());
+            else if (current_user.getFirst_name() != null && current_user.getLast_name() != null)
+                nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
+            if (current_user.getEmail() != null)
+                nav_email.setText(current_user.getEmail());
+            if (current_user.getPhoto() != null)
+                nav_photo.setImageBitmap(current_user.getPhoto());
+        }
         load_saved_data();
 
         activate_buttons();
@@ -170,6 +215,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
 
     }
 
+    /*
     public void show(){
         //button present yes/not
         Button button_take_photo1 = (Button) findViewById(R.id.button_take_photo);
@@ -187,6 +233,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         Button button_choose_photo2 = (Button) findViewById(R.id.button_choose_photo);
         button_choose_photo2.setVisibility(View.GONE);
     }
+    */
 
     public void load_saved_data(){
         //load photo
@@ -344,7 +391,33 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
             users.remove(current_user);
-            users.add(current_user);
+            //new user
+            TextView tv = (TextView) findViewById(R.id.email);
+            TextView tv2 = (TextView) findViewById(R.id.password);
+            TextView tv3 = (TextView) findViewById(R.id.first_name);
+            TextView tv4 = (TextView) findViewById(R.id.last_name);
+            TextView tv5 = (TextView) findViewById(R.id.phone_number);
+            TextView tv6 = (TextView) findViewById(R.id.vat_number);
+            String email = tv.getText().toString();
+            String password = tv2.getText().toString();
+            String first_name = tv3.getText().toString();
+            String last_name = tv4.getText().toString();
+            String phone_number = tv5.getText().toString();
+            String vat_number = tv6.getText().toString();
+            User new_user = new User();
+            if(user_id!=null){
+                new_user.setId(user_id);
+            }
+            else{
+                new_user.setId(current_user.getId());
+            }
+            new_user.setEmail(email);
+            new_user.setPassword(password);
+            new_user.setFirst_name(first_name);
+            new_user.setLast_name(last_name);
+            new_user.setPhone_number(phone_number);
+            new_user.setVat_number(vat_number);
+            users.add(new_user);
             try{
                 JSONUtil.saveJSONUsersList(users, context);
             }
@@ -416,7 +489,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         SharedPreferences.Editor edit = userDetails.edit();
         edit.putString("photouri", photouri);
         //I can not save the photo, but i could save its URI
-        hide();
+        //hide();
     }
 
     private String saveToInternalStorage(Bitmap bitmapImage) throws IOException {

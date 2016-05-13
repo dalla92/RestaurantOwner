@@ -204,7 +204,7 @@
     <string name="order_addtocart">Aggiungi</string>
     <string name="order_cart_btn_confirm">Conferma ordine</string>
     <string name="order_cart_btn_continue">Continua ordine</string>
-    <string name="order_cart_hint_note">Info sui supplementi dell\\' ordine</string>
+    <string name="order_cart_hint_note">Info sui supplementi dell\' ordine</string>
     <string name="order_cart_title">Ecco il tuo ordine:</string>
     <string name="order_category_title">Cosa vuoi mangiare?</string>
     <string name="order_confirm_message">Sicuro di confermare il tuo ordine?</string>

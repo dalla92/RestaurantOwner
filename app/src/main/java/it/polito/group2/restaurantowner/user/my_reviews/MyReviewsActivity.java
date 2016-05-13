@@ -105,16 +105,18 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user.getFirst_name()!=null && current_user.getLast_name()==null)
-            nav_username.setText(current_user.getFirst_name());
-        else if(current_user.getFirst_name()==null && current_user.getLast_name()!=null)
-            nav_username.setText(current_user.getLast_name());
-        else if(current_user.getFirst_name()!=null && current_user.getLast_name()!=null)
-            nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
-        if(current_user.getEmail()!=null)
-            nav_email.setText(current_user.getEmail());
-        if(current_user.getPhoto()!=null)
-            nav_photo.setImageBitmap(current_user.getPhoto());
+        if(current_user!=null) {
+            if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
+                nav_username.setText(current_user.getFirst_name());
+            else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
+                nav_username.setText(current_user.getLast_name());
+            else if (current_user.getFirst_name() != null && current_user.getLast_name() != null)
+                nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
+            if (current_user.getEmail() != null)
+                nav_email.setText(current_user.getEmail());
+            if (current_user.getPhoto() != null)
+                nav_photo.setImageBitmap(current_user.getPhoto());
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
