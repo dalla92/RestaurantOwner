@@ -7,10 +7,15 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -24,6 +29,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +44,8 @@ import com.bumptech.glide.Glide;
 
 import org.json.JSONException;
 
+import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -51,11 +59,11 @@ import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.Offer;
 import it.polito.group2.restaurantowner.data.User;
+import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.order.OrderActivity;
-import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 
 public class UserRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -213,6 +221,27 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 nav_email.setText(current_user.getEmail());
             if (current_user.getPhoto() != null)
                 nav_photo.setImageBitmap(current_user.getPhoto());
+        }
+        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        Uri photouri = null;
+        if(userDetails.getString("photouri", null)!=null) {
+            photouri = Uri.parse(userDetails.getString("photouri", null));
+            File f = new File(getRealPathFromURI(photouri));
+            Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+            navigationView.getHeaderView(0).setBackground(d);
+        }
+        else
+            nav_photo.setImageResource(R.drawable.blank_profile);
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
         }
     }
 
@@ -481,7 +510,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
     public void openGallery(View v){
         Intent intent = new Intent(this, GalleryViewActivity.class);
-        intent.putExtra("restaurant_id", restaurantID);
+        intent.putExtra("restaurantID", restaurantID);
         startActivity(intent);
     }
 

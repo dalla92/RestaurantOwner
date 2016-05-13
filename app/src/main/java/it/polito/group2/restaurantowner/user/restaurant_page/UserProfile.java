@@ -3,6 +3,8 @@ package it.polito.group2.restaurantowner.user.restaurant_page;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -171,11 +173,33 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
             if (current_user.getPhoto() != null)
                 nav_photo.setImageBitmap(current_user.getPhoto());
         }
+        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        Uri photouri = null;
+        if(userDetails.getString("photouri", null)!=null) {
+            photouri = Uri.parse(userDetails.getString("photouri", null));
+            File f = new File(getRealPathFromURI(photouri));
+            Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+            navigationView.getHeaderView(0).setBackground(d);
+        }
+        else
+            nav_photo.setImageResource(R.drawable.blank_profile);
+
         load_saved_data();
 
         activate_buttons();
 
 
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
     }
 
     /*
@@ -451,6 +475,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor edit = userDetails.edit();
         edit.putString("photouri", photouri);
+        edit.commit();
         //I can not save the photo, but i could save its URI
         //hide();
     }

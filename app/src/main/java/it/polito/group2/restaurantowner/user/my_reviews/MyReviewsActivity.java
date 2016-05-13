@@ -2,7 +2,12 @@ package it.polito.group2.restaurantowner.user.my_reviews;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -18,6 +23,7 @@ import android.widget.TextView;
 
 import org.json.JSONException;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
@@ -116,6 +122,27 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
                 nav_email.setText(current_user.getEmail());
             if (current_user.getPhoto() != null)
                 nav_photo.setImageBitmap(current_user.getPhoto());
+        }
+        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        Uri photouri = null;
+        if(userDetails.getString("photouri", null)!=null) {
+            photouri = Uri.parse(userDetails.getString("photouri", null));
+            File f = new File(getRealPathFromURI(photouri));
+            Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+            navigationView.getHeaderView(0).setBackground(d);
+        }
+        else
+            nav_photo.setImageResource(R.drawable.blank_profile);
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
         }
     }
 

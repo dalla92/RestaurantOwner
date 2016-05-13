@@ -2,7 +2,12 @@ package it.polito.group2.restaurantowner.user.my_orders;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -19,6 +24,7 @@ import android.widget.ListView;
 
 import org.json.JSONException;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import java.util.ArrayList;
@@ -56,11 +62,6 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.myorders_activity);
-        modelList = getModel();
-        OrderAdapter adapter = new OrderAdapter(this, modelList);
-        ListView list = (ListView) findViewById(R.id.list_order);
-        list.setAdapter(adapter);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -101,17 +102,46 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user.getFirst_name()!=null && current_user.getLast_name()==null)
-            nav_username.setText(current_user.getFirst_name());
-        else if(current_user.getFirst_name()==null && current_user.getLast_name()!=null)
-            nav_username.setText(current_user.getLast_name());
-        else if(current_user.getFirst_name()!=null && current_user.getLast_name()!=null)
-            nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
-        if(current_user.getEmail()!=null)
-            nav_email.setText(current_user.getEmail());
-        if(current_user.getPhoto()!=null)
-            nav_photo.setImageBitmap(current_user.getPhoto());
+        if(current_user != null) {
+            if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
+                nav_username.setText(current_user.getFirst_name());
+            else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
+                nav_username.setText(current_user.getLast_name());
+            else if (current_user.getFirst_name() != null && current_user.getLast_name() != null)
+                nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
+            if (current_user.getEmail() != null)
+                nav_email.setText(current_user.getEmail());
+            if (current_user.getPhoto() != null)
+                nav_photo.setImageBitmap(current_user.getPhoto());
+        }
+        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        Uri photouri = null;
+        if(userDetails.getString("photouri", null)!=null) {
+            photouri = Uri.parse(userDetails.getString("photouri", null));
+            File f = new File(getRealPathFromURI(photouri));
+            Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+            navigationView.getHeaderView(0).setBackground(d);
+        }
+        else
+            nav_photo.setImageResource(R.drawable.blank_profile);
+
+        modelList = getModel();
+        final ListView listview = (ListView) findViewById(R.id.list_order);
+        OrderAdapter adapter = new OrderAdapter(this, modelList);
+        listview.setAdapter(adapter);
     }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
+    }
+
 
     @Override
     public void onBackPressed() {

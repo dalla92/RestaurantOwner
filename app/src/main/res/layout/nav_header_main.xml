@@ -16,14 +16,17 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:src="@android:drawable/sym_def_app_icon" />
+        />
 
     <TextView
         android:id="@+id/navHeaderUsername"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:textColor="#FFFFFF"
         android:text="Username"
+        android:textSize="27dp"
+        android:textStyle="bold"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:gravity="center_horizontal" />
 
@@ -31,6 +34,9 @@
         android:id="@+id/navHeaderEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="20dp"
+        android:textColor="#FFFFFF"
         android:text="email@email.com" />
 
 </LinearLayout>
