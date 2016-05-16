@@ -4,18 +4,36 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@+id/label"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:textSize="20dp" >
-    </TextView>
-
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/list_meal"
+        android:id="@+id/order_date"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:text="dd/mm/yyyy"
+        android:textSize="15dp"
+        android:gravity="center" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/restaurant_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RestaurantName"
+            android:textSize="20dp"
+            android:layout_alignParentLeft="true"/>
+        <TextView
+            android:id="@+id/order_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="22.30"
+            android:textSize="20dp"
+            android:layout_alignParentRight="true"/>
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/order_meal_list"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

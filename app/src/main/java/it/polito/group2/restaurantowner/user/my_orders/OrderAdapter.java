@@ -1,58 +1,75 @@
 package it.polito.group2.restaurantowner.user.my_orders;
 
-import android.app.Activity;
-import android.util.Log;
+
+import android.content.Context;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
 
 /**
  * Created by Filippo on 13/05/2016.
  */
-public class OrderAdapter extends ArrayAdapter<OrderModel> {
+public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
-    private final List<OrderModel> modelList;
-    private final Activity context;
+    private final ArrayList<OrderModel> modelList;
+    private final Context context;
 
-    public OrderAdapter(Activity context, List<OrderModel> list) {
-        super(context, R.layout.myorders_activity_order_item, list);
+    public OrderAdapter(Context context, ArrayList<OrderModel> list) {
         this.context = context;
         this.modelList = list;
     }
 
-    static class ViewHolder {
-        protected TextView text;
-        protected ListView list;
+    public class OrderViewHolder extends RecyclerView.ViewHolder {
+        public TextView date;
+        public TextView restaurantName;
+        public TextView price;
+        public RecyclerView mealList;
+
+        public OrderViewHolder(View view){
+            super(view);
+            date = (TextView) itemView.findViewById(R.id.order_date);
+            restaurantName = (TextView) itemView.findViewById(R.id.restaurant_name);
+            price = (TextView) itemView.findViewById(R.id.order_price);
+            mealList = (RecyclerView) itemView.findViewById(R.id.order_meal_list);
+        }
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View view = null;
-        if (convertView == null) {
-            LayoutInflater inflator = context.getLayoutInflater();
-            view = inflator.inflate(R.layout.myorders_activity_order_item, null);
-            final ViewHolder viewHolder = new ViewHolder();
-            viewHolder.text = (TextView) view.findViewById(R.id.label);
-            viewHolder.list = (ListView) view.findViewById(R.id.list_meal);
-            view.setTag(viewHolder);
-        } else {
-            view = convertView;
-        }
-        ViewHolder holder = (ViewHolder) view.getTag();
+    public OrderAdapter.OrderViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.myorders_activity_order_item, parent, false);
+        return new OrderViewHolder(itemView);
+    }
+
+    @Override
+    public void onBindViewHolder(OrderAdapter.OrderViewHolder holder, int position) {
         Date date = modelList.get(position).getOrder().getTimestamp().getTime();
         SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
-        holder.text.setText(formatDate.format(date));
-        MealAdapter adapter = new MealAdapter(((Activity)context),modelList.get(position).getMealList());
-        holder.list.setAdapter(adapter);
-        return view;
+        holder.date.setText(formatDate.format(date));
+        holder.restaurantName.setText(modelList.get(position).getOrder().getRestaurantID());
+        holder.price.setText(formatEuro(modelList.get(position).getOrder().getPrice()));
+        holder.mealList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
+        holder.mealList.setNestedScrollingEnabled(false);
+        MealAdapter adapter = new MealAdapter(context, modelList.get(position).getMealList());
+        holder.mealList.setAdapter(adapter);
+    }
+
+    @Override
+    public int getItemCount() {
+        return modelList.size();
+    }
+
+    private String formatEuro(Float number) {
+        if(number == null)
+            return "€ 0.00";
+        return "€ "+String.format("%10.2f", number);
     }
 }

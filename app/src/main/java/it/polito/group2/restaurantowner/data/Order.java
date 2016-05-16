@@ -10,6 +10,7 @@ public class Order implements Serializable {
     private String restaurantID;
     private String userID;
     private Calendar timestamp;
+    private Float price;
     private String note;
     private ArrayList<OrderMeal> mealList = new ArrayList<>();
 
@@ -21,11 +22,12 @@ public class Order implements Serializable {
         this.userID = userID;
     }
 
-    public Order(String orderID, String restaurantID, String userID, Calendar timestamp, String note, ArrayList<OrderMeal> mealList) {
+    public Order(String orderID, String restaurantID, String userID, Calendar timestamp, Float price, String note, ArrayList<OrderMeal> mealList) {
         this.orderID = orderID;
         this.restaurantID = restaurantID;
         this.userID = userID;
         this.timestamp = timestamp;
+        this.price = price;
         this.note = note;
         this.mealList = mealList;
     }
@@ -61,6 +63,10 @@ public class Order implements Serializable {
     public void setTimestamp(Calendar timestamp) {
         this.timestamp = timestamp;
     }
+
+    public Float getPrice() { return price; }
+
+    public void setPrice(Float price) { this.price = price; }
 
     public String getNote() {
         return note;
