@@ -596,7 +596,7 @@ public class Restaurant_page extends AppCompatActivity
         c1.setUserID("Salvatore Grasso");
         c1.setRestaurantId(restaurant_id);
         c1.setComment("Mi è piaciuto tanto");
-        c1.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
+        //c1.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c1.setStars_number(4);
         comments.add(c1);
 
@@ -604,7 +604,7 @@ public class Restaurant_page extends AppCompatActivity
         c2.setUserID("Karl");
         c2.setRestaurantId(restaurant_id);
         c2.setComment("Non ho visto di meglio.............................................");
-        c2.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
+        //c2.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c2.setStars_number(5);
         comments.add(c2);
 
@@ -612,7 +612,7 @@ public class Restaurant_page extends AppCompatActivity
         c3.setUserID("Angelo Spada");
         c3.setRestaurantId(restaurant_id);
         c3.setComment("Non siti cosa");
-        c3.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
+        //c3.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c3.setStars_number(1);
         comments.add(c3);
 
@@ -620,7 +620,7 @@ public class Restaurant_page extends AppCompatActivity
         c4.setUserID("Pina");
         c4.setRestaurantId(restaurant_id);
         c4.setComment("Pessimo");
-        c4.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
+        //c4.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
         c4.setStars_number(0);
         comments.add(c4);
     }

@@ -32,7 +32,7 @@ public class JSONUtil {
             jres.put("Date", com.getDate());
             jres.put("StarsNumber", com.getStars_number());
             jres.put("Comment", com.getComment());
-            jres.put("UserPhoto", com.getUserphoto());
+            //jres.put("UserPhoto", com.getUserphoto());
             jres.put("UserId", com.getUserID());
             jres.put("ReviewId", com.getReviewID());
             jarray.put(jres);
@@ -451,7 +451,7 @@ public class JSONUtil {
             String reviewID = jsonObject.optString("Id");
             String username = jsonObject.optString("UserID");
 
-            Review review = new Review(restaurantId, username, date, comment, reviewID, null, starsNumber);
+            Review review = new Review(restaurantId, username, date, comment, reviewID, starsNumber);
             reviewList.add(review);
         }
 

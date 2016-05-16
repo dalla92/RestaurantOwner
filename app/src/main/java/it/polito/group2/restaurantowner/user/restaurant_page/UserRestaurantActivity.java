@@ -5,17 +5,14 @@ import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -39,16 +36,30 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+import com.firebase.client.AuthData;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 
 import org.json.JSONException;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -71,7 +82,7 @@ import it.polito.group2.restaurantowner.user.order.OrderActivity;
 public class UserRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private static final int ADD_REQUEST = 1;
-    private String userID, restaurantID;
+    private String userID, restaurantID, restaurantId;
     private ArrayList<Review> reviews;
     private ArrayList<Offer> offers;
     private ArrayList<MenuCategory> categories;
@@ -79,9 +90,12 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private ReviewAdapter reviewAdapter;
     private ArrayList<User> users = new ArrayList<>();
     private Context context;
-    public User current_user;
+    private User current_user;
     private boolean bookmark = false;
     private Drawable d;
+    private ProgressDialog progressDialog;
+    private Firebase firebase;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +105,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         setSupportActionBar(toolbar);
 
         context = this;
+        callbackManager = CallbackManager.Factory.create();
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
@@ -101,29 +116,52 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
 
-        /*Firebase firebase = new Firebase("https://have-break.firebaseio.com/restaurants");
-        Firebase restaurantRef = firebase.push();
+        firebase = new Firebase("https://have-break.firebaseio.com/");
+        /*Firebase restaurantRef = firebase.push();
         Restaurant r = new Restaurant("Da Pino", restaurantRef.getKey(), "2", "dunnio", "Via Vittorio Emanuele 14", "01105487980", "Kebab",
                                         true, true, true, "50", "10", "300", "Marconi" , "Caserma Morelli", "4.5", "10", "50%");
-        restaurantRef.setValue(r);
-        //Query queryRef = firebase.orderByChild("restaurantId");
+        restaurantRef.setValue(r);*/
 
-        firebase.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query restaurantRef = firebase.child("restaurants").orderByChild("restaurantId").equalTo("-KH9O71uApNuCQ0eomyB");
+
+        progressDialog = ProgressDialog.show(UserRestaurantActivity.this, null,
+                "Loading, please wait...", false, false);
+
+        restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot child: dataSnapshot.getChildren()) {
                     targetRestaurant = child.getValue(Restaurant.class);
-                    //Log.d("prova", targetRestaurant.toString());
-                    collapsing.setTitle(targetRestaurant.getName());
-                    setRestaurantInfo();
                 }
+                restaurantId = targetRestaurant.getRestaurantId();
+                reviews = new ArrayList<>();
+                collapsing.setTitle(targetRestaurant.getName());
+                progressDialog.dismiss();
+                setRestaurantInfo();
+
+                Query reviewsRef = firebase.child("reviews").orderByChild("restaurantId").equalTo("-KH9O71uApNuCQ0eomyB");
+                reviewsRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot child : dataSnapshot.getChildren()) {
+                            reviews.add(child.getValue(Review.class));
+                        }
+                        Collections.sort(reviews);
+                        addUserReviews();
+                    }
+
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+                        Log.d("test", "failed read reviews " + firebaseError.getMessage());
+                    }
+                });
             }
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
-                Log.d("test", "failed read " + firebaseError.getMessage());
+                Log.d("test", "failed read restaurant " + firebaseError.getMessage());
             }
-        });*/
+        });
 
 
         getRestaurantAndSetButtons();
@@ -144,12 +182,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
-        ImageView icon_gallery = (ImageView) findViewById(R.id.icon_gallery);
-        Paint paintBorder = new Paint();
-        paintBorder.setAntiAlias(true);
-        icon_gallery.setLayerType(View.LAYER_TYPE_SOFTWARE, paintBorder);
-        paintBorder.setShadowLayer(4.0f, 0.0f, 2.0f, Color.BLACK);
-
 
         if(targetRestaurant!=null)
             if(targetRestaurant.getPhotoUri() == null || targetRestaurant.getPhotoUri().equals(""))
@@ -157,8 +189,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             else
                 Glide.with(this).load(targetRestaurant.getPhotoUri()).into(image);
 
-        reviews = getReviewsJson();
-        Collections.sort(reviews);
+        /*reviews = getReviewsJson();
+        Collections.sort(reviews);*/
         offers = getOffersJSON();
         categories = getCategoriesJson();
 
@@ -194,12 +226,45 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         addTimesExpandAnimation();
         setTimesList();
         setCallAction();
-        setUserReviews();
         setRestaurantOffers();
         setRestaurantMenu();
         setDrawer(toolbar);
 
 
+    }
+
+    private boolean isUserLoggedIn() {
+        return isLoggedInWhitFB() /* || isLoggedInWithGoogle() || isLoggedInWithEmail()*/;
+    }
+
+    private boolean isLoggedInWhitFB() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        return accessToken != null;
+    }
+
+    private void onFacebookAccessTokenChange(AccessToken token, final NavigationView navigationView) {
+        if (token != null) {
+            firebase.authWithOAuthToken("facebook", token.getToken(), new Firebase.AuthResultHandler() {
+                @Override
+                public void onAuthenticated(AuthData authData) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+
+                    nav_username.setText(authData.getProviderData().get("displayName").toString());
+                    nav_email.setText(authData.getProviderData().get("email").toString());
+
+                    Glide.with(UserRestaurantActivity.this).load(authData.getProviderData().get("profileImageURL").toString()).into(nav_photo);
+                }
+                @Override
+                public void onAuthenticationError(FirebaseError firebaseError) {
+                    Log.d("firebaseLogin", "Error");
+                }
+            });
+        } else {
+        /* Logged out of Facebook so do a logout from the Firebase app */
+            firebase.unauth();
+        }
     }
 
     private void setDrawer(Toolbar toolbar) {
@@ -209,8 +274,50 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        View navHeader = LayoutInflater.from(context).inflate(R.layout.nav_header_login, null);
+        navigationView.addHeaderView(navHeader);
+
+        final LinearLayout loginLayout = (LinearLayout) navigationView.getHeaderView(0).findViewById(R.id.header_login);
+        final FrameLayout mainLayout = (FrameLayout) navigationView.getHeaderView(0).findViewById(R.id.header_main);
+        if(!isUserLoggedIn()) {
+            Log.d("login", "not logged in");
+
+            loginLayout.setVisibility(View.VISIBLE);
+            mainLayout.setVisibility(View.GONE);
+
+            LoginButton fbButton = (LoginButton) navigationView.getHeaderView(0).findViewById(R.id.fb_login_button);
+            fbButton.setReadPermissions("public_profile", "email");
+
+            fbButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+                    Log.d("login", "Success");
+                    loginLayout.setVisibility(View.GONE);
+                    mainLayout.setVisibility(View.VISIBLE);
+                    onFacebookAccessTokenChange(loginResult.getAccessToken(), navigationView);
+                }
+
+                @Override
+                public void onCancel() {
+                    Log.d("login", "Cancelled");
+                }
+
+                @Override
+                public void onError(FacebookException exception) {
+                    Log.d("login", "Error");
+                }
+            });
+        } else {
+            Log.d("login", "logged  in");
+            loginLayout.setVisibility(View.GONE);
+            mainLayout.setVisibility(View.VISIBLE);
+            navigationView.inflateMenu(R.menu.activity_user_restaurant_list_drawer);
+        }
+
+
+        //navigationView.setNavigationItemSelectedListener(this);
         //TODO decomment handle logged/not logged user
         /*
         if(userID==null){ //not logged
@@ -225,7 +332,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
         }
         */
-        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+        /*TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
         if(current_user != null) {
@@ -249,7 +356,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             navigationView.getHeaderView(0).setBackground(d);
         }
         else
-            nav_photo.setImageResource(R.drawable.blank_profile);
+            nav_photo.setImageResource(R.drawable.blank_profile);*/
     }
 
     private String getRealPathFromURI(Uri contentURI) {
@@ -450,6 +557,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("result", ""+ requestCode + " " + resultCode);
         if (requestCode == ADD_REQUEST) {
             if (resultCode == RESULT_OK) {
                 String comment = data.getStringExtra("comment");
@@ -457,13 +565,19 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
                 Calendar date = Calendar.getInstance();
                 //"EEE dd MMM yyyy 'at' HH:mm
-                Review review =new Review(restaurantID, "djskdj", date, comment, UUID.randomUUID().toString(), null, starNumber);
-                reviews.add(review);
+
+                Firebase reviewsRef = firebase.child("reviews").push();
+                Review review =new Review(restaurantId, "djskdj", date, comment, reviewsRef.getKey(), starNumber);
+                reviewsRef.setValue(review);
+
+                /*reviews.add(review);
                 Collections.sort(reviews);
-                reviewAdapter.notifyDataSetChanged();
-                //TODO save data
+                reviewAdapter.notifyDataSetChanged();*/
+
             }
         }
+
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     private void getRestaurantAndSetButtons() {
@@ -523,7 +637,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         });
     }
 
-    /*private void setRestaurantInfo() {
+    private void setRestaurantInfo() {
         TextView name = (TextView) findViewById(R.id.restaurant_name);
         TextView address = (TextView) findViewById(R.id.restaurant_address);
         TextView phone = (TextView) findViewById(R.id.restaurant_phone);
@@ -535,7 +649,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         phone.setText(targetRestaurant.getPhoneNum());
         text_rating.setText(targetRestaurant.getRating());
         rating.setRating(Float.valueOf(targetRestaurant.getRating()));
-    }*/
+    }
 
     public void openGallery(View v){
         Intent intent = new Intent(this, GalleryViewActivity.class);
@@ -558,7 +672,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         }
     }
 
-    private void setUserReviews() {
+    private void addUserReviews() {
         TextView reviews_num = (TextView) findViewById(R.id.user_restaurant_num_reviews);
         reviews_num.setText(""+reviews.size());
         RecyclerView reviewList = (RecyclerView) findViewById(R.id.user_restaurant_review_list);
@@ -817,23 +931,23 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         String c1 = "Davvero un bel locale, personale accogliente e mangiare davvero sopra la media. I prezzi sono accessibile e data la qualità del cibo sono più che giusti.";
         Calendar date1 = Calendar.getInstance();
         date1.set(Calendar.HOUR_OF_DAY, 12);
-        Review r1 =new Review(restaurantID, "Paola C.", "03/12/2016 20:30", c1, UUID.randomUUID().toString(), null, 3.5f);
+        Review r1 =new Review(restaurantID, "Paola C.", "03/12/2016 20:30", c1, UUID.randomUUID().toString(), 3.5f);
 
         String c2 = "Abbiamo preso la pizza da un metro e dobbiamo dare un giudizio più che positivo! Se il locale fosse un po più grande sicuramente farebbe concorrenza a parecchi grandi nomi!";
         Calendar date2 = Calendar.getInstance();
         date2.set(Calendar.HOUR_OF_DAY, 10);
-        Review r2 =new Review(restaurantID, "Mario R.",  "01/20/2016 12:30", c2, UUID.randomUUID().toString(), null, 3f);
+        Review r2 =new Review(restaurantID, "Mario R.",  "01/20/2016 12:30", c2, UUID.randomUUID().toString(), 3f);
 
 
         Calendar date3 = Calendar.getInstance();
         date3.set(Calendar.HOUR_OF_DAY, 8);
-        Review r3 =new Review(restaurantID, "Giovanni C.",  "02/14/2016 17:00", "", UUID.randomUUID().toString(), null, 4.5f);
+        Review r3 =new Review(restaurantID, "Giovanni C.",  "02/14/2016 17:00", "", UUID.randomUUID().toString(), 4.5f);
 
         String c4 = "Sono andata a cena il mio ragazzo e siamo rimasti molto sazi e contenti. Abbiamo preso le chiacchiere al crudo ed erano veramente buone! La pizza era molto buona, una delle più buone mangiate a Torino.";
         Calendar date4 = Calendar.getInstance();
         date4.set(Calendar.HOUR_OF_DAY, 12);
         date4.set(Calendar.MINUTE, 30);
-        Review r4 =new Review(restaurantID, "Francesco G.",  "10/20/2016 20:30", c4, UUID.randomUUID().toString(), null, 3.5f);
+        Review r4 =new Review(restaurantID, "Francesco G.",  "10/20/2016 20:30", c4, UUID.randomUUID().toString(), 3.5f);
 
         reviews.add(r1);
         reviews.add(r2);

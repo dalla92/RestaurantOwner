@@ -171,7 +171,8 @@
     <string name="times_Sun">Sunday</string>
     <string name="title_activity_user_restaurant_list">UserRestaurantList</string>
     <string name="filter">Filter the restaurant list</string>
-    <string name="facebook_app_id">1003333209754047</string>
+    <!--string name="facebook_app_id">1003333209754047</string-->
+    <string name="facebook_app_id">988598407901956</string>
     <string name="distance">Distance</string>
     <string name="price_range">Price range</string>
     <string name="restaurant_type">Restaurant type</string>

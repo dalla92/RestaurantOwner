@@ -8,14 +8,14 @@ import java.util.Calendar;
 import java.util.Comparator;
 
 public class Review implements Comparable<Review>{
-    private String restaurantId, userID, comment, reviewID, userphoto;
+    private String restaurantId, userID, comment, reviewID;
     private Calendar date;
     private float stars_number;
 
     public Review() {
     }
 
-    public Review(String restaurantId, String userID, String dateString, String comment, String reviewID, String picture, float stars_number) {
+    public Review(String restaurantId, String userID, String dateString, String comment, String reviewID, float stars_number) {
         this.restaurantId = restaurantId;
         this.userID = userID;
         Calendar c = Calendar.getInstance();
@@ -32,7 +32,7 @@ public class Review implements Comparable<Review>{
         this.stars_number = stars_number;
     }
 
-    public Review(String restaurantId, String userID, Calendar date, String comment, String reviewID, String picture, float stars_number) {
+    public Review(String restaurantId, String userID, Calendar date, String comment, String reviewID, float stars_number) {
         this.restaurantId = restaurantId;
         this.userID = userID;
         this.date = date;
@@ -63,14 +63,6 @@ public class Review implements Comparable<Review>{
 
     public float getStars_number() {
         return stars_number;
-    }
-
-    public String getUserphoto() {
-        return userphoto;
-    }
-
-    public void setUserphoto(String userphoto) {
-        this.userphoto = userphoto;
     }
 
     public void setStars_number(float stars_number) {
