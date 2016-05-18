@@ -14,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Review;
+import it.polito.group2.restaurantowner.firebasedata.Review;
 
 /**
  * Created by Filippo on 14/04/2016.
@@ -68,16 +68,17 @@ public class Adapter_Reviews extends RecyclerView.Adapter<Adapter_Reviews.Review
     @Override
     public void onBindViewHolder(ReviewViewHolder reviewViewHolder, final int i) {
 
-        reviewViewHolder.userName.setText(reviews.get(i).getUserID());
+        reviewViewHolder.userName.setText(reviews.get(i).getUser_id());
         SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
-        reviewViewHolder.date.setText(format.format(reviews.get(i).getDate().getTime()));
-        reviewViewHolder.stars.setRating(reviews.get(i).getStars_number());
+        reviewViewHolder.date.setText(format.format(reviews.get(i).getReview_date().getTime()));
+        reviewViewHolder.stars.setRating(reviews.get(i).getReview_rating()
+        );
 
         //TODO getting picture of user
         /*if(reviews.get(i).getUserphoto()!=null)
             reviewViewHolder.userPhoto.setImageResource(Integer.parseInt(reviews.get(i).getUserphoto()));*/
 
-        String comment_ell = reviews.get(i).getComment().substring(0, 7);
+        String comment_ell = reviews.get(i).getReview_comment().substring(0, 7);
         comment_ell = comment_ell +  this.context.getResources().getString(R.string.show_more);
         reviewViewHolder.comment.setText(comment_ell);
 

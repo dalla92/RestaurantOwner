@@ -18,10 +18,8 @@ public class HaveBreak extends Application {
         AppEventsLogger.activateApp(this);
 
         //initialize data
-        /*
         DataInitialization d = new DataInitialization();
         d.init();
-        */
 
     }
 }

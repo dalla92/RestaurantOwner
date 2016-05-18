@@ -512,12 +512,12 @@ public class DataInitialization {
     public void meal_category_fake_initialization() {
         mc = new MealCategory();
         mc.setMeal_category_id(category_id);
-        mc.setMeal_category_name("Primo");
+        mc.setMeal_category_name("Pasta");
         m_c.add(mc);
 
         mc2 = new MealCategory();
         mc2.setMeal_category_id(category_id2);
-        mc2.setMeal_category_name("Secondo");
+        mc2.setMeal_category_name("Spaghetti");
         m_c.add(mc2);
     }
 
@@ -532,13 +532,13 @@ public class DataInitialization {
         m.setIs_meal_vegetarian(false);
         m.setMeal_additions(m_a);
         m.setMeal_tags(m_c);
-        m.setMeal_category("Primi");
+        m.setMeal_category("Primo");
         m.setMeal_cooking_time(10);
         m.setMeal_description("Salsa rustica");
         m.setMeal_id(meal_id);
         m.setMeal_price(5.0);
-        m.setOffer_meal_thumbnail("https://www.flickr.com/photos/142675931@N04/26456332813/in/dateposted-public/");
-        m.setOffer_meal_photo_firebase_URL("https://www.flickr.com/photos/142675931@N04/26785604090/in/dateposted-public/");
+        m.setMeal_thumbnail("https://www.flickr.com/photos/142675931@N04/26456332813/in/dateposted-public/");
+        m.setMeal_photo_firebase_URL("https://www.flickr.com/photos/142675931@N04/26785604090/in/dateposted-public/");
 
         m2 = new Meal();
         m2.setMeal_name("Carne arrostita");
@@ -550,13 +550,13 @@ public class DataInitialization {
         m2.setIs_meal_vegetarian(false);
         m2.setMeal_additions(m_a);
         m2.setMeal_tags(m_c);
-        m2.setMeal_category("Primo");
+        m2.setMeal_category("Secondo");
         m2.setMeal_cooking_time(6);
         m2.setMeal_description("Alla brace");
         m2.setMeal_id(meal_id2);
         m2.setMeal_price(4.50);
-        m2.setOffer_meal_thumbnail("https://www.flickr.com/photos/142675931@N04/27038081936/in/dateposted-public/");
-        m2.setOffer_meal_photo_firebase_URL("https://www.flickr.com/photos/142675931@N04/26976826402/in/dateposted-public/");
+        m2.setMeal_thumbnail("https://www.flickr.com/photos/142675931@N04/27038081936/in/dateposted-public/");
+        m2.setMeal_photo_firebase_URL("https://www.flickr.com/photos/142675931@N04/26976826402/in/dateposted-public/");
     }
 
     public void offer_fake_initialization() {
@@ -665,7 +665,8 @@ public class DataInitialization {
         res.setRestaurant_name("Bella Italia");
         res.setRestaurant_rating((float) 3.7);
         res.setRestaurant_price_range(2);
-        res.setRestaurant_position(new GeoLocation(37.7853889, -122.4056973));
+        res.setRestaurant_latitude_position(39.7853889);
+        res.setRestaurant_longitude_position(-120.4056973);
         /*
         OR (https://github.com/firebase/geofire-java)
         //Point to the right restaurant location, for example
@@ -709,7 +710,8 @@ public class DataInitialization {
         res2.setRestaurant_name("Istanbul");
         res2.setRestaurant_rating((float) 4.7);
         res2.setRestaurant_price_range(1);
-        res2.setRestaurant_position(new GeoLocation(38.7853889, -121.4056973));
+        res2.setRestaurant_latitude_position(38.7853889);
+        res2.setRestaurant_longitude_position(-121.4056973);
     }
 
     public void restaurant_gallery_fake_initialization() {

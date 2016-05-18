@@ -1,14 +1,17 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.firebase.geofire.GeoFire;
 import com.firebase.geofire.GeoLocation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by Alessio on 16/05/2016.
  */
-public class Restaurant {
+@JsonIgnoreProperties(ignoreUnknown=true)
+public class Restaurant implements Serializable {
 
     private String restaurant_id;
     private String user_id; //a certain owner manages this restaurant
@@ -34,7 +37,8 @@ public class Restaurant {
     private boolean is_wifi_present;
     private boolean is_credit_card_accepted;
     private boolean is_air_conditioned_present;
-    private GeoLocation restaurant_position;
+    private double restaurant_latitude_position;
+    private double restaurant_longitude_position;
 
     public Restaurant(){
 
@@ -232,11 +236,19 @@ public class Restaurant {
         this.is_air_conditioned_present = is_air_conditioned_present;
     }
 
-    public GeoLocation getRestaurant_position() {
-        return restaurant_position;
+    public double getRestaurant_latitude_position() {
+        return restaurant_latitude_position;
     }
 
-    public void setRestaurant_position(GeoLocation restaurant_position) {
-        this.restaurant_position = restaurant_position;
+    public void setRestaurant_latitude_position(double restaurant_latitude_position) {
+        this.restaurant_latitude_position = restaurant_latitude_position;
+    }
+
+    public double getRestaurant_longitude_position() {
+        return restaurant_longitude_position;
+    }
+
+    public void setRestaurant_longitude_position(double restaurant_longitude_position) {
+        this.restaurant_longitude_position = restaurant_longitude_position;
     }
 }

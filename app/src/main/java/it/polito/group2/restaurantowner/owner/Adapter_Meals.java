@@ -10,9 +10,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.firebase.client.Firebase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,13 +27,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.MealAddition;
-import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.firebasedata.MealAddition;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 
 /**
  * Created by Alessio on 12/04/2016.
  */
-public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHolder> implements ItemTouchHelperAdapter{
+public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHolder> implements ItemTouchHelperAdapter {
     private Activity activity;
     private static ArrayList<Meal> meals;
     private static LayoutInflater inflater = null;
@@ -58,7 +61,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         }
     }
 
-    public Adapter_Meals (Activity activity, int textViewResourceId, ArrayList<Meal> meals, String restaurant_id) {
+    public Adapter_Meals(Activity activity, int textViewResourceId, ArrayList<Meal> meals, String restaurant_id) {
         try {
             this.activity = activity;
             this.meals = meals;
@@ -78,8 +81,11 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
 
     @Override
     public void onBindViewHolder(MealViewHolder MealViewHolder, int i) {
-        if(meals.get(i).getMeal_photo()!=null && !meals.get(i).getMeal_photo().equals(""))
-            MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_photo()));
+
+        index = i;
+
+        if (meals.get(i).getMeal_thumbnail() != null && !meals.get(i).getMeal_thumbnail().equals(""))
+            MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_thumbnail()));
         MealViewHolder.MealName.setText(meals.get(i).getMeal_name());
         MealViewHolder.MealPrice.setText(String.valueOf(meals.get(i).getMeal_price()));
         /*
@@ -88,7 +94,15 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         if(meals.get(i).getType2()!=null)
             MealViewHolder.Type2.setImageResource(Integer.parseInt(meals.get(i).getType2()));
         */
-        MealViewHolder.availability.setChecked(meals.get(i).isAvailable());
+        MealViewHolder.availability.setChecked(meals.get(i).is_meal_availabile());
+        MealViewHolder.availability.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                String meal_key = meals.get(index).getMeal_id();
+                Firebase ref = new Firebase("https://have-break.firebaseio.com/meals/"+meal_key);
+                ref.child("meal_available").setValue(isChecked);
+            }
+        });
         //MealViewHolder.availability.setEnabled();
     }
 
@@ -101,15 +115,17 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     public int getItemCount() {
         return meals.size();
     }
-    public void addItem(int position, Meal m){
-        meals.add(position,m);
+
+    public void addItem(int position, Meal m) {
+        meals.add(position, m);
         notifyItemInserted(position);
         notifyItemRangeChanged(position, meals.size());
     }
-    public void removeItem(int position){
+
+    public void removeItem(int position) {
         meals.remove(position);
         notifyItemRemoved(position);
-        notifyItemRangeChanged(position,meals.size());
+        notifyItemRangeChanged(position, meals.size());
     }
 
 
@@ -146,92 +162,5 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
 
         alert.show();
 
-    }
-
-    public void saveJSONMeList(ArrayList<Meal> meals) throws JSONException {
-        //meals writing
-        String FILENAME = "mealList.json";
-        JSONArray jarray = new JSONArray();
-        for (Meal me : meals) {
-            JSONObject jres = new JSONObject();
-            jres.put("RestaurantId", me.getRestaurantId());
-            jres.put("MealId", me.getMealId());
-            jres.put("MealPhoto", me.getMeal_photo());
-            jres.put("MealName", me.getMeal_name());
-            jres.put("MealPrice", me.getMeal_price());
-            jres.put("MealType1", me.getType1());
-            jres.put("MealType2", me.getType2());
-            jres.put("Category", me.getCategory());
-            jres.put("MealAvailable", me.isAvailable());
-            jres.put("MealTakeAway", me.isTake_away());
-            jres.put("MealCookingTime", me.getCooking_time());
-            jres.put("MealDescription", me.getDescription());
-            jarray.put(jres);
-        }
-        JSONObject resObj = new JSONObject();
-        resObj.put("Meals", jarray);
-        FileOutputStream fos = null;
-        try {
-            fos = activity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            fos.write(resObj.toString().getBytes());
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //additions writing
-        String FILENAME2 = "mealAddition.json";
-        JSONArray jarray2 = new JSONArray();
-        for (Meal me : meals) {
-            for (MealAddition ad : me.getMeal_Meal_additions()) {
-                JSONObject jres2 = new JSONObject();
-                jres2.put("RestaurantId", ad.getRestaurant_id());
-                jres2.put("MealId", ad.getmeal_id());
-                jres2.put("AdditionName", ad.getName());
-                jres2.put("AdditionSelected", ad.isSelected());
-                jres2.put("AdditionPrice", ad.getPrice());
-                jarray2.put(jres2);
-            }
-        }
-        JSONObject resObj2 = new JSONObject();
-        resObj2.put("MealsAdditions", jarray2);
-        FileOutputStream fos2 = null;
-        try {
-            fos2 = activity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            fos2.write(resObj2.toString().getBytes());
-            fos2.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //categories writing
-        String FILENAME3 = "mealCategory.json";
-        JSONArray jarray3 = new JSONArray();
-        for (Meal me : meals) {
-            for (MealAddition ad : me.getMeal_categories()) {
-                JSONObject jres3 = new JSONObject();
-                jres3.put("RestaurantId", ad.getRestaurant_id());
-                jres3.put("MealId", ad.getmeal_id());
-                jres3.put("CategoryName", ad.getName());
-                jres3.put("CategorySelected", ad.isSelected());
-                jres3.put("CategoryPrice", 0);
-                //jres3.put("Price", ad.getPrice());
-                jarray3.put(jres3);
-            }
-            JSONObject resObj3 = new JSONObject();
-            resObj.put("MealsCategories", jarray);
-            FileOutputStream fos3 = null;
-            try {
-                fos3 = activity.openFileOutput(FILENAME, Context.MODE_PRIVATE);
-                fos3.write(resObj3.toString().getBytes());
-                fos3.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.owner;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -35,12 +36,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.bumptech.glide.Glide;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -50,9 +52,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.Restaurant;
-import it.polito.group2.restaurantowner.data.Review;
+import it.polito.group2.restaurantowner.firebasedata.Review;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
@@ -65,15 +66,16 @@ public class Restaurant_page extends AppCompatActivity
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
     private boolean card_view_clicked=false;
-    public ArrayList<Restaurant> resList = new ArrayList<>(); //to be consistent with Daniel's code
-    public String restaurant_id = null; //if not passed by the previous activity
+    public String restaurant_id; //if not passed by the previous activity
     public int PICK_IMAGE = 0;
     public int REQUEST_TAKE_PHOTO = 1;
     public int MODIFY_INFO = 4;
     public String photouri = null;
-    public ArrayList<Review> comments = new ArrayList<>();
+    public ArrayList<Review> reviews = new ArrayList<>();
     public Restaurant my_restaurant = null;
     public Context context;
+    private ProgressDialog progressDialog;
+    private Adapter_Reviews adapter;
 
     /*private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int SELECT_PICTURE = 2;
@@ -88,64 +90,24 @@ public class Restaurant_page extends AppCompatActivity
 
         //get the right restaurant
         Bundle b = getIntent().getExtras();
+        //TODO Decomment after integrations
+        /*
         if(b!=null)
             restaurant_id = b.getString("RestaurantId");
-        //get data
-        try {
-            resList = JSONUtil.readJSONResList(context);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        addReviews(restaurant_id);
-        try {
-            JSONUtil.saveJSONReviewList(comments, context);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        try {
-            comments = JSONUtil.readJSONReviewList(context, restaurant_id);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.d("ccc", "Given " + restaurant_id);
-        for (Restaurant r : resList) {
-            Log.d("ccc", "Found "+r.getRestaurantId());
-            if (r.getRestaurantId().equals(restaurant_id)) {
-                Log.d("ccc", "Corresponding "+r.getRestaurantId());
-                my_restaurant = r;
-                break;
-            }
-        }
-        //fill data
-        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-        if(userDetails != null) {
-            ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
-            if (userDetails.getString(restaurant_id, null) != null) {
-                Uri photouri = Uri.parse(userDetails.getString(restaurant_id, null));
-                if (photouri != null)
-                    image.setImageURI(photouri);
-            }
-        }
+        */
+        if(restaurant_id==null)
+            restaurant_id = "fake_restaurant_id";
 
-        setUpPicture();
+        //get and fill related data
+        get_data_from_firebase();
 
+        //collapsing bar
         CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
-
-        EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
-        EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
-        EditText edit_restaurant_telephone_number = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
-        if(my_restaurant !=null && my_restaurant.getName()!=null)
-            edit_restaurant_name.setText(my_restaurant.getName());
-        if(my_restaurant !=null && my_restaurant.getAddress()!=null)
-            edit_restaurant_address.setText(my_restaurant.getAddress());
-        if(my_restaurant !=null && my_restaurant.getPhoneNum()!=null)
-            edit_restaurant_telephone_number.setText(my_restaurant.getPhoneNum());
 
         //toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(my_restaurant.getName());
 
         //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -161,21 +123,18 @@ public class Restaurant_page extends AppCompatActivity
         imageview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-                if(userDetails != null) {
-                    String parameter = userDetails.getString(restaurant_id, null);
-                    if(parameter!=null){
+                if(my_restaurant != null && my_restaurant.getRestaurant_photo_firebase_URL()!=null) {
                         Intent intent = new Intent(
                                 getApplicationContext(),
                                 Enlarged_image.class);
                         Bundle b = new Bundle();
-                        b.putString("photouri", parameter);
+                        b.putString("photouri", my_restaurant.getRestaurant_photo_firebase_URL());
                         intent.putExtras(b);
                         startActivity(intent);
-                    }
                 }
             }
         });
+        setUpPicture();
 
         //cardview implementation
         rv=(RecyclerView)findViewById(R.id.rv);
@@ -212,6 +171,91 @@ public class Restaurant_page extends AppCompatActivity
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
             }
         });
+    }
+
+    private void progress_dialog(){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMax(100);
+        progressDialog.setMessage("Its loading....");
+        progressDialog.setTitle("");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+    }
+
+    private void get_data_from_firebase(){
+        progress_dialog();
+
+        //my_restaurant
+        Firebase ref = new Firebase("https://have-break.firebaseio.com/restaurants/");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot restSnapshot: snapshot.getChildren()) {
+                    Restaurant snap_restaurant = restSnapshot.getValue(Restaurant.class);
+                    String snap_restaurant_id = snap_restaurant.getRestaurant_id();
+                    if(snap_restaurant_id.equals(restaurant_id)){
+                        my_restaurant = snap_restaurant;
+                        break;
+                    }
+                }
+                if(my_restaurant!=null)
+                    fill_data();
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+
+        //reviews
+        Firebase ref2 = new Firebase("https://have-break.firebaseio.com/reviews/");
+        ref2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot revSnapshot: snapshot.getChildren()) {
+                    Review snap_review = revSnapshot.getValue(Review.class);
+                    String snap_restaurant_id = snap_review.getRestaurant_id();
+                    if(snap_restaurant_id.equals(restaurant_id)){
+                        for(Review r_temp : reviews){
+                            if(r_temp.getReview_id().equals(snap_review.getReview_id())){
+                                reviews.remove(r_temp);
+                                break;
+                            }
+                        }
+                        reviews.add(snap_review);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+
+                progressDialog.dismiss();
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+
+    }
+
+    private void fill_data(){
+        ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
+        if (my_restaurant.getRestaurant_photo_firebase_URL()!= null) {
+            //TODO put it into AsyncTask
+            Glide.with(context)
+                    .load(my_restaurant.getRestaurant_photo_firebase_URL())
+                    .into(image);
+        }
+        EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
+        EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
+        EditText edit_restaurant_telephone_number = (EditText) findViewById(R.id.edit_restaurant_telephone_number);
+        if(my_restaurant !=null && my_restaurant.getRestaurant_name()!=null)
+            edit_restaurant_name.setText(my_restaurant.getRestaurant_name());
+        if(my_restaurant !=null && my_restaurant.getRestaurant_address()!=null)
+            edit_restaurant_address.setText(my_restaurant.getRestaurant_address());
+        if(my_restaurant !=null && my_restaurant.getRestaurant_telephone_number()!=null)
+            edit_restaurant_telephone_number.setText(my_restaurant.getRestaurant_telephone_number());
+
+        getSupportActionBar().setTitle(my_restaurant.getRestaurant_name());
     }
 
     private void setUpPicture() {
@@ -254,6 +298,7 @@ public class Restaurant_page extends AppCompatActivity
         }
     }
 
+    /*
     @Override
     public void onSaveInstanceState(Bundle state) {
         super.onSaveInstanceState(state);
@@ -278,25 +323,10 @@ public class Restaurant_page extends AppCompatActivity
     @Override
     public void onPause() {
         super.onPause();  // Always call the superclass method first
-        try {
-            JSONUtil.saveJSONResList(context, resList);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /*
-    @Override
-    public void onResume() {
-        super.onResume();  // Always call the superclass method first
-        try {
-            readJSONResList();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
+        get_data_from_firebase();
     }
     */
+
 
     @Override
     public void onBackPressed() {
@@ -417,7 +447,6 @@ public class Restaurant_page extends AppCompatActivity
         //take a photo result
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             //view photo
-            Log.d("aaa", "BREAK2");
             ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
             setPic();
             //add photo to gallery
@@ -427,18 +456,12 @@ public class Restaurant_page extends AppCompatActivity
                 Uri contentUri = Uri.fromFile(f);
                 mediaScanIntent.setData(contentUri);
                 this.sendBroadcast(mediaScanIntent);
-                //photouri = contentUri.toString();
-                Log.d("aaa", "BREAK3"+contentUri.toString());
-                Log.d("aaa", "BREAK4" + Uri.parse(photouri));
                 image.setImageURI(Uri.parse(photouri));
-                my_restaurant.setPhotoUri(contentUri.toString()); // ***MAYBE***
-            }
-            try {
-                JSONUtil.saveJSONResList(context, resList);
-            } catch (JSONException e) {
-                e.printStackTrace();
+                //TODO upload image to an image hosting service and set the returned URL
+                my_restaurant.setRestaurant_photo_firebase_URL(contentUri.toString());
             }
         }
+
         //choose a photo result
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
             Uri imageUri = data.getData();
@@ -463,25 +486,14 @@ public class Restaurant_page extends AppCompatActivity
                     }
                 }
             }
-            if(my_restaurant == null)
-                Log.d("aaa", "MY RESTAURANT IS NULL");
-            my_restaurant.setPhotoUri(photouri);
-            try {
-                JSONUtil.saveJSONResList(context, resList);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            /*
-            SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-            SharedPreferences.Editor edit = userDetails.edit();
-            edit.putString(restaurant_id, photouri);
-            //I can not save the photo, but i could save its URI
-            edit.commit();
-            */
+            //TODO upload image to an image hosting service and set the returned URL
+            my_restaurant.setRestaurant_photo_firebase_URL(photouri);
         }
+
         if (requestCode == MODIFY_INFO) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
+                /*
                 Restaurant res = (Restaurant) data.getExtras().get("Restaurant");
                 my_restaurant = res;
                 try {
@@ -499,13 +511,10 @@ public class Restaurant_page extends AppCompatActivity
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                */
             }
         }
-        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-        SharedPreferences.Editor edit = userDetails.edit();
-        edit.putString(restaurant_id, photouri);
-        //I can not save the photo, but i could save its URI
-        edit.commit();
+
         hide();
     }
 
@@ -529,18 +538,8 @@ public class Restaurant_page extends AppCompatActivity
         return myPath.getAbsolutePath();
     }
 
-    /*
-    private void initializeReviews(){
-        comments = new ArrayList<>();
-        comments.add(new Review("0", "Turi Lecce", "01/02/2003", 1, "@mipmap/ic_launcher", "Ah chi ni sacciu mba")); //or int photoId R.mipmap.ic_launcher
-        comments.add(new Review("0", "Iaffiu u cuttu", "11/06/2002", 2.7, "@mipmap/money_icon", "Cosa assai"));
-        comments.add(new Review("0", "Iano Papale", "21/12/2001", 5, "@mipmap/image_preview_black", "Fussi pi mia ci tunnassi, ma appi problemi cu me soggira ca ogni bota si lassa curriri de scali, iu no sacciu va."));
-        comments.add(new Review("0", "Tano Sghei", "22/05/2000", 3.4, "@mipmap/image_preview_black", "M'uccullassi n'autra vota. Turi ci emu?"));
-    }
-    */
-
     private void initializeAdapterReviews(){
-        Adapter_Reviews adapter = new Adapter_Reviews(comments, this.getApplicationContext());
+        adapter = new Adapter_Reviews(reviews, this.getApplicationContext());
         rv.setAdapter(adapter);
     }
 
@@ -550,21 +549,21 @@ public class Restaurant_page extends AppCompatActivity
         final int original_comment_height=comment.getMeasuredHeight();
         int i;
         String comment_start = comment.getText().toString().substring(0, 7);
-        for(i=0; i<comments.size(); i++){
-            if(comment_start.equals(comments.get(i).getComment().substring(0, 7)))
+        for(i=0; i<reviews.size(); i++){
+            if(comment_start.equals(reviews.get(i).getReview_comment().substring(0, 7)))
                 break;
         }
         if(!card_view_clicked) {
             card_view_clicked=true;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, 300, 1f);
             comment.setMaxLines(Integer.MAX_VALUE);
-            comment.setText(comments.get(i).getComment());
+            comment.setText(reviews.get(i).getReview_comment());
             comment.setLayoutParams(lp);
         }
         else {
             card_view_clicked=false;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, v.getLayoutParams().height, 1f);
-            String comment_ell = comments.get(i).getComment().substring(0, 7);
+            String comment_ell = reviews.get(i).getReview_comment().substring(0, 7);
             comment_ell = comment_ell + getResources().getString(R.string.show_more);
             comment.setText(comment_ell);
             comment.setMaxLines(2);
@@ -589,56 +588,6 @@ public class Restaurant_page extends AppCompatActivity
         button_take_photo2.setVisibility(View.GONE);
         Button button_choose_photo2 = (Button) findViewById(R.id.button_choose_photo);
         button_choose_photo2.setVisibility(View.GONE);
-    }
-
-    public void addReviews(String restaurant_id){
-        Review c1 = new Review();
-        c1.setUserID("Salvatore Grasso");
-        c1.setRestaurantId(restaurant_id);
-        c1.setComment("Mi è piaciuto tanto");
-        //c1.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
-        c1.setStars_number(4);
-        comments.add(c1);
-
-        Review c2 = new Review();
-        c2.setUserID("Karl");
-        c2.setRestaurantId(restaurant_id);
-        c2.setComment("Non ho visto di meglio.............................................");
-        //c2.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
-        c2.setStars_number(5);
-        comments.add(c2);
-
-        Review c3 = new Review();
-        c3.setUserID("Angelo Spada");
-        c3.setRestaurantId(restaurant_id);
-        c3.setComment("Non siti cosa");
-        //c3.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
-        c3.setStars_number(1);
-        comments.add(c3);
-
-        Review c4 = new Review();
-        c4.setUserID("Pina");
-        c4.setRestaurantId(restaurant_id);
-        c4.setComment("Pessimo");
-        //c4.setUserphoto(getResources().getResourceName(R.mipmap.ic_launcher));
-        c4.setStars_number(0);
-        comments.add(c4);
-    }
-
-    public void addRestaurants(){
-        Restaurant r1 = new Restaurant();
-        r1.setName("TRATTORIA NDI IAFFIU");
-        r1.setAddress(("Sciara curia 7"));
-        r1.setPhoneNum("095393930");
-        r1.setRestaurantId(restaurant_id);
-        resList.add(r1);
-
-        Restaurant r2 = new Restaurant();
-        r2.setName("BELLA ITALIA");
-        r2.setAddress(("Magellano 38"));
-        r2.setPhoneNum("+44099495930");
-        r2.setRestaurantId("1");
-        resList.add(r2);
     }
 
     private File createImageFile() throws IOException {

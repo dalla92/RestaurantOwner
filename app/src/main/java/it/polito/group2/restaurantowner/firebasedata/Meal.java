@@ -2,12 +2,16 @@ package it.polito.group2.restaurantowner.firebasedata;
 
 import android.graphics.Bitmap;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by Alessio on 16/05/2016.
  */
+
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class Meal implements Serializable {
 
     private String meal_id;
@@ -24,8 +28,8 @@ public class Meal implements Serializable {
     private ArrayList<MealAddition> meal_additions;
     private ArrayList<MealCategory> meal_tags;
     private boolean is_meal_take_away;
-    private String offer_meal_thumbnail; //for meal preview with Glide in AsyncTask
-    private String offer_meal_photo_firebase_URL; //for enlarging image with Glide in AsyncTask
+    private String meal_thumbnail; //for meal preview with Glide in AsyncTask
+    private String meal_photo_firebase_URL; //for enlarging image with Glide in AsyncTask
 
     public Meal(){
 
@@ -143,19 +147,19 @@ public class Meal implements Serializable {
         this.is_meal_take_away = is_meal_take_away;
     }
 
-    public String getOffer_meal_thumbnail() {
-        return offer_meal_thumbnail;
+    public String getMeal_thumbnail() {
+        return meal_thumbnail;
     }
 
-    public void setOffer_meal_thumbnail(String offer_meal_thumbnail) {
-        this.offer_meal_thumbnail = offer_meal_thumbnail;
+    public void setMeal_thumbnail(String meal_thumbnail) {
+        this.meal_thumbnail = meal_thumbnail;
     }
 
-    public String getOffer_meal_photo_firebase_URL() {
-        return offer_meal_photo_firebase_URL;
+    public String getMeal_photo_firebase_URL() {
+        return meal_photo_firebase_URL;
     }
 
-    public void setOffer_meal_photo_firebase_URL(String offer_meal_photo_firebase_URL) {
-        this.offer_meal_photo_firebase_URL = offer_meal_photo_firebase_URL;
+    public void setMeal_photo_firebase_URL(String meal_photo_firebase_URL) {
+        this.meal_photo_firebase_URL = meal_photo_firebase_URL;
     }
 }

@@ -30,7 +30,7 @@ import java.util.UUID;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
-import it.polito.group2.restaurantowner.data.Review;
+import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
@@ -136,19 +136,6 @@ public class ReviewsActivity extends AppCompatActivity
         }
         */
 
-        Review review;
-        for(int i=0;i<10;i++) {
-            review = new Review();
-            Calendar date = Calendar.getInstance();
-            date.set(Calendar.HOUR_OF_DAY, i+1);
-            review.setDate(date);
-            review.setComment("Commento dell'utente");
-            review.setReviewID(UUID.randomUUID().toString());
-            review.setStars_number(4);
-            review.setUserID("Utente " + i);
-            review.setRestaurantId("");
-            reviewList.add(review);
-        }
 
     }
 
@@ -275,20 +262,20 @@ public class ReviewsActivity extends AppCompatActivity
         int i;
         String comment_start = comment.getText().toString().substring(0, 7);
         for(i=0; i< reviewList.size(); i++){
-            if(comment_start.equals(reviewList.get(i).getComment().substring(0, 7)))
+            if(comment_start.equals(reviewList.get(i).getReview_comment().substring(0, 7)))
                 break;
         }
         if(!card_view_clicked) {
             card_view_clicked=true;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, 300, 1f);
             comment.setMaxLines(Integer.MAX_VALUE);
-            comment.setText(reviewList.get(i).getComment());
+            comment.setText(reviewList.get(i).getReview_comment());
             comment.setLayoutParams(lp);
         }
         else {
             card_view_clicked=false;
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, v.getLayoutParams().height, 1f);
-            String comment_ell = reviewList.get(i).getComment().substring(0, 7);
+            String comment_ell = reviewList.get(i).getReview_comment().substring(0, 7);
             comment_ell = comment_ell + getResources().getString(R.string.show_more);
             comment.setText(comment_ell);
             comment.setMaxLines(2);
