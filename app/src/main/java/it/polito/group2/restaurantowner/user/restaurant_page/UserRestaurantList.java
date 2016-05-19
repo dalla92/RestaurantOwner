@@ -64,11 +64,9 @@ public class UserRestaurantList extends AppCompatActivity
     private static final int VERTICAL_ITEM_SPACE = 5;
     private GoogleApiClient mGoogleApiClient;
     final static int LOCATION_REQUEST = 4;
-    /*
-    private GeoFire geoFire;
+    /*private GeoFire geoFire;
     private GeoQuery geoQuery;
-    HashMap<String,GeoLocation> resNearby = new HashMap<>();
-    */
+    HashMap<String,GeoLocation> resNearby = new HashMap<>();*/
     private String user_id;
     private ArrayList<User> users = new ArrayList<User>();
     private Context context;
@@ -128,7 +126,7 @@ public class UserRestaurantList extends AppCompatActivity
                     public void onItemClick(View view, int position) {
                         Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
                         String id = resList.get(position).getRestaurantId();
-                        mIntent.putExtra("restaurant_id", id);
+                        mIntent.putExtra("restaurant_id", "-KI2D2i6d0W_CVrgmEFV" /*id*/);
                         mIntent.putExtra("user_id", id);
                         startActivity(mIntent);
                     }

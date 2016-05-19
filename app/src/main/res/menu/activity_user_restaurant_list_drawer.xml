@@ -18,6 +18,13 @@
             android:title="Login" />
 
         <item
+            android:id="@+id/nav_logout"
+            android:icon="@mipmap/ic_login"
+            android:title="Logout"
+            android:visible="false"/>
+
+
+        <item
             android:id="@+id/nav_my_profile"
             android:icon="@mipmap/ic_user_profile"
             android:title="@string/my_profile" />

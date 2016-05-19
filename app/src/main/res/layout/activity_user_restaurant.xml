@@ -10,9 +10,6 @@
 
 
     <android.support.design.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
@@ -90,6 +87,8 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:itemIconTint="@color/colorAccent"
+        app:headerLayout="@layout/nav_header_login"
+        app:menu="@menu/activity_user_restaurant_list_drawer"
         app:itemTextColor="@color/gray"
         app:theme="@style/AppTheme"/>
 

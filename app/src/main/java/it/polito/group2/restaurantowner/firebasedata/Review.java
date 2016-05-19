@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 
 /**
  * Created by Alessio on 16/05/2016.
@@ -16,7 +17,7 @@ public class Review implements Comparable<Review>{
     private String user_thumbnail; //with Glide in AsyncTask
     private String restaurant_id;
     private String review_comment;
-    private Calendar review_date;
+    private GregorianCalendar review_date;
     private float review_rating; //android:stepSize="0.01"
 
     public Review(){
@@ -96,11 +97,11 @@ public class Review implements Comparable<Review>{
         this.review_comment = review_comment;
     }
 
-    public Calendar getReview_date() {
+    public GregorianCalendar getReview_date() {
         return review_date;
     }
 
-    public void setReview_date(Calendar review_date) {
+    public void setReview_date(GregorianCalendar review_date) {
         this.review_date = review_date;
     }
 

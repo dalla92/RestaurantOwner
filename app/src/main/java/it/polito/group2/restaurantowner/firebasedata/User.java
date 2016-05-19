@@ -2,6 +2,7 @@ package it.polito.group2.restaurantowner.firebasedata;
 
 import android.graphics.Bitmap;
 
+import java.util.HashMap;
 
 
 /**
@@ -18,6 +19,7 @@ public class User {
     private String user_email;
     private String user_password;
     private int user_fidelity_points = 0;
+    private HashMap<String, Boolean> favourites_restaurants;
 
     private boolean isOwner = false;
     private String owner_vat_number; //only if owner
@@ -25,6 +27,14 @@ public class User {
 
     public User(){
 
+    }
+
+    public HashMap<String, Boolean> getFavourites_restaurants() {
+        return favourites_restaurants;
+    }
+
+    public void setFavourites_restaurants(HashMap<String, Boolean> favourites_restaurants) {
+        this.favourites_restaurants = favourites_restaurants;
     }
 
     public String getUser_id() {

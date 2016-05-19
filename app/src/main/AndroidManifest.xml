@@ -52,12 +52,7 @@
             android:name=".owner.Restaurant_page"
             android:label="@string/restaurant_page_name"
             android:parentActivityName=".owner.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".owner.StatisticsActivity"
             android:label="@string/statistics_activity"
@@ -77,8 +72,7 @@
             android:name=".owner.MenuRestaurant_page"
             android:label="@string/title_activity_menu_restaurant_page"
             android:parentActivityName=".owner.Restaurant_page"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".owner.MenuRestaurant_edit"
             android:label="@string/title_activity_menu_restaurant_edit"
@@ -103,13 +97,17 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.UserRestaurantActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.UserRestaurantList"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".user.restaurant_page.UserTableReservationActivity"
@@ -147,9 +145,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.order.OrderActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -161,13 +157,21 @@
         <activity
             android:name=".user.restaurant_page.UserProfile"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden"/>
+            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".user.restaurant_page.UserMyFavourites"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.my_orders.MyOrdersActivity"
             android:label="@string/title_activity_my_orders"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".login.LoginManagerActivity"
+            android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".login.GoogleLogInActivity"
+            android:label="@string/title_activity_google_log_in"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>

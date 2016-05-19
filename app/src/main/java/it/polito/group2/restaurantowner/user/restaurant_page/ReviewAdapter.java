@@ -2,7 +2,6 @@ package it.polito.group2.restaurantowner.user.restaurant_page;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,7 +14,7 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Review;
+import it.polito.group2.restaurantowner.firebasedata.Review;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>  {
 
@@ -63,18 +62,18 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
 
     @Override
     public void onBindViewHolder(ReviewViewHolder holder, int position) {
-        holder.username.setText(reviews.get(position).getUserID());
-        holder.stars.setRating(reviews.get(position).getStars_number());
+        holder.username.setText(reviews.get(position).getUser_full_name());
+        holder.stars.setRating(reviews.get(position).getReview_rating());
         SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
-        holder.date.setText(format.format(reviews.get(position).getDate().getTime()));
+        holder.date.setText(format.format(reviews.get(position).getReview_date().getTime()));
 
         //TODO get the user picture with the UserID
         holder.picture.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.blank_profile_thumb));
 
-        if(reviews.get(position).getComment().equals(""))
+        if(reviews.get(position).getReview_comment().equals(""))
             holder.comment.setVisibility(View.GONE);
         else
-            holder.comment.setText(reviews.get(position).getComment());
+            holder.comment.setText(reviews.get(position).getReview_comment());
     }
 
     @Override

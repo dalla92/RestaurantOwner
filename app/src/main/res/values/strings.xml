@@ -253,6 +253,8 @@
     <string name="title_activity_my_reservation">My Reservations</string>
     <string name="title_table_reservation_activity">Reservation</string>
     <string name="yes">Yes</string>
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="title_activity_google_log_in">GoogleLogInActivity</string>
 
 
 </resources>

@@ -16,6 +16,7 @@ import it.polito.group2.restaurantowner.firebasedata.Meal;
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
 
     private final ItemTouchHelperAdapter mAdapter;
+    private ArrayList<Meal> meals = new ArrayList<Meal>();
 
     public SimpleItemTouchHelperCallback(ItemTouchHelperAdapter adapter) {
         mAdapter = adapter;

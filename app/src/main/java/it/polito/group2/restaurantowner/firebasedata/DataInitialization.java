@@ -10,6 +10,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 /**
  * Created by Alessio on 16/05/2016.
@@ -99,7 +101,7 @@ public class DataInitialization {
 
         //root node
         FirebaseDatabase root_ref = FirebaseDatabase.getInstance();
-        DatabaseReference favourites_ref = root_ref.getReference("favourites");
+        /*DatabaseReference favourites_ref = root_ref.getReference("favourites");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
         DatabaseReference favourite_new = favourites_ref.push();
         favourite_new.setValue(f, new DatabaseReference.CompletionListener() {
@@ -135,7 +137,7 @@ public class DataInitialization {
             public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
-        });
+        });*/
 
         //meals node
         DatabaseReference meals_ref  = root_ref.getReference("meals");
@@ -258,6 +260,7 @@ public class DataInitialization {
         DatabaseReference restaurants_ref  = root_ref.getReference("restaurants");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
         DatabaseReference restaurant_new = restaurants_ref.push();
+        res.setRestaurant_id(restaurant_new.getKey());
         restaurant_new.setValue(res, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
@@ -269,6 +272,7 @@ public class DataInitialization {
             }
         });
         DatabaseReference restaurant_new2 = restaurants_ref.push();
+        res2.setRestaurant_id(restaurant_new.getKey());
         restaurant_new2.setValue(res2, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
@@ -294,7 +298,7 @@ public class DataInitialization {
         });
 
         //restaurants_galleries node
-        DatabaseReference restaurants_galleries_ref  = root_ref.getReference("restaurants_galleries");
+        DatabaseReference restaurants_galleries_ref = root_ref.getReference("restaurants_galleries");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
         DatabaseReference restaurants_galleries_new = restaurants_galleries_ref.push();
         restaurants_galleries_new.setValue(r_g, new DatabaseReference.CompletionListener() {
@@ -333,7 +337,7 @@ public class DataInitialization {
         });
 
         //restaurants_previews node
-        DatabaseReference restaurants_previews_ref  = root_ref.getReference("restaurants_previews");
+        DatabaseReference restaurants_previews_ref = root_ref.getReference("restaurants_previews");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
         DatabaseReference restaurants_previews_new = restaurants_previews_ref.push();
         restaurants_previews_new.setValue(r_p, new DatabaseReference.CompletionListener() {
@@ -638,6 +642,11 @@ public class DataInitialization {
         res = new Restaurant();
         res.setUser_id(user_id);
         res.setRestaurant_id(restaurant_id);
+        HashMap<String, Boolean> favourites_users = new HashMap<>();
+        favourites_users.put("fake_user_id", true);
+        favourites_users.put("fake_user_id3", true);
+        favourites_users.put("fake_user_id2", true);
+        res.setFavourites_users(favourites_users);
         res.setIs_air_conditioned_present(true);
         res.setIs_animal_allowed(true);
         res.setIs_celiac_friendly(true);
@@ -755,6 +764,11 @@ public class DataInitialization {
         u = new User();
         u.setUser_id(user_id);
         u.setUser_full_name("Paolo Parisi");
+        HashMap<String, Boolean> favourites_restaurants = new HashMap<>();
+        favourites_restaurants.put("fake_user_id", true);
+        favourites_restaurants.put("fake_user_id3", true);
+        favourites_restaurants.put("fake_user_id2", true);
+        u.setFavourites_restaurants(favourites_restaurants);
         u.setIsOwner(true);
         u.setOwner_vat_number("656456464645");
         u.setUser_email("paolo.parisi@gmail.com");
@@ -784,7 +798,7 @@ public class DataInitialization {
         rev.setUser_full_name("Paolo Parisi");
         rev.setReview_rating((float) 3.3);
         rev.setReview_id(review_id);
-        Calendar cal = Calendar.getInstance();
+        GregorianCalendar cal = new GregorianCalendar();
         cal.set(2016, 4, 25);
         rev.setReview_date(cal);
 
@@ -796,7 +810,7 @@ public class DataInitialization {
         rev2.setUser_full_name("Alessandro Del Piero");
         rev2.setReview_rating((float)4.3);
         rev2.setReview_id(review_id2);
-        Calendar cal2 = Calendar.getInstance();
+        GregorianCalendar cal2 = new GregorianCalendar();
         cal2.set(2016, 4, 27);
         rev2.setReview_date(cal2);
     }
