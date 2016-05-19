@@ -15,7 +15,8 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.firebase.client.Firebase;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -94,16 +95,48 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         if(meals.get(i).getType2()!=null)
             MealViewHolder.Type2.setImageResource(Integer.parseInt(meals.get(i).getType2()));
         */
-        MealViewHolder.availability.setChecked(meals.get(i).is_meal_availabile());
+        MealViewHolder.availability.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+            }
+        });
+        MealViewHolder.availability.setOnCheckedChangeListener(null);
+        MealViewHolder.availability.setChecked(meals.get(i).is_meal_available());
+        MealViewHolder.availability.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean checked = ((Switch)v).isChecked();
+                String meal_key = meals.get(index).getMeal_id();
+                FirebaseDatabase ref = FirebaseDatabase.getInstance();
+                DatabaseReference ref2 = ref.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key + "/_meal_available");
+                ref2.setValue(checked);
+                ((Switch)v).setChecked(checked);
+            }
+        });
+        /*
         MealViewHolder.availability.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 String meal_key = meals.get(index).getMeal_id();
-                Firebase ref = new Firebase("https://have-break.firebaseio.com/meals/"+meal_key);
-                ref.child("meal_available").setValue(isChecked);
+                DatabaseReference ref = new DatabaseReference("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
+                ref.getReference("_meal_available").setValue(buttonView.isPressed());
+                /*
+                String meal_key = meals.get(index).getMeal_id();
+                DatabaseReference ref = new DatabaseReference("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
+                if (buttonView.isPressed() && meals.get(index).is_meal_available() == true)
+                    ref.getReference("_meal_available").setValue(false);
+                if (buttonView.isPressed() && meals.get(index).is_meal_available()==false)
+                    ref.getReference("_meal_available").setValue(true);
+                if(!buttonView.isPressed() && meals.get(index).is_meal_available()==true)
+                    ref.getReference("_meal_available").setValue(true);
+                if(!buttonView.isPressed() && meals.get(index).is_meal_available()==false)
+                    ref.getReference("_meal_available").setValue(false);
+
             }
         });
         //MealViewHolder.availability.setEnabled();
+        */
     }
 
     @Override
@@ -145,6 +178,10 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                String meal_key = meals.get(position).getMeal_id();
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
+                //delete
+                ref.setValue(null);
                 removeItem(position);
                 dialog.dismiss();
 

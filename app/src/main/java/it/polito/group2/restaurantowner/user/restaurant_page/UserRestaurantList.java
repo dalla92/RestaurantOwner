@@ -30,9 +30,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import it.polito.group2.restaurantowner.R;
 
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
-import com.firebase.geofire.GeoQuery;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -53,7 +51,7 @@ import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 
 public class UserRestaurantList extends AppCompatActivity
-//      FirebaseLoginBaseActivity
+//      DatabaseReferenceLoginBaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 /*        , OnMapReadyCallback, GeoQueryEventListener
 */{
@@ -66,9 +64,11 @@ public class UserRestaurantList extends AppCompatActivity
     private static final int VERTICAL_ITEM_SPACE = 5;
     private GoogleApiClient mGoogleApiClient;
     final static int LOCATION_REQUEST = 4;
+    /*
     private GeoFire geoFire;
     private GeoQuery geoQuery;
     HashMap<String,GeoLocation> resNearby = new HashMap<>();
+    */
     private String user_id;
     private ArrayList<User> users = new ArrayList<User>();
     private Context context;
@@ -89,8 +89,8 @@ public class UserRestaurantList extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-/*        Firebase.setAndroidContext(this);
-        geoFire = new GeoFire(new Firebase("https://flickering-fire-455.firebaseio.com/"));
+/*        DatabaseReference.setAndroidContext(this);
+        geoFire = new GeoFire(new DatabaseReference("https://flickering-fire-455.firebaseio.com/"));
 */
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
@@ -295,24 +295,24 @@ public class UserRestaurantList extends AppCompatActivity
 
 
     /*    @Override
-        protected Firebase getFirebaseRef() {
-            Firebase rootRef = new Firebase("https://flickering-fire-455.firebaseio.com/my/data");
-            // TODO: Return your Firebase ref
+        protected DatabaseReference getDatabaseReferenceRef() {
+            DatabaseReference rootRef = new DatabaseReference("https://flickering-fire-455.firebaseio.com/my/data");
+            // TODO: Return your DatabaseReference ref
             return rootRef;
         }
 
         @Override
-        protected void onFirebaseLoginProviderError(FirebaseLoginError firebaseLoginError) {
+        protected void onDatabaseReferenceLoginProviderError(DatabaseReferenceLoginError firebaseLoginError) {
             // TODO: Handle an error from the authentication provider
         }
 
         @Override
-        protected void onFirebaseLoginUserError(FirebaseLoginError firebaseLoginError) {
+        protected void onDatabaseReferenceLoginUserError(DatabaseReferenceLoginError firebaseLoginError) {
             // TODO: Handle an error from the user
         }
 
         @Override
-        public void onFirebaseLoggedIn(AuthData authData) {
+        public void onDatabaseReferenceLoggedIn(AuthData authData) {
             // TODO: Handle successful login displaying user info in the drawer
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             TextView username = (TextView) drawer.findViewById(R.id.navHeaderUsername);
@@ -322,7 +322,7 @@ public class UserRestaurantList extends AppCompatActivity
         }
 
         @Override
-        public void onFirebaseLoggedOut() {
+        public void onDatabaseReferenceLoggedOut() {
             // TODO: Handle logout
         }
 
@@ -523,11 +523,11 @@ public class UserRestaurantList extends AppCompatActivity
 
         @Override
         public void onGeoQueryReady() {
-            //TODO query the Firebase database with resNearby
+            //TODO query the DatabaseReference database with resNearby
         }
 
         @Override
-        public void onGeoQueryError(FirebaseError error) {
+        public void onGeoQueryError(DatabaseError error) {
             new AlertDialog.Builder(this)
                     .setTitle("Error")
                     .setMessage("There was an unexpected error querying GeoFire: " + error.getMessage())

@@ -2,18 +2,14 @@ package it.polito.group2.restaurantowner.firebasedata;
 
 import android.util.Log;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
-import com.firebase.geofire.GeoLocation;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Created by Alessio on 16/05/2016.
@@ -77,9 +73,9 @@ public class DataInitialization {
     public User u2;
 
     public void init(){
-        meal_addition_fake_initialization();
-        meal_category_fake_initialization();
-        meal_fake_initialization();
+        //meal_addition_fake_initialization();
+        //meal_category_fake_initialization();
+        //meal_fake_initialization();
         offer_fake_initialization();
         order_fake_initialization();
         restaurant_time_slot_fake_initialization();
@@ -97,17 +93,18 @@ public class DataInitialization {
     }
 
     public void write_db(){
-        Firebase root_ref = new Firebase("https://have-break.firebaseio.com/");
+        DatabaseReference root_ref_0 = FirebaseDatabase.getInstance().getReference(); //Database URL is automatically determined from the google-services.json file you downloaded
         //erase DB, and rewrite all
-        root_ref.setValue(null);
+        root_ref_0.setValue(null);
 
-        //favourites node
-        Firebase favourites_ref  = root_ref.child("favourites");
+        //root node
+        FirebaseDatabase root_ref = FirebaseDatabase.getInstance();
+        DatabaseReference favourites_ref = root_ref.getReference("favourites");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase favourite_new = favourites_ref.push();
-        favourite_new.setValue(f, new Firebase.CompletionListener() {
+        DatabaseReference favourite_new = favourites_ref.push();
+        favourite_new.setValue(f, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -115,10 +112,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase favourite_new2 = favourites_ref.push();
-        favourite_new2.setValue(f2, new Firebase.CompletionListener() {
+        DatabaseReference favourite_new2 = favourites_ref.push();
+        favourite_new2.setValue(f2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -127,7 +124,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("favourites").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("favourites").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -135,18 +132,18 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
 
         //meals node
-        Firebase meals_ref  = root_ref.child("meals");
+        DatabaseReference meals_ref  = root_ref.getReference("meals");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase meal_new = meals_ref.push();
-        meal_new.setValue(m, new Firebase.CompletionListener() {
+        DatabaseReference meal_new = meals_ref.push();
+        meal_new.setValue(m, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -154,10 +151,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase meal_new2 = meals_ref.push();
-        meal_new2.setValue(m2, new Firebase.CompletionListener() {
+        DatabaseReference meal_new2 = meals_ref.push();
+        meal_new2.setValue(m2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -166,7 +163,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("meals").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("meals").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -174,18 +171,18 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
 
         //offers node
-        Firebase offers_ref  = root_ref.child("offers");
+        DatabaseReference offers_ref  = root_ref.getReference("offers");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase offer_new = offers_ref.push();
-        offer_new.setValue(of, new Firebase.CompletionListener() {
+        DatabaseReference offer_new = offers_ref.push();
+        offer_new.setValue(of, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -193,10 +190,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase offer_new2 = offers_ref.push();
-        offer_new2.setValue(f2, new Firebase.CompletionListener() {
+        DatabaseReference offer_new2 = offers_ref.push();
+        offer_new2.setValue(f2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -205,7 +202,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("offers").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("offers").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -213,18 +210,18 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
 
         //orders node
-        Firebase orders_ref  = root_ref.child("orders");
+        DatabaseReference orders_ref  = root_ref.getReference("orders");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase order_new = orders_ref.push();
-        order_new.setValue(or, new Firebase.CompletionListener() {
+        DatabaseReference order_new = orders_ref.push();
+        order_new.setValue(or, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -232,10 +229,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase order_new2 = orders_ref.push();
-        order_new2.setValue(or2, new Firebase.CompletionListener() {
+        DatabaseReference order_new2 = orders_ref.push();
+        order_new2.setValue(or2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -244,7 +241,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("orders").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("orders").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -252,18 +249,18 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
 
         //restaurants node
-        Firebase restaurants_ref  = root_ref.child("restaurants");
+        DatabaseReference restaurants_ref  = root_ref.getReference("restaurants");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase restaurant_new = restaurants_ref.push();
-        restaurant_new.setValue(res, new Firebase.CompletionListener() {
+        DatabaseReference restaurant_new = restaurants_ref.push();
+        restaurant_new.setValue(res, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -271,10 +268,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase restaurant_new2 = restaurants_ref.push();
-        restaurant_new2.setValue(res2, new Firebase.CompletionListener() {
+        DatabaseReference restaurant_new2 = restaurants_ref.push();
+        restaurant_new2.setValue(res2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -283,7 +280,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("restaurants").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("restaurants").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -291,18 +288,18 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
 
         //restaurants_galleries node
-        Firebase restaurants_galleries_ref  = root_ref.child("restaurants_galleries");
+        DatabaseReference restaurants_galleries_ref  = root_ref.getReference("restaurants_galleries");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase restaurants_galleries_new = restaurants_galleries_ref.push();
-        restaurants_galleries_new.setValue(r_g, new Firebase.CompletionListener() {
+        DatabaseReference restaurants_galleries_new = restaurants_galleries_ref.push();
+        restaurants_galleries_new.setValue(r_g, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -310,10 +307,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase restaurants_galleries_new2 = restaurants_galleries_ref.push();
-        restaurants_galleries_new2.setValue(r_g2, new Firebase.CompletionListener() {
+        DatabaseReference restaurants_galleries_new2 = restaurants_galleries_ref.push();
+        restaurants_galleries_new2.setValue(r_g2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -322,7 +319,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("restaurants_galleries").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("restaurants_galleries").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -330,18 +327,18 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
 
         //restaurants_previews node
-        Firebase restaurants_previews_ref  = root_ref.child("restaurants_previews");
+        DatabaseReference restaurants_previews_ref  = root_ref.getReference("restaurants_previews");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase restaurants_previews_new = restaurants_previews_ref.push();
-        restaurants_previews_new.setValue(r_p, new Firebase.CompletionListener() {
+        DatabaseReference restaurants_previews_new = restaurants_previews_ref.push();
+        restaurants_previews_new.setValue(r_p, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -349,10 +346,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase restaurants_previews_new2 = restaurants_previews_ref.push();
-        restaurants_previews_new2.setValue(r_p2, new Firebase.CompletionListener() {
+        DatabaseReference restaurants_previews_new2 = restaurants_previews_ref.push();
+        restaurants_previews_new2.setValue(r_p2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -361,7 +358,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("restaurants_previews").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("restaurants_previews").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -369,18 +366,18 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
 
         //reviews node
-        Firebase reviews_ref  = root_ref.child("reviews");
+        DatabaseReference reviews_ref  = root_ref.getReference("reviews");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase reviews_new = reviews_ref.push();
-        reviews_new.setValue(rev, new Firebase.CompletionListener() {
+        DatabaseReference reviews_new = reviews_ref.push();
+        reviews_new.setValue(rev, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -388,10 +385,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase reviews_new2 = reviews_ref.push();
-        reviews_new2.setValue(rev2, new Firebase.CompletionListener() {
+        DatabaseReference reviews_new2 = reviews_ref.push();
+        reviews_new2.setValue(rev2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -400,7 +397,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("reviews").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("reviews").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -408,18 +405,18 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
 
         //table_reservations node
-        Firebase table_reservations_ref = root_ref.child("table_reservations");
+        DatabaseReference table_reservations_ref = root_ref.getReference("table_reservations");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase table_reservations_new = table_reservations_ref.push();
-        table_reservations_new.setValue(t, new Firebase.CompletionListener() {
+        DatabaseReference table_reservations_new = table_reservations_ref.push();
+        table_reservations_new.setValue(t, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -427,10 +424,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase table_reservations_new2 = table_reservations_ref.push();
-        table_reservations_new2.setValue(t2, new Firebase.CompletionListener() {
+        DatabaseReference table_reservations_new2 = table_reservations_ref.push();
+        table_reservations_new2.setValue(t2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -439,7 +436,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("table_reservations").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("table_reservations").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -447,18 +444,18 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
 
         //users node
-        Firebase users_ref  = root_ref.child("users");
+        DatabaseReference users_ref  = root_ref.getReference("users");
         //new node: wrap this data as data of an upper child (which will wrap it through a key)
-        Firebase users_new = users_ref.push();
-        users_new.setValue(u, new Firebase.CompletionListener() {
+        DatabaseReference users_new = users_ref.push();
+        users_new.setValue(u, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -466,10 +463,10 @@ public class DataInitialization {
                 }
             }
         });
-        Firebase users_new2 = users_ref.push();
-        users_new2.setValue(u2, new Firebase.CompletionListener() {
+        DatabaseReference users_new2 = users_ref.push();
+        users_new2.setValue(u2, new DatabaseReference.CompletionListener() {
             @Override
-            public void onComplete(FirebaseError firebaseError, Firebase firebase) {
+            public void onComplete(DatabaseError firebaseError, DatabaseReference firebase) {
                 if (firebaseError != null) {
                     Log.d("firebase", "Data could not be saved. " + firebaseError.getMessage());
                 } else {
@@ -478,7 +475,7 @@ public class DataInitialization {
             }
         });
         //add a listener to activate when there will be new data on server to be changed in the app
-        root_ref.child("users").addValueEventListener(new ValueEventListener() {
+        root_ref.getReference("users").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 Log.d("firebase", "Result: " + snapshot.getValue() + "....." + snapshot.getKey());
@@ -486,7 +483,7 @@ public class DataInitialization {
             }
 
             @Override
-            public void onCancelled(FirebaseError error) {
+            public void onCancelled(DatabaseError error) {
                 Log.d("firebase", "The read failed: " + error.getMessage());
             }
         });
@@ -525,7 +522,7 @@ public class DataInitialization {
         m = new Meal();
         m.setMeal_name("Pasta con il pomodoro");
         m.setRestaurant_id(restaurant_id);
-        m.setIs_meal_availabile(true);
+        m.setIs_meal_available(true);
         m.setIs_meal_celiac(false);
         m.setIs_meal_take_away(true);
         m.setIs_meal_vegan(false);
@@ -543,7 +540,7 @@ public class DataInitialization {
         m2 = new Meal();
         m2.setMeal_name("Carne arrostita");
         m2.setRestaurant_id(restaurant_id2);
-        m2.setIs_meal_availabile(true);
+        m2.setIs_meal_available(true);
         m2.setIs_meal_celiac(false);
         m2.setIs_meal_take_away(true);
         m2.setIs_meal_vegan(false);
@@ -670,10 +667,10 @@ public class DataInitialization {
         /*
         OR (https://github.com/firebase/geofire-java)
         //Point to the right restaurant location, for example
-        GeoFire geoFire = new GeoFire(new Firebase("https://have-break.firebaseio.com/restaurants/-KHy2d6GPPiNRzG_jFZ9"));
+        GeoFire geoFire = new GeoFire(new DatabaseReference("https://have-break-9713d.firebaseio.com/restaurants/-KHy2d6GPPiNRzG_jFZ9"));
         geoFire.setLocation("firebase-hq", new GeoLocation(37.7853889, -122.4056973), new GeoFire.CompletionListener() {
             @Override
-            public void onComplete(String key, FirebaseError error) {
+            public void onComplete(String key, DatabaseError error) {
                 if (error != null) {
                     System.err.println("There was an error saving the location to GeoFire: " + error);
                 } else {

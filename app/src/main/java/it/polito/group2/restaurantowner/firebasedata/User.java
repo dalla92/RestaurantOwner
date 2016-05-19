@@ -2,9 +2,12 @@ package it.polito.group2.restaurantowner.firebasedata;
 
 import android.graphics.Bitmap;
 
+
+
 /**
  * Created by Alessio on 16/05/2016.
  */
+
 public class User {
 
     private String user_id;

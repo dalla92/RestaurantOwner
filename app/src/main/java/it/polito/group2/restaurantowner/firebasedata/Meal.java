@@ -1,8 +1,5 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
-import android.graphics.Bitmap;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -11,7 +8,6 @@ import java.util.ArrayList;
  * Created by Alessio on 16/05/2016.
  */
 
-@JsonIgnoreProperties(ignoreUnknown=true)
 public class Meal implements Serializable {
 
     private String meal_id;
@@ -24,7 +20,7 @@ public class Meal implements Serializable {
     private boolean is_meal_vegan;
     private boolean is_meal_vegetarian;
     private boolean is_meal_celiac;
-    private boolean is_meal_availabile;
+    private boolean is_meal_available;
     private ArrayList<MealAddition> meal_additions;
     private ArrayList<MealCategory> meal_tags;
     private boolean is_meal_take_away;
@@ -115,12 +111,12 @@ public class Meal implements Serializable {
         this.is_meal_celiac = is_meal_celiac;
     }
 
-    public boolean is_meal_availabile() {
-        return is_meal_availabile;
+    public boolean is_meal_available() {
+        return is_meal_available;
     }
 
-    public void setIs_meal_availabile(boolean is_meal_availabile) {
-        this.is_meal_availabile = is_meal_availabile;
+    public void setIs_meal_available(boolean is_meal_available) {
+        this.is_meal_available = is_meal_available;
     }
 
     public ArrayList<MealAddition> getMeal_additions() {

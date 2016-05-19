@@ -1,13 +1,12 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.io.Serializable;
 
 /**
  * Created by Alessio on 16/05/2016.
  */
-@JsonIgnoreProperties(ignoreUnknown=true)
+
+
 public class MealCategory implements Serializable {
 
     private String meal_category_id;

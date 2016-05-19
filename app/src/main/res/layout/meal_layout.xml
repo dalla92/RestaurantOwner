@@ -109,7 +109,8 @@
                 android:focusableInTouchMode="true"
                 android:clickable="true"
                 android:editable="true"
-                android:onClick="myClickHandler_switch"/>
+                />
+            <!--android:onClick="myClickHandler_switch"-->
 
         </LinearLayout>
     </LinearLayout>

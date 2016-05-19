@@ -51,8 +51,8 @@ public class GalleryViewActivity extends AppCompatActivity {
 
         // Initilizing Grid View
 
-        /*Firebase firebase = new Firebase("https://have-break.firebaseio.com/images");
-        Firebase imageRef = firebase.push();
+        /*DatabaseReference firebase = new DatabaseReference("https://have-break-9713d.firebaseio.com/images");
+        DatabaseReference imageRef = firebase.push();
 
         imageRef.setValue(r);*/
 

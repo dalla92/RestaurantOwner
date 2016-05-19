@@ -13,7 +13,7 @@ import android.content.DialogInterface;
 import android.widget.NumberPicker;
 import android.widget.TimePicker;
 
-import it.polito.group2.restaurantowner.data.OpenTime;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 
 public class CustomTimePickerDialog extends TimePickerDialog {
 
@@ -22,9 +22,9 @@ public class CustomTimePickerDialog extends TimePickerDialog {
     private final OnTimeSetListener callback;
     private String weekday;
     String restaurant_id;
-    private ArrayList<OpenTime> open_times = new ArrayList<>();
+    private ArrayList<RestaurantTimeSlot> open_times = new ArrayList<>();
 
-    public CustomTimePickerDialog(Context context, String weekday, ArrayList<OpenTime> open_times, String restaurant_id, OnTimeSetListener callBack,
+    public CustomTimePickerDialog(Context context, String weekday, ArrayList<RestaurantTimeSlot> open_times, String restaurant_id, OnTimeSetListener callBack,
                                   int hourOfDay, int minute, boolean is24HourView) {
         super(context, TimePickerDialog.THEME_HOLO_LIGHT, callBack, hourOfDay, minute / TIME_PICKER_INTERVAL,
                 is24HourView);
@@ -82,32 +82,28 @@ public class CustomTimePickerDialog extends TimePickerDialog {
                 //find open hours of that weekday
                 List<String> displayed_hours_values = new ArrayList<String>();
                 //find hours of lunch
-                for (OpenTime o : this.open_times) {
-                    if (o.getRestaurantId().equals(this.restaurant_id)) {
-                        if (o.getDayOfWeek() == Integer.parseInt(weekday)) {
-                            if (o.getType().equals("Lunch")) {
-                                int open_time = Integer.parseInt(o.getOpenHour().substring(0, 2)); //I take only the hour because minutes are fixed to 00
-                                int close_time = Integer.parseInt(o.getCloseHour().substring(0, 2)); //I take only the hour because minutes are fixed to 00
+                for (RestaurantTimeSlot o : this.open_times) {
+                        if (o.getDay_of_week() == Integer.parseInt(weekday)) {
+                            if (o.isLunch()==true) {
+                                int open_time = Integer.parseInt(o.getOpen_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
+                                int close_time = Integer.parseInt(o.getClose_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                 for (int i = open_time; i < close_time - 1; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50
                                     displayed_hours_values.add(String.valueOf(i));
                                 }
                             }
                         }
-                    }
                 }
                 //find hours of dinner
-                for (OpenTime o : this.open_times) {
-                    if (o.getRestaurantId().equals(this.restaurant_id)) {
-                        if (o.getType().equals("Dinner")) {
-                            if (o.getDayOfWeek() == Integer.parseInt(weekday)) {
-                                int open_time = Integer.parseInt(o.getOpenHour().substring(0, 2)); //I take only the hour because minutes are fixed to 00
-                                int close_time = Integer.parseInt(o.getCloseHour().substring(0, 2)); //I take only the hour because minutes are fixed to 00
+                for (RestaurantTimeSlot o : this.open_times) {
+                    if (o.getDay_of_week() == Integer.parseInt(weekday)) {
+                        if (o.isDinner()==true) {
+                                int open_time = Integer.parseInt(o.getOpen_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
+                                int close_time = Integer.parseInt(o.getClose_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                 for (int i = open_time; i < close_time - 1; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50
                                     displayed_hours_values.add(String.valueOf(i));
                                 }
                             }
                         }
-                    }
                 }
                 if(displayed_hours_values != null && !displayed_hours_values.isEmpty())
                 mHourSpinner.setDisplayedValues(displayed_hours_values

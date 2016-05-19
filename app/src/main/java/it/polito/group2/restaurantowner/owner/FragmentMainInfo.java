@@ -33,7 +33,7 @@ import android.widget.CheckBox;
 import android.widget.Spinner;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 
 /**
  * Created by Alessio on 16/04/2016.
@@ -66,11 +66,13 @@ public class FragmentMainInfo extends Fragment {
         if(m.getMeal_name()!=null) {
             args.putString("meal_name", m.getMeal_name());
             args.putDouble("meal_price", m.getMeal_price());
-            args.putString("meal_photo", m.getMeal_photo());
-            args.putString("type1", m.getType1());
-            args.putString("type2", m.getType2());
-            args.putString("category", m.getCategory());
-            args.putBoolean("take_away", m.isTake_away());
+            //TODO upload both thumbnail and full size pictures
+            args.putString("meal_photo", m.getMeal_photo_firebase_URL());
+            args.putBoolean("is_vegan", m.is_meal_vegan());
+            args.putBoolean("is_vegetarian", m.is_meal_vegetarian());
+            args.putBoolean("is_celiac", m.is_meal_celiac());
+            args.putString("category", m.getMeal_category());
+            args.putBoolean("take_away", m.is_meal_take_away());
         }
         fragment.setArguments(args);
         Log.d("aaa", "passed in fragment main info1");
@@ -93,19 +95,30 @@ public class FragmentMainInfo extends Fragment {
         if(meal_price.getText().toString().equals(""))
             meal_price.setText("0.0");
         Log.d("ddd", String.valueOf(category.getSelectedItem()));
+        boolean is_vegan=false, is_vegetarian=false, is_celiac = false;
+        if(type1.getSelectedItem().equals("Vegan") || type1.getSelectedItem().equals("Vegano") ||
+                type2.getSelectedItem().equals("Vegan") || type2.getSelectedItem().equals("Vegano"))
+            is_vegan = true;
+        if(type1.getSelectedItem().equals("Vegetarian") || type1.getSelectedItem().equals("Vegetariano") ||
+                type2.getSelectedItem().equals("Vegetarian") || type2.getSelectedItem().equals("Vegetariano"))
+            is_vegetarian = true;
+        if(type1.getSelectedItem().equals("Celiac") || type1.getSelectedItem().equals("Celiaco") ||
+                type2.getSelectedItem().equals("Celiac") || type2.getSelectedItem().equals("Celiaco"))
+            is_celiac = true;
                 dataPasser.
                 onMainInfoPass(
                         meal_name.getText().toString(),
                         Double.parseDouble(meal_price.getText().toString()),
                         photouri,
-                        String.valueOf(type1.getSelectedItem()),
-                        String.valueOf(type2.getSelectedItem()),
+                        is_vegan,
+                        is_vegetarian,
+                        is_celiac,
                         String.valueOf(category.getSelectedItem()),
                         is_take_away);
     }
 
     public interface onMainInfoPass {
-        public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  String type1, String type2, String category, boolean take_away);
+        public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  boolean is_vegan, boolean is_vegetarian, boolean is_celiac, String category, boolean take_away);
     }
 
     @Override
@@ -151,19 +164,6 @@ public class FragmentMainInfo extends Fragment {
             }
         });
         type1.setAdapter(adapter);
-        if(!getArguments().isEmpty()) {
-            if(getArguments().getString("type1")!=null){
-                if(getArguments().getString("type1").equals("Celiac") || getArguments().getString("type1").equals("Celiaco"))
-                    type1.setSelection(1);
-                else if(getArguments().getString("type1").equals("Vegan") || getArguments().getString("type1").equals("Vegano"))
-                    type1.setSelection(2);
-                else if(getArguments().getString("type1").equals("Vegetarian") || getArguments().getString("type1").equals("Vegetariano"))
-                    type1.setSelection(3);
-                else if(getArguments().getString("type1").equals("More") || getArguments().getString("type1").equals("Altro"))
-                    type1.setSelection(0);
-            }
-        }
-
         //feed spinner4
         type2 = (Spinner) rootView.findViewById(R.id.spinner4);
         ArrayAdapter<CharSequence> adapter2 = ArrayAdapter.createFromResource(getActivity(),
@@ -183,15 +183,33 @@ public class FragmentMainInfo extends Fragment {
             }
         });
         if(!getArguments().isEmpty()) {
-            if(getArguments().getString("type2")!=null){
-                if(getArguments().getString("type2").equals("Celiac") || getArguments().getString("type2").equals("Celiaco"))
-                    type2.setSelection(1);
-                else if(getArguments().getString("type2").equals("Vegan") || getArguments().getString("type2").equals("Vegano"))
-                    type2.setSelection(2);
-                else if(getArguments().getString("type2").equals("Vegetarian") || getArguments().getString("type2").equals("Vegetariano"))
-                    type2.setSelection(3);
-                else if(getArguments().getString("type2").equals("More") || getArguments().getString("type2").equals("Altro"))
-                    type2.setSelection(0);
+            if(getArguments().getBoolean("is_celiac")==true && getArguments().getBoolean("is_vegan")==true) {
+                type1.setSelection(1);
+                type2.setSelection(2);
+            }
+            else if(getArguments().getBoolean("is_celiac")==true && getArguments().getBoolean("is_vegetarian")==true) {
+                type1.setSelection(1);
+                type2.setSelection(3);
+            }
+            else if(getArguments().getBoolean("is_vegan")==true && getArguments().getBoolean("is_vegetarian")==true) {
+                type1.setSelection(2);
+                type2.setSelection(3);
+            }
+            else if(getArguments().getBoolean("is_celiac")==true && getArguments().getBoolean("is_vegan")==false && getArguments().getBoolean("is_vegetarian")==false) {
+                type1.setSelection(1);
+                type2.setSelection(0);
+            }
+            else if(getArguments().getBoolean("is_celiac")==false && getArguments().getBoolean("is_vegan")==true && getArguments().getBoolean("is_vegetarian")==false) {
+                type1.setSelection(2);
+                type2.setSelection(0);
+            }
+            else if(getArguments().getBoolean("is_celiac")==false && getArguments().getBoolean("is_vegan")==false && getArguments().getBoolean("is_vegetarian")==true) {
+                type1.setSelection(3);
+                type2.setSelection(0);
+            }
+            else {
+                type1.setSelection(0);
+                type2.setSelection(0);
             }
         }
 

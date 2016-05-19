@@ -1,8 +1,6 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.firebase.geofire.GeoFire;
-import com.firebase.geofire.GeoLocation;
+
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,7 +8,7 @@ import java.util.ArrayList;
 /**
  * Created by Alessio on 16/05/2016.
  */
-@JsonIgnoreProperties(ignoreUnknown=true)
+
 public class Restaurant implements Serializable {
 
     private String restaurant_id;

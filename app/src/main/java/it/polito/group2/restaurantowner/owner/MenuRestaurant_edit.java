@@ -18,6 +18,9 @@ import android.view.ViewGroup;
 
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,8 +31,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.MealAddition;
-import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.firebasedata.MealAddition;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
+import it.polito.group2.restaurantowner.firebasedata.MealCategory;
 
 /**
  * Created by Alessio on 16/04/2016.
@@ -37,7 +41,7 @@ import it.polito.group2.restaurantowner.data.Meal;
 public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMainInfo.onMainInfoPass, FragmentOtherInfo.onOtherInfoPass{
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
-    private Meal current_meal = null;
+    private Meal current_meal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +90,6 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
             else {
                 Intent intent = new Intent();
                 intent.putExtra("meal", current_meal);
-                Log.d("ddd", "onOptionsItemSelected" + current_meal.getCategory());
                 setResult(RESULT_OK, intent);
                 finish();//finishing activity
                 return true;
@@ -102,28 +105,28 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     }
 
     @Override
-    public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  String type1, String type2, String category, boolean take_away) {
+    public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  boolean is_vegan, boolean is_vegetarian, boolean is_celiac, String category, boolean take_away) {
         current_meal.setMeal_name(meal_name);
         current_meal.setMeal_price(meal_price);
-        current_meal.setMeal_photo(photouri);
-        current_meal.setType1(type1);
-        current_meal.setType2(type2);
-        Log.d("ddd", "onmaininfopass " + category);
-        current_meal.setCategory(category);
-        current_meal.setTake_away(take_away);
+        //TODO upload both thumbnail and full size pictures
+        //current_meal.setMeal_photo_firebase_URL(photouri);
+        current_meal.setIs_meal_celiac(is_celiac);
+        current_meal.setIs_meal_vegan(is_vegan);
+        current_meal.setIs_meal_vegetarian(is_vegetarian);
+        current_meal.setMeal_category(category);
+        current_meal.setIs_meal_take_away(take_away);
     }
 
     @Override
-    public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealAddition> categories) {
-        current_meal.setDescription(meal_description);
-        current_meal.setCooking_time(cooking_time);
-        current_meal.setMeal_Meal_additions(mealAdditions);
-        current_meal.setMeal_categories(categories);
-        try {
-            saveJSONMeList();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealCategory> tags) {
+        current_meal.setMeal_description(meal_description);
+        current_meal.setMeal_cooking_time(cooking_time);
+        current_meal.setMeal_additions(mealAdditions);
+        current_meal.setMeal_tags(tags);
+
+        String meal_key = current_meal.getMeal_id();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
+        ref.setValue(current_meal);
     }
 
 
@@ -189,92 +192,6 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                     return getString(R.string.addres_section_other_info);
             }
             return null;
-        }
-    }
-
-    public void saveJSONMeList() throws JSONException {
-        Log.d("aaa", "CALLED SAVE_MODIFIED");
-        /*
-        //meals writing
-        String FILENAME = "mealList.json";
-        JSONArray jarray = new JSONArray();
-        for (Meal me : meals) {
-            JSONObject jres = new JSONObject();
-            jres.put("RestaurantId", me.getRestaurantId());
-            jres.put("MealId", me.getMealId());
-            jres.put("MealPhoto", me.getMeal_photo());
-            jres.put("MealName", me.getMeal_name());
-            jres.put("MealPrice", me.getMeal_price());
-            jres.put("MealType1", me.getType1());
-            jres.put("MealType2", me.getType2());
-            jres.put("MealAvailable", me.isAvailable());
-            jres.put("MealTakeAway", me.isTake_away());
-            jres.put("MealCookingTime", me.getCooking_time());
-            jres.put("MealDescription", me.getDescription());
-            Log.d("ccc", "WRITE");
-            jarray.put(jres);
-        }
-        JSONObject resObj = new JSONObject();
-        resObj.put("Meals", jarray);
-        FileOutputStream fos = null;
-        try {
-            fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-            fos.write(resObj.toString().getBytes());
-            fos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-        //additions writing
-        String FILENAME2 = "mealAddition.json";
-        JSONArray jarray2 = new JSONArray();
-        for (MealAddition ad : current_meal.getMeal_Meal_additions()) {
-            JSONObject jres2 = new JSONObject();
-            jres2.put("RestaurantId", ad.getRestaurant_id());
-            jres2.put("MealId", ad.getmeal_id());
-            jres2.put("AdditionName", ad.getName());
-            jres2.put("AdditionSelected", ad.isSelected());
-            jres2.put("AdditionPrice", ad.getPrice());
-            jarray2.put(jres2);
-        }
-        JSONObject resObj2 = new JSONObject();
-        resObj2.put("MealsAdditions", jarray2);
-        FileOutputStream fos2 = null;
-        try {
-            fos2 = openFileOutput(FILENAME2, Context.MODE_PRIVATE);
-            fos2.write(resObj2.toString().getBytes());
-            fos2.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        //categories writing
-        String FILENAME3 = "mealCategory.json";
-        JSONArray jarray3 = new JSONArray();
-        for (MealAddition ad : current_meal.getMeal_categories()) {
-            JSONObject jres3 = new JSONObject();
-            jres3.put("RestaurantId", ad.getRestaurant_id());
-            jres3.put("MealId", ad.getmeal_id());
-            jres3.put("CategoryName", ad.getName());
-            jres3.put("CategorySelected", ad.isSelected());
-            jres3.put("CategoryPrice", 0);
-            //jres3.put("Price", ad.getPrice());
-            jarray3.put(jres3);
-        }
-        JSONObject resObj3 = new JSONObject();
-        resObj3.put("MealsCategories", jarray3);
-        FileOutputStream fos3 = null;
-        try {
-            fos3 = openFileOutput(FILENAME3, Context.MODE_PRIVATE);
-            fos3.write(resObj3.toString().getBytes());
-            fos3.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }

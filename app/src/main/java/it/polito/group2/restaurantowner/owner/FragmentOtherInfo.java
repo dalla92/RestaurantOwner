@@ -27,10 +27,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.MealAddition;
-import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.firebasedata.MealAddition;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
+import it.polito.group2.restaurantowner.firebasedata.MealCategory;
 
 /**
  * Created by Alessio on 16/04/2016.
@@ -64,17 +66,19 @@ public class FragmentOtherInfo extends Fragment {
     public static FragmentOtherInfo newInstance(Meal m, Context c) {
         fragment = new FragmentOtherInfo();
         Bundle args = new Bundle();
-        args.putString("meal_description", m.getDescription());
-        args.putInt("cooking_time", m.getCooking_time());
+        args.putString("meal_description", m.getMeal_description());
+        args.putInt("cooking_time", m.getMeal_cooking_time());
         context = c;
         current_meal = m;
-        meal_id = m.getMealId();
+        meal_id = m.getMeal_id();
+        /*
         try{
             readJSONMeList();
         }
         catch(JSONException e){
             Log.d("aaa", "Exception in reading");
         }
+        */
         fragment.setArguments(args);
         return fragment;
     }
@@ -89,11 +93,18 @@ public class FragmentOtherInfo extends Fragment {
     */
 
     public void passData() {
-        dataPasser.onOtherInfoPass(meal_description.getText().toString(), time, childMealAdditions, childCategories);
+        ArrayList<MealCategory> childMealCategories = new ArrayList<MealCategory>();
+        for(MealAddition ma : childCategories){
+            MealCategory mc = new MealCategory();
+            mc.setMeal_category_id(ma.getMeal_addition_id());
+            mc.setMeal_category_name(ma.getMeal_addition_name());
+            childMealCategories.add(mc);
+        }
+        dataPasser.onOtherInfoPass(meal_description.getText().toString(), time, childMealAdditions, childMealCategories);
     }
 
     public interface onOtherInfoPass {
-        public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealAddition> categories);
+        public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealCategory> categories);
     }
 
 
@@ -126,7 +137,7 @@ public class FragmentOtherInfo extends Fragment {
             }
         });
         //expandable additions
-        childMealAdditions = current_meal.getMeal_Meal_additions();
+        childMealAdditions = current_meal.getMeal_additions();
         parentAddition = "Meal additions";
         additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
         additions_adapter = new MyExpandableAdapter(parentAddition, childMealAdditions);
@@ -134,8 +145,13 @@ public class FragmentOtherInfo extends Fragment {
         additions.setDividerHeight(5);
         additions.setGroupIndicator(null);
         additions.setClickable(true);
-        //expandable categories
-        childCategories = current_meal.getMeal_categories();
+        //expandable categorie
+        if(current_meal.getMeal_tags()!=null)
+            for(MealCategory mc : current_meal.getMeal_tags()){
+                MealAddition ma = new MealAddition();
+                ma.setMeal_addition_name(mc.getMeal_category_name());
+                childCategories.add(ma);
+            }
         parentCategory = "Meal categories";
         categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
         categories_adapter = new MyExpandableAdapter(parentCategory, childCategories);
@@ -149,7 +165,12 @@ public class FragmentOtherInfo extends Fragment {
             @Override
             public void onClick(View v) {
                 childMealAdditions = additions_adapter.getChildItems();
-                childMealAdditions.add(new MealAddition(current_meal.getRestaurantId(),current_meal.getMealId(), getResources().getText(R.string.meal_add_new_addition).toString(), 0, false));
+                MealAddition ma = new MealAddition();
+                ma.setMeal_addition_name(getResources().getText(R.string.meal_add_new_addition).toString());
+                ma.setMeal_addition_price(0.0);
+                ma.setIs_addition_selected(false);
+                ma.setMeal_addition_id(UUID.randomUUID().toString());
+                childMealAdditions.add(ma);
                 additions_adapter.setChildItems(childMealAdditions);
                 additions.expandGroup(0);
 
@@ -160,7 +181,10 @@ public class FragmentOtherInfo extends Fragment {
             @Override
             public void onClick(View v) {
                 childCategories = categories_adapter.getChildItems();
-                childCategories.add(new MealAddition(current_meal.getRestaurantId(),current_meal.getMealId(),getResources().getText(R.string.meal_add_new_category).toString(), 0, false));
+                MealAddition ma = new MealAddition();
+                ma.setMeal_addition_name(getResources().getText(R.string.meal_add_new_category).toString());
+                ma.setMeal_addition_id(UUID.randomUUID().toString());
+                childCategories.add(ma);
                 categories_adapter.setChildItems(childCategories);
                 categories.expandGroup(0);
             }
@@ -214,10 +238,10 @@ public class FragmentOtherInfo extends Fragment {
                 convertView.findViewById(R.id.edit_addition_price).setVisibility(View.INVISIBLE);
             }
             checkbox_text = (CheckBox) convertView.findViewById(R.id.meal_addition);
-            checkbox_text.setText(childItems.get(childPosition).getName());
+            checkbox_text.setText(childItems.get(childPosition).getMeal_addition_name());
             if(parentItem.equals("Meal additions")) {
                 textview = (TextView) convertView.findViewById(R.id.edit_addition_price);
-                textview.setText( String.valueOf(childItems.get(childPosition).getPrice()));
+                textview.setText( String.valueOf(childItems.get(childPosition).getMeal_addition_price()));
             }
             convertView.findViewById(R.id.addition_delete).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -258,12 +282,12 @@ public class FragmentOtherInfo extends Fragment {
                             .setPositiveButton("OK",
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
-                                            childItems.get(childPosition).setName(userInput_name.getText().toString());
+                                            childItems.get(childPosition).setMeal_addition_name(userInput_name.getText().toString());
                                             if (parentItem.equals("Meal additions")) {
                                                 userInput_price = (EditText) promptsView
                                                         .findViewById(R.id.new_price);
                                                 if(!userInput_price.getText().toString().trim().equals(""))
-                                                    childItems.get(childPosition).setPrice(Double.parseDouble(userInput_price.getText().toString()));
+                                                    childItems.get(childPosition).setMeal_addition_price(Double.parseDouble(userInput_price.getText().toString()));
                                             }
                                             /*
                                                 if (parentItem.equals("Meal additions"))
@@ -315,7 +339,10 @@ public class FragmentOtherInfo extends Fragment {
         @Override
         public int getChildrenCount(int groupPosition) {
             //return ((ArrayList<MealAddition>) childItems.get(groupPosition)).size();
-            return childItems.size();
+            if(childItems!=null)
+                return childItems.size();
+            else
+                return 0;
         }
 
         @Override
@@ -355,111 +382,4 @@ public class FragmentOtherInfo extends Fragment {
 
     }
 
-    public static void readJSONMeList() throws JSONException {
-        /*
-        Log.d("aaa", "CALLED READ");
-        //mealList.json
-        meals = new ArrayList<>();
-        meals_additions = new ArrayList<>();
-        meals_categories = new ArrayList<>();
-        String json = null;
-        FileInputStream fis = null;
-        String FILENAME = "mealList.json";
-        try {
-            fis = context.openFileInput(FILENAME);
-            int size = fis.available();
-            byte[] buffer = new byte[size];
-            fis.read(buffer);
-            fis.close();
-            json = new String(buffer, "UTF-8");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        JSONObject jobj = new JSONObject(json);
-        JSONArray jsonArray = jobj.optJSONArray("Meals");
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            Meal me = new Meal();
-            Log.d("aaa", "TRYING TO READ ONE MEAL");
-            me.setRestaurantId(jsonObject.optString("RestaurantId"));
-            me.setMealId(jsonObject.optString("MealId"));
-            me.setMeal_photo(jsonObject.optString("MealPhoto"));
-            me.setMeal_name(jsonObject.optString("MealName"));
-            me.setMeal_price(jsonObject.optDouble("MealPrice"));
-            me.setType1(jsonObject.optString("MealType1"));
-            me.setType2(jsonObject.optString("MealType2"));
-            me.setAvailable(jsonObject.getBoolean("MealAvailable"));
-            me.setTake_away(jsonObject.getBoolean("MealTakeAway"));
-            me.setCooking_time(jsonObject.optInt("MealCookingTime"));
-            me.setDescription(jsonObject.getString("MealDescription"));
-            if(me.getRestaurantId().equals(restaurant_id))
-                meals.add(me);
-        }
-        */
-        childMealAdditions = new ArrayList<>();
-        childCategories = new ArrayList<>();
-        //mealAdditions.json
-        String json2 = null;
-        FileInputStream fis2 = null;
-        String FILENAME2 = "mealAddition.json";
-        try {
-            fis2 = context.openFileInput(FILENAME2);
-            int size2 = fis2.available();
-            byte[] buffer2 = new byte[size2];
-            fis2.read(buffer2);
-            fis2.close();
-            json2 = new String(buffer2, "UTF-8");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        JSONObject jobj2 = new JSONObject(json2);
-        JSONArray jsonArray2 = jobj2.optJSONArray("MealsAdditions");
-        for (int i = 0; i < jsonArray2.length(); i++) {
-            JSONObject jsonObject2 = jsonArray2.getJSONObject(i);
-            MealAddition ad = new MealAddition();
-            if (jsonObject2.optString("MealId").equals(meal_id)) {
-                ad.setRestaurant_id(jsonObject2.optString("RestaurantId"));
-                ad.setmeal_id(jsonObject2.optString("MealId"));
-                ad.setName(jsonObject2.optString("AdditionName"));
-                ad.setSelected(jsonObject2.getBoolean("AdditionSelected"));
-                ad.setPrice(jsonObject2.optDouble("AdditionPrice"));
-                childMealAdditions.add(ad);
-            }
-        }
-        //mealCategories.json
-        String json3 = null;
-        FileInputStream fis3 = null;
-        String FILENAME3 = "mealCategory.json";
-        try {
-            fis3 = context.openFileInput(FILENAME3);
-            int size3 = fis3.available();
-            byte[] buffer3 = new byte[size3];
-            fis3.read(buffer3);
-            fis3.close();
-            json3 = new String(buffer3, "UTF-8");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        JSONObject jobj3 = new JSONObject(json3);
-        JSONArray jsonArray3 = jobj3.optJSONArray("MealsCategories");
-        for (int i = 0; i < jsonArray3.length(); i++) {
-            JSONObject jsonObject3 = jsonArray3.getJSONObject(i);
-            MealAddition ad = new MealAddition();
-            if (jsonObject3.optString("MealId").equals(meal_id)) {
-                ad.setRestaurant_id(jsonObject3.optString("RestaurantId"));
-                ad.setmeal_id(jsonObject3.optString("MealId"));
-                ad.setName(jsonObject3.optString("CategoryName"));
-                ad.setSelected(jsonObject3.getBoolean("CategorySelected"));
-                ad.setPrice(0);
-                //ad.setPrice(jsonObject3.optDouble("CategoryPrice"));
-                childCategories.add(ad);
-            }
-        }
-    }
 }

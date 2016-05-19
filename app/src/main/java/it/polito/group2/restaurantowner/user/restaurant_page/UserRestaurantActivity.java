@@ -50,12 +50,12 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
-import com.firebase.client.AuthData;
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 
@@ -94,7 +94,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private boolean bookmark = false;
     private Drawable d;
     private ProgressDialog progressDialog;
-    private Firebase firebase;
+    private FirebaseDatabase firebase;
     private CallbackManager callbackManager;
 
     @Override
@@ -116,13 +116,13 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
 
-        firebase = new Firebase("https://have-break.firebaseio.com/");
-        /*Firebase restaurantRef = firebase.push();
+        firebase = FirebaseDatabase.getInstance();
+        /*DatabaseReference restaurantRef = firebase.push();
         Restaurant r = new Restaurant("Da Pino", restaurantRef.getKey(), "2", "dunnio", "Via Vittorio Emanuele 14", "01105487980", "Kebab",
                                         true, true, true, "50", "10", "300", "Marconi" , "Caserma Morelli", "4.5", "10", "50%");
         restaurantRef.setValue(r);*/
 
-        Query restaurantRef = firebase.child("restaurants").orderByChild("restaurantId").equalTo("-KH9O71uApNuCQ0eomyB");
+        Query restaurantRef = firebase.getReference("restaurants").orderByChild("restaurantId").equalTo("-KH9O71uApNuCQ0eomyB");
 
         progressDialog = ProgressDialog.show(UserRestaurantActivity.this, null,
                 "Loading, please wait...", false, false);
@@ -139,7 +139,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 progressDialog.dismiss();
                 setRestaurantInfo();
 
-                Query reviewsRef = firebase.child("reviews").orderByChild("restaurantId").equalTo("-KH9O71uApNuCQ0eomyB");
+                Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurantId").equalTo("-KH9O71uApNuCQ0eomyB");
                 reviewsRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -151,14 +151,14 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     }
 
                     @Override
-                    public void onCancelled(FirebaseError firebaseError) {
+                    public void onCancelled(DatabaseError firebaseError) {
                         Log.d("test", "failed read reviews " + firebaseError.getMessage());
                     }
                 });
             }
 
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
                 Log.d("test", "failed read restaurant " + firebaseError.getMessage());
             }
         });
@@ -243,8 +243,9 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     private void onFacebookAccessTokenChange(AccessToken token, final NavigationView navigationView) {
+        /*
         if (token != null) {
-            firebase.authWithOAuthToken("facebook", token.getToken(), new Firebase.AuthResultHandler() {
+            firebase.authWithOAuthToken("facebook", token.getToken(), new DatabaseReference.AuthResultHandler() {
                 @Override
                 public void onAuthenticated(AuthData authData) {
                     TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
@@ -257,14 +258,15 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     Glide.with(UserRestaurantActivity.this).load(authData.getProviderData().get("profileImageURL").toString()).into(nav_photo);
                 }
                 @Override
-                public void onAuthenticationError(FirebaseError firebaseError) {
+                public void onAuthenticationError(DatabaseError firebaseError) {
                     Log.d("firebaseLogin", "Error");
                 }
             });
         } else {
-        /* Logged out of Facebook so do a logout from the Firebase app */
+        /* Logged out of Facebook so do a logout from the DatabaseReference app
             firebase.unauth();
         }
+        */
     }
 
     private void setDrawer(Toolbar toolbar) {
@@ -566,7 +568,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 Calendar date = Calendar.getInstance();
                 //"EEE dd MMM yyyy 'at' HH:mm
 
-                Firebase reviewsRef = firebase.child("reviews").push();
+                DatabaseReference reviewsRef = firebase.getReference("reviews").push();
                 Review review =new Review(restaurantId, "djskdj", date, comment, reviewsRef.getKey(), starNumber);
                 reviewsRef.setValue(review);
 

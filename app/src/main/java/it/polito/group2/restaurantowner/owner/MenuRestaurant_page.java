@@ -11,7 +11,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,38 +20,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.graphics.Rect;
 
-import com.firebase.client.DataSnapshot;
-import com.firebase.client.Firebase;
-import com.firebase.client.FirebaseError;
-import com.firebase.client.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-
-import java.io.File;
-import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
-import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
-import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
 
@@ -122,7 +107,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
                     @Override
                     public void onItemClick(View view, int position) {
                         final String meal_key = meals.get(position).getMeal_id();
-                        Firebase ref = new Firebase("https://have-break.firebaseio.com/meals/");
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
                         ref.addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot snapshot) {
@@ -138,7 +123,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
                             }
 
                             @Override
-                            public void onCancelled(FirebaseError firebaseError) {
+                            public void onCancelled(DatabaseError firebaseError) {
                                 System.out.println("The read failed: " + firebaseError.getMessage());
                             }
                         });
@@ -154,7 +139,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         adapter = new Adapter_Meals(this, 0, meals, restaurant_id);
         mRecyclerView.setAdapter(adapter);
         //delete with swipe
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter, true, meals, "https://have-break.firebaseio.com/meals/");
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
@@ -194,30 +179,27 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         progress_dialog();
 
         //my_restaurant
-        Firebase ref = new Firebase("https://have-break.firebaseio.com/meals/");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot meSnapshot: snapshot.getChildren()) {
                     Meal snap_meal = meSnapshot.getValue(Meal.class);
                     String snap_restaurant_id = snap_meal.getRestaurant_id();
-                    if(snap_restaurant_id.equals(restaurant_id)){
-                        meals.add(snap_meal);
-                    }
-                }
-                /*The owner is the only one that can edit, so I should not put more synchronization, but in case put something like this:
-                       for(Review r_temp : reviews){
-                            if(r_temp.getReview_id().equals(snap_review.getReview_id())){
-                                reviews.remove(r_temp);
+                    if(snap_restaurant_id.equals(restaurant_id)) {
+                        for (Meal m_temp : meals) {
+                            if (m_temp.getMeal_id().equals(snap_meal.getMeal_id())) {
+                                meals.remove(m_temp);
                                 break;
                             }
                         }
-                        reviews.add(snap_review);
+                        meals.add(0, snap_meal);
                         adapter.notifyDataSetChanged();
-            */
+                    }
+                }
             }
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
+            public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
@@ -332,9 +314,9 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         Meal m = new Meal();
         m.setMeal_name("");
         m.setMeal_price(0.0);
-        m.setIs_meal_availabile(false);
+        m.setIs_meal_available(false);
         m.setMeal_cooking_time(0);
-        m.setMeal_id(UUID.randomUUID().toString());
+        m.setMeal_id("");
         m.setRestaurant_id(restaurant_id);
         m.setMeal_description("");
         m.setIs_meal_vegetarian(false);
@@ -343,14 +325,10 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         m.setIs_meal_take_away(false);
         m.setMeal_photo_firebase_URL("");
         m.setMeal_thumbnail("");
-        meals.add(0, m);  //insert at the top
-        adapter.notifyDataSetChanged();
-        Firebase ref = new Firebase("https://have-break.firebaseio.com/meals/");
-        Firebase ref_pushed = ref.push();
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
+        DatabaseReference ref_pushed = ref.push();
+        m.setMeal_id(ref_pushed.getKey());
         ref_pushed.setValue(m);
-        String m_key = ref_pushed.getKey();
-        Firebase ref2 = new Firebase("https://have-break.firebaseio.com/meals/"+m_key);
-        ref2.child("meal_id").setValue(m_key);
     }
 
     public void myClickHandler_enlarge(View v) {
@@ -411,8 +389,6 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
             if (resultCode == RESULT_OK) {
                 Meal m = (Meal) data.getExtras().get("meal");
                 meals.set(index_position, m);
-                //TODO update meal into db
-
                 adapter.notifyDataSetChanged();
             }
         }
