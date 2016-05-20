@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Review;
+import it.polito.group2.restaurantowner.gallery.GalleryViewItem;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>  {
 
@@ -24,6 +25,11 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     public ReviewAdapter(ArrayList<Review> reviews, Context context) {
         this.reviews = reviews;
         this.context = context;
+    }
+
+    public void setReviewData(ArrayList<Review> reviews) {
+        this.reviews = reviews;
+        notifyDataSetChanged();
     }
 
 

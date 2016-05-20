@@ -70,12 +70,14 @@ public class UserSessionManager {
      * */
     public void logoutUser(){
 
-        String provider = pref.getString(PROVIDER, null);
+        /*String provider = pref.getString(PROVIDER, null);
         if(provider != null) {
-            if (provider.equals("facebook")) {
+            if (provider.equals("facebook"))
                 LoginManager.getInstance().logOut();
-            }
-        }
+
+            if(provider.equals("google"))
+
+        }*/
 
         FirebaseAuth.getInstance().signOut();
 

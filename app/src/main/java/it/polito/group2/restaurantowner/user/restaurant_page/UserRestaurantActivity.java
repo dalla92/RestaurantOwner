@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.UiThread;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -42,6 +43,7 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -52,12 +54,9 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.Bookmark;
@@ -88,11 +87,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private Context context;
     private User current_user;
     private boolean bookmark = false;
-    private Drawable d;
-    private ProgressDialog progressDialog;
-    //private FirebaseApp firebase;
+    private ProgressDialog mProgressDialog;
     private  FirebaseDatabase firebase;
     private UserSessionManager sessionManager;
+    private RecyclerView reviewList;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +104,9 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         context = this;
         sessionManager = new UserSessionManager(this);
+        reviews = new ArrayList<>();
+
+        initializeUserReviewList();
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
@@ -118,39 +120,50 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         firebase = FirebaseDatabase.getInstance();
 
-        DatabaseReference restaurantsRef = firebase.getReference("restaurants");
+        DatabaseReference restaurantRef = firebase.getReference("restaurants/-KI8xQ4PDVSKKjnRGmdG");
 
-        Query restaurantRef = restaurantsRef.orderByChild("restaurant_id").equalTo("-KI8O-cx7-lFjei0_dwm");
+        //Query restaurantRef = restaurantsRef.orderByChild("restaurant_id").equalTo("-KI8O-cx7-lFjei0_dwm");
 
-        progressDialog = ProgressDialog.show(UserRestaurantActivity.this, null, "Loading...", false, false);
+        showProgressDialog();
 
         restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot child : dataSnapshot.getChildren()) {
-                    targetRestaurant = child.getValue(Restaurant.class);
-                }
+                targetRestaurant = dataSnapshot.getValue(Restaurant.class);
 
                 restaurantID = targetRestaurant.getRestaurant_id();
                 reviews = new ArrayList<>();
                 collapsing.setTitle(targetRestaurant.getRestaurant_name());
-                progressDialog.dismiss();
+                hideProgressDialog();
                 setRestaurantInfo();
 
-                Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo("-KI8O-cx7-lFjei0_dwm");
-                reviewsRef.addValueEventListener(new ValueEventListener() {
+                Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo("-KI8xQ4PDVSKKjnRGmdG");
+                reviewsRef.addChildEventListener(new ChildEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot child : dataSnapshot.getChildren()) {
-                            reviews.add(child.getValue(Review.class));
-                        }
-                        Collections.sort(reviews);
-                        addUserReviews();
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        Log.d("prova", "child added");
+                        reviews.add(dataSnapshot.getValue(Review.class));
+                        reviewAdapter.setReviewData(reviews);
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                        Log.d("prova", "child changed");
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        Log.d("prova", "child removed");
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                        Log.d("prova", "child moved");
                     }
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        Log.d("test", "failed read reviews " + databaseError.getMessage());
+                        Log.d("prova", "child cancelled");
                     }
                 });
             }
@@ -234,6 +247,22 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
     }
 
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Loading...");
+            mProgressDialog.setIndeterminate(true);
+        }
+
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
+    }
+
     private void setDrawer(Toolbar toolbar) {
         //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -266,9 +295,9 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
             TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
 
-            /*HashMap<String, String> userData = sessionManager.getSessionData();
-            nav_email.setText(userData.get(UserSessionManager.EMAIL));
-            nav_username.setText(userData.get(UserSessionManager.FULL_NAME));*/
+            HashMap<String, String> userData = sessionManager.getSessionData();
+
+
         }
         else{
             loginItem.setVisible(true);
@@ -343,13 +372,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        d = null;
-        System.gc();
-    }
-
-    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
@@ -392,9 +414,9 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             startActivity(intent1);
             return true;
         } else if(id==R.id.nav_logout){
-            progressDialog = ProgressDialog.show(UserRestaurantActivity.this, null, "Loading...", false, false);
+            showProgressDialog();
             sessionManager.logoutUser();
-            progressDialog.dismiss();
+            hideProgressDialog();
 
             Intent intent = new Intent(getApplicationContext(), UserRestaurantList.class);
 
@@ -643,10 +665,10 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         }
     }
 
-    private void addUserReviews() {
+    private void initializeUserReviewList() {
         TextView reviews_num = (TextView) findViewById(R.id.user_restaurant_num_reviews);
         reviews_num.setText(""+reviews.size());
-        RecyclerView reviewList = (RecyclerView) findViewById(R.id.user_restaurant_review_list);
+        reviewList = (RecyclerView) findViewById(R.id.user_restaurant_review_list);
         assert reviewList != null;
         reviewList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         reviewList.setNestedScrollingEnabled(false);

@@ -171,6 +171,9 @@
     <string name="times_Sun">Sunday</string>
     <string name="title_activity_user_restaurant_list">UserRestaurantList</string>
     <string name="filter">Filter the restaurant list</string>
+    <string name="forgot_password">Forgot password?</string>
+    <string name="login_err_msg_email">Enter a valid email address</string>
+    <string name="login_err_msg_password">Enter the password</string>
     <!--string name="facebook_app_id">1003333209754047</string-->
     <string name="facebook_app_id">988598407901956</string>
     <string name="distance">Distance</string>
