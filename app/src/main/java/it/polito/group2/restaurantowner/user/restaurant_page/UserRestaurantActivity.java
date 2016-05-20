@@ -98,6 +98,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_restaurant);
+
+        /*
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -111,7 +113,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             userID = getIntent().getExtras().getString("user_id");
         }
 
-        Log.d("prova", restaurantID);
+        //Log.d("prova", restaurantID);
         final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
 
         firebase = FirebaseDatabase.getInstance();
@@ -188,7 +190,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         }
 
         /*reviews = getReviewsJson();
-        Collections.sort(reviews);*/
+        Collections.sort(reviews)
         offers = getOffersJSON();
         categories = getCategoriesJson();
 
@@ -228,6 +230,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         setRestaurantMenu();
         setDrawer(toolbar);
 
+        */
 
     }
 

@@ -1,6 +1,7 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * Created by Alessio on 16/05/2016.
@@ -11,7 +12,7 @@ public class TableReservation {
     private String restaurant_id;
     private String user_id;
     private String user_full_name;
-    private Calendar table_reservation_date;
+    private GregorianCalendar table_reservation_date;
     private String table_reservation_notes;
     private int table_reservation_guests_number;
 
@@ -51,11 +52,11 @@ public class TableReservation {
         this.user_full_name = user_full_name;
     }
 
-    public Calendar getTable_reservation_date() {
+    public GregorianCalendar getTable_reservation_date() {
         return table_reservation_date;
     }
 
-    public void setTable_reservation_date(Calendar table_reservation_date) {
+    public void setTable_reservation_date(GregorianCalendar table_reservation_date) {
         this.table_reservation_date = table_reservation_date;
     }
 

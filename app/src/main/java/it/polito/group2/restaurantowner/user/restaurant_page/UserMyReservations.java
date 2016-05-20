@@ -65,7 +65,7 @@ import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 /**
  * Created by Alessio on 27/04/2016.
  */
-public class UserMyReservations extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class UserMyReservations extends AppCompatActivity{
 
     Toolbar toolbar;
     ArrayList<TableReservation> all_table_reservations = new ArrayList<TableReservation>();
@@ -98,99 +98,18 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         if(user_id==null)
             user_id = "fake_user_id";
 
-        //get and fill related data
-        get_data_from_firebase();
-
-        //ordering from last done
-        Collections.reverse(all_table_reservations);
-        Log.d("tagx", String.valueOf(all_table_reservations.size()));
-
-        //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        //TODO decomment handle logged/not logged user
-        /*
-        if(user_id==null){ //not logged
-            Menu nav_Menu = navigationView.getMenu();
-            nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reservations).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reviews).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_favorites).setVisible(false);
-        }
-        else{ //logged
-            //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
-        }
-        */
+
+        //get and fill related data
+        get_data_from_firebase();
 
         //take the right user
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/");
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot usSnapshot: snapshot.getChildren()) {
-                    User snap_user = usSnapshot.getValue(User.class);
-                    String snap_user_id = snap_user.getUser_id();
-                    if(user_id.equals(snap_user_id)){
-                        current_user = snap_user;
-                        break;
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
-        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user != null) {
-            if (current_user.getUser_full_name() != null && current_user.getUser_full_name() == null)
-                nav_username.setText(current_user.getUser_full_name());
-            if (current_user.getUser_email() != null)
-                nav_email.setText(current_user.getUser_email());
-            //TODO load photo
-            /*
-            if (current_user.getUser_photo_firebase_URL() != null)
-                Glide.load(current_user.getUser_photo_firebase_URL()).into(nav_photo);
+        get_user_from_firebase();
 
-            SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-            Uri photouri = null;
-            if (userDetails.getString("photouri", null) != null) {
-                photouri = Uri.parse(userDetails.getString("photouri", null));
-                File f = new File(getRealPathFromURI(photouri));
-                Drawable d = Drawable.createFromPath(f.getAbsolutePath());
-                navigationView.getHeaderView(0).setBackground(d);
-            } else
-                nav_photo.setImageResource(R.drawable.blank_profile);
-            */
-        }
-
-        //recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        mRecyclerView.setHasFixedSize(true);
-        GridLayoutManager mLayoutManager = null;
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mLayoutManager = new GridLayoutManager(this, 1);
-            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1,5,true));
-        }
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mLayoutManager = new GridLayoutManager(this, 2);
-            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
-        }
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        adapter = new My_Reservations_Adapter(context, all_table_reservations);
-        mRecyclerView.setAdapter(adapter);
-        //delete with swipe
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
     private void progress_dialog(){
@@ -209,19 +128,193 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot revSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot revSnapshot : snapshot.getChildren()) {
                     TableReservation snap_table_reservations = revSnapshot.getValue(TableReservation.class);
                     String snap_user_id = snap_table_reservations.getUser_id();
-                    if(snap_user_id.equals(user_id)){
-                        for(TableReservation r_temp : all_table_reservations){
-                            if(r_temp.getTable_reservation_id().equals(snap_table_reservations.getTable_reservation_id())){
+                    if (snap_user_id.equals(user_id)) {
+                        for (TableReservation r_temp : all_table_reservations) {
+                            if (r_temp.getTable_reservation_id().equals(snap_table_reservations.getTable_reservation_id())) {
                                 all_table_reservations.remove(r_temp);
                                 break;
                             }
                         }
                         all_table_reservations.add(snap_table_reservations);
-                        adapter.notifyDataSetChanged();
+                        if(adapter!=null)
+                            adapter.notifyDataSetChanged();
                     }
+                }
+
+                //ordering from last done
+                Collections.reverse(all_table_reservations);
+
+                //recycler view
+                mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                mRecyclerView.setHasFixedSize(true);
+                GridLayoutManager mLayoutManager = null;
+                /*
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    mLayoutManager = new GridLayoutManager(this, 1);
+                    mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1,5,true));
+                }
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    mLayoutManager = new GridLayoutManager(this, 2);
+                    mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
+                }
+                */
+                mRecyclerView.setLayoutManager(mLayoutManager);
+                adapter = new My_Reservations_Adapter(context, all_table_reservations);
+                mRecyclerView.setAdapter(adapter);
+                //delete with swipe
+                ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+                ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
+                mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    private void get_user_from_firebase(){
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot usSnapshot: snapshot.getChildren()) {
+                    User snap_user = usSnapshot.getValue(User.class);
+                    String snap_user_id = snap_user.getUser_id();
+                    if(user_id.equals(snap_user_id)){
+                        current_user = snap_user;
+                        break;
+                    }
+                }
+
+                //TODO decomment handle logged/not logged user
+                /*
+                if(user_id==null){ //not logged
+                    Menu nav_Menu = navigationView.getMenu();
+                    nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
+                    nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
+                    nav_Menu.findItem(R.id.nav_my_reservations).setVisible(false);
+                    nav_Menu.findItem(R.id.nav_my_reviews).setVisible(false);
+                    nav_Menu.findItem(R.id.nav_my_favorites).setVisible(false);
+                }
+                else{ //logged
+                    //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
+                }
+                */
+
+                //navigation drawer
+                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                    @SuppressWarnings("StatementWithEmptyBody")
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem item) {
+                        // Handle navigation view item clicks here.
+                        int id = item.getItemId();
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if(id==R.id.nav_owner){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    MainActivity.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        }
+                        else if(id==R.id.nav_home){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserRestaurantList.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        }
+                        else if(id==R.id.nav_login){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserRestaurantList.class);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.nav_my_profile) {
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserProfile.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.nav_my_orders) {
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    MyOrdersActivity.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.nav_my_reservations){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    UserMyReservations.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("user_id", user_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        } else if(id==R.id.nav_my_reviews){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    MyReviewsActivity.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("user_id", user_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        } else if(id==R.id.nav_my_favourites){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    UserMyFavourites.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("user_id", user_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        }
+
+                        drawer.closeDrawer(GravityCompat.START);
+                        return true;
+                    }
+                });
+                TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+                if(current_user != null) {
+                    if (current_user.getUser_full_name() != null && current_user.getUser_full_name() == null)
+                        nav_username.setText(current_user.getUser_full_name());
+                    if (current_user.getUser_email() != null)
+                        nav_email.setText(current_user.getUser_email());
+                    //TODO load photo
+                    /*
+                    if (current_user.getUser_photo_firebase_URL() != null)
+                        Glide.load(current_user.getUser_photo_firebase_URL()).into(nav_photo);
+
+                    SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+                    Uri photouri = null;
+                    if (userDetails.getString("photouri", null) != null) {
+                        photouri = Uri.parse(userDetails.getString("photouri", null));
+                        File f = new File(getRealPathFromURI(photouri));
+                        Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+                        navigationView.getHeaderView(0).setBackground(d);
+                    } else
+                        nav_photo.setImageResource(R.drawable.blank_profile);
+                    */
                 }
 
                 progressDialog.dismiss();
@@ -266,89 +359,6 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         } else {
             super.onBackPressed();
         }
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.nav_owner){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MainActivity.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        }
-        else if(id==R.id.nav_home){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantList.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        }
-        else if(id==R.id.nav_login){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantList.class);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.nav_my_profile) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserProfile.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.nav_my_orders) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MyOrdersActivity.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.nav_my_reservations){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    UserMyReservations.class);
-            Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        } else if(id==R.id.nav_my_reviews){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    MyReviewsActivity.class);
-            Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        } else if(id==R.id.nav_my_favourites){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    UserMyFavourites.class);
-            Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
 

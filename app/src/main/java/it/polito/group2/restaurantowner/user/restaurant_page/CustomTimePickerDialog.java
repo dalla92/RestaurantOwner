@@ -83,11 +83,11 @@ public class CustomTimePickerDialog extends TimePickerDialog {
                 List<String> displayed_hours_values = new ArrayList<String>();
                 //find hours of lunch
                 for (RestaurantTimeSlot o : this.open_times) {
-                        if (o.getDay_of_week() == Integer.parseInt(weekday)) {
+                        if (o.getDay_of_week()+1 == Integer.parseInt(weekday)) {
                             if (o.isLunch()==true) {
                                 int open_time = Integer.parseInt(o.getOpen_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                 int close_time = Integer.parseInt(o.getClose_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
-                                for (int i = open_time; i < close_time - 1; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50
+                                for (int i = open_time; i < close_time; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50
                                     displayed_hours_values.add(String.valueOf(i));
                                 }
                             }
@@ -95,19 +95,21 @@ public class CustomTimePickerDialog extends TimePickerDialog {
                 }
                 //find hours of dinner
                 for (RestaurantTimeSlot o : this.open_times) {
-                    if (o.getDay_of_week() == Integer.parseInt(weekday)) {
+                    if (o.getDay_of_week()+1 == Integer.parseInt(weekday)) {
                         if (o.isDinner()==true) {
                                 int open_time = Integer.parseInt(o.getOpen_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                 int close_time = Integer.parseInt(o.getClose_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
-                                for (int i = open_time; i < close_time - 1; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50
+                                for (int i = open_time; i < close_time; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50
                                     displayed_hours_values.add(String.valueOf(i));
                                 }
                             }
                         }
                 }
-                if(displayed_hours_values != null && !displayed_hours_values.isEmpty())
-                mHourSpinner.setDisplayedValues(displayed_hours_values
-                        .toArray(new String[0]));
+                if(displayed_hours_values != null && !displayed_hours_values.isEmpty()) {
+                    mHourSpinner.setMaxValue(displayed_hours_values.size()-1);
+                    mHourSpinner.setDisplayedValues(displayed_hours_values
+                            .toArray(new String[0]));
+                }
             }
 
         } catch (Exception e) {

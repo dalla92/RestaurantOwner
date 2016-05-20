@@ -71,7 +71,7 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
 
         //get the right restaurant
         if(restaurant_id==null)
-            restaurant_id = "fake_restaurant_id";
+            restaurant_id = "-KI8xQ4PDVSKKjnRGmdG";
 
         //get and fill related data
         get_data_from_firebase();
@@ -120,6 +120,13 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
                                         }
                                     }
                                 }
+                                Intent intent1 = new Intent(
+                                        getApplicationContext(),
+                                        MenuRestaurant_edit.class);
+                                if (meal_to_edit != null) {
+                                    intent1.putExtra("meal", meal_to_edit);
+                                    startActivityForResult(intent1, MODIFY_MEAL);
+                                }
                             }
 
                             @Override
@@ -127,13 +134,6 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
                                 System.out.println("The read failed: " + firebaseError.getMessage());
                             }
                         });
-                        Intent intent1 = new Intent(
-                                getApplicationContext(),
-                                MenuRestaurant_edit.class);
-                        if (meal_to_edit != null) {
-                            intent1.putExtra("meal", meal_to_edit);
-                            startActivityForResult(intent1, MODIFY_MEAL);
-                        }
                     }
                 }));
         adapter = new Adapter_Meals(this, 0, meals, restaurant_id);
@@ -179,14 +179,15 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         progress_dialog();
 
         //my_restaurant
+        //TODO optimize research here
         DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot meSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot meSnapshot : snapshot.getChildren()) {
                     Meal snap_meal = meSnapshot.getValue(Meal.class);
                     String snap_restaurant_id = snap_meal.getRestaurant_id();
-                    if(snap_restaurant_id.equals(restaurant_id)) {
+                    if (snap_restaurant_id.equals(restaurant_id)) {
                         for (Meal m_temp : meals) {
                             if (m_temp.getMeal_id().equals(snap_meal.getMeal_id())) {
                                 meals.remove(m_temp);
@@ -197,14 +198,16 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
                         adapter.notifyDataSetChanged();
                     }
                 }
+
+                progressDialog.dismiss();
             }
+
             @Override
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
 
-        progressDialog.dismiss();
     }
 
     @Override

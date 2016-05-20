@@ -78,7 +78,7 @@ public class Adapter_Reviews extends RecyclerView.Adapter<Adapter_Reviews.Review
         /*if(reviews.get(i).getUserphoto()!=null)
             reviewViewHolder.userPhoto.setImageResource(Integer.parseInt(reviews.get(i).getUserphoto()));*/
 
-        String comment_ell = reviews.get(i).getReview_comment().substring(0, 7);
+        String comment_ell = reviews.get(i).getReview_comment().substring(0, 4);
         comment_ell = comment_ell +  this.context.getResources().getString(R.string.show_more);
         reviewViewHolder.comment.setText(comment_ell);
 

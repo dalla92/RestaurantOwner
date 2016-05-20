@@ -170,6 +170,8 @@ public class FragmentOtherInfo extends Fragment {
                 ma.setMeal_addition_price(0.0);
                 ma.setIs_addition_selected(false);
                 ma.setMeal_addition_id(UUID.randomUUID().toString());
+                if(childMealAdditions==null)
+                    childMealAdditions = new ArrayList<MealAddition>();
                 childMealAdditions.add(ma);
                 additions_adapter.setChildItems(childMealAdditions);
                 additions.expandGroup(0);

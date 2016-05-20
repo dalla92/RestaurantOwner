@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner.firebasedata;
 import android.graphics.Bitmap;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 /**
  * Created by Alessio on 16/05/2016.
@@ -14,8 +15,8 @@ public class Offer {
     private String restaurant_id;
     private String offer_name;
     private String offer_description;
-    private Calendar offer_start_date;
-    private Calendar offer_end_date;
+    private GregorianCalendar offer_start_date;
+    private GregorianCalendar offer_end_date;
     private boolean is_offer_at_lunch;
     private boolean is_offer_at_dinner;
     private String offer_meal_id;
@@ -59,19 +60,19 @@ public class Offer {
         this.offer_description = offer_description;
     }
 
-    public Calendar getOffer_start_date() {
+    public GregorianCalendar getOffer_start_date() {
         return offer_start_date;
     }
 
-    public void setOffer_start_date(Calendar offer_start_date) {
+    public void setOffer_start_date(GregorianCalendar offer_start_date) {
         this.offer_start_date = offer_start_date;
     }
 
-    public Calendar getOffer_end_date() {
+    public GregorianCalendar getOffer_end_date() {
         return offer_end_date;
     }
 
-    public void setOffer_end_date(Calendar offer_end_date) {
+    public void setOffer_end_date(GregorianCalendar offer_end_date) {
         this.offer_end_date = offer_end_date;
     }
 

@@ -97,7 +97,7 @@ public class Restaurant_page extends AppCompatActivity
             restaurant_id = b.getString("RestaurantId");
         */
         if(restaurant_id==null)
-            restaurant_id = "fake_restaurant_id";
+            restaurant_id = "-KI8xQ4PDVSKKjnRGmdG";
 
         //get and fill related data
         get_data_from_firebase();
@@ -187,6 +187,7 @@ public class Restaurant_page extends AppCompatActivity
         progress_dialog();
 
         //my_restaurant
+        //TODO optimize research here
         DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -201,6 +202,8 @@ public class Restaurant_page extends AppCompatActivity
                 }
                 if(my_restaurant!=null)
                     fill_data();
+
+                progressDialog.dismiss();
             }
             @Override
             public void onCancelled(DatabaseError firebaseError) {

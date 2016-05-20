@@ -567,7 +567,7 @@ public class DataInitialization {
         of.setOffer_description("Due porzioni di pasta al prezzo di una");
         Calendar cal = Calendar.getInstance();
         cal.set(2016, 5, 25);
-        of.setOffer_end_date(cal);
+        of.setOffer_end_date((GregorianCalendar)cal);
         of.setOffer_id(offer_id);
         of.setOffer_meal_name("Pasta col pomodoro");
         of.setOffer_meal_id(meal_id);
@@ -582,7 +582,7 @@ public class DataInitialization {
         of2.setOffer_description("Per ogni porzione di carne arrostita, una bibita in omaggio");
         Calendar cal2 = Calendar.getInstance();
         cal2.set(2016, 5, 25);
-        of2.setOffer_end_date(cal2);
+        of2.setOffer_end_date((GregorianCalendar)cal2);
         of2.setOffer_id(offer_id2);
         of2.setOffer_meal_name("Carne arrostita");
         of2.setOffer_meal_id(meal_id2);
@@ -821,7 +821,7 @@ public class DataInitialization {
         t.setRestaurant_id(restaurant_id);
         Calendar cal = Calendar.getInstance();
         cal.set(2016, 5, 25);
-        t.setTable_reservation_date(cal);
+        t.setTable_reservation_date((GregorianCalendar)cal);
         t.setTable_reservation_guests_number(3);
         t.setTable_reservation_id(table_reservation_id);
         t.setUser_full_name("Paolo Parisi");
@@ -832,7 +832,7 @@ public class DataInitialization {
         t2.setRestaurant_id(restaurant_id);
         Calendar cal2 = Calendar.getInstance();
         cal2.set(2016, 5, 26);
-        t2.setTable_reservation_date(cal2);
+        t2.setTable_reservation_date((GregorianCalendar)cal2);
         t2.setTable_reservation_guests_number(13);
         t2.setTable_reservation_id(table_reservation_id2);
         t2.setUser_full_name("Alessandro Del Piero");
