@@ -12,12 +12,14 @@ public class MealModel {
     private String id;
     private String name;
     private Meal meal;
+    private Integer quantity;
     private ArrayList<AdditionModel> additionModel = new ArrayList<AdditionModel>();
 
-    public MealModel(String id, String name, Meal meal) {
+    public MealModel(String id, String name, Meal meal, Integer quantity) {
         this.id = id;
         this.name = name;
         this.meal = meal;
+        this.quantity = quantity;
     }
 
     public String getId() {
@@ -42,6 +44,14 @@ public class MealModel {
 
     public void setMeal(Meal meal) {
         this.meal = meal;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 
     public ArrayList<AdditionModel> getAdditionModel() {

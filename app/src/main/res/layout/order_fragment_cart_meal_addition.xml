@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="5dp">
 
     <TextView
-        android:id="@+id/label"
+        android:id="@+id/addition_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@+id/label"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:textSize="20dp" >
-    </TextView>
+        android:text="AdditionName"
+        android:textSize="20dp" />
+
+    <TextView
+        android:id="@+id/addition_price"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2.50"
+        android:textSize="20dp"
+        android:layout_alignParentRight="true"/>
 
 </RelativeLayout>

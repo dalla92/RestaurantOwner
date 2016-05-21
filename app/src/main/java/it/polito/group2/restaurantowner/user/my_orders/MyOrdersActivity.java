@@ -274,7 +274,7 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
                     aModel.setSelected(true);
                     additionList.add(aModel);
                 }
-                MealModel mModel = new MealModel(m.getMeal().getMealId(),m.getMeal().getMeal_name(),m.getMeal());
+                MealModel mModel = new MealModel(m.getMeal().getMealId(),m.getMeal().getMeal_name(),m.getMeal(),m.getQuantity());
                 mModel.setAdditionModel(additionList);
                 mealList.add(mModel);
             }

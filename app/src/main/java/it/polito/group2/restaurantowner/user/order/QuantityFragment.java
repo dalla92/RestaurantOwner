@@ -1,10 +1,8 @@
 package it.polito.group2.restaurantowner.user.order;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,15 +14,13 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 
-import java.util.Calendar;
-
 import it.polito.group2.restaurantowner.R;
 
-public class InfoFragment extends Fragment {
+public class QuantityFragment extends Fragment {
 
     private OnActionListener mCallback;
 
-    public InfoFragment() {}
+    public QuantityFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,7 +37,7 @@ public class InfoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.order_fragment_info, container, false);
+        View view = inflater.inflate(R.layout.order_fragment_quantity, container, false);
         NumberPicker qty = (NumberPicker)view.findViewById(R.id.meal_quantity);
         qty.setMinValue(1);
         qty.setMaxValue(30);
@@ -67,13 +63,13 @@ public class InfoFragment extends Fragment {
     }
 
     public interface OnActionListener {
-        public void onAddClicked(Integer quantity, String note);
+        public void onAddClicked(Integer quantity);
         public void onCartClicked();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.order_fragment_info_menu, menu);
+        inflater.inflate(R.menu.order_fragment_quantity_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -83,8 +79,7 @@ public class InfoFragment extends Fragment {
         if(id == R.id.action_add){
 
             NumberPicker qty = (NumberPicker)getView().findViewById(R.id.meal_quantity);
-            EditText note = (EditText)getView().findViewById(R.id.meal_note);
-            mCallback.onAddClicked(qty.getValue(), note.getText().toString());
+            mCallback.onAddClicked(qty.getValue());
             return true;
         }
         if(id == R.id.goto_cart){

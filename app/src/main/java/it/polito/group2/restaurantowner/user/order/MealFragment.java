@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.user.my_orders.*;
 
 public class MealFragment extends ListFragment {
 
@@ -42,7 +45,7 @@ public class MealFragment extends ListFragment {
         if (getArguments() != null) {
             categoryID = getArguments().getString(CATEGORY);
         }
-        modelList = getModel(categoryID);
+
         setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
@@ -62,8 +65,7 @@ public class MealFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        MealAdapter adapter = new MealAdapter(getActivity(), modelList);
-        setListAdapter(adapter);
+        setMealList();
     }
 
     @Override
@@ -111,11 +113,21 @@ public class MealFragment extends ListFragment {
         return super.onOptionsItemSelected(item);
     }
 
+    private void setMealList() {
+        modelList = getModel(categoryID);
+        final RecyclerView mealList = (RecyclerView) getView().findViewById(R.id.meal_list);
+        assert mealList != null;
+        mealList.setLayoutManager(new LinearLayoutManager(getContext()));
+        mealList.setNestedScrollingEnabled(false);
+        MealAdapter adapter = new MealAdapter(getContext(), modelList);
+        mealList.setAdapter(adapter);
+    }
+
     private ArrayList<MealModel> getModel(String categoryID) {
         ArrayList<MealModel> list = new ArrayList<MealModel>();
         ArrayList<Meal> categoryMeals = getMealList(categoryID);
         for(Meal m : categoryMeals) {
-            MealModel model = new MealModel(m.getMealId(), m.getMeal_name(), m);
+            MealModel model = new MealModel(m.getMealId(), m.getMeal_name(),m, 1);
             list.add(model);
         }
         return list;
@@ -132,6 +144,7 @@ public class MealFragment extends ListFragment {
             m.setCategory(categoryID);
             m.setMeal_name("meal "+i);
             m.setMealId("mealID"+i);
+            m.setMeal_price(7.5);
             mealList.add(m);
         }
         return mealList;

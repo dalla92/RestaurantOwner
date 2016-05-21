@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -48,7 +50,6 @@ public class CartFragment extends ListFragment {
         if (getArguments() != null) {
             order = (Order)getArguments().getSerializable(ORDER);
         }
-        modelList = getModel();
 
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
@@ -124,8 +125,7 @@ public class CartFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        CartMealAdapter adapter = new CartMealAdapter(getActivity(), modelList);
-        setListAdapter(adapter);
+        setCartList();
     }
 
     @Override
@@ -166,10 +166,21 @@ public class CartFragment extends ListFragment {
         public void onMealDeleted(Order order, String mealID);
     }
 
+    private void setCartList() {
+        modelList = getModel();
+        final RecyclerView cartMealList = (RecyclerView) getView().findViewById(R.id.order_meal_list);
+        assert cartMealList != null;
+        cartMealList.setLayoutManager(new LinearLayoutManager(getContext()));
+        cartMealList.setNestedScrollingEnabled(false);
+        CartMealAdapter adapter = new CartMealAdapter(getContext(), modelList);
+        cartMealList.setAdapter(adapter);
+
+    }
+
     private ArrayList<MealModel> getModel() {
         ArrayList<MealModel> list = new ArrayList<MealModel>();
         for(OrderMeal m : order.getMealList()) {
-            MealModel model = new MealModel(m.getMeal().getMealId(), m.getMeal().getMeal_name(), m.getMeal());
+            MealModel model = new MealModel(m.getMeal().getMealId(), m.getMeal().getMeal_name(), m.getMeal(), m.getQuantity());
             for(OrderMealAddition a : m.getAdditionList()) {
                 AdditionModel am = new AdditionModel(a.getAddition().getAddition_id(),
                         a.getAddition().getName(), true, a.getAddition());

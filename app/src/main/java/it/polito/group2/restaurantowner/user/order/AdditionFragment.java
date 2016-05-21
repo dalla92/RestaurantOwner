@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,7 +43,6 @@ public class AdditionFragment extends ListFragment {
         if (getArguments() != null) {
             mealID = getArguments().getString(MEAL);
         }
-        modelList = getModel(mealID);
         setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
@@ -61,8 +62,7 @@ public class AdditionFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        AdditionAdapter adapter = new AdditionAdapter(getActivity(), modelList);
-        setListAdapter(adapter);
+        setAdditionList();
     }
 
     @Override
@@ -115,6 +115,16 @@ public class AdditionFragment extends ListFragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setAdditionList() {
+        modelList = getModel(mealID);
+        final RecyclerView additionList = (RecyclerView) getView().findViewById(R.id.addition_list);
+        assert additionList != null;
+        additionList.setLayoutManager(new LinearLayoutManager(getContext()));
+        additionList.setNestedScrollingEnabled(false);
+        AdditionAdapter adapter = new AdditionAdapter(getContext(), modelList);
+        additionList.setAdapter(adapter);
     }
 
     private ArrayList<AdditionModel> getModel(String mealID) {

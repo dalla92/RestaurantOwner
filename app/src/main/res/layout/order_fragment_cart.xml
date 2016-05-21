@@ -5,11 +5,10 @@
     android:orientation="vertical"
     tools:context=".user.order.CartFragment">
 
-    <ListView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@android:id/list"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/order_meal_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"/>
+        android:layout_height="wrap_content" />
 
     <EditText
         android:layout_width="match_parent"

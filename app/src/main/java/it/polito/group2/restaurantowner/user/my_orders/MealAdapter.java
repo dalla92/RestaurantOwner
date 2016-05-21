@@ -31,6 +31,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         public TextView name;
         public TextView category;
         public TextView price;
+        public TextView quantity;
         public RecyclerView additionList;
 
         public MealViewHolder(View view){
@@ -38,6 +39,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
             name = (TextView) itemView.findViewById(R.id.meal_name);
             category = (TextView) itemView.findViewById(R.id.category_name);
             price = (TextView) itemView.findViewById(R.id.meal_price);
+            quantity = (TextView) itemView.findViewById(R.id.meal_quantity);
             additionList = (RecyclerView) itemView.findViewById(R.id.order_meal_addition_list);
         }
     }
@@ -53,6 +55,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         holder.name.setText(modelList.get(position).getName().toString());
         holder.category.setText(modelList.get(position).getMeal().getCategory().toString());
         holder.price.setText(formatEuro(modelList.get(position).getMeal().getMeal_price()));
+        holder.quantity.setText(modelList.get(position).getQuantity().toString());
         holder.additionList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.additionList.setNestedScrollingEnabled(false);
         AdditionAdapter adapter = new AdditionAdapter(context, modelList.get(position).getAdditionModel());

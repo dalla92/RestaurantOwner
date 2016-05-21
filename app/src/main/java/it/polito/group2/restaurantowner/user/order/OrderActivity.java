@@ -34,11 +34,12 @@ public class OrderActivity extends AppCompatActivity
         CategoryFragment.OnActionListener,
         MealFragment.OnActionListener,
         AdditionFragment.OnActionListener,
-        InfoFragment.OnActionListener,
+        QuantityFragment.OnActionListener,
         CartFragment.OnActionListener {
 
     private Order order;
     private OrderMeal meal;
+    private ArrayList<OrderMealAddition> additionList;
     private String user_id;
     private String restaurant_id;
 
@@ -223,24 +224,30 @@ public class OrderActivity extends AppCompatActivity
 
     @Override
     public void onNextClicked(ArrayList<MealAddition> additionList) {
+        this.additionList = new ArrayList<OrderMealAddition>();
         for(MealAddition ma : additionList) {
             OrderMealAddition addition = new OrderMealAddition();
             addition.setAddition(ma);
-            this.meal.getAdditionList().add(addition);
+            this.additionList.add(addition);
         }
-
-        InfoFragment infoFragment = new InfoFragment();
+        QuantityFragment quantityFragment = new QuantityFragment();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, infoFragment, "INFO");
+        transaction.replace(R.id.fragment_container, quantityFragment, "QUANTITY");
         transaction.addToBackStack(null);
         transaction.commit();
     }
 
     @Override
-    public void onAddClicked(Integer quantity, String note) {
+    public void onAddClicked(Integer quantity) {
         this.meal.setQuantity(quantity);
-        this.meal.setNote(note);
-        this.order.getMealList().add(meal);
+        this.meal.setAdditionList(this.additionList);
+        for(OrderMealAddition a : this.meal.getAdditionList()) {
+            this.meal.getMeal().setMeal_price(this.meal.getMeal().getMeal_price()+a.getAddition().getPrice());
+        }
+        this.additionList = null;
+        this.order.getMealList().add(this.meal);
+        this.order.setPrice((float)(this.order.getPrice()+(meal.getMeal().getMeal_price()*meal.getQuantity())));
+        this.meal = null;
         CartFragment cartFragment = CartFragment.newInstance(this.order);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, cartFragment, "CART");

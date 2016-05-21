@@ -2,8 +2,11 @@ package it.polito.group2.restaurantowner.user.order;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,7 +21,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.MealAddition;
 import it.polito.group2.restaurantowner.data.MenuCategory;
 
-public class CategoryFragment extends ListFragment {
+public class CategoryFragment extends Fragment {
 
     private static final String RESTAURANT = "restaurantID";
     private String restaurantID;
@@ -42,7 +45,6 @@ public class CategoryFragment extends ListFragment {
         if (getArguments() != null) {
             restaurantID = getArguments().getString(RESTAURANT);
         }
-        modelList = getModel(restaurantID);
         setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
@@ -62,11 +64,10 @@ public class CategoryFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        CategoryAdapter adapter = new CategoryAdapter(getActivity(), modelList);
-        setListAdapter(adapter);
+        setCategoryList();
     }
 
-    @Override
+    //@Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         mCallback.onCategorySelected(modelList.get(position).getCategory());
     }
@@ -109,6 +110,16 @@ public class CategoryFragment extends ListFragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setCategoryList() {
+        modelList = getModel(restaurantID);
+        final RecyclerView categoryList = (RecyclerView) getView().findViewById(R.id.category_list);
+        assert categoryList != null;
+        categoryList.setLayoutManager(new LinearLayoutManager(getContext()));
+        categoryList.setNestedScrollingEnabled(false);
+        CategoryAdapter adapter = new CategoryAdapter(getContext(), modelList);
+        categoryList.setAdapter(adapter);
     }
 
     private ArrayList<CategoryModel> getModel(String restaurantID) {
