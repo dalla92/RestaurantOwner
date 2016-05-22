@@ -68,11 +68,11 @@ public class FragmentMainInfo extends Fragment {
             args.putDouble("meal_price", m.getMeal_price());
             //TODO upload both thumbnail and full size pictures
             args.putString("meal_photo", m.getMeal_photo_firebase_URL());
-            args.putBoolean("is_vegan", m.is_meal_vegan());
-            args.putBoolean("is_vegetarian", m.is_meal_vegetarian());
-            args.putBoolean("is_celiac", m.is_meal_celiac());
+            args.putBoolean("is_vegan", m.getMealVegan());
+            args.putBoolean("is_vegetarian", m.getMealVegetarian());
+            args.putBoolean("is_celiac", m.getMealGlutenFree());
             args.putString("category", m.getMeal_category());
-            args.putBoolean("take_away", m.is_meal_take_away());
+            args.putBoolean("take_away", m.getMealTakeAway());
         }
         fragment.setArguments(args);
         Log.d("aaa", "passed in fragment main info1");

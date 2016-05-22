@@ -84,7 +84,7 @@ public class CustomTimePickerDialog extends TimePickerDialog {
                 //find hours of lunch
                 for (RestaurantTimeSlot o : this.open_times) {
                         if (o.getDay_of_week()+1 == Integer.parseInt(weekday)) {
-                            if (o.isLunch()==true) {
+                            if (o.getLunch()==true) {
                                 int open_time = Integer.parseInt(o.getOpen_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                 int close_time = Integer.parseInt(o.getClose_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                 for (int i = open_time; i < close_time; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50
@@ -96,7 +96,7 @@ public class CustomTimePickerDialog extends TimePickerDialog {
                 //find hours of dinner
                 for (RestaurantTimeSlot o : this.open_times) {
                     if (o.getDay_of_week()+1 == Integer.parseInt(weekday)) {
-                        if (o.isDinner()==true) {
+                        if (o.getDinner()==true) {
                                 int open_time = Integer.parseInt(o.getOpen_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                 int close_time = Integer.parseInt(o.getClose_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                 for (int i = open_time; i < close_time; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50

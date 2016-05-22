@@ -1,6 +1,5 @@
 package it.polito.group2.restaurantowner.owner;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -11,7 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -21,13 +19,6 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
@@ -110,11 +101,11 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         current_meal.setMeal_price(meal_price);
         //TODO upload both thumbnail and full size pictures
         //current_meal.setMeal_photo_firebase_URL(photouri);
-        current_meal.setIs_meal_celiac(is_celiac);
-        current_meal.setIs_meal_vegan(is_vegan);
-        current_meal.setIs_meal_vegetarian(is_vegetarian);
+        current_meal.setMealGlutenFree(is_celiac);
+        current_meal.setMealVegan(is_vegan);
+        current_meal.setMealVegetarian(is_vegetarian);
         current_meal.setMeal_category(category);
-        current_meal.setIs_meal_take_away(take_away);
+        current_meal.setMealTakeAway(take_away);
     }
 
     @Override

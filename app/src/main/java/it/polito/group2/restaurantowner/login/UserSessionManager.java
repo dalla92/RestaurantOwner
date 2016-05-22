@@ -75,7 +75,7 @@ public class UserSessionManager {
             if (provider.equals("facebook"))
                 LoginManager.getInstance().logOut();
 
-            if(provider.equals("google"))
+            if(provider.equals("google.com"))
 
         }*/
 

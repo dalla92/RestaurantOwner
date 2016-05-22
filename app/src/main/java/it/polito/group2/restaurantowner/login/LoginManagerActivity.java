@@ -32,13 +32,23 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class LoginManagerActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -49,6 +59,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private UserSessionManager sessionManager;
     private TextInputLayout inputLayoutPassword, inputLayoutEmail;
@@ -65,6 +76,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
 
         sessionManager = new UserSessionManager(this);
         callbackManager = CallbackManager.Factory.create();
+        firebase = FirebaseDatabase.getInstance();
 
         LoginButton fbButton = (LoginButton) findViewById(R.id.fb_login_button);
         fbButton.setReadPermissions("public_profile", "email");
@@ -82,6 +94,8 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
         findViewById(R.id.login_btn).setOnClickListener(this);
 
+        findViewById(R.id.register_link).setOnClickListener(this);
+        findViewById(R.id.forgot_password_link).setOnClickListener(this);
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -103,7 +117,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 if (user != null) {
                     String fullName = user.getDisplayName();
                     String email = user.getEmail();
-                    String userID = user.getUid();
+                    final String userID = user.getUid();
                     String providerId = null;
                     for (UserInfo profile : user.getProviderData()) {
                         // Id of the provider (ex: google.com)
@@ -112,6 +126,54 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
 
                     if(providerId == null)
                         providerId = "password";
+
+                    final String targetProvider = providerId.equals("google.com")? "google" : providerId;
+                    if(!providerId.equals("password")) {
+
+                        final User myUser = new User(userID, fullName, "", email);
+                        myUser.getProviders().put(providerId, true);
+
+                        final DatabaseReference userRef = firebase.getReference("users");
+                        final Query userQuery = userRef.orderByChild("user_email").equalTo(email);
+                        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                if (!dataSnapshot.hasChildren()) {
+                                    userRef.child(userID).setValue(myUser, new DatabaseReference.CompletionListener() {
+                                        @Override
+                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                            if (databaseError != null)
+                                                Log.d("prova", "write error");
+                                            else {
+                                                Log.d("prova", "done");
+                                                finish();
+                                            }
+
+                                        }
+                                    });
+                                }
+                                else{
+                                    User target = null;
+                                    for(DataSnapshot data : dataSnapshot.getChildren()) {
+                                        target = data.getValue(User.class);
+                                    }
+                                    Log.d("prova", target.getUser_email() + " " + target.getUser_full_name() + " " + target.getUser_id() + " " + target.getProviders());
+                                    HashMap<String, Boolean> providers = target.getProviders();
+                                    if(!providers.containsKey(targetProvider)) {
+                                        providers.put(targetProvider, true);
+                                        userRef.child(userID).child("providers").setValue(providers);
+                                    }
+                                }
+
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                Log.d("prova", "check user calcelled!");
+                            }
+                        });
+                    }
 
                     sessionManager.createUserLoginSession(userID, providerId);
 
@@ -128,23 +190,45 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                     // Staring UserRestaurantList Activity
                     startActivity(i);
 
-                    //ending Log In Activity
-                    finish();
-
                     Log.d("prova", fullName + " " + email + " " + userID + " " + providerId);
                 } else {
                     // User is signed out
-                    Log.d("state", "onAuthStateChanged:signed_out");
+                    Log.d("prova", "Login: onAuthStateChanged:signed_out");
                 }
             }
         };
     }
 
     private void handleAuthToken(String provider, String accessToken) {
-        if(provider.equals("facebook"))
+        if (provider.equals("facebook")) {
             firebaseAuthWithFacebook(accessToken);
-        if(provider.equals("google"))
+        }
+        if (provider.equals("google")) {
             firebaseAuthWithGoogle(accessToken);
+        }
+        if(provider.equals("password")){
+            firebaseAuthWithPassword();
+        }
+
+    }
+
+    private void firebaseAuthWithPassword() {
+        mAuth.signInWithEmailAndPassword(inputEmail.getText().toString().trim(), inputPassword.getText().toString().trim())
+                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+
+                            // If sign in fails, display a message to the user. If sign in succeeds
+                            // the auth state listener will be notified and logic to handle the
+                            // signed in user can be handled in the listener.
+                            if (!task.isSuccessful()) {
+                                task.getException().printStackTrace();
+                                Toast.makeText(LoginManagerActivity.this, "Authentication with password failed on firebase.",
+                                        Toast.LENGTH_SHORT).show();
+                                hideProgressDialog();
+                            }
+                        }
+                    });
     }
 
     private void firebaseAuthWithGoogle(String accessToken) {
@@ -159,8 +243,12 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Toast.makeText(LoginManagerActivity.this, "Authentication failed.",
+                            task.getException().printStackTrace();
+                            FirebaseUser user =task.getResult().getUser();
+                            Log.d("prova", user.getDisplayName() + " " + user.getProviderId() + " " +user.getEmail());
+                            Toast.makeText(LoginManagerActivity.this, "Authentication with google failed on firebase.",
                                     Toast.LENGTH_SHORT).show();
+                            hideProgressDialog();
                         }
                     }
                 });
@@ -177,8 +265,10 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Toast.makeText(LoginManagerActivity.this, "Authentication failed.",
+                            task.getException().printStackTrace();
+                            Toast.makeText(LoginManagerActivity.this, "Authentication with facebook failed on firebase",
                                     Toast.LENGTH_SHORT).show();
+                            hideProgressDialog();
                         }
                     }
                 });
@@ -220,20 +310,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
             return;
         }
 
-        mAuth.signInWithEmailAndPassword(inputEmail.getText().toString(), inputPassword.getText().toString())
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Toast.makeText(LoginManagerActivity.this, "Authentication failed.",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
+        handleAuthToken("password", null);
     }
 
     private void signInWithGoogle() {
@@ -264,7 +341,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         String email = inputEmail.getText().toString().trim();
 
         if (email.isEmpty() || !isValidEmail(email)) {
-            inputLayoutEmail.setError(getString(R.string.login_err_msg_email));
+            inputLayoutEmail.setError(getString(R.string.err_msg_email));
             requestFocus(inputEmail);
             return false;
         } else {
@@ -276,7 +353,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
 
     private boolean validatePassword() {
         if (inputPassword.getText().toString().trim().isEmpty()) {
-            inputLayoutPassword.setError(getString(R.string.login_err_msg_password));
+            inputLayoutPassword.setError(getString(R.string.err_msg_password));
             requestFocus(inputPassword);
             return false;
         } else {
@@ -353,7 +430,12 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
             case R.id.login_btn:
                 showProgressDialog();
                 signInWithPassword();
+                break;
 
+            case R.id.register_link:
+                Intent i = new Intent(LoginManagerActivity.this, RegisterActivity.class);
+                startActivity(i);
+                break;
         }
     }
 

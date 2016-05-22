@@ -88,7 +88,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private User current_user;
     private boolean bookmark = false;
     private ProgressDialog mProgressDialog;
-    private  FirebaseDatabase firebase;
+    private FirebaseDatabase firebase;
     private UserSessionManager sessionManager;
     private RecyclerView reviewList;
 
@@ -98,7 +98,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_restaurant);
 
-        /*
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -120,9 +119,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         firebase = FirebaseDatabase.getInstance();
 
-        DatabaseReference restaurantRef = firebase.getReference("restaurants/-KI8xQ4PDVSKKjnRGmdG");
-
-        //Query restaurantRef = restaurantsRef.orderByChild("restaurant_id").equalTo("-KI8O-cx7-lFjei0_dwm");
+        DatabaseReference restaurantRef = firebase.getReference("restaurants/-KIMqPtRSEdm0Cvfc3Za");
 
         showProgressDialog();
 
@@ -137,7 +134,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 hideProgressDialog();
                 setRestaurantInfo();
 
-                Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo("-KI8xQ4PDVSKKjnRGmdG");
+                Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo("-KIMlQqpVOfKUrKec-tH");
                 reviewsRef.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -202,11 +199,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 Glide.with(this).load(photoURL).into(image);
         }
 
-        /*reviews = getReviewsJson();
-        Collections.sort(reviews)
+
         offers = getOffersJSON();
         categories = getCategoriesJson();
 
+        /*
         //TODO Rearrange the following code
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
             userID = getIntent().getExtras().getString("user_id");
@@ -232,7 +229,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             current_user.setPassword("tipiacerebbe");
             current_user.setPhone_number("0989897879789");
             current_user.setVat_number("sw8d9wd8w9d8w9d9");
-        }
+        }*/
 
         setBookmarkButton();
         addInfoExpandAnimation();
@@ -243,7 +240,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         setRestaurantMenu();
         setDrawer(toolbar);
 
-        */
 
     }
 
@@ -273,8 +269,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
-        Log.d("prova", menu.getItem(2).getTitle().toString());
-        Log.d("prova", menu.getItem(3).getTitle().toString());
         MenuItem loginItem = menu.findItem(R.id.nav_login);
         MenuItem logoutItem = menu.findItem(R.id.nav_logout);
         MenuItem myProfileItem = menu.findItem(R.id.nav_my_profile);
@@ -651,7 +645,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     private void setRestaurantOffers() {
-        if(offers.isEmpty()){
+        if(offers == null || offers.isEmpty()){
             CardView cardOffers = (CardView) findViewById(R.id.restaurant_offers);
             cardOffers.setVisibility(View.GONE);
         }

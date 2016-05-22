@@ -1,8 +1,5 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
-import android.graphics.Bitmap;
-
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 /**
@@ -17,8 +14,8 @@ public class Offer {
     private String offer_description;
     private GregorianCalendar offer_start_date;
     private GregorianCalendar offer_end_date;
-    private boolean is_offer_at_lunch;
-    private boolean is_offer_at_dinner;
+    private Boolean offerAtLunch;
+    private Boolean offerAtDinner;
     private String offer_meal_id;
     private String offer_meal_name;
     private String offer_meal_thumbnail; //for meal preview with Glide in AsyncTask
@@ -76,20 +73,20 @@ public class Offer {
         this.offer_end_date = offer_end_date;
     }
 
-    public boolean is_offer_at_lunch() {
-        return is_offer_at_lunch;
+    public Boolean getOfferAtLunch() {
+        return offerAtLunch;
     }
 
-    public void setIs_offer_at_lunch(boolean is_offer_at_lunch) {
-        this.is_offer_at_lunch = is_offer_at_lunch;
+    public void setOfferAtLunch(Boolean offerAtLunch) {
+        this.offerAtLunch = offerAtLunch;
     }
 
-    public boolean is_offer_at_dinner() {
-        return is_offer_at_dinner;
+    public Boolean getOfferAtDinner() {
+        return offerAtDinner;
     }
 
-    public void setIs_offer_at_dinner(boolean is_offer_at_dinner) {
-        this.is_offer_at_dinner = is_offer_at_dinner;
+    public void setOfferAtDinner(Boolean offerAtDinner) {
+        this.offerAtDinner = offerAtDinner;
     }
 
     public String getOffer_meal_id() {

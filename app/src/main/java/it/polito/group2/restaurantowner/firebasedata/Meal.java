@@ -17,13 +17,13 @@ public class Meal implements Serializable {
     private int meal_cooking_time;
     private String meal_description;
     private String meal_category;
-    private boolean is_meal_vegan;
-    private boolean is_meal_vegetarian;
-    private boolean is_meal_celiac;
-    private boolean is_meal_available;
+    private Boolean mealVegan;
+    private Boolean mealVegetarian;
+    private Boolean mealGlutenFree;
+    private Boolean mealAvailable;
     private ArrayList<MealAddition> meal_additions;
     private ArrayList<MealCategory> meal_tags;
-    private boolean is_meal_take_away;
+    private Boolean mealTakeAway;
     private String meal_thumbnail; //for meal preview with Glide in AsyncTask
     private String meal_photo_firebase_URL; //for enlarging image with Glide in AsyncTask
 
@@ -87,36 +87,36 @@ public class Meal implements Serializable {
         this.meal_category = meal_category;
     }
 
-    public boolean is_meal_vegan() {
-        return is_meal_vegan;
+    public Boolean getMealVegan() {
+        return mealVegan;
     }
 
-    public void setIs_meal_vegan(boolean is_meal_vegan) {
-        this.is_meal_vegan = is_meal_vegan;
+    public void setMealVegan(Boolean mealVegan) {
+        this.mealVegan = mealVegan;
     }
 
-    public boolean is_meal_vegetarian() {
-        return is_meal_vegetarian;
+    public Boolean getMealVegetarian() {
+        return mealVegetarian;
     }
 
-    public void setIs_meal_vegetarian(boolean is_meal_vegetarian) {
-        this.is_meal_vegetarian = is_meal_vegetarian;
+    public void setMealVegetarian(Boolean mealVegetarian) {
+        this.mealVegetarian = mealVegetarian;
     }
 
-    public boolean is_meal_celiac() {
-        return is_meal_celiac;
+    public Boolean getMealGlutenFree() {
+        return mealGlutenFree;
     }
 
-    public void setIs_meal_celiac(boolean is_meal_celiac) {
-        this.is_meal_celiac = is_meal_celiac;
+    public void setMealGlutenFree(Boolean mealGlutenFree) {
+        this.mealGlutenFree = mealGlutenFree;
     }
 
-    public boolean is_meal_available() {
-        return is_meal_available;
+    public Boolean getMealAvailable() {
+        return mealAvailable;
     }
 
-    public void setIs_meal_available(boolean is_meal_available) {
-        this.is_meal_available = is_meal_available;
+    public void setMealAvailable(Boolean mealAvailable) {
+        this.mealAvailable = mealAvailable;
     }
 
     public ArrayList<MealAddition> getMeal_additions() {
@@ -135,12 +135,12 @@ public class Meal implements Serializable {
         this.meal_tags = meal_tags;
     }
 
-    public boolean is_meal_take_away() {
-        return is_meal_take_away;
+    public Boolean getMealTakeAway() {
+        return mealTakeAway;
     }
 
-    public void setIs_meal_take_away(boolean is_meal_take_away) {
-        this.is_meal_take_away = is_meal_take_away;
+    public void setMealTakeAway(Boolean mealTakeAway) {
+        this.mealTakeAway = mealTakeAway;
     }
 
     public String getMeal_thumbnail() {

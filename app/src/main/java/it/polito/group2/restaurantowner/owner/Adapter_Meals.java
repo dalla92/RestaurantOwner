@@ -18,17 +18,9 @@ import android.widget.TextView;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 
 /**
@@ -102,7 +94,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
             }
         });
         MealViewHolder.availability.setOnCheckedChangeListener(null);
-        MealViewHolder.availability.setChecked(meals.get(i).is_meal_available());
+        MealViewHolder.availability.setChecked(meals.get(i).getMealAvailable());
         MealViewHolder.availability.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,13 +116,13 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
                 /*
                 String meal_key = meals.get(index).getMeal_id();
                 DatabaseReference ref = new DatabaseReference("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
-                if (buttonView.isPressed() && meals.get(index).is_meal_available() == true)
+                if (buttonView.isPressed() && meals.get(index).getMealAvailable() == true)
                     ref.getReference("_meal_available").setValue(false);
-                if (buttonView.isPressed() && meals.get(index).is_meal_available()==false)
+                if (buttonView.isPressed() && meals.get(index).getMealAvailable()==false)
                     ref.getReference("_meal_available").setValue(true);
-                if(!buttonView.isPressed() && meals.get(index).is_meal_available()==true)
+                if(!buttonView.isPressed() && meals.get(index).getMealAvailable()==true)
                     ref.getReference("_meal_available").setValue(true);
-                if(!buttonView.isPressed() && meals.get(index).is_meal_available()==false)
+                if(!buttonView.isPressed() && meals.get(index).getMealAvailable()==false)
                     ref.getReference("_meal_available").setValue(false);
 
             }

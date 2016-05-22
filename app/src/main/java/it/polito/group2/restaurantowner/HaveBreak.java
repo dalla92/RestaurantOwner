@@ -19,6 +19,5 @@ public class HaveBreak extends Application {
         //initialize data
         /*DataInitialization d = new DataInitialization();
         d.init();*/
-
     }
 }

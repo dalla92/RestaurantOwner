@@ -17,24 +17,24 @@ public class Restaurant implements Serializable {
     private String restaurant_telephone_number;
     private float restaurant_rating; //android:stepSize="0.01"
     private ArrayList<RestaurantTimeSlot> restaurant_time_slot;
-    private HashMap<String, Boolean> favourites_users;
+    private HashMap<String, Boolean> favouriteUsers;
     private String restaurant_photo_firebase_URL; //with Glide in AsyncTask
     private String restaurant_category;
-    private Boolean is_fidelity_program_accepted;
-    private Boolean is_table_reservation_allowed;
+    private Boolean fidelityProgramAccepted;
+    private Boolean tableReservationAllowed;
     private int restaurant_total_tables_number;
-    private Boolean is_take_away_allowed;
+    private Boolean takeAwayAllowed;
     private int restaurant_orders_per_hour;
     private int restaurant_squared_meters;
     private String restaurant_closest_metro;
     private String restaurant_closest_bus;
     private int restaurant_price_range;
-    private Boolean is_animal_allowed;
-    private Boolean is_celiac_friendly;
-    private Boolean is_tv_present;
-    private Boolean is_wifi_present;
-    private Boolean is_credit_card_accepted;
-    private Boolean is_air_conditioned_present;
+    private Boolean animalAllowed;
+    private Boolean celiacFriendly;
+    private Boolean tvPresent;
+    private Boolean wifiPresent;
+    private Boolean creditCardAccepted;
+    private Boolean airConditionedPresent;
     private double restaurant_latitude_position;
     private double restaurant_longitude_position;
 
@@ -42,12 +42,48 @@ public class Restaurant implements Serializable {
 
     }
 
-    public HashMap<String, Boolean> getFavourites_users() {
-        return favourites_users;
+    public HashMap<String, Boolean> getFavouriteUsers() {
+        return favouriteUsers;
     }
 
-    public void setFavourites_users(HashMap<String, Boolean> favourites_users) {
-        this.favourites_users = favourites_users;
+    public Boolean getFidelityProgramAccepted() {
+        return fidelityProgramAccepted;
+    }
+
+    public Boolean getTableReservationAllowed() {
+        return tableReservationAllowed;
+    }
+
+    public Boolean getTakeAwayAllowed() {
+        return takeAwayAllowed;
+    }
+
+    public Boolean getAnimalAllowed() {
+        return animalAllowed;
+    }
+
+    public Boolean getCeliacFriendly() {
+        return celiacFriendly;
+    }
+
+    public Boolean getTvPresent() {
+        return tvPresent;
+    }
+
+    public Boolean getWifiPresent() {
+        return wifiPresent;
+    }
+
+    public Boolean getCreditCardAccepted() {
+        return creditCardAccepted;
+    }
+
+    public Boolean getAirConditionedPresent() {
+        return airConditionedPresent;
+    }
+
+    public void setFavouriteUsers(HashMap<String, Boolean> favouriteUsers) {
+        this.favouriteUsers = favouriteUsers;
     }
 
     public String getRestaurant_id() {
@@ -122,20 +158,12 @@ public class Restaurant implements Serializable {
         this.restaurant_category = restaurant_category;
     }
 
-    public Boolean is_fidelity_program_accepted() {
-        return is_fidelity_program_accepted;
+    public void setFidelityProgramAccepted(Boolean fidelityProgramAccepted) {
+        this.fidelityProgramAccepted = fidelityProgramAccepted;
     }
 
-    public void setIs_fidelity_program_accepted(Boolean is_fidelity_program_accepted) {
-        this.is_fidelity_program_accepted = is_fidelity_program_accepted;
-    }
-
-    public Boolean is_table_reservation_allowed() {
-        return is_table_reservation_allowed;
-    }
-
-    public void setIs_table_reservation_allowed(Boolean is_table_reservation_allowed) {
-        this.is_table_reservation_allowed = is_table_reservation_allowed;
+    public void setTableReservationAllowed(Boolean tableReservationAllowed) {
+        this.tableReservationAllowed = tableReservationAllowed;
     }
 
     public int getRestaurant_total_tables_number() {
@@ -146,12 +174,8 @@ public class Restaurant implements Serializable {
         this.restaurant_total_tables_number = restaurant_total_tables_number;
     }
 
-    public Boolean is_take_away_allowed() {
-        return is_take_away_allowed;
-    }
-
-    public void setIs_take_away_allowed(Boolean is_take_away_allowed) {
-        this.is_take_away_allowed = is_take_away_allowed;
+    public void setTakeAwayAllowed(Boolean takeAwayAllowed) {
+        this.takeAwayAllowed = takeAwayAllowed;
     }
 
     public int getRestaurant_orders_per_hour() {
@@ -194,52 +218,30 @@ public class Restaurant implements Serializable {
         this.restaurant_price_range = restaurant_price_range;
     }
 
-    public Boolean is_animal_allowed() {
-        return is_animal_allowed;
+
+    public void setAnimalAllowed(Boolean animalAllowed) {
+        this.animalAllowed = animalAllowed;
     }
 
-    public void setIs_animal_allowed(Boolean is_animal_allowed) {
-        this.is_animal_allowed = is_animal_allowed;
+    public void setCeliacFriendly(Boolean celiacFriendly) {
+        this.celiacFriendly = celiacFriendly;
     }
 
-    public Boolean is_celiac_friendly() {
-        return is_celiac_friendly;
+    public void setTvPresent(Boolean tvPresent) {
+        this.tvPresent = tvPresent;
     }
 
-    public void setIs_celiac_friendly(Boolean is_celiac_friendly) {
-        this.is_celiac_friendly = is_celiac_friendly;
+
+    public void setWifiPresent(Boolean wifiPresent) {
+        this.wifiPresent = wifiPresent;
     }
 
-    public Boolean is_tv_present() {
-        return is_tv_present;
+    public void setCreditCardAccepted(Boolean creditCardAccepted) {
+        this.creditCardAccepted = creditCardAccepted;
     }
 
-    public void setIs_tv_present(Boolean is_tv_present) {
-        this.is_tv_present = is_tv_present;
-    }
-
-    public Boolean is_wifi_present() {
-        return is_wifi_present;
-    }
-
-    public void setIs_wifi_present(Boolean is_wifi_present) {
-        this.is_wifi_present = is_wifi_present;
-    }
-
-    public Boolean is_credit_card_accepted() {
-        return is_credit_card_accepted;
-    }
-
-    public void setIs_credit_card_accepted(Boolean is_credit_card_accepted) {
-        this.is_credit_card_accepted = is_credit_card_accepted;
-    }
-
-    public Boolean is_air_conditioned_present() {
-        return is_air_conditioned_present;
-    }
-
-    public void setIs_air_conditioned_present(Boolean is_air_conditioned_present) {
-        this.is_air_conditioned_present = is_air_conditioned_present;
+    public void setAirConditionedPresent(Boolean airConditionedPresent) {
+        this.airConditionedPresent = airConditionedPresent;
     }
 
     public double getRestaurant_latitude_position() {

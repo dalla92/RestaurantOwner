@@ -172,8 +172,20 @@
     <string name="title_activity_user_restaurant_list">UserRestaurantList</string>
     <string name="filter">Filter the restaurant list</string>
     <string name="forgot_password">Forgot password?</string>
-    <string name="login_err_msg_email">Enter a valid email address</string>
-    <string name="login_err_msg_password">Enter the password</string>
+    <string name="err_msg_email">Enter a valid email address</string>
+    <string name="err_msg_password">Password must be at least 6 characters long</string>
+    <string name="err_msg_confirm_password">The two passwords must be the same</string>
+    <string name="err_msg_first_name">Enter the first name</string>
+    <string name="err_msg_last_name">Enter the last name</string>
+    <string name="register_first_name">First Name</string>
+    <string name="register_last_name">Last Name</string>
+    <string name="register_email">Email</string>
+    <string name="register_password">Password</string>
+    <string name="register_confirm_password">Confirm password</string>
+    <string name="register_phone_number">Phone number (Optional)</string>
+    <string name="registration">Registration</string>
+    <string name="register_btn">Sign Up</string>
+    <string name="no_account">Don\'t have an account?</string>
     <!--string name="facebook_app_id">1003333209754047</string-->
     <string name="facebook_app_id">988598407901956</string>
     <string name="distance">Distance</string>
@@ -258,6 +270,21 @@
     <string name="yes">Yes</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_google_log_in">GoogleLogInActivity</string>
+    <string name="title_activity_test">Sign in</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="title_activity_register">RegisterActivity</string>
 
 
 </resources>

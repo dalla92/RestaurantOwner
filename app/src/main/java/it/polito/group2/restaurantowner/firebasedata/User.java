@@ -17,11 +17,10 @@ public class User {
     private String user_photo_firebase_URL; //for Navigation Drawer with Glide in AsyncTask
     private String user_telephone_number;
     private String user_email;
-    private String user_password;
+    private HashMap<String, Boolean> providers;
     private int user_fidelity_points = 0;
     private HashMap<String, Boolean> favourites_restaurants;
-
-    private boolean isOwner = false;
+    private Boolean ownerUser = false;
     private String owner_vat_number; //only if owner
 
 
@@ -29,7 +28,22 @@ public class User {
 
     }
 
+    public User(String user_id, String user_full_name, String user_telephone_number, String user_email) {
+        this.user_id = user_id;
+        this.user_full_name = user_full_name;
+        this.user_telephone_number = user_telephone_number;
+        this.user_email = user_email;
+    }
+
+    public HashMap<String, Boolean> getProviders() {
+        if(providers == null)
+            providers = new HashMap<>();
+        return providers;
+    }
+
     public HashMap<String, Boolean> getFavourites_restaurants() {
+        if(favourites_restaurants == null)
+            favourites_restaurants = new HashMap<>();
         return favourites_restaurants;
     }
 
@@ -85,14 +99,6 @@ public class User {
         this.user_email = user_email;
     }
 
-    public String getUser_password() {
-        return user_password;
-    }
-
-    public void setUser_password(String user_password) {
-        this.user_password = user_password;
-    }
-
     public int getUser_fidelity_points() {
         return user_fidelity_points;
     }
@@ -101,12 +107,12 @@ public class User {
         this.user_fidelity_points = user_fidelity_points;
     }
 
-    public boolean isOwner() {
-        return isOwner;
+    public Boolean getOwnerUser() {
+        return ownerUser;
     }
 
-    public void setIsOwner(boolean isOwner) {
-        this.isOwner = isOwner;
+    public void setOwnerUser(Boolean ownerUser) {
+        this.ownerUser = ownerUser;
     }
 
     public String getOwner_vat_number() {

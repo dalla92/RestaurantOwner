@@ -6,8 +6,8 @@ package it.polito.group2.restaurantowner.firebasedata;
 public class RestaurantTimeSlot {
 
     private String restaurant_id;
-    private boolean lunch;
-    private boolean dinner; //is_open is not needed anymore because lunch and dinner are both false when close
+    private Boolean lunch;
+    private Boolean dinner; //is_open is not needed anymore because lunch and dinner are both false when close
     private int day_of_week;
     private String open_lunch_time;
     private String close_lunch_time;
@@ -26,19 +26,19 @@ public class RestaurantTimeSlot {
         this.restaurant_id = restaurant_id;
     }
 
-    public boolean isLunch() {
+    public Boolean getLunch() {
         return lunch;
     }
 
-    public void setLunch(boolean lunch) {
+    public void setLunch(Boolean lunch) {
         this.lunch = lunch;
     }
 
-    public boolean isDinner() {
+    public Boolean getDinner() {
         return dinner;
     }
 
-    public void setDinner(boolean dinner) {
+    public void setDinner(Boolean dinner) {
         this.dinner = dinner;
     }
 
