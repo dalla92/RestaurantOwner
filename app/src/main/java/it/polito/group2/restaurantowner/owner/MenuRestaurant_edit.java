@@ -2,6 +2,9 @@ package it.polito.group2.restaurantowner.owner;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,19 +19,30 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnPausedListener;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
@@ -42,11 +56,17 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private Meal current_meal;
+    private StorageReference photo_reference;
+    private StorageReference user_storage_reference;
+    private Context context;
+    private String photouri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_restaurant);
+
+        context = this;
 
         //get current_meal
         Bundle b = getIntent().getExtras();
@@ -71,6 +91,13 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         mViewPager.setAdapter(mSectionsPagerAdapter);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
     @Override
@@ -110,6 +137,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         current_meal.setMeal_price(meal_price);
         //TODO upload both thumbnail and full size pictures
         //current_meal.setMeal_photo_firebase_URL(photouri);
+        this.photouri = photouri;
         current_meal.setMealGlutenFree(is_celiac);
         current_meal.setMealVegan(is_vegan);
         current_meal.setMealVegetarian(is_vegetarian);
@@ -124,15 +152,94 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         current_meal.setMeal_additions(mealAdditions);
         current_meal.setMeal_tags(tags);
 
-        String meal_key = current_meal.getMeal_id();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
-        ref.setValue(null);
-        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
-        DatabaseReference ref3 = ref2.push();
-        current_meal.setMeal_id(ref3.getKey());
-        ref3.setValue(current_meal);
+        //save photo
+        ImageView image = (ImageView) findViewById(R.id.imageView);
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        user_storage_reference = storage.getReferenceFromUrl("gs://have-break-9713d.appspot.com");
+        // Create a child reference
+        // imagesRef now points to "images"
+        photo_reference = user_storage_reference.child("images/meals/" + current_meal.getMeal_id());
+        File f = new File(photouri);
+        Uri imageUri = Uri.fromFile(f);
+        //upload
+        UploadTask uploadTask = user_storage_reference.putFile(imageUri);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            //public void onFailure(@NonNull Throwable throwable) {
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Log.d("my_ex", e.getMessage());
+                Toast failure_message = Toast.makeText(context, "The upload is failed", Toast.LENGTH_LONG);
+                failure_message.show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                current_meal.setMeal_photo_firebase_URL(downloadUrl.toString());
+                String meal_key = current_meal.getMeal_id();
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
+                ref.setValue(null);
+                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
+                DatabaseReference ref3 = ref2.push();
+                current_meal.setMeal_id(ref3.getKey());
+                ref3.setValue(current_meal);
+
+                //TODO save also thumbnail
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = 100.0 * (taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                Toast progress_message = Toast.makeText(context, "Upload is " + progress + "% done", Toast.LENGTH_LONG);
+                progress_message.show();
+            }
+        }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast pause_message = Toast.makeText(context, "Upload is has been paused", Toast.LENGTH_LONG);
+                pause_message.show();
+            }
+        });
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // If there's an upload in progress, save the reference so you can query it later
+        if (photo_reference != null) {
+            outState.putString("reference", photo_reference.toString());
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // If there was an upload in progress, get its reference and create a new StorageReference
+        final String stringRef = savedInstanceState.getString("reference");
+        if (stringRef == null) {
+            return;
+        }
+        photo_reference = FirebaseStorage.getInstance().getReferenceFromUrl(stringRef);
+
+        // Find all UploadTasks under this StorageReference (in this example, there should be one)
+        List<UploadTask> tasks = photo_reference.getActiveUploadTasks();
+        if (tasks.size() > 0) {
+            // Get the task monitoring the upload
+            UploadTask task = tasks.get(0);
+
+            // Add new listeners to the task using an Activity scope
+            task.addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //
+                }
+            });
+        }
+    }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         private FragmentMainInfo fm;

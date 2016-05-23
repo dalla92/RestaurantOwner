@@ -103,11 +103,6 @@
         <activity
             android:name=".user.restaurant_page.UserRestaurantActivity"
             android:theme="@style/AppTheme.NoActionBar" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".user.restaurant_page.UserRestaurantList"
@@ -162,7 +157,13 @@
         <activity
             android:name=".user.restaurant_page.UserProfile"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            </activity>
         <activity
             android:name=".user.restaurant_page.UserMyFavourites"
             android:theme="@style/AppTheme.NoActionBar" />
