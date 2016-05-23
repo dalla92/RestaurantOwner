@@ -16,6 +16,7 @@ public class Order implements Serializable {
     private Calendar order_date;
     private String order_notes;
     private ArrayList<Meal> order_meals;
+    private Double order_price;
 
     public Order(){
 
@@ -75,5 +76,13 @@ public class Order implements Serializable {
 
     public void setOrder_meals(ArrayList<Meal> order_meals) {
         this.order_meals = order_meals;
+    }
+
+    public Double getOrder_price() {
+        return order_price;
+    }
+
+    public void setOrder_price(Double order_price) {
+        this.order_price = order_price;
     }
 }

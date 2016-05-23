@@ -26,6 +26,7 @@ public class Meal implements Serializable {
     private Boolean mealTakeAway;
     private String meal_thumbnail; //for meal preview with Glide in AsyncTask
     private String meal_photo_firebase_URL; //for enlarging image with Glide in AsyncTask
+    private Integer meal_quantity; //for takeaway order quantity
 
     public Meal(){
 
@@ -157,5 +158,13 @@ public class Meal implements Serializable {
 
     public void setMeal_photo_firebase_URL(String meal_photo_firebase_URL) {
         this.meal_photo_firebase_URL = meal_photo_firebase_URL;
+    }
+
+    public Integer getMeal_quantity() {
+        return meal_quantity;
+    }
+
+    public void setMeal_quantity(Integer meal_quantity) {
+        this.meal_quantity = meal_quantity;
     }
 }
