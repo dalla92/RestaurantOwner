@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,7 +29,9 @@ import org.json.JSONException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
@@ -46,11 +49,12 @@ public class My_Reservations_Adapter extends RecyclerView.Adapter<My_Reservation
     List<Restaurant> resList = new ArrayList<Restaurant>();
     private String chosen_year, chosen_month, chosen_day, chosen_hour, chosen_minute, chosen_weekday;
     private Calendar last_chosen_date;
-    private int index;
     private String restaurant_name;
     private Context context;
     private String restaurant_telephone_number;
     private ReservationViewHolder res_view_holder;
+    private ProgressDialog progressDialog;
+    private HashMap<String, String> restaurant_names_and_phone = new HashMap<String, String>();
 
     public static class ReservationViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
@@ -75,10 +79,12 @@ public class My_Reservations_Adapter extends RecyclerView.Adapter<My_Reservation
 
 
 
-    My_Reservations_Adapter(Context context, ArrayList<TableReservation> user_TableReservations){
+    My_Reservations_Adapter(Context context, ArrayList<TableReservation> user_TableReservations, ProgressDialog progressDialog, HashMap<String, String> restaurant_names_and_phone){
         this.user_TableReservations = user_TableReservations;
         this.context = context;
-            }
+        this.progressDialog = progressDialog;
+        this.restaurant_names_and_phone = restaurant_names_and_phone;
+    }
 
     @Override
     public ReservationViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
@@ -90,108 +96,75 @@ public class My_Reservations_Adapter extends RecyclerView.Adapter<My_Reservation
     @Override
     public void onBindViewHolder(ReservationViewHolder reservationViewHolder, int i) {
         //prepare all data
-        index = i;
         res_view_holder = reservationViewHolder;
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot resSnapshot: snapshot.getChildren()) {
-                    Restaurant snap_restaurant = resSnapshot.getValue(Restaurant.class);
-                    String snap_restaurant_id = snap_restaurant.getRestaurant_id();
-                    if(snap_restaurant_id.equals(user_TableReservations.get(index).getRestaurant_id())){
-                        restaurant_name = snap_restaurant.getRestaurant_name();
-                        break;
-                    }
-                }
+        //We take the set, we convert it into list and then get
+        Set<String> set = restaurant_names_and_phone.keySet();
+        List<String> list = new ArrayList<String>(set);
+        restaurant_name = list.get(i);
+        restaurant_telephone_number = restaurant_names_and_phone.get(i);
 
-                last_chosen_date = user_TableReservations.get(index).getTable_reservation_date();
-                chosen_day = Integer.toString(last_chosen_date.get(Calendar.DAY_OF_MONTH));
-                chosen_weekday = Integer.toString(last_chosen_date.get(Calendar.DAY_OF_WEEK));
-                chosen_month = Integer.toString(last_chosen_date.get(Calendar.MONTH) + 1); //need to correct +1
-                chosen_year = Integer.toString(last_chosen_date.get(Calendar.YEAR));
-                chosen_hour = Integer.toString(last_chosen_date.get(Calendar.HOUR));
-                chosen_minute = Integer.toString(last_chosen_date.get(Calendar.MINUTE));
-                String date_to_display = chosen_day + "/" + chosen_month + "/" + chosen_year + " " + chosen_hour + ":" + chosen_minute;
+        last_chosen_date = user_TableReservations.get(i).getTable_reservation_date();
+        chosen_day = Integer.toString(last_chosen_date.get(Calendar.DAY_OF_MONTH));
+        chosen_weekday = Integer.toString(last_chosen_date.get(Calendar.DAY_OF_WEEK));
+        chosen_month = Integer.toString(last_chosen_date.get(Calendar.MONTH) + 1); //need to correct +1
+        chosen_year = Integer.toString(last_chosen_date.get(Calendar.YEAR));
+        chosen_hour = Integer.toString(last_chosen_date.get(Calendar.HOUR));
+        chosen_minute = Integer.toString(last_chosen_date.get(Calendar.MINUTE));
+        String date_to_display = chosen_day + "/" + chosen_month + "/" + chosen_year + " " + chosen_hour + ":" + chosen_minute;
 
-                //display data
-                if(date_to_display != null)
-                    res_view_holder.date.setText(date_to_display);
-                if(restaurant_name != null)
-                    res_view_holder.restaurant_name.setText(restaurant_name);
-                res_view_holder.guests.setText("x"+user_TableReservations.get(index).getTable_reservation_guests_number());
-                res_view_holder.notes.setText(user_TableReservations.get(index).getTable_reservation_notes());
-            }
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
+        //display data
+        if(date_to_display != null)
+            res_view_holder.date.setText(date_to_display);
+        if(restaurant_name != null)
+            res_view_holder.restaurant_name.setText(restaurant_name);
+        res_view_holder.guests.setText("x"+user_TableReservations.get(i).getTable_reservation_guests_number());
+        res_view_holder.notes.setText(user_TableReservations.get(i).getTable_reservation_notes());
+        if(i == user_TableReservations.size()-1)
+            progressDialog.dismiss();
 
         //call setting
         reservationViewHolder.call_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
-                ref.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        for (DataSnapshot resSnapshot: snapshot.getChildren()) {
-                            Restaurant snap_restaurant = resSnapshot.getValue(Restaurant.class);
-                            String snap_restaurant_id = snap_restaurant.getRestaurant_id();
-                            if(snap_restaurant_id.equals(user_TableReservations.get(index).getRestaurant_id())){
-                                restaurant_telephone_number = snap_restaurant.getRestaurant_telephone_number();
-                                break;
-                            }
-                        }
+                //restaurant_number = "+39095365265";
+                if (restaurant_telephone_number == null) {
+                    Toast.makeText(context, R.string.telephone_number_not_provided, Toast.LENGTH_SHORT);
+                } else {
+                    new AlertDialog.Builder(context)
+                            .setTitle(context.getResources().getString(R.string.call_confirmation))
+                            .setMessage(
+                                    context.getResources().getString(R.string.call_confirmation_message))
+                            .setIcon(
+                                    context.getResources().getDrawable(
+                                            android.R.drawable.ic_dialog_alert))
+                            .setPositiveButton(
+                                    context.getResources().getString(R.string.yes),
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            //call
+                                            Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                            callIntent.setData(Uri.parse("tel:" + restaurant_telephone_number));
+                                            try {
+                                                context.startActivity(callIntent);
+                                            } catch (SecurityException s) {
+                                                Log.e("EXCEPTION", "EXCEPTION SECURITY IN my_reservation_call");
+                                            }
+                                        }
 
-                        //restaurant_number = "+39095365265";
-                        if(restaurant_telephone_number==null){
-                            Toast.makeText(context, R.string.telephone_number_not_provided, Toast.LENGTH_SHORT);
-                        }
-                        else {
-                            new AlertDialog.Builder(context)
-                                    .setTitle(context.getResources().getString(R.string.call_confirmation))
-                                    .setMessage(
-                                            context.getResources().getString(R.string.call_confirmation_message))
-                                    .setIcon(
-                                            context.getResources().getDrawable(
-                                                    android.R.drawable.ic_dialog_alert))
-                                    .setPositiveButton(
-                                            context.getResources().getString(R.string.yes),
-                                            new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog,
-                                                                    int which) {
-                                                    //call
-                                                    Intent callIntent = new Intent(Intent.ACTION_CALL);
-                                                    callIntent.setData(Uri.parse("tel:" + restaurant_telephone_number));
-                                                    try {
-                                                        context.startActivity(callIntent);
-                                                    } catch (SecurityException s) {
-                                                        Log.e("EXCEPTION", "EXCEPTION SECURITY IN my_reservation_call");
-                                                    }
-                                                }
-
-                                            })
-                                    .setNegativeButton(
-                                            context.getResources().getString(R.string.no),
-                                            new DialogInterface.OnClickListener() {
-                                                @Override
-                                                public void onClick(DialogInterface dialog,
-                                                                    int which) {
-                                                    //Do Something Here
-                                                }
-                                            }).show();
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError firebaseError) {
-                        System.out.println("The read failed: " + firebaseError.getMessage());
-                    }
-                });
-
+                                    })
+                            .setNegativeButton(
+                                    context.getResources().getString(R.string.no),
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            //Do Something Here
+                                        }
+                                    }).show();
+                }
             }
         });
     }
@@ -232,13 +205,20 @@ public class My_Reservations_Adapter extends RecyclerView.Adapter<My_Reservation
             AlertDialog.Builder alert = new AlertDialog.Builder(context);
             alert.setTitle("Attention!");
             alert.setMessage("You can not delete a reservation at this moment! Please call the restaurant");
+            alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            notifyDataSetChanged();
+                        }
+                    }
+            );
+            alert.show();
         }
         else {
             AlertDialog.Builder alert = new AlertDialog.Builder(context);
             alert.setTitle("Confirmation!");
             alert.setMessage("Are you sure you want to delete the restaurant?\nThe operation cannot be undone!");
             alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     String TableReservation_key = user_TableReservations.get(position).getTable_reservation_id();
@@ -246,20 +226,17 @@ public class My_Reservations_Adapter extends RecyclerView.Adapter<My_Reservation
                     //delete
                     ref.setValue(null);
                     removeItem(position);
-                    dialog.dismiss();
-
-                }
-            });
-            alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
                     notifyDataSetChanged();
                     dialog.dismiss();
                 }
             });
-
+            alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    notifyDataSetChanged();
+                    dialog.dismiss();
+                }
+            });
             alert.show();
         }
     }

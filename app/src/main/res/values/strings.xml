@@ -285,6 +285,7 @@
         completions."
     </string>
     <string name="title_activity_register">RegisterActivity</string>
+    <string name="profile_full_name">Full name</string>
 
 
 </resources>

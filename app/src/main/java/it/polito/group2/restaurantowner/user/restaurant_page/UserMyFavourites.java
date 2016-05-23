@@ -1,12 +1,8 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
@@ -17,86 +13,43 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import org.json.JSONException;
-
-import java.io.FileOutputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Bookmark;
-import it.polito.group2.restaurantowner.data.Review;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.Restaurant;
-import it.polito.group2.restaurantowner.data.Offer;
-import it.polito.group2.restaurantowner.data.User;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Environment;
+
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-public class UserMyFavourites extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class UserMyFavourites extends AppCompatActivity{
 
     private String user_id;
     private ListView listView;
-    private ArrayList<Bookmark> bookmarks = new ArrayList<Bookmark>();
-    private ArrayList<Restaurant> bookmarked_restaurants = new ArrayList<Restaurant>();
-    private ArrayList<Restaurant> all_restaurants = new ArrayList<Restaurant>();
-    private ArrayList<User> users = new ArrayList<User>();
+    private ArrayList<String> favourites = new ArrayList<String>();
+    private ArrayList<Restaurant> favourite_restaurants = new ArrayList<Restaurant>();
     private Context context;
     public User current_user;
     public Drawable d;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,64 +60,14 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
             user_id = getIntent().getExtras().getString("user_id");
-            try {
-                bookmarks = JSONUtil.readBookmarkList(context, user_id);
-                all_restaurants = JSONUtil.readJSONResList(context);
-            }
-            catch(JSONException e){
-                e.printStackTrace();
-            }
-            for(Bookmark b : bookmarks){
-                for(Restaurant r : all_restaurants){
-                    if(r.getRestaurantId().equals(b.getRestaurant_id())){
-                        bookmarked_restaurants.add(r);
-                    }
-                }
-            }
         }
-        else{
-            Restaurant r1 = new Restaurant();
-            r1.setName("Bella Italia");
-            Restaurant r2 = new Restaurant();
-            r2.setName("La trattoria dello zio Tom");
-            bookmarked_restaurants.add(r1);
-            bookmarked_restaurants.add(r2);
-        }
+        else
+            user_id = "fake_user_id";
 
-        //list view implementation
-        listView = (ListView) findViewById(R.id.list);
-        BookmarkAdapter adapter = new BookmarkAdapter (this, R.layout.bookmark_layout, bookmarked_restaurants);
-        listView.setAdapter(adapter);
-        //TODO Decomment
-        /*
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                // ListView Clicked item value
-                Restaurant  itemValue    = (Restaurant) listView.getItemAtPosition(position);
-                Intent intent3 = new Intent(
-                        getApplicationContext(),
-                        UserMyFavourites.class);
-                Bundle b3 = new Bundle();
-                b3.putString("user_id", user_id);
-                b3.putString("restaurant_id", itemValue.getRestaurantId());
-                intent3.putExtras(b3);
-                startActivity(intent3);
-            }
-        });
-        */
+        get_favourites_from_firebase();
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        //navigation drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        get_user_from_firebase();
+
         //TODO decomment handle logged/not logged user
         /*
         if(user_id==null){ //not logged
@@ -179,58 +82,240 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
             //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
         }
         */
-        //TODO Rearrange the following code
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            user_id = getIntent().getExtras().getString("user_id");
-            try {
-                users = JSONUtil.readJSONUsersList(context, null);
-            }
-            catch(JSONException e){
-                e.printStackTrace();
-            }
-            for(User u : users){
-                if(u.getId().equals(user_id)){
-                    current_user = u;
-                    break;
-                }
-            }
-        }
-        else{
-            current_user = new User();
-            current_user.setEmail("jkjs@dskj");
-            //current_user.setFidelity_points(110);
-            current_user.setFirst_name("Alex");
-            current_user.setIsOwner(true);
-            current_user.setPassword("tipiacerebbe");
-            current_user.setPhone_number("0989897879789");
-            current_user.setVat_number("sw8d9wd8w9d8w9d9");
-        }
-        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user!=null) {
-            if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
-                nav_username.setText(current_user.getFirst_name());
-            else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getLast_name());
-            else if (current_user.getFirst_name() != null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
-            if (current_user.getEmail() != null)
-                nav_email.setText(current_user.getEmail());
-            if (current_user.getPhoto() != null)
-                nav_photo.setImageBitmap(current_user.getPhoto());
-        }
-        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-        Uri photouri = null;
-        if(userDetails.getString("photouri", null)!=null) {
-            photouri = Uri.parse(userDetails.getString("photouri", null));
-            File f = new File(getRealPathFromURI(photouri));
-            Drawable d = Drawable.createFromPath(f.getAbsolutePath());
-            navigationView.getHeaderView(0).setBackground(d);
-        }
-        else
-            nav_photo.setImageResource(R.drawable.blank_profile);
+
+
     }
+
+    public void get_favourites_from_firebase(){
+        progress_dialog();
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot usSnapshot: snapshot.getChildren()) {
+                    User snap_user = usSnapshot.getValue(User.class);
+                    String snap_user_id = snap_user.getUser_id();
+                    if(snap_user_id.equals(user_id)) {
+                        for (String s : snap_user.getFavourites_restaurants().keySet()){
+                            favourites.add(s);
+                        }
+                        break;
+                    }
+                }
+
+
+                if(favourites!=null && !favourites.isEmpty()){
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
+                    ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            for (DataSnapshot resSnapshot : snapshot.getChildren()) {
+                                Restaurant snap_restaurant = resSnapshot.getValue(Restaurant.class);
+                                String snap_restaurant_id = snap_restaurant.getRestaurant_id();
+                                if (favourites.contains(snap_restaurant_id)) {
+                                    favourite_restaurants.add(snap_restaurant);
+                                }
+                            }
+
+                            //list view implementation
+                            listView = (ListView) findViewById(R.id.list);
+                            FavouriteAdapter adapter = new FavouriteAdapter(context, R.layout.favourite_layout, favourite_restaurants);
+                            listView.setAdapter(adapter);
+
+                            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view,
+                                                        int position, long id) {
+                                    // ListView Clicked item value
+                                    Restaurant itemValue = (Restaurant) listView.getItemAtPosition(position);
+                                    Intent intent3 = new Intent(
+                                            getApplicationContext(),
+                                            UserRestaurantActivity.class);
+                                    Bundle b3 = new Bundle();
+                                    b3.putString("user_id", user_id);
+                                    b3.putString("restaurant_id", itemValue.getRestaurant_id());
+                                    intent3.putExtras(b3);
+                                    startActivity(intent3);
+                                }
+                            });
+
+                            progressDialog.dismiss();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError firebaseError) {
+                            System.out.println("The read failed: " + firebaseError.getMessage());
+                        }
+                    });
+                }
+
+            }
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    public void get_user_from_firebase(){
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/"+user_id);
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                /*
+                for (DataSnapshot usSnapshot : snapshot.getChildren()) {
+                    User snap_user = usSnapshot.getValue(User.class);
+                    String snap_user_id = snap_user.getUser_id();
+                    if (snap_user_id.equals(user_id)) {
+                        current_user = snap_user;
+                        break;
+                    }
+                }
+                */
+
+                current_user = snapshot.getValue(User.class);
+
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                setSupportActionBar(toolbar);
+                //navigation drawer
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                        (Activity) context, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                drawer.setDrawerListener(toggle);
+                toggle.syncState();
+                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                    @SuppressWarnings("StatementWithEmptyBody")
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem item) {
+                        // Handle navigation view item clicks here.
+                        int id = item.getItemId();
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if(id==R.id.nav_owner){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    MainActivity.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        }
+                        else if(id==R.id.nav_home){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserRestaurantList.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        }
+                        else if(id==R.id.nav_login){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserRestaurantList.class);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.nav_my_profile) {
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserProfile.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.nav_my_orders) {
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    MyOrdersActivity.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.nav_my_reservations){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    UserMyReservations.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("user_id", user_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        } else if(id==R.id.nav_my_reviews){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    MyReviewsActivity.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("user_id", user_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        } else if(id==R.id.nav_my_favourites){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    UserMyFavourites.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("user_id", user_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        }
+
+                        drawer.closeDrawer(GravityCompat.START);
+                        return true;
+                    }
+                });
+
+                TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+                if (current_user != null) {
+                    if (current_user.getUser_full_name() != null && current_user.getUser_full_name() == null)
+                        nav_username.setText(current_user.getUser_full_name());
+                    if (current_user.getUser_email() != null)
+                        nav_email.setText(current_user.getUser_email());
+                    if (current_user.getUser_photo_firebase_URL() != null)
+                        Glide.with(context)
+                                .load(current_user.getUser_photo_firebase_URL()) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .placeholder(R.drawable.blank_profile)
+                                .into(nav_photo);
+                }
+				/*
+				SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+				Uri photouri = null;
+				if(userDetails.getString("photouri", null)!=null) {
+					photouri = Uri.parse(userDetails.getString("photouri", null));
+					File f = new File(getRealPathFromURI(photouri));
+					Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+					navigationView.getHeaderView(0).setBackground(d);
+				}
+				else
+					nav_photo.setImageResource();
+						}
+				*/
+            }
+
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    private void progress_dialog(){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMax(100);
+        progressDialog.setMessage("Its loading....");
+        progressDialog.setTitle("");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+    }
+
 
     @Override
     protected void onDestroy() {
@@ -258,89 +343,6 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
         } else {
             super.onBackPressed();
         }
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.nav_owner){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MainActivity.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        }
-        else if(id==R.id.nav_home){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantList.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        }
-        else if(id==R.id.nav_login){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantList.class);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.nav_my_profile) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserProfile.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.nav_my_orders) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MyOrdersActivity.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.nav_my_reservations){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    UserMyReservations.class);
-            Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        } else if(id==R.id.nav_my_reviews){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    MyReviewsActivity.class);
-            Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        } else if(id==R.id.nav_my_favourites){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    UserMyFavourites.class);
-            Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
 }

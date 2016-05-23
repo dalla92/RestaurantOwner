@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.owner;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -19,6 +21,13 @@ import android.widget.Toast;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
@@ -117,7 +126,11 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
 
         String meal_key = current_meal.getMeal_id();
         DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
-        ref.setValue(current_meal);
+        ref.setValue(null);
+        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
+        DatabaseReference ref3 = ref2.push();
+        current_meal.setMeal_id(ref3.getKey());
+        ref3.setValue(current_meal);
     }
 
 

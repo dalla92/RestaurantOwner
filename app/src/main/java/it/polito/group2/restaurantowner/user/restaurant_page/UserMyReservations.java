@@ -33,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
@@ -46,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
@@ -79,6 +81,8 @@ public class UserMyReservations extends AppCompatActivity{
     public Drawable d;
     private RecyclerView mRecyclerView;
     private ProgressDialog progressDialog;
+    private HashMap<String, String> restaurant_names_and_phone = new HashMap<String, String>();
+    private int j=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,27 +151,72 @@ public class UserMyReservations extends AppCompatActivity{
                 //ordering from last done
                 Collections.reverse(all_table_reservations);
 
-                //recycler view
-                mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-                mRecyclerView.setHasFixedSize(true);
-                GridLayoutManager mLayoutManager = null;
+                //Searching the names of the restaurants
+                //DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
+                for(TableReservation tr : all_table_reservations) {
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + tr.getRestaurant_id());
+                    ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            Restaurant snap_restaurant = snapshot.getValue(Restaurant.class);
+                            restaurant_names_and_phone.put(snap_restaurant.getRestaurant_name(), snap_restaurant.getRestaurant_telephone_number());
+
+                            if (j == all_table_reservations.size() - 1) {
+                                //recycler view
+                                mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                                mRecyclerView.setHasFixedSize(true);
+                                /*
+                                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                                    mLayoutManager = new GridLayoutManager(this, 1);
+                                    mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1,5,true));
+                                }
+                                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                    mLayoutManager = new GridLayoutManager(this, 2);
+                                    mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
+                                }
+                                */
+
+                                // use a linear layout manager
+                                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
+                                mRecyclerView.setLayoutManager(mLayoutManager);
+                                adapter = new My_Reservations_Adapter(context, all_table_reservations, progressDialog, restaurant_names_and_phone);
+                                mRecyclerView.setAdapter(adapter);
+                                //delete with swipe
+                                ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+                                ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
+                                mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+
+                                //progressDialog.dismiss(); done inside the adapter
+
+                            }
+
+                            j++;
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError firebaseError) {
+                            System.out.println("The read failed: " + firebaseError.getMessage());
+                        }
+                    });
+                }
+
                 /*
-                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                    mLayoutManager = new GridLayoutManager(this, 1);
-                    mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1,5,true));
-                }
-                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                    mLayoutManager = new GridLayoutManager(this, 2);
-                    mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
-                }
+                ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        for (DataSnapshot resSnapshot : snapshot.getChildren()) {
+                            Restaurant snap_restaurant = resSnapshot.getValue(Restaurant.class);
+                            String snap_restaurant_id = snap_restaurant.getRestaurant_id();
+                            for(TableReservation tr : all_table_reservations) {
+                                if (snap_restaurant_id.equals(tr.getRestaurant_id())) {
+                                    restaurant_names_and_phone.put(snap_restaurant.getRestaurant_name(), snap_restaurant.getRestaurant_telephone_number());
+                                    break;
+                                }
+                            }
+                        }
                 */
-                mRecyclerView.setLayoutManager(mLayoutManager);
-                adapter = new My_Reservations_Adapter(context, all_table_reservations);
-                mRecyclerView.setAdapter(adapter);
-                //delete with swipe
-                ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-                ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
-                mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+
             }
 
             @Override
@@ -300,6 +349,13 @@ public class UserMyReservations extends AppCompatActivity{
                         nav_username.setText(current_user.getUser_full_name());
                     if (current_user.getUser_email() != null)
                         nav_email.setText(current_user.getUser_email());
+                    if (current_user.getUser_photo_firebase_URL() != null)
+                        Glide.with(context)
+                                .load(current_user.getUser_photo_firebase_URL()) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .placeholder(R.drawable.blank_profile)
+                                .into(nav_photo);
+                }
                     //TODO load photo
                     /*
                     if (current_user.getUser_photo_firebase_URL() != null)
@@ -315,9 +371,7 @@ public class UserMyReservations extends AppCompatActivity{
                     } else
                         nav_photo.setImageResource(R.drawable.blank_profile);
                     */
-                }
 
-                progressDialog.dismiss();
             }
             @Override
             public void onCancelled(DatabaseError firebaseError) {

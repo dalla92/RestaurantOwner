@@ -187,11 +187,12 @@ public class Restaurant_page extends AppCompatActivity
         progress_dialog();
 
         //my_restaurant
-        //TODO optimize research here
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
+        //DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                /*
                 for (DataSnapshot restSnapshot: snapshot.getChildren()) {
                     Restaurant snap_restaurant = restSnapshot.getValue(Restaurant.class);
                     String snap_restaurant_id = snap_restaurant.getRestaurant_id();
@@ -200,6 +201,8 @@ public class Restaurant_page extends AppCompatActivity
                         break;
                     }
                 }
+                */
+                my_restaurant = snapshot.getValue(Restaurant.class);
                 if(my_restaurant!=null)
                     fill_data();
 

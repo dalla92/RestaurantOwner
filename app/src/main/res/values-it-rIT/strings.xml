@@ -232,4 +232,11 @@
     <string name="make_a_reservation">Prenota Tavolo</string>
     <string name="make_an_order">Ordina Piatto</string>
     <string name="order_cart_button">Carrello</string>
+    <string name="profile_full_name">Nome e cognome</string>
+    <string name="order_cancel_message">Vuoi cancellare questo ordine?</string>
+    <string name="order_cancel_title">Attenzione!</string>
+    <string name="order_cart_delmessage">Vuoi cancellare questo cibo?</string>
+    <string name="order_cart_deltitle">Cancella cibo</string>
+    <string name="order_info_alert_message">Devi inserire la quantità da aggiungere al carrello.</string>
+    <string name="order_info_alert_title">Attenzione!</string>
 </resources>

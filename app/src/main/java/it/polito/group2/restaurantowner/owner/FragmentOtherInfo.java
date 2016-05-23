@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,13 +18,6 @@ import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -168,7 +160,7 @@ public class FragmentOtherInfo extends Fragment {
                 MealAddition ma = new MealAddition();
                 ma.setMeal_addition_name(getResources().getText(R.string.meal_add_new_addition).toString());
                 ma.setMeal_addition_price(0.0);
-                ma.setIs_addition_selected(false);
+                ma.setAdditionSelected(false);
                 ma.setMeal_addition_id(UUID.randomUUID().toString());
                 if(childMealAdditions==null)
                     childMealAdditions = new ArrayList<MealAddition>();

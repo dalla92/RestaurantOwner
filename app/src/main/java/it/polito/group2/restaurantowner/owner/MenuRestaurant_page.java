@@ -1,14 +1,14 @@
 package it.polito.group2.restaurantowner.owner;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
@@ -41,7 +41,7 @@ import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
 
-public class MenuRestaurant_page extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MenuRestaurant_page extends AppCompatActivity {
     private Menu menu;
     private ListView listView;
     private Adapter_Meals adapter;
@@ -76,72 +76,6 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         //get and fill related data
         get_data_from_firebase();
 
-        //toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        //navigation drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        //recycler view
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        mRecyclerView.setHasFixedSize(true);
-        GridLayoutManager mLayoutManager = null;
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mLayoutManager = new GridLayoutManager(this, 1);
-            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1,5,true));
-        }
-        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mLayoutManager = new GridLayoutManager(this, 2);
-            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
-        }
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        final String meal_key = meals.get(position).getMeal_id();
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
-                        ref.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot snapshot) {
-                                for (DataSnapshot meSnapshot : snapshot.getChildren()) {
-                                    Meal snap_meal = meSnapshot.getValue(Meal.class);
-                                    String snap_restaurant_id = snap_meal.getRestaurant_id();
-                                    if (snap_restaurant_id.equals(restaurant_id)) {
-                                        if (meal_key.equals(snap_meal.getMeal_id())) {
-                                            meal_to_edit = snap_meal;
-                                        }
-                                    }
-                                }
-                                Intent intent1 = new Intent(
-                                        getApplicationContext(),
-                                        MenuRestaurant_edit.class);
-                                if (meal_to_edit != null) {
-                                    intent1.putExtra("meal", meal_to_edit);
-                                    startActivityForResult(intent1, MODIFY_MEAL);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError firebaseError) {
-                                System.out.println("The read failed: " + firebaseError.getMessage());
-                            }
-                        });
-                    }
-                }));
-        adapter = new Adapter_Meals(this, 0, meals, restaurant_id);
-        mRecyclerView.setAdapter(adapter);
-        //delete with swipe
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
     }
 
     /*
@@ -178,8 +112,6 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
     private void get_data_from_firebase(){
         progress_dialog();
 
-        //my_restaurant
-        //TODO optimize research here
         DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -198,6 +130,159 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
                         adapter.notifyDataSetChanged();
                     }
                 }
+
+                //toolbar
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                setSupportActionBar(toolbar);
+
+                //navigation drawer
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                        (Activity)context, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                drawer.setDrawerListener(toggle);
+                toggle.syncState();
+                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                    @SuppressWarnings("StatementWithEmptyBody")
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem item) {
+                        // Handle navigation view item clicks here.
+                        int id = item.getItemId();
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if(id==R.id.action_my_restaurants){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    MainActivity.class);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.action_gallery) {
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    GalleryViewActivity.class);
+                            Bundle b = new Bundle();
+                            b.putString("restaurant_id", restaurant_id);
+                            intent1.putExtras(b);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.action_menu) {
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    MenuRestaurant_page.class);
+                            Bundle b = new Bundle();
+                            b.putString("restaurant_id", restaurant_id);
+                            intent1.putExtras(b);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.action_offers) {
+                            Intent intent2 = new Intent(
+                                    getApplicationContext(),
+                                    OfferListActivity.class);
+                            Bundle b2 = new Bundle();
+                            b2.putString("restaurant_id", restaurant_id);
+                            intent2.putExtras(b2);
+                            startActivity(intent2);
+                            return true;
+                        } else if(id==R.id.action_reservations){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    ReservationActivity.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("restaurant_id", restaurant_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        } else if(id==R.id.action_reviews){
+                            Intent intent4 = new Intent(
+                                    getApplicationContext(),
+                                    ReviewsActivity.class); //here Filippo must insert his class name
+                            Bundle b4 = new Bundle();
+                            b4.putString("restaurant_id", restaurant_id);
+                            intent4.putExtras(b4);
+                            startActivity(intent4);
+                            return true;
+                        } else if(id==R.id.action_statistics){
+                            Intent intent5 = new Intent(
+                                    getApplicationContext(),
+                                    StatisticsActivity.class); //here Filippo must insert his class name
+                            Bundle b5 = new Bundle();
+                            b5.putString("restaurant_id", restaurant_id);
+                            intent5.putExtras(b5);
+                            startActivity(intent5);
+                            return true;
+                        } else if(id==R.id.action_edit){
+                            Intent intent6 = new Intent(
+                                    getApplicationContext(),
+                                    AddRestaurantActivity.class);
+                            intent6.putExtra("Restaurant", current_restaurant);
+                            final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
+                            appbar.setExpanded(false);
+                            startActivityForResult(intent6, MODIFY_INFO);
+                            return true;
+                        }
+
+                        drawer.closeDrawer(GravityCompat.START);
+                        return true;
+                    }
+                });
+
+                //recycler view
+                mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                mRecyclerView.setHasFixedSize(true);
+                /*
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                    mLayoutManager = new GridLayoutManager(this, 1);
+                    mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1,5,true));
+                }
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    mLayoutManager = new GridLayoutManager(this, 2);
+                    mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
+                }
+                */
+                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
+                mRecyclerView.setLayoutManager(mLayoutManager);
+                mRecyclerView.addOnItemTouchListener(
+                        new RecyclerItemClickListener(context, new RecyclerItemClickListener.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(View view, int position) {
+                                final String meal_key = meals.get(position).getMeal_id();
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+meal_key);
+                                ref.addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot snapshot) {
+                                        /*
+                                        for (DataSnapshot meSnapshot : snapshot.getChildren()) {
+                                            Meal snap_meal = meSnapshot.getValue(Meal.class);
+                                            String snap_restaurant_id = snap_meal.getRestaurant_id();
+                                            if (snap_restaurant_id.equals(restaurant_id)) {
+                                                if (meal_key.equals(snap_meal.getMeal_id())) {
+                                                    meal_to_edit = snap_meal;
+                                                }
+                                            }
+                                        }
+                                        */
+                                        meal_to_edit = snapshot.getValue(Meal.class);
+                                        Intent intent1 = new Intent(
+                                                getApplicationContext(),
+                                                MenuRestaurant_edit.class);
+                                        if (meal_to_edit != null) {
+                                            intent1.putExtra("meal", meal_to_edit);
+                                            startActivityForResult(intent1, MODIFY_MEAL);
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError firebaseError) {
+                                        System.out.println("The read failed: " + firebaseError.getMessage());
+                                    }
+                                });
+                            }
+                        }));
+                adapter = new Adapter_Meals((Activity)context, 0, meals, restaurant_id);
+                mRecyclerView.setAdapter(adapter);
+                //delete with swipe
+                ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+                ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
+                mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
                 progressDialog.dismiss();
             }
@@ -230,87 +315,6 @@ public class MenuRestaurant_page extends AppCompatActivity implements Navigation
         } else {
             super.onBackPressed();
         }
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.action_my_restaurants){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MainActivity.class);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.action_gallery) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    GalleryViewActivity.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurant_id);
-            intent1.putExtras(b);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.action_menu) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MenuRestaurant_page.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurant_id);
-            intent1.putExtras(b);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.action_offers) {
-            Intent intent2 = new Intent(
-                    getApplicationContext(),
-                    OfferListActivity.class);
-            Bundle b2 = new Bundle();
-            b2.putString("restaurant_id", restaurant_id);
-            intent2.putExtras(b2);
-            startActivity(intent2);
-            return true;
-        } else if(id==R.id.action_reservations){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    ReservationActivity.class);
-            Bundle b3 = new Bundle();
-            b3.putString("restaurant_id", restaurant_id);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        } else if(id==R.id.action_reviews){
-            Intent intent4 = new Intent(
-                    getApplicationContext(),
-                    ReviewsActivity.class); //here Filippo must insert his class name
-            Bundle b4 = new Bundle();
-            b4.putString("restaurant_id", restaurant_id);
-            intent4.putExtras(b4);
-            startActivity(intent4);
-            return true;
-        } else if(id==R.id.action_statistics){
-            Intent intent5 = new Intent(
-                    getApplicationContext(),
-                    StatisticsActivity.class); //here Filippo must insert his class name
-            Bundle b5 = new Bundle();
-            b5.putString("restaurant_id", restaurant_id);
-            intent5.putExtras(b5);
-            startActivity(intent5);
-            return true;
-        } else if(id==R.id.action_edit){
-            Intent intent6 = new Intent(
-                    getApplicationContext(),
-                    AddRestaurantActivity.class);
-            intent6.putExtra("Restaurant", current_restaurant);
-            final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
-            appbar.setExpanded(false);
-            startActivityForResult(intent6, MODIFY_INFO);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     public void myClickHandler_add(View v) {

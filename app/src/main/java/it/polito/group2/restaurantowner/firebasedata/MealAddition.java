@@ -11,7 +11,7 @@ public class MealAddition implements Serializable {
     private String meal_addition_id;
     private String meal_addition_name;
     private double meal_addition_price = 0.0;
-    private boolean is_addition_selected = false;
+    private Boolean additionSelected = false;
 
     public MealAddition(){
 
@@ -41,11 +41,11 @@ public class MealAddition implements Serializable {
         this.meal_addition_price = meal_addition_price;
     }
 
-    public boolean is_addition_selected() {
-        return is_addition_selected;
+    public Boolean getAdditionSelected() {
+        return additionSelected;
     }
 
-    public void setIs_addition_selected(boolean is_addition_selected) {
-        this.is_addition_selected = is_addition_selected;
+    public void setAdditionSelected(Boolean additionSelected) {
+        this.additionSelected = additionSelected;
     }
 }

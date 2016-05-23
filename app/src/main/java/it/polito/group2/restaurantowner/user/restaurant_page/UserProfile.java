@@ -1,5 +1,7 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -26,8 +28,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.User;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
@@ -39,6 +40,14 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.widget.Button;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -46,7 +55,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class UserProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class UserProfile extends AppCompatActivity{
 
     private String user_id;
     static final int PICK_IMAGE = 2;
@@ -55,8 +64,8 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
     public String photouri=null;
     public User current_user;
     private Context context;
-    private ArrayList<User> users = new ArrayList<User>();
     private Drawable d;
+    private ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,86 +74,20 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
 
         context = this;
 
-        //TODO Rearrange the following code
-        try {
-            users = JSONUtil.readJSONUsersList(context, null);
-        }
-        catch(JSONException e){
-            e.printStackTrace();
-        }
-        if(users==null){
-            current_user = new User();
-            current_user.setEmail("jkjs@dskj");
-            current_user.setId("d48jd48d48j");
-            //current_user.setFidelity_points(110);
-            current_user.setFirst_name("Alex");
-            current_user.setIsOwner(true);
-            current_user.setPassword("tipiacerebbe");
-            current_user.setPhone_number("0989897879789");
-            current_user.setVat_number("sw8d9wd8w9d8w9d9");
-            users.add(current_user);
-            try{
-                JSONUtil.saveJSONUsersList(users, context);
-            }
-            catch(JSONException e){
-                e.printStackTrace();
-            }
-            try {
-                users = JSONUtil.readJSONUsersList(context, null);
-            }
-            catch(JSONException e){
-                e.printStackTrace();
-            }
-        }
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            user_id = getIntent().getExtras().getString("user_id");
-            for(User u : users){
-                if(u.getId().equals(user_id)){
-                    current_user = u;
-                    break;
-                }
-            }
-            if(current_user==null){
-                for(User u : users){
-                    if(u.getId()!=null)
-                    if(u.getId().equals("d48jd48d48j")){
-                        current_user = u;
-                        break;
-                    }
-                }
-            }
-        }
-        if(current_user==null){
-            for(User u : users){
-                if(u.getId()!=null)
-                    if(u.getId().equals("d48jd48d48j")){
-                        current_user = u;
-                        break;
-                    }
-            }
-        }
-        if(current_user==null){
-            current_user = new User();
-            current_user.setEmail("jkjs@dskj");
-            current_user.setId("d48jd48d48j");
-            //current_user.setFidelity_points(110);
-            current_user.setFirst_name("Alex");
-            current_user.setIsOwner(true);
-            current_user.setPassword("tipiacerebbe");
-            current_user.setPhone_number("0989897879789");
-            current_user.setVat_number("sw8d9wd8w9d8w9d9");
-            users.add(current_user);
-        }
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        //navigation drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        //get the right user
+        Bundle b = getIntent().getExtras();
+        //TODO Decomment after integrations
+        /*
+        if(b!=null)
+            restaurant_id = b.getString("user_id");
+        */
+        if(user_id==null)
+            user_id = "fake_user_id";
+
+        //get and fill related data
+        get_user_from_firebase();
+		
+
         //TODO decomment handle logged/not logged user
         /*
         if(user_id==null){ //not logged
@@ -159,39 +102,176 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
             //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
         }
         */
-        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user!=null) {
-            if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
-                nav_username.setText(current_user.getFirst_name());
-            else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getLast_name());
-            else if (current_user.getFirst_name() != null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
-            if (current_user.getEmail() != null)
-                nav_email.setText(current_user.getEmail());
-            if (current_user.getPhoto() != null)
-                nav_photo.setImageBitmap(current_user.getPhoto());
-        }
-        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-        Uri photouri = null;
-        if(userDetails.getString("photouri", null)!=null) {
-            photouri = Uri.parse(userDetails.getString("photouri", null));
-            File f = new File(getRealPathFromURI(photouri));
-            Drawable d = Drawable.createFromPath(f.getAbsolutePath());
-            navigationView.getHeaderView(0).setBackground(d);
-        }
-        else
-            nav_photo.setImageResource(R.drawable.blank_profile);
-
-        load_saved_data();
-
-        activate_buttons();
-
-
+		
     }
 
+    private void progress_dialog(){
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMax(100);
+        progressDialog.setMessage("Its loading....");
+        progressDialog.setTitle("");
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.show();
+    }
+
+    public void get_user_from_firebase(){
+		progress_dialog();
+
+		//DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/"+user_id);
+        ref.addValueEventListener(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot snapshot) {
+                /*
+				for (DataSnapshot usSnapshot: snapshot.getChildren()) {
+					User snap_user = usSnapshot.getValue(User.class);
+					String snap_user_id = snap_user.getUser_id();
+					if(snap_user_id.equals(user_id)){
+						current_user = snap_user;
+						break;
+					}
+				}
+				*/
+
+                current_user = snapshot.getValue(User.class);
+
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                setSupportActionBar(toolbar);
+                //navigation drawer
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                        (Activity)context, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                drawer.setDrawerListener(toggle);
+                toggle.syncState();
+                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+                    @SuppressWarnings("StatementWithEmptyBody")
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem item) {
+                        // Handle navigation view item clicks here.
+                        int id = item.getItemId();
+                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                        if(id==R.id.nav_owner){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    MainActivity.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        }
+                        else if(id==R.id.nav_home){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserRestaurantList.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        }
+                        else if(id==R.id.nav_login){
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserRestaurantList.class);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.nav_my_profile) {
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserProfile.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.nav_my_orders) {
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    MyOrdersActivity.class);
+                            Bundle b1 = new Bundle();
+                            b1.putString("user_id", user_id);
+                            intent1.putExtras(b1);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.nav_my_reservations){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    UserMyReservations.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("user_id", user_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        } else if(id==R.id.nav_my_reviews){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    MyReviewsActivity.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("user_id", user_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        } else if(id==R.id.nav_my_favourites){
+                            Intent intent3 = new Intent(
+                                    getApplicationContext(),
+                                    UserMyFavourites.class);
+                            Bundle b3 = new Bundle();
+                            b3.putString("user_id", user_id);
+                            intent3.putExtras(b3);
+                            startActivity(intent3);
+                            return true;
+                        }
+
+                        drawer.closeDrawer(GravityCompat.START);
+                        return true;
+                    }
+                });
+
+                TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+                if (current_user != null) {
+                    if (current_user.getUser_full_name() != null && current_user.getUser_full_name() == null)
+                        nav_username.setText(current_user.getUser_full_name());
+                    if (current_user.getUser_email() != null)
+                        nav_email.setText(current_user.getUser_email());
+                    if (current_user.getUser_photo_firebase_URL() != null)
+                        Glide.with(context)
+                                .load(current_user.getUser_photo_firebase_URL()) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                .placeholder(R.drawable.blank_profile)
+                                .into(nav_photo);
+                }
+                /*
+                SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+                Uri photouri = null;
+                if(userDetails.getString("photouri", null)!=null) {
+                    photouri = Uri.parse(userDetails.getString("photouri", null));
+                    File f = new File(getRealPathFromURI(photouri));
+                    Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+                    navigationView.getHeaderView(0).setBackground(d);
+                }
+                else
+                    nav_photo.setImageResource();
+                        }
+                */
+
+                load_saved_data();
+
+                activate_buttons();
+
+                progressDialog.dismiss();
+
+        }
+        @Override
+        public void onCancelled(DatabaseError firebaseError) {
+            System.out.println("The read failed: " + firebaseError.getMessage());
+        }
+    });
+	}
+	
     private String getRealPathFromURI(Uri contentURI) {
         Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
         if (cursor == null) { // Source is Dropbox or other similar local file path
@@ -233,39 +313,27 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
     public void load_saved_data(){
         //load photo
         ImageView image = (ImageView) findViewById(R.id.imageView);
-        if (current_user.getPhoto()!=null){
-            image.setImageBitmap(current_user.getPhoto());
-        }
-        else {
-            SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-            if (userDetails != null) {
-                if (userDetails.getString("photouri", null) != null) {
-                    Uri photouri = Uri.parse(userDetails.getString("photouri", null));
-                    if (photouri != null)
-                        image.setImageURI(photouri);
-                }
-            }
+        if (current_user.getUser_photo_firebase_URL()!=null){
+            Glide.with(this)
+							 .load(current_user.getUser_photo_firebase_URL()) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+							 .diskCacheStrategy(DiskCacheStrategy.ALL)
+							 .placeholder(R.drawable.blank_profile)
+							 .into(image);
         }
 
         //load other fields
         TextView tv = (TextView) findViewById(R.id.email);
-        if (current_user.getEmail() != null)
-            tv.setText(current_user.getEmail());
-        TextView tv2 = (TextView) findViewById(R.id.password);
-        if (current_user.getPassword() != null)
-            tv2.setText(current_user.getPassword());
-        TextView tv3 = (TextView) findViewById(R.id.first_name);
-        if (current_user.getFirst_name() != null)
-            tv3.setText(current_user.getFirst_name());
-        TextView tv4 = (TextView) findViewById(R.id.last_name);
-        if (current_user.getLast_name() != null)
-            tv4.setText(current_user.getLast_name());
+        if (current_user.getUser_email() != null)
+            tv.setText(current_user.getUser_email());
+        TextView tv3 = (TextView) findViewById(R.id.profile_full_name);
+        if (current_user.getUser_full_name() != null)
+            tv3.setText(current_user.getUser_full_name());
         TextView tv5 = (TextView) findViewById(R.id.phone_number);
-        if (current_user.getPhone_number() != null)
-            tv5.setText(current_user.getPhone_number());
+        if (current_user.getUser_telephone_number() != null)
+            tv5.setText(current_user.getUser_telephone_number());
         TextView tv6 = (TextView) findViewById(R.id.vat_number);
-        if (current_user.getVat_number() != null)
-            tv6.setText(current_user.getVat_number());
+        if (current_user.getOwner_vat_number() != null)
+            tv6.setText(current_user.getOwner_vat_number());
     }
 
     public void activate_buttons() {
@@ -299,23 +367,17 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
 
     public void saveinstancestate(Bundle savedInstanceState){
         TextView tv = (TextView) findViewById(R.id.email);
-        TextView tv2 = (TextView) findViewById(R.id.password);
-        TextView tv3 = (TextView) findViewById(R.id.first_name);
-        TextView tv4 = (TextView) findViewById(R.id.last_name);
+        TextView tv3 = (TextView) findViewById(R.id.profile_full_name);
         TextView tv5 = (TextView) findViewById(R.id.phone_number);
         TextView tv6 = (TextView) findViewById(R.id.vat_number);
 
         String email = tv.getText().toString();
-        String password = tv2.getText().toString();
-        String first_name = tv3.getText().toString();
-        String last_name = tv4.getText().toString();
+        String full_name = tv3.getText().toString();
         String phone_number = tv5.getText().toString();
         String vat_number = tv6.getText().toString();
 
         savedInstanceState.putString("email", email);
-        savedInstanceState.putString("password", password);
-        savedInstanceState.putString("first_name", first_name);
-        savedInstanceState.putString("last_name", last_name);
+        savedInstanceState.putString("full_name", full_name);
         savedInstanceState.putString("phone_number", phone_number);
         savedInstanceState.putString("vat_number", vat_number);
         //I can not save the photo, but i could save its URI
@@ -339,19 +401,13 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                 }
             }
             TextView tv = (TextView) findViewById(R.id.email);
-            TextView tv2 = (TextView) findViewById(R.id.password);
-            TextView tv3 = (TextView) findViewById(R.id.first_name);
-            TextView tv4 = (TextView) findViewById(R.id.last_name);
+            TextView tv3 = (TextView) findViewById(R.id.profile_full_name);
             TextView tv5 = (TextView) findViewById(R.id.phone_number);
             TextView tv6 = (TextView) findViewById(R.id.vat_number);
             if (savedInstanceState.getString("email") != null)
                 tv.setText(savedInstanceState.getString("email", null));
-            if (savedInstanceState.getString("password") != null)
-                tv2.setText(savedInstanceState.getString("password", null));
-            if (savedInstanceState.getString("first_name") != null)
-                tv3.setText(savedInstanceState.getString("first_name", null));
-            if (savedInstanceState.getString("last_name") != null)
-                tv4.setText(savedInstanceState.getString("last_name", null));
+            if (savedInstanceState.getString("full_name") != null)
+                tv3.setText(savedInstanceState.getString("full_name", null));
             if (savedInstanceState.getString("phone_number") != null)
                 tv5.setText(savedInstanceState.getString("phone_number", null));
             if (savedInstanceState.getString("vat_number") != null)
@@ -385,40 +441,30 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
-            users.remove(current_user);
             //new user
             TextView tv = (TextView) findViewById(R.id.email);
-            TextView tv2 = (TextView) findViewById(R.id.password);
-            TextView tv3 = (TextView) findViewById(R.id.first_name);
-            TextView tv4 = (TextView) findViewById(R.id.last_name);
+            TextView tv3 = (TextView) findViewById(R.id.profile_full_name);
             TextView tv5 = (TextView) findViewById(R.id.phone_number);
             TextView tv6 = (TextView) findViewById(R.id.vat_number);
             String email = tv.getText().toString();
-            String password = tv2.getText().toString();
-            String first_name = tv3.getText().toString();
-            String last_name = tv4.getText().toString();
+            String full_name = tv3.getText().toString();
             String phone_number = tv5.getText().toString();
             String vat_number = tv6.getText().toString();
             User new_user = new User();
-            if(user_id!=null){
-                new_user.setId(user_id);
-            }
-            else{
-                new_user.setId(current_user.getId());
-            }
-            new_user.setEmail(email);
-            new_user.setPassword(password);
-            new_user.setFirst_name(first_name);
-            new_user.setLast_name(last_name);
-            new_user.setPhone_number(phone_number);
-            new_user.setVat_number(vat_number);
-            users.add(new_user);
-            try{
-                JSONUtil.saveJSONUsersList(users, context);
-            }
-            catch(JSONException e){
-                e.printStackTrace();
-            }
+            new_user.setUser_email(email);
+            new_user.setUser_full_name(full_name);
+            new_user.setUser_telephone_number(phone_number);
+            new_user.setOwner_vat_number(vat_number);
+
+            //remove old user and insert new one
+            //TODO remove the next line
+            String fake_id = "-KI8xQ4iFbjV_HjmFqU4";
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/"+fake_id);
+            ref.setValue(null);
+            DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/");
+            DatabaseReference ref3 = ref2.push();
+            new_user.setUser_id(ref3.getKey());
+            ref3.setValue(new_user);
         }
         if (id == R.id.action_cancel) {
             Intent intent1 = new Intent(
@@ -572,88 +618,5 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         edit.commit();
         */
     }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-        @Override
-        public boolean onNavigationItemSelected(MenuItem item) {
-            // Handle navigation view item clicks here.
-            int id = item.getItemId();
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            if(id==R.id.nav_owner){
-                Intent intent1 = new Intent(
-                        getApplicationContext(),
-                        MainActivity.class);
-                Bundle b1 = new Bundle();
-                b1.putString("user_id", user_id);
-                intent1.putExtras(b1);
-                startActivity(intent1);
-                return true;
-            }
-            else if(id==R.id.nav_home){
-                Intent intent1 = new Intent(
-                        getApplicationContext(),
-                        UserRestaurantList.class);
-                Bundle b1 = new Bundle();
-                b1.putString("user_id", user_id);
-                intent1.putExtras(b1);
-                startActivity(intent1);
-                return true;
-            }
-            else if(id==R.id.nav_login){
-                Intent intent1 = new Intent(
-                        getApplicationContext(),
-                        UserRestaurantList.class);
-                startActivity(intent1);
-                return true;
-            } else if(id==R.id.nav_my_profile) {
-                Intent intent1 = new Intent(
-                        getApplicationContext(),
-                        UserProfile.class);
-                Bundle b1 = new Bundle();
-                b1.putString("user_id", user_id);
-                intent1.putExtras(b1);
-                startActivity(intent1);
-                return true;
-            } else if(id==R.id.nav_my_orders) {
-                Intent intent1 = new Intent(
-                        getApplicationContext(),
-                        MyOrdersActivity.class);
-                Bundle b1 = new Bundle();
-                b1.putString("user_id", user_id);
-                intent1.putExtras(b1);
-                startActivity(intent1);
-                return true;
-            } else if(id==R.id.nav_my_reservations){
-                Intent intent3 = new Intent(
-                        getApplicationContext(),
-                        UserMyReservations.class);
-                Bundle b3 = new Bundle();
-                b3.putString("user_id", user_id);
-                intent3.putExtras(b3);
-                startActivity(intent3);
-                return true;
-            } else if(id==R.id.nav_my_reviews){
-                Intent intent3 = new Intent(
-                        getApplicationContext(),
-                        MyReviewsActivity.class);
-                Bundle b3 = new Bundle();
-                b3.putString("user_id", user_id);
-                intent3.putExtras(b3);
-                startActivity(intent3);
-                return true;
-            } else if(id==R.id.nav_my_favourites){
-                Intent intent3 = new Intent(
-                        getApplicationContext(),
-                        UserMyFavourites.class);
-                Bundle b3 = new Bundle();
-                b3.putString("user_id", user_id);
-                intent3.putExtras(b3);
-                startActivity(intent3);
-                return true;
-            }
-
-            drawer.closeDrawer(GravityCompat.START);
-            return true;
-        }
 
 }

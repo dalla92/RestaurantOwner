@@ -496,14 +496,14 @@ public class DataInitialization {
 
     public void meal_addition_fake_initialization() {
         ma = new MealAddition();
-        ma.setIs_addition_selected(true);
+        ma.setAdditionSelected(true);
         ma.setMeal_addition_id(meal_id);
         ma.setMeal_addition_price(0.50);
         ma.setMeal_addition_name("Parmigiano");
         m_a.add(ma);
 
         ma2 = new MealAddition();
-        ma2.setIs_addition_selected(true);
+        ma2.setAdditionSelected(true);
         ma2.setMeal_addition_id(meal_id2);
         ma2.setMeal_addition_price(1.0);
         ma2.setMeal_addition_name("Pancetta");

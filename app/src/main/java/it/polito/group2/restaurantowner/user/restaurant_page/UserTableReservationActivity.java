@@ -95,11 +95,12 @@ public class UserTableReservationActivity extends AppCompatActivity{
         */
         restaurant_id = "-KI8xQ4PDVSKKjnRGmdG";
         user_id = "fake_user_id";
-        //TODO optimize research here
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
+        //DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+user_id);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                /*
                 for (DataSnapshot resSnapshot : snapshot.getChildren()) {
                     Restaurant snap_restaurant = resSnapshot.getValue(Restaurant.class);
                     String snap_restaurant_id = snap_restaurant.getRestaurant_id();
@@ -108,7 +109,8 @@ public class UserTableReservationActivity extends AppCompatActivity{
                         break;
                     }
                 }
-
+                */
+                current_restaurant = snapshot.getValue(Restaurant.class);
                 if (current_restaurant.getRestaurant_total_tables_number() <= 0) {
                     new AlertDialog.Builder(context)
                             .setMessage(R.string.no_table_reservation_service)
@@ -393,7 +395,6 @@ public class UserTableReservationActivity extends AppCompatActivity{
                             @Override
                             public void onClick(DialogInterface dialog,
                                                 int which) {
-                                //TODO add current_table_reservation into db
                                 DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
                                 DatabaseReference ref2 = ref.push();
                                 current_table_reservation.setTable_reservation_id(ref2.getKey());
@@ -463,7 +464,6 @@ public class UserTableReservationActivity extends AppCompatActivity{
                                             Log.e("EXCEPTION", "NULL POINTER EXCEPTION IN onOptionsItemSelected");
                                         }
                                         current_table_reservation.setRestaurant_id(restaurant_id);
-                                        //TODO change user_id
                                         current_table_reservation.setUser_id(user_id);
                                         if(current_table_reservation.getTable_reservation_date() != null
                                                 && current_table_reservation.getTable_reservation_guests_number() !=0
