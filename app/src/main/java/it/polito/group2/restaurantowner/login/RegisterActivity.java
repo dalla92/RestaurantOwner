@@ -1,11 +1,6 @@
 package it.polito.group2.restaurantowner.login;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.ProgressDialog;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
@@ -99,7 +94,6 @@ public class RegisterActivity extends AppCompatActivity {
                     // User is signed out
                     Log.d("prova", "Register: onAuthStateChanged:signed_out");
                 }
-                // ...
             }
         };
 

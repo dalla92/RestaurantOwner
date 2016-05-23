@@ -722,11 +722,11 @@ public class DataInitialization {
 
     public void restaurant_gallery_fake_initialization() {
         r_g = new RestaurantGallery();
-        r_g.setRestaurant_gallery_image_URL("https://www.flickr.com/photos/142675931@N04/26785604560/in/dateposted-public/");
+        //r_g.setRestaurant_gallery_image_URL("https://www.flickr.com/photos/142675931@N04/26785604560/in/dateposted-public/");
         r_g.setRestaurant_id(restaurant_id);
 
         r_g2 = new RestaurantGallery();
-        r_g2.setRestaurant_gallery_image_URL("https://www.flickr.com/photos/142675931@N04/27038201146/in/dateposted-public/");
+        //r_g2.setRestaurant_gallery_image_URL("https://www.flickr.com/photos/142675931@N04/27038201146/in/dateposted-public/");
         r_g2.setRestaurant_id(restaurant_id);
     }
 
