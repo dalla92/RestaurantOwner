@@ -35,14 +35,24 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnPausedListener;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -51,6 +61,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Review;
@@ -77,6 +88,8 @@ public class Restaurant_page extends AppCompatActivity
     public Context context;
     private ProgressDialog progressDialog;
     private Adapter_Reviews adapter;
+    private StorageReference photo_reference;
+    private StorageReference user_storage_reference;
 
     /*private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int SELECT_PICTURE = 2;
@@ -449,6 +462,13 @@ public class Restaurant_page extends AppCompatActivity
         return true;
     }
 
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //take a photo result
@@ -463,9 +483,14 @@ public class Restaurant_page extends AppCompatActivity
                 Uri contentUri = Uri.fromFile(f);
                 mediaScanIntent.setData(contentUri);
                 this.sendBroadcast(mediaScanIntent);
-                image.setImageURI(Uri.parse(photouri));
-                //TODO upload image to an image hosting service and set the returned URL
+                //image.setImageURI(Uri.parse(photouri));
+                Glide.with(context)
+                        .load(photouri) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.blank_profile)
+                        .into(image);
                 my_restaurant.setRestaurant_photo_firebase_URL(contentUri.toString());
+                save_photo();
             }
         }
 
@@ -478,8 +503,13 @@ public class Restaurant_page extends AppCompatActivity
                 imageStream = getContentResolver().openInputStream(imageUri);
                 ImageView image_to_enlarge = (ImageView) findViewById(R.id.image_to_enlarge);
                 Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
-                image_to_enlarge.setImageBitmap(bitmap);
+                Glide.with(context)
+                        .load(getImageUri(context, bitmap)) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.blank_profile)
+                        .into(image_to_enlarge);
                 photouri = saveToInternalStorage(bitmap);
+                save_photo();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -493,8 +523,6 @@ public class Restaurant_page extends AppCompatActivity
                     }
                 }
             }
-            //TODO upload image to an image hosting service and set the returned URL
-            my_restaurant.setRestaurant_photo_firebase_URL(photouri);
         }
 
         if (requestCode == MODIFY_INFO) {
@@ -523,6 +551,89 @@ public class Restaurant_page extends AppCompatActivity
         }
 
         hide();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // If there's an upload in progress, save the reference so you can query it later
+        if (photo_reference != null) {
+            outState.putString("reference", photo_reference.toString());
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // If there was an upload in progress, get its reference and create a new StorageReference
+        final String stringRef = savedInstanceState.getString("reference");
+        if (stringRef == null) {
+            return;
+        }
+        photo_reference = FirebaseStorage.getInstance().getReferenceFromUrl(stringRef);
+
+        // Find all UploadTasks under this StorageReference (in this example, there should be one)
+        List<UploadTask> tasks = photo_reference.getActiveUploadTasks();
+        if (tasks.size() > 0) {
+            // Get the task monitoring the upload
+            UploadTask task = tasks.get(0);
+
+            // Add new listeners to the task using an Activity scope
+            task.addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    //
+                }
+            });
+        }
+    }
+
+    public void save_photo(){
+        //save photo
+        ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        user_storage_reference = storage.getReferenceFromUrl("gs://have-break-9713d.appspot.com");
+        File f = new File(photouri);
+        Uri imageUri = Uri.fromFile(f);
+        // Create a child reference
+        // imagesRef now points to "images"
+        photo_reference = user_storage_reference.child("images/restaurants/" + restaurant_id);
+        //upload
+        UploadTask uploadTask = user_storage_reference.putFile(imageUri);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            //public void onFailure(@NonNull Throwable throwable) {
+            public void onFailure(Exception e) {
+                e.printStackTrace();
+                Log.d("my_ex", e.getMessage());
+                Toast failure_message = Toast.makeText(context, "The upload is failed", Toast.LENGTH_LONG);
+                failure_message.show();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                my_restaurant.setRestaurant_photo_firebase_URL(downloadUrl.toString());
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id+"/restaurant_photo_firebase_URL");
+                ref.setValue(downloadUrl.toString());
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = 100.0 * (taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                Toast progress_message = Toast.makeText(context, "Upload is " + progress + "% done", Toast.LENGTH_LONG);
+                progress_message.show();
+            }
+        }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
+                Toast pause_message = Toast.makeText(context, "Upload is has been paused", Toast.LENGTH_LONG);
+                pause_message.show();            }
+        });
+
     }
 
     private String saveToInternalStorage(Bitmap bitmapImage) throws IOException {
@@ -653,7 +764,11 @@ public class Restaurant_page extends AppCompatActivity
         bmOptions.inPurgeable = true;
         Bitmap bitmap = BitmapFactory.decodeFile(photouri, bmOptions);
         if(bitmap!=null)
-            mImageView.setImageBitmap(bitmap);
+            Glide.with(context)
+                    .load(getImageUri(context, bitmap)) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .placeholder(R.drawable.blank_profile)
+                    .into(mImageView);
         /*
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor edit = userDetails.edit();

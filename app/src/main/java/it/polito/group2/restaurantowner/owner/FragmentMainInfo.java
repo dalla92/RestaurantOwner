@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,6 +32,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.Spinner;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
@@ -144,7 +148,11 @@ public class FragmentMainInfo extends Fragment {
         ImageView image = (ImageView) rootView.findViewById(R.id.meal_photo);
         if(!getArguments().isEmpty()) {
             if (getArguments().getString("meal_photo") != null) {
-                image.setImageURI(Uri.parse(getArguments().getString("meal_photo")));
+                Glide.with(getContext())
+                        .load(getArguments().getString("meal_photo")) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.blank_profile)
+                        .into(image);
                 photouri = getArguments().getString("meal_photo");
             }
         }
@@ -318,7 +326,11 @@ public class FragmentMainInfo extends Fragment {
                 //photouri = contentUri.toString();
                 Log.d("aaa", "BREAK3"+contentUri.toString());
                 Log.d("aaa", "BREAK4" + Uri.parse(photouri));
-                image.setImageURI(Uri.parse(photouri));
+                Glide.with(getContext())
+                        .load(photouri) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .placeholder(R.drawable.blank_profile)
+                        .into(image);
                 photouri = (contentUri.toString()); // ***MAYBE***
             }
         }
@@ -331,7 +343,10 @@ public class FragmentMainInfo extends Fragment {
                 imageStream = getActivity().getContentResolver().openInputStream(imageUri);
                 ImageView meal_photo = (ImageView) rootView.findViewById(R.id.meal_photo);
                 Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
-                meal_photo.setImageBitmap(bitmap);
+                Glide.with(getContext())
+                        .load(getImageUri(getContext(), bitmap)) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(meal_photo);
                 photouri = saveToInternalStorage(bitmap);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -362,6 +377,13 @@ public class FragmentMainInfo extends Fragment {
         //I can not save the photo, but i could save its URI
         edit.commit();
         */
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
     }
 
     private String saveToInternalStorage(Bitmap bitmapImage) throws IOException {
@@ -422,7 +444,10 @@ public class FragmentMainInfo extends Fragment {
         bmOptions.inPurgeable = true;
         Bitmap bitmap = BitmapFactory.decodeFile(photouri, bmOptions);
         if(bitmap!=null)
-            mImageView.setImageBitmap(bitmap);
+            Glide.with(getContext())
+                    .load(getImageUri(getContext(), bitmap)) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .into(mImageView);
         /*
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor edit = userDetails.edit();
