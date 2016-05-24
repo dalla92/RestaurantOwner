@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.restaurant_page;
+package it.polito.group2.restaurantowner.user.restaurant_list;
 
 import android.Manifest;
 import android.content.Context;
@@ -24,10 +24,10 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import it.polito.group2.restaurantowner.R;
 
 
@@ -40,7 +40,6 @@ import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
@@ -49,6 +48,11 @@ import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.Filter;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class UserRestaurantList extends AppCompatActivity
 //      DatabaseReferenceLoginBaseActivity
@@ -86,6 +90,26 @@ public class UserRestaurantList extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        ImageView filter_icon = (ImageView) findViewById(R.id.icon_filter);
+        assert filter_icon != null;
+        filter_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserRestaurantList.this, Filter.class);
+                startActivityForResult(intent, ACTION_FILTER);
+            }
+        });
+
+        TextView search = (TextView) findViewById(R.id.search_text);
+        assert search != null;
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UserRestaurantList.this, SearchActivity.class);
+                startActivityForResult(intent, ACTION_FILTER);
+            }
+        });
 
 /*        DatabaseReference.setAndroidContext(this);
         geoFire = new GeoFire(new DatabaseReference("https://flickering-fire-455.firebaseio.com/"));
@@ -140,7 +164,7 @@ public class UserRestaurantList extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -262,10 +286,11 @@ public class UserRestaurantList extends AppCompatActivity
 */    }
 
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.user_restaurant_list, menu);
+
         return true;
     }
 
@@ -289,7 +314,7 @@ public class UserRestaurantList extends AppCompatActivity
                 return super.onOptionsItemSelected(item);
 
         }
-    }
+    }*/
 
 
     /*    @Override

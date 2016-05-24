@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -23,7 +24,11 @@ public class FullScreenGalleryActivity extends AppCompatActivity {
         int position = i.getIntExtra("position", 0);
         ArrayList<String> mGridData = i.getStringArrayListExtra("urls");
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        for(String url: mGridData){
+            Log.d("fullscreen", url);
+        }
+
+        ExtendedViewPager viewPager = (ExtendedViewPager) findViewById(R.id.pager);
         FullScreenGalleryAdapter adapter = new FullScreenGalleryAdapter(this, mGridData);
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(position);

@@ -11,7 +11,7 @@
         android:layout_centerInParent="true" />
 
     <it.polito.group2.restaurantowner.gallery.PinchToZoomImageView
-        android:id="@+id/gallery_item_image"
+        android:id="@+id/fullscreen_gallery_item_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"

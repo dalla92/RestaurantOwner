@@ -27,7 +27,7 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
+import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class OrderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,

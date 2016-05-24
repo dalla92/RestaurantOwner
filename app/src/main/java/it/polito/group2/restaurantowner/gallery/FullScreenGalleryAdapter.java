@@ -43,7 +43,7 @@ public class FullScreenGalleryAdapter extends PagerAdapter {
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewLayout = inflater.inflate(R.layout.full_screen_gallery_item, container, false);
 
-        PinchToZoomImageView imgDisplay = (PinchToZoomImageView) viewLayout.findViewById(R.id.gallery_item_image);
+        PinchToZoomImageView imgDisplay = (PinchToZoomImageView) viewLayout.findViewById(R.id.fullscreen_gallery_item_image);
         final ProgressBar mProgressBar = (ProgressBar) viewLayout.findViewById(R.id.progress_bar);
 
         String imagesURL = mGridData.get(position);

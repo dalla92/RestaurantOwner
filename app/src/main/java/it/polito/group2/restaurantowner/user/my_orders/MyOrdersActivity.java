@@ -1,8 +1,5 @@
 package it.polito.group2.restaurantowner.user.my_orders;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,31 +8,23 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.ListView;
 
 import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 
@@ -44,11 +33,10 @@ import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.MenuAdapter;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
+import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 import it.polito.group2.restaurantowner.data.Meal;
 import it.polito.group2.restaurantowner.data.MealAddition;
 import it.polito.group2.restaurantowner.data.MenuCategory;
