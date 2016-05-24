@@ -188,6 +188,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
+        Glide
+                .with(this)
+                .load(R.drawable.image)
+                .fitCenter()
+                .into(image);
 
         if(targetRestaurant!=null) {
             String photoURL = targetRestaurant.getRestaurant_photo_firebase_URL();
