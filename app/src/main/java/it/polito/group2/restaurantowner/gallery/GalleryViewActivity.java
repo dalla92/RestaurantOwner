@@ -4,8 +4,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,44 +17,37 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.RatingBar;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantGallery;
-import it.polito.group2.restaurantowner.firebasedata.User;
 
 /**
  * Created by TheChuck on 09/05/2016.
@@ -63,7 +56,7 @@ import it.polito.group2.restaurantowner.firebasedata.User;
 public class GalleryViewActivity extends AppCompatActivity {
 
     private GalleryViewAdapter mGridAdapter;
-    private ArrayList<String> mGridData;
+    private HashMap<String, String> mGridData;
     private String restaurantID;
     private GridView mGridView;
     public int PICK_IMAGE = 0;
@@ -72,6 +65,7 @@ public class GalleryViewActivity extends AppCompatActivity {
     private FirebaseDatabase firebase;
     private String mCurrentPhotoPath;
     private ProgressDialog mProgressDialog;
+    private boolean isOwner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +77,7 @@ public class GalleryViewActivity extends AppCompatActivity {
 
         Bundle bundle = getIntent().getExtras();
         restaurantID = "-KIMqPtRSEdm0Cvfc3Za";
+        isOwner = true;
         //restaurantID = bundle.getString("restaurantID");
 
         firebase = FirebaseDatabase.getInstance();
@@ -90,9 +85,6 @@ public class GalleryViewActivity extends AppCompatActivity {
         mGridView = (GridView) findViewById(R.id.gridView);
 
         storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com");
-        StorageReference image1Ref = storageRef.child("restaurants/-KIMqPtRSEdm0Cvfc3Za/img.jpg");
-        StorageReference image2Ref = storageRef.child("restaurants/-KIMqPtRSEdm0Cvfc3Za/image9.png");
-        final StorageReference listRef = storageRef.child("restaurants/-KIMqPtRSEdm0Cvfc3Za/list.txt");
 
         showProgressDialog();
         DatabaseReference galleryRef =  firebase.getReference("restaurants_galleries/" + restaurantID);
@@ -100,8 +92,8 @@ public class GalleryViewActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 RestaurantGallery gallery = dataSnapshot.getValue(RestaurantGallery.class);
-                mGridData = new ArrayList<>();
-                mGridData.addAll(gallery.getUrls().values());
+                mGridData = new HashMap<>(gallery.getUrls());
+                //mGridData.addAll(gallery.getUrls().values());
                 mGridAdapter = new GalleryViewAdapter(GalleryViewActivity.this, R.layout.gallery_item, mGridData);
                 mGridView.setAdapter(mGridAdapter);
                 hideProgressDialog();
@@ -129,9 +121,16 @@ public class GalleryViewActivity extends AppCompatActivity {
                 int[] screenLocation = new int[2];
                 imageView.getLocationOnScreen(screenLocation);
 
+                ArrayList<String> urls = new ArrayList<>();
+                urls.addAll(mGridData.values());
+
+                for(String url: urls){
+                    Log.d("gallery", url);
+                }
+
                 //Pass the image title and url to DetailsActivity
                 intent.putExtra("position", position)
-                        .putExtra("urls", mGridData);
+                        .putExtra("urls", urls);
 
                 Bundle b = null;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
@@ -146,12 +145,109 @@ public class GalleryViewActivity extends AppCompatActivity {
             }
         });
 
+        if(isOwner){
+            mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
+            mGridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+
+                @Override
+                public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                    final int checkedCount = mGridView.getCheckedItemCount();
+                    // Set the CAB title according to total checked items
+                    mode.setTitle(checkedCount + " Selected");
+                    // Calls toggleSelection method from ListViewAdapter Class
+                    mGridAdapter.toggleSelection(position);
+                }
+
+                @Override
+                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                    mode.getMenuInflater().inflate(R.menu.menu_gallery_selected, menu);
+                    return true;
+                }
+
+                @Override
+                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                    return false;
+                }
+
+                @Override
+                public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.action_delete:
+                            AlertDialog.Builder alert = new AlertDialog.Builder(GalleryViewActivity.this);
+                            alert.setTitle("Confirmation!");
+                            alert.setMessage("Are you sure you want to delete the selected images?\nThis operation cannot be undone!");
+                            alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Calls getSelectedIds method from ListViewAdapter Class
+                                    dialog.dismiss();
+                                    SparseBooleanArray selected = mGridAdapter.getSelectedIds();
+                                    // Captures all selected ids with a loop
+                                    for (int i = (selected.size() - 1); i >= 0; i--) {
+                                        showProgressDialog();
+                                        if (selected.valueAt(i)) {
+                                            final String selectedItemKey = (String) mGridAdapter.getItem(selected.keyAt(i));
+                                            String url = mGridData.get(selectedItemKey);
+
+                                            //remove item from storage, database and adapter
+                                            int index = url.indexOf("?");
+                                            final String fileName = url.substring(index - 17, index);
+
+                                            StorageReference imageRef = storageRef.child("restaurants/" + restaurantID + "/" + fileName);
+                                            imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                @Override
+                                                public void onSuccess(Void aVoid) {
+                                                    DatabaseReference galleryRef = firebase.getReference("restaurants_galleries/" + restaurantID + "/urls");
+                                                    galleryRef.child(selectedItemKey).removeValue(new DatabaseReference.CompletionListener() {
+                                                        @Override
+                                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                                            mGridAdapter.remove(selectedItemKey);
+                                                            hideProgressDialog();
+                                                        }
+                                                    });
+                                                }
+                                            }).addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    Toast.makeText(GalleryViewActivity.this, "Error during removal of the pictures, try again!", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+
+                                        }
+                                    }
+                                    // Close CAB
+                                    mode.finish();
+                                }
+                            });
+                            alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    mode.finish();
+                                    dialog.dismiss();
+                                }
+                            });
+                            alert.show();
+                        default:
+                            return false;
+                    }
+                }
+
+                @Override
+                public void onDestroyActionMode(ActionMode mode) {
+                    mGridAdapter.removeSelection();
+                }
+            });
+        }
+
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_gallery, menu);
+        if(isOwner)
+            getMenuInflater().inflate(R.menu.menu_gallery_owner, menu);
+        else
+            getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
         return true;
     }
 
@@ -162,33 +258,34 @@ public class GalleryViewActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_add_photo) {
-            View menuItemView = findViewById(R.id.action_add_photo);
-            PopupMenu popup = new PopupMenu(GalleryViewActivity.this, menuItemView);
-            popup.getMenuInflater().inflate(R.menu.menu_popup_pictures, popup.getMenu());
+        if(isOwner) {
+            if (id == R.id.action_add_photo) {
+                View menuItemView = findViewById(R.id.action_add_photo);
+                PopupMenu popup = new PopupMenu(GalleryViewActivity.this, menuItemView);
+                popup.getMenuInflater().inflate(R.menu.menu_popup_pictures, popup.getMenu());
 
-            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                public boolean onMenuItemClick(MenuItem item) {
-                    int id = item.getItemId();
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    public boolean onMenuItemClick(MenuItem item) {
+                        int id = item.getItemId();
 
-                    if (id == R.id.camera) {
-                        dispatchTakePictureIntent();
-                        return true;
+                        if (id == R.id.camera) {
+                            dispatchTakePictureIntent();
+                            return true;
+                        }
+                        if (id == R.id.gallery) {
+                            Intent intent = new Intent();
+                            intent.setType("image/*");
+                            intent.setAction(Intent.ACTION_GET_CONTENT);
+                            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
+                            return true;
+                        } else {
+                            return true;
+                        }
                     }
-                    if (id == R.id.gallery) {
-                        Intent intent = new Intent();
-                        intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_GET_CONTENT);
-                        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE);
-                        return true;
-                    } else {
-                        return true;
-                    }
-                }
-            });
-            popup.setGravity(Gravity.CENTER);
-            popup.show();
+                });
+                popup.setGravity(Gravity.CENTER);
+                popup.show();
+            }
         }
 
         if(id == android.R.id.home){
@@ -247,35 +344,44 @@ public class GalleryViewActivity extends AppCompatActivity {
         //take a photo result
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
             showProgressDialog();
-            galleryAddPic();
-            File f = new File(mCurrentPhotoPath);
-            Uri imageUri = Uri.fromFile(f);
 
-            final Calendar c = Calendar.getInstance();
-            StorageReference imageRef = storageRef.child("restaurants/" + restaurantID + "/" +
-                    c.get(Calendar.DAY_OF_MONTH) + "_" +
-                    c.get(Calendar.MONTH) + "_" +
-                    c.get(Calendar.YEAR) + ".jpg");
+            /*File f = new File(mCurrentPhotoPath);
+            Uri imageUri = Uri.fromFile(f);*/
 
-            //uploading image on the firebase storage
-            UploadTask uploadTask = imageRef.putFile(imageUri);
-            uploadTask.addOnFailureListener(new OnFailureListener() {
+            ImageCompressionAsyncTask imageCompression = new ImageCompressionAsyncTask() {
                 @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(GalleryViewActivity.this, "Error during save of the picture, try again!", Toast.LENGTH_SHORT).show();
-                    hideProgressDialog();
+                protected void onPostExecute(Uri imageUri) {
+                    // image here is compressed & ready to be saved
+                    galleryAddPic();
+                    final Calendar c = Calendar.getInstance();
+                    StorageReference imageRef = storageRef.child("restaurants/" + restaurantID + "/" +
+                            c.getTimeInMillis() + ".jpg");
+
+                    //uploading image on the firebase storage
+                    UploadTask uploadTask = imageRef.putFile(imageUri);
+                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(GalleryViewActivity.this, "Error during save of the picture, try again!", Toast.LENGTH_SHORT).show();
+                            hideProgressDialog();
+                        }
+                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                            DatabaseReference galleryRef = firebase.getReference("restaurants_galleries/" + restaurantID + "/urls");
+                            DatabaseReference itemRef = galleryRef.push();
+                            itemRef.setValue(downloadUrl.toString());
+                            mGridData.put(itemRef.getKey(), downloadUrl.toString());
+                            mGridAdapter.setGridData(mGridData);
+                            hideProgressDialog();
+                        }
+                    });
                 }
-            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                    DatabaseReference galleryRef =  firebase.getReference("restaurants_galleries/" + restaurantID + "/urls");
-                    galleryRef.push().setValue(downloadUrl.toString());
-                    mGridData.add(downloadUrl.toString());
-                    mGridAdapter.setGridData(mGridData);
-                    hideProgressDialog();
-                }
-            });
+            };
+            imageCompression.execute(mCurrentPhotoPath);// imagePath as a string
+
+
         }
 
         //choose a photo result
@@ -285,9 +391,7 @@ public class GalleryViewActivity extends AppCompatActivity {
 
             final Calendar c = Calendar.getInstance();
             StorageReference imageRef = storageRef.child("restaurants/" + restaurantID + "/" +
-                    c.get(Calendar.DAY_OF_MONTH) + "_" +
-                    c.get(Calendar.MONTH) + "_" +
-                    c.get(Calendar.YEAR) + ".jpg");
+                    c.getTimeInMillis() + ".jpg");
 
             //uploading image on the firebase storage
             UploadTask uploadTask = imageRef.putFile(imageUri);
@@ -302,14 +406,28 @@ public class GalleryViewActivity extends AppCompatActivity {
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     Uri downloadUrl = taskSnapshot.getDownloadUrl();
                     DatabaseReference galleryRef =  firebase.getReference("restaurants_galleries/" + restaurantID + "/urls");
-                    galleryRef.push().setValue(downloadUrl.toString());
-                    mGridData.add(downloadUrl.toString());
+                    DatabaseReference itemRef = galleryRef.push();
+                    itemRef.setValue(downloadUrl.toString());
+                    mGridData.put(itemRef.getKey(), downloadUrl.toString());
                     mGridAdapter.setGridData(mGridData);
                     hideProgressDialog();
                 }
             });
 
         }
+    }
+
+
+    public abstract class ImageCompressionAsyncTask extends AsyncTask<String, Void, Uri> {
+
+        @Override
+        protected Uri doInBackground(String... strings) {
+            if(strings.length == 0 || strings[0] == null)
+                return null;
+            return ImageUtils.compressImage(strings[0]);
+        }
+
+        protected abstract void onPostExecute(Uri imageUri) ;
     }
 
     private void showProgressDialog() {

@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
+import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

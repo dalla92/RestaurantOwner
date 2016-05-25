@@ -5,7 +5,7 @@
     android:background="@color/black"
     tools:context=".gallery.FullscreenGalleryActivity">
 
-    <android.support.v4.view.ViewPager
+    <it.polito.group2.restaurantowner.gallery.ExtendedViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

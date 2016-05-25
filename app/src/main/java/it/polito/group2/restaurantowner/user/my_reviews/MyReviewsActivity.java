@@ -38,7 +38,7 @@ import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantList;
+import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class MyReviewsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 

@@ -11,11 +11,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.UiThread;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -54,7 +52,6 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -73,6 +70,7 @@ import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.order.OrderActivity;
+import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class UserRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -190,6 +188,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
+        Glide
+                .with(this)
+                .load(R.drawable.image)
+                .fitCenter()
+                .into(image);
 
         if(targetRestaurant!=null) {
             String photoURL = targetRestaurant.getRestaurant_photo_firebase_URL();
