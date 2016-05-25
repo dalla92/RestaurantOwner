@@ -13,26 +13,26 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.MealAddition;
+import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 
 public class AdditionFragment extends ListFragment {
 
-    public static final String MEAL = "mealID";
-    private String mealID;
-
-    private ArrayList<AdditionModel> modelList;
+    public static final String LIST = "additionList";
+    private ArrayList<MealAddition> additionList;
+    private ArrayList<MealAddition> selectedAddition;
     private OnActionListener mCallback;
 
     public AdditionFragment() {}
 
-    public static AdditionFragment newInstance(String mealID) {
+    public static AdditionFragment newInstance(ArrayList<MealAddition> list) {
         AdditionFragment fragment = new AdditionFragment();
         Bundle args = new Bundle();
-        args.putString(MEAL, mealID);
+        args.putParcelableArrayList(LIST, list);
         fragment.setArguments(args);
         return fragment;
     }
@@ -41,7 +41,7 @@ public class AdditionFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mealID = getArguments().getString(MEAL);
+            additionList = getArguments().getParcelableArrayList(LIST);
         }
         setHasOptionsMenu(true);
         try {
@@ -66,6 +66,15 @@ public class AdditionFragment extends ListFragment {
     }
 
     @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        if(selectedAddition.indexOf(additionList.get(position)) == -1) {
+            selectedAddition.add(additionList.get(position));
+        } else {
+            selectedAddition.remove(additionList.get(position));
+        }
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnActionListener) {
@@ -83,7 +92,7 @@ public class AdditionFragment extends ListFragment {
     }
 
     public interface OnActionListener {
-        public void onNextClicked(ArrayList<MealAddition> additionList);
+        public void onAdditionsSelected(ArrayList<MealAddition> selectedAdditions);
         public void onCartClicked();
     }
 
@@ -99,13 +108,7 @@ public class AdditionFragment extends ListFragment {
 
         if(id == R.id.action_next){
             // Send the Additions to the host activity
-            ArrayList<MealAddition> additionList = new ArrayList<MealAddition>();
-            for(AdditionModel am : modelList) {
-                if(am.isSelected()) {
-                    additionList.add(am.getAddition());
-                }
-            }
-            mCallback.onNextClicked(additionList);
+            mCallback.onAdditionsSelected(selectedAddition);
             return true;
         }
 
@@ -118,37 +121,12 @@ public class AdditionFragment extends ListFragment {
     }
 
     private void setAdditionList() {
-        modelList = getModel(mealID);
-        final RecyclerView additionList = (RecyclerView) getView().findViewById(R.id.addition_list);
-        assert additionList != null;
-        additionList.setLayoutManager(new LinearLayoutManager(getContext()));
-        additionList.setNestedScrollingEnabled(false);
-        AdditionAdapter adapter = new AdditionAdapter(getContext(), modelList);
-        additionList.setAdapter(adapter);
+        final RecyclerView list = (RecyclerView) getView().findViewById(R.id.addition_list);
+        assert list != null;
+        list.setLayoutManager(new LinearLayoutManager(getContext()));
+        list.setNestedScrollingEnabled(false);
+        AdditionAdapter adapter = new AdditionAdapter(getContext(), additionList);
+        list.setAdapter(adapter);
     }
 
-    private ArrayList<AdditionModel> getModel(String mealID) {
-        ArrayList<AdditionModel> list = new ArrayList<AdditionModel>();
-        ArrayList<MealAddition> mealAdditions = getAdditionList(mealID);
-        for(MealAddition ma : mealAdditions) {
-            AdditionModel model = new AdditionModel(ma.getAddition_id(), ma.getName(), false, ma);
-            list.add(model);
-        }
-        return list;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////
-    //GENERATE DATAS
-    //TODO change this method to get data from firebase
-    private ArrayList<MealAddition> getAdditionList(String mealID) {
-        ArrayList<MealAddition> mealAdditionList = new ArrayList<MealAddition>();
-        for(int i=0; i<10; i++) {
-            MealAddition a = new MealAddition();
-            a.setmeal_id(mealID);
-            a.setName("Addition " + i);
-            a.setAddition_id("addID" + i);
-            mealAdditionList.add(a);
-        }
-        return mealAdditionList;
-    }
 }

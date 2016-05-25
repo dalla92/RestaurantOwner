@@ -1,12 +1,15 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
 /**
  * Created by Alessio on 16/05/2016.
  */
-public class MealAddition implements Serializable {
+public class MealAddition implements Serializable, Parcelable {
 
     private String meal_addition_id;
     private String meal_addition_name;
@@ -47,5 +50,15 @@ public class MealAddition implements Serializable {
 
     public void setAdditionSelected(Boolean additionSelected) {
         this.additionSelected = additionSelected;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        //TODO implementare
     }
 }

@@ -1,5 +1,7 @@
 package it.polito.group2.restaurantowner.user.order;
 
+
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -18,23 +20,20 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Meal;
-import it.polito.group2.restaurantowner.user.my_orders.*;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 
 public class MealFragment extends ListFragment {
 
-    public static final String CATEGORY = "categoryID";
-    private String categoryID;
-
-    private ArrayList<MealModel> modelList;
+    public static final String LIST = "mealList";
+    private ArrayList<Meal> mealList;
     private OnActionListener mCallback;
 
     public MealFragment() {}
 
-    public static MealFragment newInstance(String catID) {
+    public static MealFragment newInstance(ArrayList<Meal> mList) {
         MealFragment fragment = new MealFragment();
         Bundle args = new Bundle();
-        args.putString(CATEGORY, catID);
+        args.putParcelableArrayList(LIST, mList);
         fragment.setArguments(args);
         return fragment;
     }
@@ -43,7 +42,7 @@ public class MealFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            categoryID = getArguments().getString(CATEGORY);
+            mealList = getArguments().getParcelableArrayList(LIST);
         }
 
         setHasOptionsMenu(true);
@@ -70,7 +69,7 @@ public class MealFragment extends ListFragment {
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        mCallback.onMealSelected(modelList.get(position).getMeal());
+        mCallback.onMealSelected(mealList.get(position));
     }
 
     @Override
@@ -114,40 +113,12 @@ public class MealFragment extends ListFragment {
     }
 
     private void setMealList() {
-        modelList = getModel(categoryID);
-        final RecyclerView mealList = (RecyclerView) getView().findViewById(R.id.meal_list);
-        assert mealList != null;
-        mealList.setLayoutManager(new LinearLayoutManager(getContext()));
-        mealList.setNestedScrollingEnabled(false);
-        MealAdapter adapter = new MealAdapter(getContext(), modelList);
-        mealList.setAdapter(adapter);
-    }
-
-    private ArrayList<MealModel> getModel(String categoryID) {
-        ArrayList<MealModel> list = new ArrayList<MealModel>();
-        ArrayList<Meal> categoryMeals = getMealList(categoryID);
-        for(Meal m : categoryMeals) {
-            MealModel model = new MealModel(m.getMealId(), m.getMeal_name(),m, 1);
-            list.add(model);
-        }
-        return list;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////
-    //GENERATE DATAS
-    //TODO change this method to get data from firebase
-    private ArrayList<Meal> getMealList(String categoryID) {
-        ArrayList<Meal> mealList = new ArrayList<Meal>();
-        for(int i=0; i<10; i++) {
-            Meal m = new Meal();
-            m.setRestaurantId("ResID0");
-            m.setCategory(categoryID);
-            m.setMeal_name("meal "+i);
-            m.setMealId("mealID"+i);
-            m.setMeal_price(7.5);
-            mealList.add(m);
-        }
-        return mealList;
+        final RecyclerView list = (RecyclerView) getView().findViewById(R.id.meal_list);
+        assert list != null;
+        list.setLayoutManager(new LinearLayoutManager(getContext()));
+        list.setNestedScrollingEnabled(false);
+        MealAdapter adapter = new MealAdapter(getContext(), mealList);
+        list.setAdapter(adapter);
     }
 
 }

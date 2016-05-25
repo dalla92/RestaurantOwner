@@ -13,18 +13,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 
 /**
  * Created by Filippo on 12/05/2016.
  */
 public class CartAdditionAdapter extends RecyclerView.Adapter<CartAdditionAdapter.AdditionViewHolder> {
 
-    private final ArrayList<AdditionModel> modelList;
+    private final ArrayList<MealAddition> additionList;
     private final Context context;
 
-    public CartAdditionAdapter(Context context, ArrayList<AdditionModel> list) {
+    public CartAdditionAdapter(Context context, ArrayList<MealAddition> list) {
         this.context = context;
-        this.modelList = list;
+        this.additionList = list;
     }
 
     public class AdditionViewHolder extends RecyclerView.ViewHolder {
@@ -46,13 +47,13 @@ public class CartAdditionAdapter extends RecyclerView.Adapter<CartAdditionAdapte
 
     @Override
     public void onBindViewHolder(CartAdditionAdapter.AdditionViewHolder holder, int position) {
-        holder.name.setText(modelList.get(position).getName().toString());
-        holder.price.setText(formatEuro(modelList.get(position).getAddition().getPrice()));
+        holder.name.setText(additionList.get(position).getMeal_addition_name());
+        holder.price.setText(formatEuro(additionList.get(position).getMeal_addition_price()));
     }
 
     @Override
     public int getItemCount() {
-        return modelList.size();
+        return additionList.size();
     }
 
     private String formatEuro(double number) {

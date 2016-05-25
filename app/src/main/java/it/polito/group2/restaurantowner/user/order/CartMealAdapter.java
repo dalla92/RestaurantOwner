@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.user.my_orders.*;
 
 /**
@@ -24,12 +25,12 @@ import it.polito.group2.restaurantowner.user.my_orders.*;
  */
 public class CartMealAdapter extends RecyclerView.Adapter<CartMealAdapter.MealViewHolder> {
 
-    private final ArrayList<MealModel> modelList;
+    private final ArrayList<Meal> mealList;
     private final Context context;
 
-    public CartMealAdapter(Context context, ArrayList<MealModel> list) {
+    public CartMealAdapter(Context context, ArrayList<Meal> list) {
         this.context = context;
-        this.modelList = list;
+        this.mealList = list;
     }
 
     public class MealViewHolder extends RecyclerView.ViewHolder {
@@ -57,19 +58,19 @@ public class CartMealAdapter extends RecyclerView.Adapter<CartMealAdapter.MealVi
 
     @Override
     public void onBindViewHolder(CartMealAdapter.MealViewHolder holder, int position) {
-        holder.name.setText(modelList.get(position).getName().toString());
-        holder.category.setText(modelList.get(position).getMeal().getCategory().toString());
-        holder.price.setText(formatEuro(modelList.get(position).getMeal().getMeal_price()));
-        holder.quantity.setText(modelList.get(position).getQuantity().toString());
+        holder.name.setText(mealList.get(position).getMeal_name());
+        holder.category.setText(mealList.get(position).getMeal_category());
+        holder.price.setText(formatEuro(mealList.get(position).getMeal_price()));
+        holder.quantity.setText(mealList.get(position).getMeal_quantity());
         holder.additionList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.additionList.setNestedScrollingEnabled(false);
-        CartAdditionAdapter adapter = new CartAdditionAdapter(context, modelList.get(position).getAdditionModel());
+        CartAdditionAdapter adapter = new CartAdditionAdapter(context, mealList.get(position).getMeal_additions());
         holder.additionList.setAdapter(adapter);
     }
 
     @Override
     public int getItemCount() {
-        return modelList.size();
+        return mealList.size();
     }
 
     private String formatEuro(double number) {

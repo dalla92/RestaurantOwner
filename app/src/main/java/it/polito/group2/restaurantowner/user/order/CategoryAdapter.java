@@ -19,12 +19,12 @@ import it.polito.group2.restaurantowner.R;
  */
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
-    private final ArrayList<CategoryModel> modelList;
+    private final ArrayList<String> categoryList;
     private final Context context;
 
-    public CategoryAdapter(Context context, ArrayList<CategoryModel> list) {
+    public CategoryAdapter(Context context, ArrayList<String> list) {
         this.context = context;
-        this.modelList = list;
+        this.categoryList = list;
     }
 
     public class CategoryViewHolder extends RecyclerView.ViewHolder {
@@ -44,11 +44,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
 
     @Override
     public void onBindViewHolder(CategoryAdapter.CategoryViewHolder holder, int position) {
-        holder.categoryName.setText(modelList.get(position).getName());
+        holder.categoryName.setText(categoryList.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return modelList.size();
+        return categoryList.size();
     }
 }

@@ -3,7 +3,6 @@ package it.polito.group2.restaurantowner.user.order;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,26 +14,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.MealAddition;
-import it.polito.group2.restaurantowner.data.MenuCategory;
 
 public class CategoryFragment extends Fragment {
 
-    private static final String RESTAURANT = "restaurantID";
-    private String restaurantID;
+    private static final String LIST = "categoryList";
+    private ArrayList<String> categoryList;
 
-    private ArrayList<CategoryModel> modelList;
     private OnActionListener mCallback;
 
     public CategoryFragment() {}
 
-    public static CategoryFragment newInstance(String resID) {
+    public static CategoryFragment newInstance(ArrayList<String> catList) {
         CategoryFragment fragment = new CategoryFragment();
         Bundle args = new Bundle();
-        args.putString(RESTAURANT, resID);
+        args.putStringArrayList(LIST, catList);
         fragment.setArguments(args);
         return fragment;
     }
@@ -43,7 +40,7 @@ public class CategoryFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            restaurantID = getArguments().getString(RESTAURANT);
+            categoryList = getArguments().getStringArrayList(LIST);
         }
         setHasOptionsMenu(true);
         try {
@@ -69,7 +66,7 @@ public class CategoryFragment extends Fragment {
 
     //@Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        mCallback.onCategorySelected(modelList.get(position).getCategory());
+        mCallback.onCategorySelected(categoryList.get(position));
     }
 
     @Override
@@ -90,7 +87,7 @@ public class CategoryFragment extends Fragment {
     }
 
     public interface OnActionListener {
-        public void onCategorySelected(MenuCategory category);
+        public void onCategorySelected(String categoryName);
         public void onCartClicked();
     }
 
@@ -113,36 +110,12 @@ public class CategoryFragment extends Fragment {
     }
 
     private void setCategoryList() {
-        modelList = getModel(restaurantID);
-        final RecyclerView categoryList = (RecyclerView) getView().findViewById(R.id.category_list);
-        assert categoryList != null;
-        categoryList.setLayoutManager(new LinearLayoutManager(getContext()));
-        categoryList.setNestedScrollingEnabled(false);
-        CategoryAdapter adapter = new CategoryAdapter(getContext(), modelList);
-        categoryList.setAdapter(adapter);
-    }
-
-    private ArrayList<CategoryModel> getModel(String restaurantID) {
-        ArrayList<CategoryModel> list = new ArrayList<CategoryModel>();
-        ArrayList<MenuCategory> restaurantCategories = getMenuCategoryList(restaurantID);
-        for(MenuCategory cat : restaurantCategories) {
-            CategoryModel model = new CategoryModel(cat.getCategoryID(), cat.getName(), cat);
-            list.add(model);
-        }
-        return list;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////
-    //GENERATE DATAS
-    //TODO change this method to get data from firebase
-    private ArrayList<MenuCategory> getMenuCategoryList(String resID) {
-        ArrayList<MenuCategory> menuCatList = new ArrayList<MenuCategory>();
-        for(int i=0; i<10; i++) {
-            MenuCategory mc = new MenuCategory("catID"+i, "Category "+i, "RestID0");
-            mc.setRestaurantID(resID);
-            menuCatList.add(mc);
-        }
-        return menuCatList;
+        final RecyclerView catList = (RecyclerView) getView().findViewById(R.id.category_list);
+        assert catList != null;
+        catList.setLayoutManager(new LinearLayoutManager(getContext()));
+        catList.setNestedScrollingEnabled(false);
+        CategoryAdapter adapter = new CategoryAdapter(getContext(), categoryList);
+        catList.setAdapter(adapter);
     }
 
 }

@@ -16,22 +16,21 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Order;
-import it.polito.group2.restaurantowner.data.OrderMeal;
-import it.polito.group2.restaurantowner.data.OrderMealAddition;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
+import it.polito.group2.restaurantowner.firebasedata.Order;
 
 public class CartFragment extends ListFragment {
 
     public static final String ORDER = "order";
     private Order order;
 
-    private ArrayList<MealModel> modelList;
     private OnActionListener mCallback;
 
     public CartFragment() {}
@@ -63,26 +62,28 @@ public class CartFragment extends ListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.order_fragment_cart, container, false);
-        if(order.getNote() != null && order.getNote() != "") {
+
+        TextView orderPrice = (TextView) view.findViewById(R.id.order_price);
+        orderPrice.setText(formatEuro(this.order.getOrder_price()));
+
+        if(order.getOrder_notes() != null && order.getOrder_notes() != "") {
             EditText note = (EditText) view.findViewById(R.id.ordernote);
-            note.setText(order.getNote());
+            note.setText(order.getOrder_notes());
         }
 
         Button confirm_btn = (Button) view.findViewById(R.id.confirm_order);
         Button continue_btn = (Button) view.findViewById(R.id.continue_order);
         Button cancel_btn = (Button) view.findViewById(R.id.cancel_order);
 
-        continue_btn.setOnClickListener(new View.OnClickListener()
-        {
-            public void onClick(View v)
-            {
+        continue_btn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
                 EditText note = (EditText) view.findViewById(R.id.ordernote);
-                order.setNote(note.getText().toString());
+                order.setOrder_notes(note.getText().toString());
                 mCallback.onContinueOrderClicked(order);
             }
         });
 
-        if(order.getMealList().size() == 0) {
+        if(order.getOrder_meals().size() == 0) {
             confirm_btn.setVisibility(View.INVISIBLE);
         } else {
             confirm_btn.setVisibility(View.VISIBLE);
@@ -95,8 +96,8 @@ public class CartFragment extends ListFragment {
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     EditText note = (EditText) view.findViewById(R.id.ordernote);
-                                    order.setNote(note.getText().toString());
-                                    order.setTimestamp(Calendar.getInstance());
+                                    order.setOrder_notes(note.getText().toString());
+                                    order.setOrder_date(Calendar.getInstance());
                                     mCallback.onConfirmOrderClicked(order);
                                 }
                             })
@@ -136,7 +137,7 @@ public class CartFragment extends ListFragment {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        mCallback.onMealDeleted(order, modelList.get(position).getId());
+                        mCallback.onMealDeleted(order, order.getOrder_meals().get(position));
                     }
                 })
                 .setNegativeButton(android.R.string.no, null).show();
@@ -163,31 +164,20 @@ public class CartFragment extends ListFragment {
         public void onConfirmOrderClicked(Order order);
         public void onContinueOrderClicked(Order order);
         public void onCancelOrderClicked();
-        public void onMealDeleted(Order order, String mealID);
+        public void onMealDeleted(Order order, Meal meal);
     }
 
     private void setCartList() {
-        modelList = getModel();
-        final RecyclerView cartMealList = (RecyclerView) getView().findViewById(R.id.order_meal_list);
-        assert cartMealList != null;
-        cartMealList.setLayoutManager(new LinearLayoutManager(getContext()));
-        cartMealList.setNestedScrollingEnabled(false);
-        CartMealAdapter adapter = new CartMealAdapter(getContext(), modelList);
-        cartMealList.setAdapter(adapter);
+        final RecyclerView list = (RecyclerView) getView().findViewById(R.id.order_meal_list);
+        assert list != null;
+        list.setLayoutManager(new LinearLayoutManager(getContext()));
+        list.setNestedScrollingEnabled(false);
+        CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.getOrder_meals());
+        list.setAdapter(adapter);
 
     }
 
-    private ArrayList<MealModel> getModel() {
-        ArrayList<MealModel> list = new ArrayList<MealModel>();
-        for(OrderMeal m : order.getMealList()) {
-            MealModel model = new MealModel(m.getMeal().getMealId(), m.getMeal().getMeal_name(), m.getMeal(), m.getQuantity());
-            for(OrderMealAddition a : m.getAdditionList()) {
-                AdditionModel am = new AdditionModel(a.getAddition().getAddition_id(),
-                        a.getAddition().getName(), true, a.getAddition());
-                model.getAdditionModel().add(am);
-            }
-            list.add(model);
-        }
-        return list;
+    private String formatEuro(double number) {
+        return "Euro "+String.format("%10.2f", number);
     }
 }

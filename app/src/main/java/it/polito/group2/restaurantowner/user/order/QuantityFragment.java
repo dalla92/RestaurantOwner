@@ -63,7 +63,7 @@ public class QuantityFragment extends Fragment {
     }
 
     public interface OnActionListener {
-        public void onAddClicked(Integer quantity);
+        public void onQuantitySelected(Integer quantity);
         public void onCartClicked();
     }
 
@@ -79,7 +79,7 @@ public class QuantityFragment extends Fragment {
         if(id == R.id.action_add){
 
             NumberPicker qty = (NumberPicker)getView().findViewById(R.id.meal_quantity);
-            mCallback.onAddClicked(qty.getValue());
+            mCallback.onQuantitySelected(qty.getValue());
             return true;
         }
         if(id == R.id.goto_cart){

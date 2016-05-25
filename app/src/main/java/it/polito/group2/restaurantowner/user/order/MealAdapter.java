@@ -11,25 +11,25 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 
 /**
  * Created by Filippo on 10/05/2016.
  */
 public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder> {
 
-    private final ArrayList<MealModel> modelList;
+    private final ArrayList<Meal> mealList;
     private final Context context;
 
-    public MealAdapter(Context context, ArrayList<MealModel> list) {
+    public MealAdapter(Context context, ArrayList<Meal> list) {
         this.context = context;
-        this.modelList = list;
+        this.mealList = list;
     }
 
     public class MealViewHolder extends RecyclerView.ViewHolder {
         public TextView name;
         public TextView category;
         public TextView price;
-        public RecyclerView additionList;
 
         public MealViewHolder(View view){
             super(view);
@@ -47,14 +47,14 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
 
     @Override
     public void onBindViewHolder(MealAdapter.MealViewHolder holder, int position) {
-        holder.name.setText(modelList.get(position).getName().toString());
-        holder.category.setText(modelList.get(position).getMeal().getCategory().toString());
-        holder.price.setText(formatEuro(modelList.get(position).getMeal().getMeal_price()));
+        holder.name.setText(mealList.get(position).getMeal_name());
+        holder.category.setText(mealList.get(position).getMeal_category());
+        holder.price.setText(formatEuro(mealList.get(position).getMeal_price()));
     }
 
     @Override
     public int getItemCount() {
-        return modelList.size();
+        return mealList.size();
     }
 
     private String formatEuro(double number) {
