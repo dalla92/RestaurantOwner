@@ -28,7 +28,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -49,6 +53,7 @@ import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.User;
+import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class LoginManagerActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
@@ -61,20 +66,47 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
-    private UserSessionManager sessionManager;
     private TextInputLayout inputLayoutPassword, inputLayoutEmail;
     private EditText inputEmail, inputPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Configure Google Sign In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("51105168084-mt7a75l4aep1v8chjvkdo7i9rldbsiak.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        boolean logIn = getIntent().getBooleanExtra("login", false);
+        if(!logIn){
+            signOut();
+            Intent intent = new Intent(getApplicationContext(), UserRestaurantList.class);
+
+            // Closing all the Activities from stack
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            // Add new Flag to start new Activity
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            // Staring UserRestaurantList Activity
+            startActivity(intent);
+
+            //ending Log In Activity
+            finish();
+        }
+
         setContentView(R.layout.activity_login);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FirebaseAuth.getInstance().signOut();
-
-        sessionManager = new UserSessionManager(this);
+        //sessionManager = new UserSessionManager(this);
         callbackManager = CallbackManager.Factory.create();
         firebase = FirebaseDatabase.getInstance();
 
@@ -97,20 +129,11 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         findViewById(R.id.register_link).setOnClickListener(this);
         findViewById(R.id.forgot_password_link).setOnClickListener(this);
 
-        // Configure Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("51105168084-mt7a75l4aep1v8chjvkdo7i9rldbsiak.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
 
         mAuth = FirebaseAuth.getInstance();
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
+        /*mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -196,7 +219,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                     Log.d("prova", "Login: onAuthStateChanged:signed_out");
                 }
             }
-        };
+        };*/
     }
 
     private void handleAuthToken(String provider, String accessToken) {
@@ -213,7 +236,23 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
     }
 
     private void firebaseAuthWithPassword() {
-        mAuth.signInWithEmailAndPassword(inputEmail.getText().toString().trim(), inputPassword.getText().toString().trim())
+        showProgressDialog();
+        AuthCredential credential = EmailAuthProvider.getCredential(inputEmail.getText().toString().trim(), inputPassword.getText().toString().trim());
+        mAuth.signInWithCredential(credential)
+                .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult result) {
+                        handleFirebaseAuthResult(result);
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("prova", "auth:onFailure:" + e.getMessage());
+                        handleFirebaseAuthResult(null);
+                    }
+                });
+        /*mAuth.signInWithEmailAndPassword(inputEmail.getText().toString().trim(), inputPassword.getText().toString().trim())
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -228,12 +267,111 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                                 hideProgressDialog();
                             }
                         }
-                    });
+                    });*/
+    }
+
+    private void handleFirebaseAuthResult(AuthResult result) {
+        if (result != null) {
+            Log.d("prova", "handleFirebaseAuthResult:SUCCESS");
+            FirebaseUser user = result.getUser();
+            final String fullName = user.getDisplayName();
+            final String email = user.getEmail();
+            final String userID = user.getUid();
+            String providerId = null;
+            for (UserInfo profile : user.getProviderData()) {
+                // Id of the provider (ex: google.com)
+                providerId = profile.getProviderId();
+            }
+            if(providerId == null)
+                providerId = "password";
+            if(providerId.equals("google.com"))
+                providerId = "google";
+
+            final String targetProvider = providerId;
+
+            final DatabaseReference userRef = firebase.getReference("users");
+            final Query userQuery = userRef.orderByChild("user_email").equalTo(email);
+            userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.hasChildren()) {
+                        Log.d("prova", fullName + " " + email + " " + userID);
+
+                        User user = new User(userID, fullName, "", email);
+                        user.getProviders().put("google", true);
+                        userRef.child(userID).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                hideProgressDialog();
+                                Intent i = new Intent(LoginManagerActivity.this, UserRestaurantActivity.class);
+
+                                i.putExtra("restaurant_id", "-KI35BWFjfamV1gY4l3G");
+
+                                // Closing all the Activities from stack
+                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                                // Add new Flag to start new Activity
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                // Staring UserRestaurantList Activity
+                                startActivity(i);
+                            }
+                        });
+
+                    } else {
+                        User target = null;
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            target = data.getValue(User.class);
+                        }
+                        HashMap<String, Boolean> providers = target.getProviders();
+                        if(!targetProvider.contains(targetProvider)){
+                            providers.put(targetProvider, true);
+                        }
+                        userRef.child(target.getUser_id()).child("providers").setValue(providers);
+
+                        hideProgressDialog();
+                        Intent i = new Intent(LoginManagerActivity.this, UserRestaurantActivity.class);
+
+                        i.putExtra("restaurant_id", "-KI35BWFjfamV1gY4l3G");
+
+                        // Closing all the Activities from stack
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                        // Add new Flag to start new Activity
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        // Staring UserRestaurantList Activity
+                        startActivity(i);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "check user calcelled!");
+                }
+            });
+        } else {
+            Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void firebaseAuthWithGoogle(String accessToken) {
         AuthCredential credential = GoogleAuthProvider.getCredential(accessToken, null);
         mAuth.signInWithCredential(credential)
+                .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult result) {
+                        handleFirebaseAuthResult(result);
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("prova", "auth:onFailure:" + e.getMessage());
+                        handleFirebaseAuthResult(null);
+                    }
+                });
+        /*mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -251,7 +389,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                             hideProgressDialog();
                         }
                     }
-                });
+                });*/
     }
 
     private void firebaseAuthWithFacebook(String token) {
@@ -274,7 +412,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 });
     }
 
-    @Override
+    /*@Override
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
@@ -287,7 +425,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
-    }
+    }*/
 
     private void showProgressDialog() {
         if (mProgressDialog == null) {
@@ -373,18 +511,13 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         return target != null && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
     }
 
-    /*private void signOut() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
-                new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(Status status) {
-                        // [START_EXCLUDE]
-                        Toast.makeText(LoginManagerActivity.this, "LogOut", Toast.LENGTH_SHORT).show();
-                        hideProgressDialog();
-                        // [END_EXCLUDE]
-                    }
-                });
-    }*/
+    private void signOut() {
+        if(mGoogleApiClient.isConnected())
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+
+        LoginManager.getInstance().logOut();
+        FirebaseAuth.getInstance().signOut();
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -465,141 +598,5 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
             }
         }
     }
-
-
-        /*firebase = new Firebase("https://have-break.firebaseio.com/");
-        sessionManager = new UserSessionManager(this);
-        callbackManager = CallbackManager.Factory.create();
-
-        LoginButton fbButton = (LoginButton) findViewById(R.id.fb_login_button);
-        fbButton.setReadPermissions("public_profile", "email");
-
-        fbButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                progressDialog = ProgressDialog.show(LoginManagerActivity.this, null, "Loading...", false, false);
-
-                LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        Log.d("login", "Success");
-
-                        onFacebookAccessTokenChange(loginResult.getAccessToken());
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        Log.d("login", "Cancelled");
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-                        Log.d("login", "Error");
-                    }
-
-                });
-            }
-        });
-    }
-
-    private void onFacebookAccessTokenChange(AccessToken token) {
-        if (token != null) {
-            firebase.authWithOAuthToken("facebook", token.getToken(), new Firebase.AuthResultHandler() {
-                @Override
-                public void onAuthenticated(AuthData authData) {
-
-                    HashMap<String, String> userData = (HashMap<String, String>) authData.getProviderData().get("cachedUserProfile");
-                    String email = userData.get("email");
-                    String firstName = userData.get("first_name");
-                    String lastName = userData.get("last_name");
-                    String gender = userData.get("gender");
-                    String userID = authData.getUid();
-                    Log.d("prova", email + " " + firstName + " " + lastName + " " + gender + " " + userID);
-
-
-                    String provider = "facebook";
-
-                    sessionManager.createUserLoginSession(userID, provider);
-
-                    Intent i = new Intent(LoginManagerActivity.this, UserRestaurantActivity.class);
-
-                    i.putExtra("restaurant_id", "-KI35BWFjfamV1gY4l3G";
-                    // Closing all the Activities from stack
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                    // Add new Flag to start new Activity
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                    // Staring UserRestaurantList Activity
-                    startActivity(i);
-
-                    //ending Log In Activity
-                    finish();
-
-
-
-                }
-
-                @Override
-                public void onAuthenticationError(FirebaseError firebaseError) {
-                    Log.d("firebaseLogin", "Error");
-                }
-            });
-        } else {
-
-            firebase.unauth();
-        }
-    }
-
-    private void syncGoogleSignInToken( GoogleSignInAccount googleSignInAccount ){
-        AsyncTask<GoogleSignInAccount, Void, String> task = new AsyncTask<GoogleSignInAccount, Void, String>() {
-            @Override
-            protected String doInBackground(GoogleSignInAccount... params) {
-                GoogleSignInAccount gsa = params[0];
-                String scope = "oauth2:profile email";
-                String token = null;
-
-                try {
-                    token = GoogleAuthUtil.getToken(LoginManagerActivity.this, gsa.getEmail(), scope);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (GoogleAuthException e) {
-                    e.printStackTrace();
-                }
-
-                return token;
-            }
-
-            @Override
-            protected void onPostExecute(String token) {
-                super.onPostExecute(token);
-
-                if( token != null ){
-                    accessGoogleLoginData( token );
-                }
-                else{
-                    showSnackbar("Google login falhou, tente novamente");
-                }
-            }
-        };
-
-        task.execute(googleSignInAccount);
-    }
-
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if( requestCode == RC_SIGN_IN_GOOGLE && resultCode == RESULT_OK ){
-
-            GoogleSignInResult googleSignInResult = Auth.GoogleSignInApi.getSignInResultFromIntent( data );
-            GoogleSignInAccount account = googleSignInResult.getSignInAccount();
-
-            syncGoogleSignInToken( account );
-        }
-        else{
-            callbackManager.onActivityResult( requestCode, resultCode, data );
-        }
-    }*/
 
 }

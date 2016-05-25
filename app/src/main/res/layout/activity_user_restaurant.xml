@@ -87,9 +87,10 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:itemIconTint="@color/colorAccent"
-        app:headerLayout="@layout/nav_header_login"
+
         app:menu="@menu/activity_user_restaurant_list_drawer"
         app:itemTextColor="@color/gray"
         app:theme="@style/AppTheme"/>
+    <!--app:headerLayout="@layout/nav_header_login"-->
 
 </android.support.v4.widget.DrawerLayout>

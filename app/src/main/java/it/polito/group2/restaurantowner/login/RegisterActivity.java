@@ -1,9 +1,12 @@
 package it.polito.group2.restaurantowner.login;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -15,21 +18,43 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.EmailAuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.User;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+
+    private static final int RC_SIGN_IN_GOOGLE = 9001;
 
     private TextInputLayout inputLayoutFirstName, inputLayoutLastName, inputLayoutPassword, inputLayoutConfirmPassword, inputLayoutEmail;
     private EditText inputFirstName, inputLastName, inputPassword, inputConfirmPassword, inputEmail, inputPhoneNumber;
@@ -37,6 +62,9 @@ public class RegisterActivity extends AppCompatActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
+    private GoogleApiClient mGoogleApiClient;
+    private DatabaseReference userRef;
+    private String userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +75,20 @@ public class RegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         firebase = FirebaseDatabase.getInstance();
+        userRef = firebase.getReference("users");
 
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
+        // Configure Google Sign In
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("51105168084-mt7a75l4aep1v8chjvkdo7i9rldbsiak.apps.googleusercontent.com")
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        /*mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 final FirebaseUser user = firebaseAuth.getCurrentUser();
@@ -95,7 +135,7 @@ public class RegisterActivity extends AppCompatActivity {
                     Log.d("prova", "Register: onAuthStateChanged:signed_out");
                 }
             }
-        };
+        };*/
 
         inputLayoutFirstName = (TextInputLayout) findViewById(R.id.input_layout_first_name);
         inputLayoutLastName = (TextInputLayout) findViewById(R.id.input_layout_last_name);
@@ -126,9 +166,86 @@ public class RegisterActivity extends AppCompatActivity {
                         validatePassword() && validateConfirmPassword()) {
 
                     showProgressDialog();
-                    String email = inputEmail.getText().toString().trim();
-                    String password = inputPassword.getText().toString().trim();
-                    mAuth.createUserWithEmailAndPassword(email, password)
+                    final String email = inputEmail.getText().toString().trim();
+                    final String password = inputConfirmPassword.getText().toString().trim();
+                    final String fullName = inputFirstName.getText().toString().trim() + " " + inputLastName.getText().toString().trim();
+                    final String phoneNumber = inputPhoneNumber.getText().toString().trim();
+
+                    Query userQuery = userRef.orderByChild("user_email").equalTo(email);
+                    userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (!dataSnapshot.hasChildren()) {
+                                mAuth.createUserWithEmailAndPassword(email, password)
+                                        .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                                            @Override
+                                            public void onSuccess(AuthResult authResult) {
+                                                User user = new User(authResult.getUser().getUid(), fullName, phoneNumber, email);
+                                                user.getProviders().put("password", true);
+                                                userRef.child(authResult.getUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        hideProgressDialog();
+                                                        Toast.makeText(RegisterActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
+
+                                                        signOut();
+
+                                                        Intent i = new Intent(RegisterActivity.this, LoginManagerActivity.class);
+
+                                                        i.putExtra("login", true);
+
+                                                        // Closing all the Activities from stack
+                                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                                                        // Add new Flag to start new Activity
+                                                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                                        // Staring UserRestaurantList Activity
+                                                        startActivity(i);
+                                                    }
+                                                });
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                hideProgressDialog();
+                                                Toast.makeText(RegisterActivity.this, "Registration failed, try again!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                            } else {
+                                User target = null;
+                                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                    target = data.getValue(User.class);
+                                }
+                                Log.d("prova", target.getUser_email() + " " + target.getUser_full_name() + " " + target.getUser_id() + " " + target.getProviders());
+                                userID = target.getUser_id();
+                                target.setUser_telephone_number(inputPhoneNumber.getText().toString().trim());
+                                HashMap<String, Boolean> providers = target.getProviders();
+                                if (!providers.containsKey("password")) {
+                                    providers.put("password", true);
+                                    userRef.child(target.getUser_id()).setValue(target);
+                                    if(providers.containsKey("google")){
+                                        signInWithGoogle();
+                                    }
+                                    if (providers.containsKey("facebook")){
+                                        //TODO facebook merge
+                                    }
+                                }
+                                else{
+                                    Toast.makeText(RegisterActivity.this, "This account already exists!", Toast.LENGTH_SHORT).show();
+                                    hideProgressDialog();
+                                }
+                            }
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            Log.d("prova", "check user calcelled!");
+                        }
+                    });
+
+                    /*mAuth.createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -148,14 +265,15 @@ public class RegisterActivity extends AppCompatActivity {
                                     }
 
                                 }
-                            });
+                            });*/
 
                 }
             }
         });
     }
 
-    @Override
+
+   /* @Override
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
@@ -167,6 +285,33 @@ public class RegisterActivity extends AppCompatActivity {
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }*/
+
+    private void signInWithGoogle() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Confirmation!");
+        alert.setMessage("You have already logged in with Google using this email," +
+                "\nIt's not possible to have more then one account with the same email." +
+                "Click yes to choose your google account and merge the data.");
+        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
+                dialog.dismiss();
+            }
+        });
+        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                userRef.child(userID + "/providers/password").setValue(null);
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
     }
 
     private boolean validateFirstName() {
@@ -259,6 +404,151 @@ public class RegisterActivity extends AppCompatActivity {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.hide();
         }
+    }
+
+    private void handleAuthToken(String provider, String accessToken) {
+        /*if (provider.equals("facebook")) {
+            firebaseAuthWithFacebook(accessToken);
+        }*/
+        if (provider.equals("google")) {
+            firebaseAuthWithGoogle(accessToken);
+        }
+    }
+
+    private void firebaseAuthWithGoogle(String accessToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(accessToken, null);
+        mAuth.signInWithCredential(credential)
+                .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult result) {
+                        handleFirebaseAuthResult(result);
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("prova", "auth:onFailure:" + e.getMessage());
+                        handleFirebaseAuthResult(null);
+                    }
+                });
+    }
+
+    private void handleFirebaseAuthResult(AuthResult result) {
+        if (result != null) {
+            final FirebaseUser user = result.getUser();
+            if(user.getDisplayName() != null) {
+                if (!user.getDisplayName().equals(inputFirstName.getText().toString().trim() + " " + inputLastName.getText().toString().trim())) {
+                    signOut();
+                    userRef.child(user.getUid() + "/providers/password").setValue(null);
+                    Toast.makeText(RegisterActivity.this, "This email is already register with Google under a different name," +
+                            "\ntry again with the correct First name and Last name to merge the account info!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+            }
+
+            AuthCredential credential = EmailAuthProvider.getCredential(inputEmail.getText().toString().trim(), inputConfirmPassword.getText().toString().trim());
+            user.linkWithCredential(credential)
+                    .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                        @Override
+                        public void onSuccess(AuthResult authResult) {
+                            Toast.makeText(RegisterActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
+
+                            signOut();
+
+                            Intent i = new Intent(RegisterActivity.this, LoginManagerActivity.class);
+
+                            i.putExtra("login", true);
+
+                            // Closing all the Activities from stack
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                            // Add new Flag to start new Activity
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            // Staring UserRestaurantList Activity
+                            startActivity(i);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            signOut();
+                            userRef.child(user.getUid() + "/providers/password").setValue(null);
+                            Toast.makeText(RegisterActivity.this, "Registration failed in link.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+
+
+            /*user.updatePassword(inputPassword.getText().toString().trim())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(RegisterActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
+
+                            signOut();
+
+                            Intent i = new Intent(RegisterActivity.this, LoginManagerActivity.class);
+
+                            i.putExtra("login", true);
+
+                            // Closing all the Activities from stack
+                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                            // Add new Flag to start new Activity
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                            // Staring UserRestaurantList Activity
+                            startActivity(i);
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            signOut();
+                            Toast.makeText(RegisterActivity.this, "Registration failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    });*/
+        } else {
+            userRef.child(userID + "/providers/password").setValue(null);
+            Toast.makeText(this, "Registration failed result = null.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN_GOOGLE) {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess()) {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = result.getSignInAccount();
+                handleAuthToken("google", account.getIdToken());
+            } else {
+                // Google Sign In failed
+                userRef.child(userID + "/providers/password").setValue(null);
+                hideProgressDialog();
+                Toast.makeText(RegisterActivity.this, "Error during registration, Try again!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void signOut() {
+        if(mGoogleApiClient.isConnected())
+            Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+
+        LoginManager.getInstance().logOut();
+        FirebaseAuth.getInstance().signOut();
+        hideProgressDialog();
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        hideProgressDialog();
+        Toast.makeText(RegisterActivity.this, "Fatal error,try again!", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     private class MyTextWatcher implements TextWatcher {

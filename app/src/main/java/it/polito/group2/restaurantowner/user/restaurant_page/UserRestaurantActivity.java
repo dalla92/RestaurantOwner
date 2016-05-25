@@ -9,8 +9,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -41,6 +39,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -61,9 +61,10 @@ import it.polito.group2.restaurantowner.data.MenuCategory;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Offer;
-import it.polito.group2.restaurantowner.data.User;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
+import it.polito.group2.restaurantowner.login.FirebaseUtil;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.login.UserSessionManager;
 import it.polito.group2.restaurantowner.owner.MainActivity;
@@ -81,14 +82,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private ArrayList<MenuCategory> categories;
     private Restaurant targetRestaurant;
     private ReviewAdapter reviewAdapter;
-    private ArrayList<User> users = new ArrayList<>();
     private Context context;
-    private User current_user;
     private boolean bookmark = false;
     private ProgressDialog mProgressDialog;
     private FirebaseDatabase firebase;
-    private UserSessionManager sessionManager;
-    private RecyclerView reviewList;
+    private Toolbar toolbar;
 
 
     @Override
@@ -96,14 +94,17 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_restaurant);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         context = this;
-        sessionManager = new UserSessionManager(this);
+        //UserSessionManager sessionManager = new UserSessionManager(this);
         reviews = new ArrayList<>();
-
         initializeUserReviewList();
+        final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
+        ImageView coverPicture = (ImageView) findViewById(R.id.user_restaurant_image);
+        firebase = FirebaseDatabase.getInstance();
+        showProgressDialog();
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
@@ -112,15 +113,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             userID = getIntent().getExtras().getString("user_id");
         }
 
-        //Log.d("prova", restaurantID);
-        final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
-
-        firebase = FirebaseDatabase.getInstance();
-
+        collapsing.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
         DatabaseReference restaurantRef = firebase.getReference("restaurants/-KIMqPtRSEdm0Cvfc3Za");
-
-        showProgressDialog();
-
         restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -129,8 +123,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 restaurantID = targetRestaurant.getRestaurant_id();
                 reviews = new ArrayList<>();
                 collapsing.setTitle(targetRestaurant.getRestaurant_name());
-                hideProgressDialog();
                 setRestaurantInfo();
+                hideProgressDialog();
 
                 Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo("-KIMlQqpVOfKUrKec-tH");
                 reviewsRef.addChildEventListener(new ChildEventListener() {
@@ -169,14 +163,23 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
-
         getRestaurantAndSetButtons();
 
-        collapsing.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
+        Glide
+                .with(this)
+                .load(R.drawable.image)
+                .fitCenter()
+                .into(coverPicture);
 
+        /*if(targetRestaurant!=null) {
+            String photoURL = targetRestaurant.getRestaurant_photo_firebase_URL();
+            if (photoURL == null || photoURL.equals(""))
+                Glide.with(this).load(R.drawable.no_image).into(coverPicture);
+            else
+                Glide.with(this).load(photoURL).into(coverPicture);
+        }*/
 
-        ImageView image = (ImageView) findViewById(R.id.user_restaurant_image);
-        Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
+        /*Bitmap bitmap = ((BitmapDrawable) image.getDrawable()).getBitmap();
         Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
             @Override
             public void onGenerated(Palette palette) {
@@ -186,53 +189,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 collapsing.setContentScrimColor(palette.getMutedColor(primary));
                 collapsing.setStatusBarScrimColor(palette.getDarkVibrantColor(primaryDark));
             }
-        });
-
-        Glide
-                .with(this)
-                .load(R.drawable.image)
-                .fitCenter()
-                .into(image);
-
-        if(targetRestaurant!=null) {
-            String photoURL = targetRestaurant.getRestaurant_photo_firebase_URL();
-            if (photoURL == null || photoURL.equals(""))
-                Glide.with(this).load(R.drawable.no_image).into(image);
-            else
-                Glide.with(this).load(photoURL).into(image);
-        }
+        });*/
 
 
         offers = getOffersJSON();
         categories = getCategoriesJson();
-
-        /*
-        //TODO Rearrange the following code
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            userID = getIntent().getExtras().getString("user_id");
-            try {
-                users = JSONUtil.readJSONUsersList(this, null);
-            }
-            catch(JSONException e){
-                e.printStackTrace();
-            }
-            for(User u : users){
-                if(u.getId().equals(userID)){
-                    current_user = u;
-                    break;
-                }
-            }
-        }
-        else{
-            current_user = new User();
-            current_user.setEmail("jkjs@dskj");
-            //current_user.setFidelity_points(110);
-            current_user.setFirst_name("Alex");
-            current_user.setIsOwner(true);
-            current_user.setPassword("tipiacerebbe");
-            current_user.setPhone_number("0989897879789");
-            current_user.setVat_number("sw8d9wd8w9d8w9d9");
-        }*/
 
         setBookmarkButton();
         addInfoExpandAnimation();
@@ -241,7 +202,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         setCallAction();
         setRestaurantOffers();
         setRestaurantMenu();
-        setDrawer(toolbar);
+        setDrawer();
 
 
     }
@@ -262,12 +223,12 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         }
     }
 
-    private void setDrawer(Toolbar toolbar) {
+    private void setDrawer() {
         //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -280,7 +241,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         MenuItem myReviewsItem = menu.findItem(R.id.nav_my_reviews);
         MenuItem myFavItem = menu.findItem(R.id.nav_my_favourites);
 
-        if(sessionManager.isUserLoggedIn()) {
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
             loginItem.setVisible(false);
             logoutItem.setVisible(true);
             myProfileItem.setVisible(true);
@@ -288,12 +250,42 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             mrResItem.setVisible(true);
             myReviewsItem.setVisible(true);
             myFavItem.setVisible(true);
+            navigationView.inflateHeaderView(R.layout.nav_header_login);
 
-            TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-            TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    User target = dataSnapshot.getValue(User.class);
 
-            HashMap<String, String> userData = sessionManager.getSessionData();
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
 
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(UserRestaurantActivity.this)
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                    else{
+                        Glide
+                                .with(UserRestaurantActivity.this)
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
 
         }
         else{
@@ -304,6 +296,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             mrResItem.setVisible(false);
             myReviewsItem.setVisible(false);
             myFavItem.setVisible(false);
+
         }
 
         navigationView.setNavigationItemSelectedListener(this);
@@ -405,30 +398,18 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             return true;
         }
         else if(id==R.id.nav_login){
-            Intent intent1 = new Intent(
+            Intent intent = new Intent(
                     getApplicationContext(),
                     LoginManagerActivity.class);
-            startActivity(intent1);
+            intent.putExtra("login", true);
+            startActivity(intent);
             return true;
         } else if(id==R.id.nav_logout){
-            showProgressDialog();
-            sessionManager.logoutUser();
-            hideProgressDialog();
-
-            Intent intent = new Intent(getApplicationContext(), UserRestaurantList.class);
-
-            // Closing all the Activities from stack
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-            // Add new Flag to start new Activity
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            // Staring UserRestaurantList Activity
+            Intent intent = new Intent(
+                    getApplicationContext(),
+                    LoginManagerActivity.class);
+            intent.putExtra("login", false);
             startActivity(intent);
-
-            //ending Log In Activity
-            finish();
-
         } else if(id==R.id.nav_my_profile) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
@@ -665,7 +646,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private void initializeUserReviewList() {
         TextView reviews_num = (TextView) findViewById(R.id.user_restaurant_num_reviews);
         reviews_num.setText(""+reviews.size());
-        reviewList = (RecyclerView) findViewById(R.id.user_restaurant_review_list);
+        RecyclerView reviewList = (RecyclerView) findViewById(R.id.user_restaurant_review_list);
         assert reviewList != null;
         reviewList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         reviewList.setNestedScrollingEnabled(false);
