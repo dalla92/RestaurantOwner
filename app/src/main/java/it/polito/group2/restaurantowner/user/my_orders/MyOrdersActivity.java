@@ -1,6 +1,6 @@
 package it.polito.group2.restaurantowner.user.my_orders;
 
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -20,76 +20,106 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.json.JSONException;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import java.util.Calendar;
-import java.util.Random;
-
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.User;
+import it.polito.group2.restaurantowner.firebasedata.Order;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
-import it.polito.group2.restaurantowner.data.Meal;
-import it.polito.group2.restaurantowner.data.MealAddition;
-import it.polito.group2.restaurantowner.data.MenuCategory;
-import it.polito.group2.restaurantowner.data.Order;
-import it.polito.group2.restaurantowner.data.OrderMeal;
-import it.polito.group2.restaurantowner.data.OrderMealAddition;
-import it.polito.group2.restaurantowner.user.order.AdditionModel;
-import it.polito.group2.restaurantowner.user.order.MealModel;
+
 
 public class MyOrdersActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
-    private ArrayList<User> users = new ArrayList<User>();
-    private Context context;
-    public User current_user;
-    private String user_id;
-    private Drawable d;
+    private String userID;
+    private User user;
 
-    private ArrayList<OrderModel> modelList;
+    private FirebaseDatabase firebase;
+    private ProgressDialog mProgressDialog;
+    private ArrayList<Order> orderList;             //order list got from firebase
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.myorders_activity);
+
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
+            userID = getIntent().getExtras().getString("user_id");
+        }
+
+        showProgressDialog();
+        firebase = FirebaseDatabase.getInstance();
+        orderList = new ArrayList<Order>();
+        Query ordersReference = firebase.getReference("orders").orderByChild("user_id").equalTo(userID);
+        DatabaseReference userReference = firebase.getReference("users/" + userID);
+        hideProgressDialog();
+
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //TODO gestire se l'utente viene cancellato
+            }
+        });
+
+        ordersReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                orderList.add(dataSnapshot.getValue(Order.class));
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Order changedOrder = dataSnapshot.getValue(Order.class);
+                for (Order o : orderList) {
+                    if (o.getOrder_id().equals(changedOrder.getOrder_id())) {
+                        orderList.remove(o);
+                        orderList.add(changedOrder);
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Order changedOrder = dataSnapshot.getValue(Order.class);
+                for (Order o : orderList) {
+                    if (o.getOrder_id().equals(changedOrder.getOrder_id())) {
+                        orderList.remove(o);
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                //TODO capire quando si verifica
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //TODO capire quando si verifica
+            }
+        });
+
+        //Toolbar setting
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //TODO Rearrange the following code
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            user_id = getIntent().getExtras().getString("user_id");
-            try {
-                users = JSONUtil.readJSONUsersList(this, null);
-            }
-            catch(JSONException e){
-                e.printStackTrace();
-            }
-            for(User u : users){
-                if(u.getId().equals(user_id)){
-                    current_user = u;
-                    break;
-                }
-            }
-        }
-        else{
-            current_user = new User();
-            current_user.setEmail("jkjs@dskj");
-            //current_user.setFidelity_points(110);
-            current_user.setFirst_name("Alex");
-            current_user.setIsOwner(true);
-            current_user.setPassword("tipiacerebbe");
-            current_user.setPhone_number("0989897879789");
-            current_user.setVat_number("sw8d9wd8w9d8w9d9");
-        }
-        //navigation drawer
+        //Navigation drawer setting
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -97,43 +127,38 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //Navigation drawer user info
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user != null) {
-            if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
-                nav_username.setText(current_user.getFirst_name());
-            else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getLast_name());
-            else if (current_user.getFirst_name() != null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
-            if (current_user.getEmail() != null)
-                nav_email.setText(current_user.getEmail());
-            if (current_user.getPhoto() != null)
-                nav_photo.setImageBitmap(current_user.getPhoto());
+        if(user != null) {
+            if (user.getUser_full_name() != null)
+                nav_username.setText(user.getUser_full_name());
+            if (user.getUser_email() != null)
+                nav_email.setText(user.getUser_email());
         }
         SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         Uri photouri = null;
-        if(userDetails.getString("photouri", null)!=null) {
+        if(userDetails.getString("photouri", null) != null) {
             photouri = Uri.parse(userDetails.getString("photouri", null));
             File f = new File(getRealPathFromURI(photouri));
             Drawable d = Drawable.createFromPath(f.getAbsolutePath());
             navigationView.getHeaderView(0).setBackground(d);
-        }
-        else
+        } else {
             nav_photo.setImageResource(R.drawable.blank_profile);
+        }
 
         setOrderList();
     }
 
     private void setOrderList() {
-        modelList = getModel();
-        final RecyclerView orderList = (RecyclerView) findViewById(R.id.order_list);
+        final RecyclerView list = (RecyclerView) findViewById(R.id.order_list);
         assert orderList != null;
-        orderList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        orderList.setNestedScrollingEnabled(false);
-        OrderAdapter adapter = new OrderAdapter(this, modelList);
-        orderList.setAdapter(adapter);
+        list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        list.setNestedScrollingEnabled(false);
+        OrderAdapter adapter = new OrderAdapter(this, orderList);
+        list.setAdapter(adapter);
     }
 
     private String getRealPathFromURI(Uri contentURI) {
@@ -147,13 +172,28 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
         }
     }
 
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Loading...");
+            mProgressDialog.setIndeterminate(true);
+        }
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
+    }
+/*
     @Override
     protected void onDestroy() {
         super.onDestroy();
         d = null;
         System.gc();
     }
-
+*/
 
     @Override
     public void onBackPressed() {
@@ -176,7 +216,7 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
                     getApplicationContext(),
                     MainActivity.class);
             Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
+            b1.putString("user_id", userID);
             intent1.putExtras(b1);
             startActivity(intent1);
             return true;
@@ -186,7 +226,7 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
                     getApplicationContext(),
                     UserRestaurantList.class);
             Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
+            b1.putString("user_id", userID);
             intent1.putExtras(b1);
             startActivity(intent1);
             return true;
@@ -202,7 +242,7 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
                     getApplicationContext(),
                     UserProfile.class);
             Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
+            b1.putString("user_id", userID);
             intent1.putExtras(b1);
             startActivity(intent1);
             return true;
@@ -211,7 +251,7 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
                     getApplicationContext(),
                     MyOrdersActivity.class);
             Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
+            b1.putString("user_id", userID);
             intent1.putExtras(b1);
             startActivity(intent1);
             return true;
@@ -220,7 +260,7 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
                     getApplicationContext(),
                     UserMyReservations.class);
             Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
+            b3.putString("user_id", userID);
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
@@ -229,7 +269,7 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
                     getApplicationContext(),
                     MyReviewsActivity.class);
             Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
+            b3.putString("user_id", userID);
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
@@ -238,7 +278,7 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
                     getApplicationContext(),
                     UserMyFavourites.class);
             Bundle b3 = new Bundle();
-            b3.putString("user_id", user_id);
+            b3.putString("user_id", userID);
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
@@ -246,80 +286,6 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    private ArrayList<OrderModel> getModel() {
-        ArrayList<OrderModel> list = new ArrayList<OrderModel>();
-        ArrayList<Order> myorders = getMyOrders();
-
-        for(Order o : myorders) {
-            ArrayList<MealModel> mealList = new ArrayList<MealModel>();
-            for(OrderMeal m : o.getMealList()) {
-                ArrayList<AdditionModel> additionList = new ArrayList<AdditionModel>();
-                for(OrderMealAddition a : m.getAdditionList()) {
-                    AdditionModel aModel = new AdditionModel(a.getAddition().getAddition_id(),
-                            a.getAddition().getName(),true, a.getAddition());
-                    aModel.setSelected(true);
-                    additionList.add(aModel);
-                }
-                MealModel mModel = new MealModel(m.getMeal().getMealId(),m.getMeal().getMeal_name(),m.getMeal(),m.getQuantity());
-                mModel.setAdditionModel(additionList);
-                mealList.add(mModel);
-            }
-            OrderModel oMod = new OrderModel(o.getOrderID(),o,mealList);
-            list.add(oMod);
-        }
-        return list;
-    }
-
-    private ArrayList<Order> getMyOrders() {
-        //TODO modificare il metodo per prendere i dati da firebase
-        ArrayList<Order> myorders = new ArrayList<Order>();
-
-        Random randomGenerator = new Random();
-        for(int i=0; i<(randomGenerator.nextInt(5)+3); i++) {
-            Order o = new Order();
-            o.setNote("Test note " + i);
-            o.setRestaurantID("restID0");
-            o.setUserID("userID0");
-            o.setOrderID("orderID" + i);
-            o.setTimestamp(Calendar.getInstance());
-            for(int j=0; j<(randomGenerator.nextInt(5)+2); j++){
-                OrderMeal om = new OrderMeal();
-                om.setNote("meal note");
-                om.setOrderID("orderID" + i);
-                om.setQuantity((randomGenerator.nextInt(3) + 1));
-                om.setOrderMealID("ordermealID" + j);
-                Meal m = new Meal();
-                m.setMeal_name("Meal " + j);
-                m.setMealId("mealID" + j);
-                m.setCategory("CAT0");
-                m.setDescription("Example description");
-                m.setMeal_price(5.2);
-                om.setMeal(m);
-                MenuCategory cat = new MenuCategory();
-                cat.setName("CAT0");
-                cat.setCategoryID("CAT0");
-                om.setCategory(cat);
-
-                for(int k=0; k<(randomGenerator.nextInt(2)+2); k++) {
-                    OrderMealAddition oam = new OrderMealAddition();
-                    oam.setOrderID("orderID" + i);
-                    oam.setOrderMealID("ordermealID" + j);
-                    oam.setOrderMealAdditionID("orderadditionID" + k);
-                    MealAddition ma = new MealAddition();
-                    ma.setName("add "+k);
-                    ma.setAddition_id("addID"+k);
-                    ma.setPrice(0.5);
-                    oam.setAddition(ma);
-                    om.getAdditionList().add(oam);
-                }
-
-                o.getMealList().add(om);
-            }
-            myorders.add(o);
-        }
-        return myorders;
     }
 
 }

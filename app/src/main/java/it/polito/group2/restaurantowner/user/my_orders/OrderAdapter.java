@@ -14,18 +14,19 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.firebasedata.Order;
 
 /**
  * Created by Filippo on 13/05/2016.
  */
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
-    private final ArrayList<OrderModel> modelList;
+    private final ArrayList<Order> orderList;
     private final Context context;
 
-    public OrderAdapter(Context context, ArrayList<OrderModel> list) {
+    public OrderAdapter(Context context, ArrayList<Order> list) {
         this.context = context;
-        this.modelList = list;
+        this.orderList = list;
     }
 
     public class OrderViewHolder extends RecyclerView.ViewHolder {
@@ -51,23 +52,24 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(OrderAdapter.OrderViewHolder holder, int position) {
-        Date date = modelList.get(position).getOrder().getTimestamp().getTime();
+        Date date = orderList.get(position).getOrder_date().getTime();
         SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
         holder.date.setText(formatDate.format(date));
-        holder.restaurantName.setText(modelList.get(position).getOrder().getRestaurantID());
-        holder.price.setText(formatEuro(modelList.get(position).getOrder().getPrice()));
+        //TODO stampare il nome del ristorante e non il suo id
+        holder.restaurantName.setText(orderList.get(position).getRestaurant_id());
+        holder.price.setText(formatEuro(orderList.get(position).getOrder_price()));
         holder.mealList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.mealList.setNestedScrollingEnabled(false);
-        MealAdapter adapter = new MealAdapter(context, modelList.get(position).getMealList());
+        MealAdapter adapter = new MealAdapter(context, orderList.get(position).getOrder_meals());
         holder.mealList.setAdapter(adapter);
     }
 
     @Override
     public int getItemCount() {
-        return modelList.size();
+        return orderList.size();
     }
 
-    private String formatEuro(Float number) {
+    private String formatEuro(Double number) {
         if(number == null)
             return "€ 0.00";
         return "€ "+String.format("%10.2f", number);

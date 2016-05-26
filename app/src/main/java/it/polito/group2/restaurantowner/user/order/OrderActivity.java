@@ -3,7 +3,12 @@ package it.polito.group2.restaurantowner.user.order;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -12,6 +17,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -21,6 +28,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +39,7 @@ import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.MealCategory;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
@@ -55,6 +64,7 @@ public class OrderActivity extends AppCompatActivity
     private String restaurantID;
 
     private Restaurant restaurant;
+    private User user;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private ArrayList<Meal> mealList;
@@ -74,64 +84,68 @@ public class OrderActivity extends AppCompatActivity
 
         showProgressDialog();
         firebase = FirebaseDatabase.getInstance();
+        mealList = new ArrayList<Meal>();
         DatabaseReference restaurantReference = firebase.getReference("restaurants/"+restaurantID);
+        DatabaseReference userReference = firebase.getReference("users/" + userID);
+        Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
+        hideProgressDialog();
 
         restaurantReference.addListenerForSingleValueEvent(new ValueEventListener() {
-
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-
                 restaurant = dataSnapshot.getValue(Restaurant.class);
                 //TODO tenere conto che il ristornte ha due parametri che mi servono: se è abilitato il takeaway e quanti ne può fare in un'ora
-                mealList = new ArrayList<Meal>();
-                Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
-                hideProgressDialog();
-
-                mealsReference.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        mealList.add(dataSnapshot.getValue(Meal.class));
-                    }
-
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                        Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                        for(Meal m : mealList) {
-                            if(m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                                mealList.remove(m);
-                                mealList.add(changedMeal);
-                                break;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-                        Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                        for(Meal m : mealList) {
-                            if(m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                                mealList.remove(m);
-                                break;
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                        //Log.d("prova", "child moved");
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        //Log.d("prova", "child cancelled");
-                    }
-                });
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                //Log.d("test", "failed read restaurant " + databaseError.getMessage());
                 //TODO gestire se il ristorante viene cancellato
+            }
+        });
+        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                user = dataSnapshot.getValue(User.class);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //TODO gestire se l'utente viene cancellato
+            }
+        });
+
+        mealsReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mealList.add(dataSnapshot.getValue(Meal.class));
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Meal changedMeal = dataSnapshot.getValue(Meal.class);
+                for (Meal m : mealList) {
+                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
+                        mealList.remove(m);
+                        mealList.add(changedMeal);
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Meal changedMeal = dataSnapshot.getValue(Meal.class);
+                for (Meal m : mealList) {
+                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
+                        mealList.remove(m);
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                //Log.d("prova", "child moved");
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //Log.d("prova", "child cancelled");
             }
         });
 
@@ -149,6 +163,27 @@ public class OrderActivity extends AppCompatActivity
         toggle.syncState();
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //Navigation drawer user info
+        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+        if(user != null) {
+            if (user.getUser_full_name() != null)
+                nav_username.setText(user.getUser_full_name());
+            if (user.getUser_email() != null)
+                nav_email.setText(user.getUser_email());
+        }
+        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        Uri photouri = null;
+        if(userDetails.getString("photouri", null) != null) {
+            photouri = Uri.parse(userDetails.getString("photouri", null));
+            File f = new File(getRealPathFromURI(photouri));
+            Drawable d = Drawable.createFromPath(f.getAbsolutePath());
+            navigationView.getHeaderView(0).setBackground(d);
+        } else {
+            nav_photo.setImageResource(R.drawable.blank_profile);
+        }
 
         //Fragment loader
         if(findViewById(R.id.fragment_container) != null) {
@@ -266,8 +301,6 @@ public class OrderActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
 
     @Override
     public void onCategorySelected(String categoryName) {
@@ -443,6 +476,17 @@ public class OrderActivity extends AppCompatActivity
     private void hideProgressDialog() {
         if (mProgressDialog != null && mProgressDialog.isShowing()) {
             mProgressDialog.hide();
+        }
+    }
+
+    private String getRealPathFromURI(Uri contentURI) {
+        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) { // Source is Dropbox or other similar local file path
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
         }
     }
 }
