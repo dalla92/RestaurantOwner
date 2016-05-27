@@ -175,6 +175,7 @@ public class CartFragment extends ListFragment {
         CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.getOrder_meals());
         list.setAdapter(adapter);
 
+        //TODO controllare in restaurant se fidelityProgramAccepted è abilitato e l'utente se può avere sconto
     }
 
     private String formatEuro(double number) {

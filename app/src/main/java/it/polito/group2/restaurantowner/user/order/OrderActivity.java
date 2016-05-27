@@ -96,7 +96,8 @@ public class OrderActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 restaurant = dataSnapshot.getValue(Restaurant.class);
-                //TODO tenere conto che il ristornte ha due parametri che mi servono: se è abilitato il takeaway e quanti ne può fare in un'ora
+                //TODO controllare se takeAwayAllowed is true
+                //TODO controllare se restaurant_orders_per_hour non ha raggiunto il limite
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -211,7 +212,9 @@ public class OrderActivity extends AppCompatActivity
                 transaction.addToBackStack(null);
                 transaction.commit();
             } else if(getSupportFragmentManager().findFragmentByTag("CATEGORY") != null) {
-                //TODO controllare: quando vieni da un'altra activity o semplicemente vieni dal carrello o dal fragment meal
+                //TODO controllare quando vieni da un'altra activity
+                //TODO controllare quando vieni dal carrello
+                //TODO controllare quando vieni dal mealList
                 Intent intent = new Intent(this, UserRestaurantActivity.class);
                 intent.putExtra("restaurant_id", restaurantID);
                 intent.putExtra("user_id", userID);
@@ -465,8 +468,10 @@ public class OrderActivity extends AppCompatActivity
     private ArrayList<Meal> getMealListByCategory(String categoryName) {
         ArrayList<Meal> mealCategoryList = new ArrayList<Meal>();
         for(Meal m : mealList) {
-            if(m.getMeal_category().equals(categoryName))
-                mealCategoryList.add(m);
+            if(m.getMeal_category().equals(categoryName)) {
+                if(m.getMealAvailable() && m.getMealTakeAway())
+                    mealCategoryList.add(m);
+            }
         }
         return mealCategoryList;
     }
