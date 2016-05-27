@@ -2,6 +2,7 @@ package it.polito.group2.restaurantowner.user.order;
 
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -14,6 +15,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -96,7 +98,6 @@ public class OrderActivity extends AppCompatActivity
                 restaurant = dataSnapshot.getValue(Restaurant.class);
                 //TODO tenere conto che il ristornte ha due parametri che mi servono: se è abilitato il takeaway e quanti ne può fare in un'ora
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 //TODO gestire se il ristorante viene cancellato
@@ -377,8 +378,15 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onConfirmOrderClicked(Order order){
         this.order = order;
-        //TODO bisogna salvare su firebase l'ordine
+
+        DatabaseReference ordersReference = firebase.getReference("orders/");
+        DatabaseReference keyReference= ordersReference.push();
+        this.order.setOrder_id(keyReference.getKey());
+        keyReference.setValue(this.order);
+        this.order = setNewOrder();
+
         Intent intent = new Intent(this, MyOrdersActivity.class);
+        intent.putExtra("user_id", userID);
         startActivity(intent);
     }
 
@@ -437,8 +445,7 @@ public class OrderActivity extends AppCompatActivity
     private Order setNewOrder() {
         Order o = new Order();
         o.setUser_id(userID);
-        //TODO recupera fullname dello user
-        o.setUser_full_name("TEST");
+        o.setUser_full_name(user.getUser_full_name());
         o.setRestaurant_id(restaurantID);
         o.setOrder_price(0.0);
         ArrayList<Meal> mealList = new ArrayList<Meal>();
