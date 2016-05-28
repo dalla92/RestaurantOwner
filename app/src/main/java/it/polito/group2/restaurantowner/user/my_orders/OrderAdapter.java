@@ -1,12 +1,18 @@
 package it.polito.group2.restaurantowner.user.my_orders;
 
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -34,6 +40,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         public TextView restaurantName;
         public TextView price;
         public RecyclerView mealList;
+        public LinearLayout orderItem;
 
         public OrderViewHolder(View view){
             super(view);
@@ -41,6 +48,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
             restaurantName = (TextView) itemView.findViewById(R.id.restaurant_name);
             price = (TextView) itemView.findViewById(R.id.order_price);
             mealList = (RecyclerView) itemView.findViewById(R.id.order_meal_list);
+            orderItem = (LinearLayout) itemView.findViewById(R.id.order_item);
         }
     }
 
@@ -51,7 +59,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     }
 
     @Override
-    public void onBindViewHolder(OrderAdapter.OrderViewHolder holder, int position) {
+    public void onBindViewHolder(final OrderAdapter.OrderViewHolder holder, int position) {
         Date date = orderList.get(position).getOrder_date().getTime();
         SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
         holder.date.setText(formatDate.format(date));
@@ -62,6 +70,76 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.mealList.setNestedScrollingEnabled(false);
         MealAdapter adapter = new MealAdapter(context, orderList.get(position).getOrder_meals());
         holder.mealList.setAdapter(adapter);
+
+
+        holder.mealList.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        final int targetHeight = holder.mealList.getMeasuredHeight();
+        holder.mealList.setVisibility(View.INVISIBLE);
+        holder.mealList.measure(ViewGroup.LayoutParams.MATCH_PARENT, 0);
+
+        holder.orderItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentHeight, newHeight;
+
+                if (holder.mealList.getVisibility() == View.VISIBLE) {
+                    currentHeight = targetHeight;
+                    newHeight = 0;
+                } else {
+                    currentHeight = 0;
+                    newHeight = targetHeight;
+                }
+
+                ValueAnimator slideAnimator = ValueAnimator.ofInt(currentHeight, newHeight).setDuration(300);
+                slideAnimator.addListener(new Animator.AnimatorListener() {
+                    boolean modified = false;
+
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+                        if (holder.mealList.getVisibility() == View.VISIBLE) {
+                            holder.mealList.setVisibility(View.INVISIBLE);
+                            modified = true;
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        if (holder.mealList.getVisibility() == View.INVISIBLE && !modified) {
+                            holder.mealList.setVisibility(View.VISIBLE);
+                            modified = false;
+                        }
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+
+                slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        // get the value the interpolator is at
+                        Integer value = (Integer) animation.getAnimatedValue();
+                        // I'm going to set the layout's height 1:1 to the tick
+                        holder.mealList.getLayoutParams().height = value.intValue();
+                        // force all layouts to see which ones are affected by
+                        // this layouts height change
+                        holder.mealList.requestLayout();
+                    }
+                });
+                AnimatorSet set = new AnimatorSet();
+                set.play(slideAnimator);
+                set.setInterpolator(new AccelerateDecelerateInterpolator());
+                set.start();
+            }
+        });
+
     }
 
     @Override

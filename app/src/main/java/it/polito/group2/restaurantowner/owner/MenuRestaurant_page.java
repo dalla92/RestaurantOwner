@@ -32,6 +32,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
@@ -265,7 +266,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                                                 getApplicationContext(),
                                                 MenuRestaurant_edit.class);
                                         if (meal_to_edit != null) {
-                                            intent1.putExtra("meal", meal_to_edit);
+                                            intent1.putExtra("meal", (Serializable) meal_to_edit);
                                             startActivityForResult(intent1, MODIFY_MEAL);
                                         }
                                     }

@@ -36,7 +36,7 @@ public class AdditionAdapter extends RecyclerView.Adapter<AdditionAdapter.Additi
         public CheckBox checkbox;
         public RelativeLayout box;
 
-        public AdditionViewHolder(View view){
+        public AdditionViewHolder(View view) {
             super(view);
             name = (TextView) itemView.findViewById(R.id.addition_name);
             price = (TextView) itemView.findViewById(R.id.addition_price);
@@ -68,10 +68,10 @@ public class AdditionAdapter extends RecyclerView.Adapter<AdditionAdapter.Additi
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
-                AdditionModel element = (AdditionModel) holder.checkbox.getTag();
-                element.setSelected(buttonView.isChecked());
+                MealAddition element = (MealAddition) holder.checkbox.getTag();
+                element.setAdditionSelected(buttonView.isChecked());
             }
-                });
+        });
     }
 
     @Override
@@ -80,6 +80,6 @@ public class AdditionAdapter extends RecyclerView.Adapter<AdditionAdapter.Additi
     }
 
     private String formatEuro(double number) {
-        return "+ € "+String.format("%10.2f", number);
+        return "+ € " + String.format("%10.2f", number);
     }
 }

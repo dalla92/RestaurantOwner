@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,7 +117,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                 Toast.makeText(this,"Please insert meal name to continue", Toast.LENGTH_SHORT).show();
             else {
                 Intent intent = new Intent();
-                intent.putExtra("meal", current_meal);
+                intent.putExtra("meal", (Serializable) current_meal);
                 setResult(RESULT_OK, intent);
                 finish();//finishing activity
                 return true;
