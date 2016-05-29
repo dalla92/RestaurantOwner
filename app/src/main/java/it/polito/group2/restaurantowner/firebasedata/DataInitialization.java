@@ -78,7 +78,7 @@ public class DataInitialization {
         //meal_addition_fake_initialization();
         //meal_category_fake_initialization();
         //meal_fake_initialization();
-        offer_fake_initialization();
+        //offer_fake_initialization();
         order_fake_initialization();
         restaurant_time_slot_fake_initialization();
         restaurant_fake_initialization();
@@ -559,7 +559,7 @@ public class DataInitialization {
         m2.setMeal_thumbnail("https://www.flickr.com/photos/142675931@N04/27038081936/in/dateposted-public/");
         m2.setMeal_photo_firebase_URL("https://www.flickr.com/photos/142675931@N04/26976826402/in/dateposted-public/");
     }
-
+/*
     public void offer_fake_initialization() {
         of = new Offer();
         of.setOfferAtDinner(true);
@@ -591,6 +591,7 @@ public class DataInitialization {
         of2.setOffer_meal_thumbnail("https://www.flickr.com/photos/142675931@N04/27038081936/in/dateposted-public/");
         of2.setRestaurant_id(restaurant_id2);
     }
+    */
 
     public void order_fake_initialization() {
         or = new Order();

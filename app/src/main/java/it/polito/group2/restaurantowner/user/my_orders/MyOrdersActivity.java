@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.User;
+import it.polito.group2.restaurantowner.login.FirebaseUtil;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
@@ -61,8 +62,9 @@ public class MyOrdersActivity extends AppCompatActivity implements NavigationVie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.myorders_activity);
 
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            userID = getIntent().getExtras().getString("user_id");
+        userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
+        if(userID == null) {
+            //TODO utende disconnesso: blocca tutto
         }
 
         showProgressDialog();

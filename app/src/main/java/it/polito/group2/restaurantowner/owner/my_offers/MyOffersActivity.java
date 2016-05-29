@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner.offer;
+package it.polito.group2.restaurantowner.owner.my_offers;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -44,8 +44,9 @@ import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
 import it.polito.group2.restaurantowner.owner.ReservationActivity;
 import it.polito.group2.restaurantowner.owner.ReviewsActivity;
 import it.polito.group2.restaurantowner.owner.StatisticsActivity;
+import it.polito.group2.restaurantowner.owner.offer.OfferActivity;
 
-public class OfferListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MyOffersActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private static final int ADD_REQUEST = 1;
     private ArrayList<Offer> offer_list;
@@ -124,7 +125,7 @@ public class OfferListActivity extends AppCompatActivity implements NavigationVi
             @Override
             public View getView(final int position, View convertView, ViewGroup parent) {
                 if(convertView == null){
-                    LayoutInflater inflater = LayoutInflater.from(OfferListActivity.this);
+                    LayoutInflater inflater = LayoutInflater.from(MyOffersActivity.this);
                     convertView = inflater.inflate(R.layout.offer_item, parent, false);
                 }
 
@@ -162,7 +163,7 @@ public class OfferListActivity extends AppCompatActivity implements NavigationVi
                         @Override
                         public void onClick(View v) {
 
-                            AlertDialog.Builder alert = new AlertDialog.Builder(OfferListActivity.this);
+                            AlertDialog.Builder alert = new AlertDialog.Builder(MyOffersActivity.this);
                             alert.setTitle("Confirmation!");
                             alert.setMessage("Are you sure you want to delete the offer?\nThe operation cannot be undone!");
                             alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
@@ -216,7 +217,7 @@ public class OfferListActivity extends AppCompatActivity implements NavigationVi
         int id = item.getItemId();
 
         if (id == R.id.icon_new_offer) {
-            Intent intent = new Intent(getApplicationContext(), AddOfferActivity.class);
+            Intent intent = new Intent(getApplicationContext(), OfferActivity.class);
             startActivityForResult(intent, ADD_REQUEST);
             return true;
         }
@@ -267,7 +268,7 @@ public class OfferListActivity extends AppCompatActivity implements NavigationVi
         } else if(id==R.id.action_offers) {
             Intent intent2 = new Intent(
                     getApplicationContext(),
-                    OfferListActivity.class);
+                    MyOffersActivity.class);
             Bundle b2 = new Bundle();
             b2.putString("restaurant_id", restaurantId);
             intent2.putExtras(b2);
@@ -310,7 +311,7 @@ public class OfferListActivity extends AppCompatActivity implements NavigationVi
             startActivityForResult(intent6, MODIFY_INFO);
             return true;
         } else if (id == R.id.icon_new_offer) {
-            Intent intent = new Intent(getApplicationContext(), AddOfferActivity.class);
+            Intent intent = new Intent(getApplicationContext(), OfferActivity.class);
             startActivityForResult(intent, ADD_REQUEST);
             return true;
         }
@@ -391,7 +392,7 @@ public class OfferListActivity extends AppCompatActivity implements NavigationVi
             String month = getIntFromMonthName(words[1]);
             String year = words[2];
 
-            Toast.makeText(OfferListActivity.this, words[1] + " " + month, Toast.LENGTH_SHORT).show();
+            Toast.makeText(MyOffersActivity.this, words[1] + " " + month, Toast.LENGTH_SHORT).show();
             String validDate = day + "/" + month + "/" + year;
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             cal.setTime(dateFormat.parse(validDate));

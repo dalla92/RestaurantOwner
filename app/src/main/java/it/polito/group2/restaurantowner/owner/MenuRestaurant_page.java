@@ -40,7 +40,7 @@ import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
-import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
+import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 
 public class MenuRestaurant_page extends AppCompatActivity {
     private Menu menu;
@@ -177,7 +177,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                         } else if(id==R.id.action_offers) {
                             Intent intent2 = new Intent(
                                     getApplicationContext(),
-                                    OfferListActivity.class);
+                                    MyOffersActivity.class);
                             Bundle b2 = new Bundle();
                             b2.putString("restaurant_id", restaurant_id);
                             intent2.putExtras(b2);

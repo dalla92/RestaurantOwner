@@ -18,7 +18,7 @@ import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 
-public class AddOfferActivity extends AppCompatActivity {
+public class OfferActivity extends AppCompatActivity {
 
     private boolean lunch, dinner;
 
@@ -118,7 +118,7 @@ public class AddOfferActivity extends AppCompatActivity {
         DatePickerDialog dialog =  new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                TextView date = (TextView) AddOfferActivity.this.findViewById(R.id.text_from_date);
+                TextView date = (TextView) OfferActivity.this.findViewById(R.id.text_from_date);
                 Calendar c = Calendar.getInstance();
                 if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
                     date.setText(getString(R.string.today));
@@ -143,7 +143,7 @@ public class AddOfferActivity extends AppCompatActivity {
         DatePickerDialog dialog =  new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                TextView date = (TextView) AddOfferActivity.this.findViewById(R.id.text_to_date);
+                TextView date = (TextView) OfferActivity.this.findViewById(R.id.text_to_date);
                 if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
                     date.setText(getString(R.string.today));
                 else {

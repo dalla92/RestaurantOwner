@@ -27,7 +27,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
-import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
+import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 
 public class ReservationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -153,7 +153,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
         } else if(id==R.id.action_offers) {
             Intent intent2 = new Intent(
                     getApplicationContext(),
-                    OfferListActivity.class);
+                    MyOffersActivity.class);
             Bundle b2 = new Bundle();
             b2.putString("restaurant_id", restaurantId);
             intent2.putExtras(b2);

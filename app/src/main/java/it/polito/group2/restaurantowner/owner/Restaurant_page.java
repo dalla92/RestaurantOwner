@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -67,7 +66,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
-import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
+import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class Restaurant_page extends AppCompatActivity
@@ -410,7 +409,7 @@ public class Restaurant_page extends AppCompatActivity
         } else if(id==R.id.action_offers) {
             Intent intent2 = new Intent(
                     getApplicationContext(),
-                    OfferListActivity.class);
+                    MyOffersActivity.class);
             Bundle b2 = new Bundle();
             b2.putString("restaurant_id", restaurant_id);
             intent2.putExtras(b2);
