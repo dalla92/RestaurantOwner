@@ -25,7 +25,8 @@ import java.util.UUID;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.OpenTime;
-import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 
 public class AddRestaurantActivity extends AppCompatActivity implements FragmentInfo.OnInfoPass, FragmentServices.OnServicesPass, FragmentExtras.OnExtrasPass {
 
@@ -54,12 +55,12 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             res = (Restaurant) intent.getExtras().get("Restaurant");
         if(res==null){
             res = new Restaurant();
-            res.setRestaurantId(UUID.randomUUID().toString());
-            res.setPhotoUri("");
+            res.setRestaurant_id(UUID.randomUUID().toString());
+            res.setRestaurant_photo_firebase_URL("");
             //TODO take off this hardcoded values and get the real values
-            res.setRating("4.5");
-            res.setReservedPercentage("27%");
-            res.setReservationNumber("240");
+            res.setRestaurant_rating(4);
+            res.setRestaurant_total_tables_number(200);
+            res.setRestaurant_orders_per_hour(50);
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -95,7 +96,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
         if (id == R.id.action_save) {
             saveData();
-            if(res.getName().equals(""))
+            if(res.getRestaurant_name().equals(""))
                 Toast.makeText(this,"Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
             else {
                 Intent intent = new Intent();
@@ -116,54 +117,43 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
     @Override
     public void onInfoPass(String name, String address, String phone, String category) {
-       res.setName(name);
-        res.setAddress(address);
-        res.setPhoneNum(phone);
-        res.setCategory(category);
+       res.setRestaurant_name(name);
+        res.setRestaurant_address(address);
+        res.setRestaurant_telephone_number(phone);
+        res.setRestaurant_category(category);
     }
 
 
     @Override
     public void onServicesPass(Boolean fidelity, Boolean tableRes, String numTables, Boolean takeAway, String orderPerHour, List<String> lunchOpenTime,
                                List<String> lunchCloseTime, List<String> dinnerOpenTime, List<String> dinnerCloseTime, boolean[] lunchClosure, boolean[] dinnerClosure) {
-        res.setFidelity(fidelity);
-        res.setTableReservation(tableRes);
+        res.setFidelityProgramAccepted(fidelity);
+        res.setTableReservationAllowed(tableRes);
         if(tableRes)
-            res.setTableNum(numTables);
-        res.setTakeAway(takeAway);
+            res.setRestaurant_total_tables_number(Integer.parseInt(numTables));
+        res.setTakeAwayAllowed(takeAway);
         if(takeAway)
-            res.setOrdersPerHour(orderPerHour);
-        ArrayList<OpenTime> openTimeList = new ArrayList<>();
+            res.setRestaurant_orders_per_hour(Integer.parseInt(orderPerHour));
+        ArrayList<RestaurantTimeSlot> openTimeList = new ArrayList<>();
         for(int i=0;i<7;i++){
-            OpenTime lunch = new OpenTime();
-            lunch.setRestaurantId(res.getRestaurantId());
-            lunch.setType("Lunch");
-            lunch.setDayOfWeek(i);
-            lunch.setIsOpen(!lunchClosure[i]);
-            if(lunch.isOpen()){
-                lunch.setOpenHour(lunchOpenTime.get(i));
-                lunch.setCloseHour(lunchCloseTime.get(i));
+
+            RestaurantTimeSlot daySlot = new RestaurantTimeSlot();
+            daySlot.setRestaurant_id(res.getRestaurant_id());
+            daySlot.setDay_of_week(i);
+            if(!lunchClosure[i]){
+                daySlot.setLunch(true);
+                daySlot.setOpen_lunch_time(lunchOpenTime.get(i));
+                daySlot.setClose_lunch_time(lunchCloseTime.get(i));
             }
-            openTimeList.add(lunch);
-            OpenTime dinner = new OpenTime();
-            dinner.setRestaurantId(res.getRestaurantId());
-            dinner.setType("Dinner");
-            dinner.setDayOfWeek(i);
-            dinner.setIsOpen(!dinnerClosure[i]);
-            if(dinner.isOpen()){
-                dinner.setOpenHour(dinnerOpenTime.get(i));
-                dinner.setCloseHour(dinnerCloseTime.get(i));
+            if(!dinnerClosure[i]){
+                daySlot.setDinner(true);
+                daySlot.setOpen_dinner_time(dinnerOpenTime.get(i));
+                daySlot.setClose_dinner_time(dinnerCloseTime.get(i));
             }
-            openTimeList.add(dinner);
+            openTimeList.add(daySlot);
 
         }
-        try {
-            ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(this, res.getRestaurantId());
-            otList.addAll(openTimeList);
-            JSONUtil.saveJSONOpenTimeList(this, otList);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        res.setRestaurant_time_slot(openTimeList);
 
     }
 
@@ -171,10 +161,10 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
     public void onExtrasPass(List<RestaurantService> list) {
         if(list!=null) {
             for (RestaurantService rs : list) {
-                rs.setRestaurantId(res.getRestaurantId());
+                rs.setRestaurantId(res.getRestaurant_id());
             }
             try {
-                ArrayList<RestaurantService> rsList = JSONUtil.readJSONServicesList(this,res.getRestaurantId());
+                ArrayList<RestaurantService> rsList = JSONUtil.readJSONServicesList(this,res.getRestaurant_id());
                 rsList.addAll(list);
                 JSONUtil.saveJSONServiceList(this, rsList);
             } catch (JSONException e) {

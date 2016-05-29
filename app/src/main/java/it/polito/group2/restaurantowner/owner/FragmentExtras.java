@@ -17,7 +17,7 @@ import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 
 /**
  * Created by Daniele on 07/04/2016.
@@ -55,11 +55,11 @@ public class FragmentExtras extends Fragment {
     public static FragmentExtras newInstance(Restaurant res,Context mContext) {
         FragmentExtras fragment = new FragmentExtras();
         Bundle args = new Bundle();
-        if(res.getName()!=null) {
+        if(res.getRestaurant_name()!=null) {
             try {
                 ArrayList<RestaurantService> serList = JSONUtil.readJSONServicesList(mContext);
                 for(RestaurantService ser : serList){
-                    if(ser.getRestaurantId().equals(res.getRestaurantId())) {
+                    if(ser.getRestaurantId().equals(res.getRestaurant_id())) {
                         args.putBoolean(ser.getName(), true);
                         if (ser.getName().equals("Squared Meters"))
                             args.putString("Squared Meters", ser.getAttribute());

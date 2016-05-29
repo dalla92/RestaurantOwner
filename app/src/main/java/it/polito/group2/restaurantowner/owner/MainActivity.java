@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.owner;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
@@ -17,13 +18,23 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+
 import org.json.JSONException;
 
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.Order;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.User;
+import it.polito.group2.restaurantowner.login.FirebaseUtil;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class MainActivity extends AppCompatActivity
@@ -34,6 +45,11 @@ public class MainActivity extends AppCompatActivity
     private  RecyclerView  mRecyclerView;
     ArrayList<Restaurant> resList = new ArrayList<>();
     private static final int VERTICAL_ITEM_SPACE = 5;
+    private FirebaseDatabase firebase;
+    private ProgressDialog mProgressDialog;
+
+    private String userID;
+    private User user;
 
 
     @Override
@@ -42,6 +58,56 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        userID = FirebaseUtil.getCurrentUserId();
+
+        showProgressDialog();
+        firebase = FirebaseDatabase.getInstance();
+        Query restaurantReference = firebase.getReference("restaurants").orderByChild("user_id").equalTo(userID);
+        DatabaseReference userReference = firebase.getReference("users/" + userID);
+        hideProgressDialog();
+
+        restaurantReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mAdapter.addItem(0, dataSnapshot.getValue(Restaurant.class));
+                //resList.add(dataSnapshot.getValue(Restaurant.class));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
+                for (Restaurant r : resList) {
+                    if (r.getRestaurant_id().equals(changedRes.getRestaurant_id())) {
+                        resList.remove(r);
+                        resList.add(changedRes);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Restaurant removedRes = dataSnapshot.getValue(Restaurant.class);
+                for (Restaurant r : resList) {
+                    if (r.getRestaurant_id().equals(removedRes.getRestaurant_id())) {
+                        mAdapter.removeItem(resList.indexOf(r));
+                        resList.remove(r);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                //TODO capire quando si verifica
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //TODO capire quando si verifica
+            }
+        });
 
          mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         // use this setting to improve performance if you know that changes
@@ -64,14 +130,14 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onItemClick(View view, int position) {
                         Intent mIntent = new Intent(MainActivity.this,Restaurant_page.class);
-                        String id = resList.get(position).getRestaurantId();
+                        String id = resList.get(position).getRestaurant_id();
                         mIntent.putExtra("RestaurantId", id);
                         startActivity(mIntent);
                     }
                 })
         );
 
-        mAdapter = new RestaurantPreviewAdapter(getData(),this);
+        mAdapter = new RestaurantPreviewAdapter(resList,this);
         mRecyclerView.setAdapter(mAdapter);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
@@ -129,18 +195,7 @@ public class MainActivity extends AppCompatActivity
 
         }
     }
-
-    @Override
-    public void onPause() {
-        super.onPause();  // Always call the superclass method first
-
-        try {
-            JSONUtil.saveJSONResList(this, resList);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
+/*
     @Override
     public void onRestart() {
         super.onRestart();  // Always call the superclass method first
@@ -153,7 +208,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
-
+*/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
@@ -161,13 +216,14 @@ public class MainActivity extends AppCompatActivity
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 Restaurant res = (Restaurant) data.getExtras().get("Restaurant");
+                if(userID!=null)
+                    res.setUser_id(userID);
                 //resList.add(0,res);
-                mAdapter.addItem(0, res);
-                try {
-                    JSONUtil.saveJSONResList(this, resList);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                //mAdapter.addItem(0, res);
+                DatabaseReference restaurantReference = firebase.getReference("restaurants");
+                DatabaseReference item = restaurantReference.push();
+                res.setRestaurant_id(item.getKey());
+                item.setValue(res);
             }
         }
     }
@@ -190,15 +246,20 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public ArrayList<Restaurant> getData(){
 
-        try {
-            resList = JSONUtil.readJSONResList(this);
-        } catch (JSONException e) {
-            e.printStackTrace();
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Loading...");
+            mProgressDialog.setIndeterminate(true);
         }
+        mProgressDialog.show();
+    }
 
-        return resList;
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
     }
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {

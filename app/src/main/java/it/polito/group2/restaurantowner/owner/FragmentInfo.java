@@ -13,7 +13,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 
 /**
  * Created by Daniele on 07/04/2016.
@@ -41,11 +41,11 @@ public class FragmentInfo extends Fragment {
     public static FragmentInfo newInstance(Restaurant res) {
         FragmentInfo fragment = new FragmentInfo();
         Bundle args = new Bundle();
-        if(res.getName()!=null) {
-            args.putString("Name", res.getName());
-            args.putString("Address", res.getAddress());
-            args.putString("Phone", res.getPhoneNum());
-            args.putString("Category", res.getCategory());
+        if(res.getRestaurant_name()!=null) {
+            args.putString("Name", res.getRestaurant_name());
+            args.putString("Address", res.getRestaurant_address());
+            args.putString("Phone", res.getRestaurant_telephone_number());
+            args.putString("Category", res.getRestaurant_category());
         }
         fragment.setArguments(args);
         return fragment;

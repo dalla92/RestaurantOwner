@@ -12,10 +12,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 
 /**
  * Created by Daniele on 05/04/2016.
@@ -67,16 +70,22 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
             */
             SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);
             if(userDetails != null) {
-                if (userDetails.getString(obj.getRestaurantId(), null) != null) {
-                    Uri photouri = Uri.parse(userDetails.getString(obj.getRestaurantId(), null));
+                if (userDetails.getString(obj.getRestaurant_id(), null) != null) {
+                    Uri photouri = Uri.parse(userDetails.getString(obj.getRestaurant_id(), null));
                     if (photouri != null)
                         this.image.setImageURI(photouri);
                 }
             }
-            this.resName.setText(obj.getName());
-            this.rating.setText(obj.getRating());
-            this.reservationNumber.setText(obj.getReservationNumber());
-            this.reservedPercentage.setText(obj.getReservedPercentage());
+            this.resName.setText(obj.getRestaurant_name());
+            this.rating.setText(String.valueOf(obj.getRestaurant_rating()));
+            if(obj.getTableReservationAllowed())
+                this.reservationNumber.setText(String.valueOf(obj.getRestaurant_total_tables_number()));
+            else
+                this.reservationNumber.setText("0");
+            if(obj.getTakeAwayAllowed())
+                this.reservedPercentage.setText(String.valueOf(obj.getRestaurant_orders_per_hour()));
+            else
+                this.reservedPercentage.setText("0");
             this.position = position;
             this.current = obj;
         }
@@ -121,6 +130,10 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
         notifyItemRangeChanged(position, mDataset.size());
     }
     public void removeItem(int position){
+        Restaurant r = mDataset.get(position);
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        DatabaseReference resReference = firebase.getReference("restaurants/" + r.getRestaurant_id());
+        resReference.removeValue();
         mDataset.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position,mDataset.size());

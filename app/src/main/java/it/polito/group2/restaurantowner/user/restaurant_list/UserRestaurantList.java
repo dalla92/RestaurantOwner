@@ -1,6 +1,7 @@
 package it.polito.group2.restaurantowner.user.restaurant_list;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -35,6 +36,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import org.json.JSONException;
 
@@ -42,8 +49,9 @@ import java.io.File;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.User;
+import it.polito.group2.restaurantowner.firebasedata.Order;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
@@ -76,6 +84,8 @@ public class UserRestaurantList extends AppCompatActivity
     private Context context;
     public User current_user;
     private Drawable d;
+    private FirebaseDatabase firebase;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +97,47 @@ public class UserRestaurantList extends AppCompatActivity
         if(intent.getExtras()!=null && intent.getExtras().get("user_id")!=null)
             user_id = (String) intent.getExtras().get("user_id");
 
+        showProgressDialog();
+        firebase = FirebaseDatabase.getInstance();
+        //if location is not active, otherwise should call GeoFire
+        Query resturantReference = firebase.getReference("restaurants").orderByChild("rating");
+
+        resturantReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                resList.add(dataSnapshot.getValue(Restaurant.class));
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
+                for (Restaurant r : resList) {
+                    if (r.getRestaurant_id().equals(changedRes.getRestaurant_id())) {
+                        resList.remove(r);
+                        resList.add(changedRes);
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Restaurant removedRes = dataSnapshot.getValue(Restaurant.class);
+                for (Restaurant r : resList) {
+                    if (r.getRestaurant_id().equals(removedRes.getRestaurant_id())) {
+                        resList.remove(r);
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                //TODO capire quando si verifica
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //TODO capire quando si verifica
+            }
+        });
+        hideProgressDialog();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -149,7 +200,7 @@ public class UserRestaurantList extends AppCompatActivity
                     @Override
                     public void onItemClick(View view, int position) {
                         Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
-                        String id = resList.get(position).getRestaurantId();
+                        String id = resList.get(position).getRestaurant_id();
                         mIntent.putExtra("restaurant_id", "-KI2D2i6d0W_CVrgmEFV" /*id*/);
                         mIntent.putExtra("user_id", id);
                         startActivity(mIntent);
@@ -157,7 +208,7 @@ public class UserRestaurantList extends AppCompatActivity
                 })
         );
 
-        mAdapter = new UserRestaurantPreviewAdapter(getData(), this);
+        mAdapter = new UserRestaurantPreviewAdapter(resList, this);
         mRecyclerView.setAdapter(mAdapter);
 
         //navigation drawer
@@ -452,17 +503,6 @@ public class UserRestaurantList extends AppCompatActivity
         return true;
     }
 
-    public ArrayList<Restaurant> getData() {
-
-        try {
-            resList = JSONUtil.readJSONResList(this);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return resList;
-    }
-
     /*    @Override
         public void onMapReady(GoogleMap googleMap) {
             Set<String> keySet = resNearby.keySet();
@@ -560,6 +600,21 @@ public class UserRestaurantList extends AppCompatActivity
 
         }
     */
+
+    private void showProgressDialog() {
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage("Loading...");
+            mProgressDialog.setIndeterminate(true);
+        }
+        mProgressDialog.show();
+    }
+
+    private void hideProgressDialog() {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
+    }
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 
         private int spanCount;

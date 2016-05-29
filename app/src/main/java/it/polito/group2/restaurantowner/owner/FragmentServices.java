@@ -30,7 +30,7 @@ import java.util.List;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.OpenTime;
-import it.polito.group2.restaurantowner.data.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 
 /**
  * Created by Daniele on 07/04/2016.
@@ -71,16 +71,16 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
     public static FragmentServices newInstance(Restaurant res, Context mContext) {
         FragmentServices fragment = new FragmentServices();
         Bundle args = new Bundle();
-        if(res.getName()!=null) {
-            args.putBoolean("Fidelity Program", res.isFidelity());
-            args.putBoolean("Table Reservation", res.isTableReservation());
-            args.putString("Table Number", res.getTableNum());
-            args.putBoolean("Take Away", res.isTakeAway());
-            args.putString("Orders Hour", res.getOrdersPerHour());
+        if(res.getRestaurant_name()!=null) {
+            args.putBoolean("Fidelity Program", res.getFidelityProgramAccepted());
+            args.putBoolean("Table Reservation", res.getTableReservationAllowed());
+            args.putString("Table Number", String.valueOf(res.getRestaurant_total_tables_number()));
+            args.putBoolean("Take Away", res.getTakeAwayAllowed());
+            args.putString("Orders Hour", String.valueOf(res.getRestaurant_orders_per_hour()));
             try {
                 ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(mContext);
                 for(OpenTime ot : otList){
-                    if(ot.getRestaurantId().equals(res.getRestaurantId())) {
+                    if(ot.getRestaurantId().equals(res.getRestaurant_id())) {
                         int day = ot.getDayOfWeek();
                         if (ot.getType().equals("Lunch")){
                             if(!ot.isOpen()){
@@ -109,11 +109,11 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
     }
 
     public void passData() {
-        if(tableResEdit.getText().toString()!=null && tableResEdit.getText().toString().trim()!="0")
+        if(tableResEdit.getText().toString().length()!=0)
             tableRes.setChecked(true);
         else
             tableRes.setChecked(false);
-        if(takeAway.getText().toString()!=null && takeAway.getText().toString().trim()!="0")
+        if(takeAwayEdit.getText().toString().length()!=0)
             takeAway.setChecked(true);
         else
             takeAway.setChecked(false);

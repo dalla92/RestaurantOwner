@@ -1,9 +1,11 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
+import java.io.Serializable;
+
 /**
  * Created by Alessio on 16/05/2016.
  */
-public class RestaurantTimeSlot {
+public class RestaurantTimeSlot implements Serializable{
 
     private String restaurant_id;
     private Boolean lunch;

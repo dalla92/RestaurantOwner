@@ -24,8 +24,8 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Meal;
 import it.polito.group2.restaurantowner.data.OpenTime;
-import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.TableReservation;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 
 /**
  * Created by Daniele on 05/04/2016.
@@ -43,7 +43,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                 nResList = mDataset;
 
                 for (Restaurant r : mDataset) {
-                    if (r.getCategory().equals(category))
+                    if (r.getRestaurant_category().equals(category))
                         nResList.add(r);
                 }
             //filter by time
@@ -58,7 +58,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                         Calendar calendar = Calendar.getInstance();
                         int day = calendar.get(Calendar.DAY_OF_WEEK);
                         for (OpenTime ot : otList) {
-                            if (ot.getRestaurantId().equals(r.getRestaurantId()) && ot.getDayOfWeek() == day) {
+                            if (ot.getRestaurantId().equals(r.getRestaurant_id()) && ot.getDayOfWeek() == day) {
                                 Date openTime = sdf.parse(ot.getOpenHour());
                                 Date closeTime = sdf.parse(ot.getCloseHour());
                                 if (openTime.before(filterTime) && closeTime.after(filterTime)) {
@@ -80,19 +80,19 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             //filter by price
             List<Restaurant> n3ResList = new ArrayList<Restaurant>();
             for(Restaurant r : n2ResList){
-                if(price1 && r.getPriceRange().equals("1")) {
+                if(price1 && r.getRestaurant_price_range()==1) {
                     n3ResList.add(r);
                     continue;
                 }
-                if(price2 && r.getPriceRange().equals("2")) {
+                if(price2 && r.getRestaurant_price_range()==2) {
                     n3ResList.add(r);
                     continue;
                 }
-                if(price3 && r.getPriceRange().equals("3")) {
+                if(price3 && r.getRestaurant_price_range()==3) {
                     n3ResList.add(r);
                     continue;
                 }
-                if(price4 && r.getPriceRange().equals("4")) {
+                if(price4 && r.getRestaurant_price_range()==4) {
                     n3ResList.add(r);
                     continue;
                 }
@@ -130,10 +130,10 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
 
         public void setData(Restaurant restaurant, int position){
 
-            if(restaurant.getPhotoUri() == null || restaurant.getPhotoUri().equals(""))
+            if(restaurant.getRestaurant_photo_firebase_URL() == null || restaurant.getRestaurant_photo_firebase_URL().equals(""))
                 Glide.with(mContext).load(R.drawable.no_image).into(this.image);
             else
-                Glide.with(mContext).load(restaurant.getPhotoUri()).into(this.image);
+                Glide.with(mContext).load(restaurant.getRestaurant_photo_firebase_URL()).into(this.image);
 
             /*
             SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);
@@ -147,10 +147,10 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
 
             //TODO remember to take out, just for testing purpose
             //restaurant.setPriceRange(String.valueOf(calculate_range(restaurant)));
-            restaurant.setPriceRange("2");
+            restaurant.setRestaurant_price_range(2);
 
-            this.resName.setText(restaurant.getName());
-            this.rating.setText(restaurant.getRating());
+            this.resName.setText(restaurant.getRestaurant_name());
+            this.rating.setText(String.valueOf(restaurant.getRestaurant_rating()));
 
             //TODO remember to take out, just for testing purpose2
             /*
@@ -209,7 +209,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         Calendar c = Calendar.getInstance();
         ArrayList<TableReservation> today_reservations = null;
         try{
-            today_reservations = JSONUtil.readJSONTableResList(mContext, c, r.getRestaurantId());
+            today_reservations = JSONUtil.readJSONTableResList(mContext, c, r.getRestaurant_id());
         }
         catch(JSONException e){
             e.printStackTrace();
@@ -220,7 +220,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
     public static int calculate_range(Restaurant r){
         ArrayList<Meal> meals = null;
         try{
-            meals = JSONUtil.readJSONMeList(mContext, r.getRestaurantId());
+            meals = JSONUtil.readJSONMeList(mContext, r.getRestaurant_id());
         }
         catch(JSONException e){
             e.printStackTrace();
