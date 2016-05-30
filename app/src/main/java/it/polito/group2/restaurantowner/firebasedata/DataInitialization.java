@@ -75,10 +75,10 @@ public class DataInitialization {
     public User u2;
 
     public void init(){
-        //meal_addition_fake_initialization();
-        //meal_category_fake_initialization();
-        //meal_fake_initialization();
-        //offer_fake_initialization();
+        meal_addition_fake_initialization();
+        meal_category_fake_initialization();
+        meal_fake_initialization();
+        offer_fake_initialization();
         order_fake_initialization();
         restaurant_time_slot_fake_initialization();
         restaurant_fake_initialization();
@@ -97,7 +97,7 @@ public class DataInitialization {
     public void write_db(){
         DatabaseReference root_ref_0 = FirebaseDatabase.getInstance().getReference(); //Database URL is automatically determined from the google-services.json file you downloaded
         //erase DB, and rewrite all
-        root_ref_0.setValue(null);
+        //root_ref_0.setValue(null);
 
         //root node
         FirebaseDatabase root_ref = FirebaseDatabase.getInstance();

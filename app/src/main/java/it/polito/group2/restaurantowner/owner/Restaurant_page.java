@@ -488,7 +488,7 @@ public class Restaurant_page extends AppCompatActivity
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.blank_profile)
                         .into(image);
-                my_restaurant.setRestaurant_photo_firebase_URL(contentUri.toString());
+                //my_restaurant.setRestaurant_photo_firebase_URL(contentUri.toString());
                 save_photo();
             }
         }

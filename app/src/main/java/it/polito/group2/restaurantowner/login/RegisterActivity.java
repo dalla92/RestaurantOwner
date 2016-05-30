@@ -59,7 +59,6 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
     private TextInputLayout inputLayoutFirstName, inputLayoutLastName, inputLayoutPassword, inputLayoutConfirmPassword, inputLayoutEmail;
     private EditText inputFirstName, inputLastName, inputPassword, inputConfirmPassword, inputEmail, inputPhoneNumber;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private GoogleApiClient mGoogleApiClient;
@@ -88,54 +87,6 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
-        /*mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                final FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    final String fullName = inputFirstName.getText().toString().trim() + " " + inputLastName.getText().toString().trim();
-                    String email = user.getEmail();
-                    String userID = user.getUid();
-                    String phoneNumber = inputPhoneNumber.getText().toString().trim();
-                    User myUser = new User(userID, fullName, phoneNumber, email);
-                    myUser.getProviders().put("password", true);
-
-                    firebase.getReference("users").child(userID).setValue(myUser, new DatabaseReference.CompletionListener() {
-                        @Override
-                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                            if (databaseError != null)
-                                Log.d("prova", "write error");
-                            else {
-                                Log.d("prova", "done");
-                            }
-
-                        }
-                    });
-
-                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setDisplayName(fullName)
-                            .build();
-
-                    user.updateProfile(profileUpdates)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        FirebaseAuth.getInstance().signOut();
-                                        hideProgressDialog();
-                                        Log.d("prova", "User profile updated.");
-                                        finish();
-                                    }
-                                }
-                            });
-
-                } else {
-                    // User is signed out
-                    Log.d("prova", "Register: onAuthStateChanged:signed_out");
-                }
-            }
-        };*/
 
         inputLayoutFirstName = (TextInputLayout) findViewById(R.id.input_layout_first_name);
         inputLayoutLastName = (TextInputLayout) findViewById(R.id.input_layout_last_name);
@@ -210,6 +161,7 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
                                                 hideProgressDialog();
+                                                e.printStackTrace();
                                                 Toast.makeText(RegisterActivity.this, "Registration failed, try again!", Toast.LENGTH_SHORT).show();
                                             }
                                         });

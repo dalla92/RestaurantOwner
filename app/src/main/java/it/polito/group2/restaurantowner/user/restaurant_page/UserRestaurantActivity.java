@@ -106,6 +106,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         firebase = FirebaseDatabase.getInstance();
         showProgressDialog();
 
+        //FirebaseAuth.getInstance().signOut();
+
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
         }
