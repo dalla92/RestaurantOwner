@@ -55,7 +55,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             res = (Restaurant) intent.getExtras().get("Restaurant");
         if(res==null){
             res = new Restaurant();
-            res.setRestaurant_id(UUID.randomUUID().toString());
+            //res.setRestaurant_id(UUID.randomUUID().toString());
             res.setRestaurant_photo_firebase_URL("");
             //TODO take off this hardcoded values and get the real values
             res.setRestaurant_rating(4);
@@ -158,18 +158,17 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
     }
 
     @Override
-    public void onExtrasPass(List<RestaurantService> list) {
-        if(list!=null) {
-            for (RestaurantService rs : list) {
-                rs.setRestaurantId(res.getRestaurant_id());
-            }
-            try {
-                ArrayList<RestaurantService> rsList = JSONUtil.readJSONServicesList(this,res.getRestaurant_id());
-                rsList.addAll(list);
-                JSONUtil.saveJSONServiceList(this, rsList);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+    public void onExtrasPass(Restaurant myRes) {
+        if(myRes!=null) {
+            res.setAnimalAllowed(myRes.getAnimalAllowed());
+            res.setWifiPresent(myRes.getWifiPresent());
+            res.setCreditCardAccepted(myRes.getCreditCardAccepted());
+            //res.setCeliacFriendly(myRes.getCeliacFriendly());
+            res.setAirConditionedPresent(myRes.getAirConditionedPresent());
+            res.setTvPresent(myRes.getTvPresent());
+            res.setRestaurant_squared_meters(myRes.getRestaurant_squared_meters());
+            res.setRestaurant_closest_metro(myRes.getRestaurant_closest_metro());
+            res.setRestaurant_closest_bus(myRes.getRestaurant_closest_bus());
         }
     }
 

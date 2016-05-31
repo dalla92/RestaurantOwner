@@ -114,7 +114,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         }
 
         collapsing.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
-        DatabaseReference restaurantRef = firebase.getReference("restaurants/-KIMqPtRSEdm0Cvfc3Za");
+        DatabaseReference restaurantRef = firebase.getReference("restaurants/" + restaurantID);
         restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -126,7 +126,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 setRestaurantInfo();
                 hideProgressDialog();
 
-                Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo("-KIMlQqpVOfKUrKec-tH");
+                Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo(restaurantID);
                 reviewsRef.addChildEventListener(new ChildEventListener() {
                     @Override
                     public void onChildAdded(DataSnapshot dataSnapshot, String s) {

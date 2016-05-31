@@ -41,7 +41,7 @@ public class FragmentInfo extends Fragment {
     public static FragmentInfo newInstance(Restaurant res) {
         FragmentInfo fragment = new FragmentInfo();
         Bundle args = new Bundle();
-        if(res.getRestaurant_name()!=null) {
+        if(res.getRestaurant_id()!=null) {
             args.putString("Name", res.getRestaurant_name());
             args.putString("Address", res.getRestaurant_address());
             args.putString("Phone", res.getRestaurant_telephone_number());

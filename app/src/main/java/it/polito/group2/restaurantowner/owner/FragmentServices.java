@@ -20,7 +20,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
-import org.json.JSONException;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -28,9 +27,8 @@ import java.util.Calendar;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 
 /**
  * Created by Daniele on 07/04/2016.
@@ -71,38 +69,27 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
     public static FragmentServices newInstance(Restaurant res, Context mContext) {
         FragmentServices fragment = new FragmentServices();
         Bundle args = new Bundle();
-        if(res.getRestaurant_name()!=null) {
+        if(res.getRestaurant_id()!=null) {
             args.putBoolean("Fidelity Program", res.getFidelityProgramAccepted());
             args.putBoolean("Table Reservation", res.getTableReservationAllowed());
             args.putString("Table Number", String.valueOf(res.getRestaurant_total_tables_number()));
             args.putBoolean("Take Away", res.getTakeAwayAllowed());
             args.putString("Orders Hour", String.valueOf(res.getRestaurant_orders_per_hour()));
-            try {
-                ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(mContext);
-                for(OpenTime ot : otList){
-                    if(ot.getRestaurantId().equals(res.getRestaurant_id())) {
-                        int day = ot.getDayOfWeek();
-                        if (ot.getType().equals("Lunch")){
-                            if(!ot.isOpen()){
-                                args.putBoolean("ClosedLunch"+day,true);
-                            } else {
-                                args.putString("lunchOpenTime"+day,ot.getOpenHour());
-                                args.putString("lunchCloseTime" + day, ot.getCloseHour());
-                            }
-                        }
-                        if (ot.getType().equals("Dinner")){
-                            if(!ot.isOpen()){
-                                args.putBoolean("ClosedDinner"+day,true);
-                            } else {
-                                args.putString("dinnerOpenTime" + day, ot.getOpenHour());
-                                args.putString("dinnerCloseTime" + day, ot.getCloseHour());
-                            }
-                        }
+                for(RestaurantTimeSlot ot : res.getRestaurant_time_slot()){
+                    int day = ot.getDay_of_week();
+                    if (ot.getLunch()){
+                        args.putString("lunchOpenTime"+day,ot.getOpen_lunch_time());
+                        args.putString("lunchCloseTime" + day, ot.getClose_lunch_time());
                     }
+                    else
+                        args.putBoolean("ClosedLunch"+day,true);
+                    if (ot.getDinner()){
+                        args.putString("dinnerOpenTime"+day,ot.getOpen_dinner_time());
+                        args.putString("dinnerCloseTime" + day, ot.getClose_dinner_time());
+                    }
+                    else
+                        args.putBoolean("ClosedDinner"+day,true);
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
         fragment.setArguments(args);
         return fragment;

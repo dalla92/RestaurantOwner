@@ -201,8 +201,8 @@ public class UserRestaurantList extends AppCompatActivity
                     public void onItemClick(View view, int position) {
                         Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
                         String id = resList.get(position).getRestaurant_id();
-                        mIntent.putExtra("restaurant_id", "-KI2D2i6d0W_CVrgmEFV" /*id*/);
-                        mIntent.putExtra("user_id", id);
+                        mIntent.putExtra("restaurant_id", id);
+                        mIntent.putExtra("user_id", user_id);
                         startActivity(mIntent);
                     }
                 })

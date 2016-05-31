@@ -105,13 +105,13 @@ public class Restaurant_page extends AppCompatActivity
         //get the right restaurant
         Bundle b = getIntent().getExtras();
         //TODO Decomment after integrations
-        /*
+
         if(b!=null)
             restaurant_id = b.getString("RestaurantId");
-        */
+        /*
         if(restaurant_id==null)
             restaurant_id = "-KI8xQ4PDVSKKjnRGmdG";
-
+        */
         //get and fill related data
         get_data_from_firebase();
 
@@ -528,25 +528,11 @@ public class Restaurant_page extends AppCompatActivity
         if (requestCode == MODIFY_INFO) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                /*
                 Restaurant res = (Restaurant) data.getExtras().get("Restaurant");
                 my_restaurant = res;
-                try {
-                    ArrayList<Restaurant> resList = JSONUtil.readJSONResList(this);
-                    for(Restaurant restaurant : resList){
-                        if(restaurant.getRestaurantId().equals(res.getRestaurantId())){
-                            resList.set(resList.indexOf(restaurant),res);
-                        }
-                    }
-                    JSONUtil.saveJSONResList(this, resList);
-                    Intent intent = getIntent();
-                    intent.putExtra("RestaurantId", res.getRestaurantId());
-                    finish();
-                    startActivity(intent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                */
+                FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+                DatabaseReference resReference = firebase.getReference("restaurants/" + res.getRestaurant_id());
+                resReference.setValue(res);
             }
         }
 
