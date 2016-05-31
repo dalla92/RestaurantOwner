@@ -38,7 +38,6 @@ import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
-import it.polito.group2.restaurantowner.login.FirebaseUtil;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;

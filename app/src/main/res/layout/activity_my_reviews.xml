@@ -43,7 +43,7 @@
         app:itemIconTint="@color/colorAccent"
         app:itemTextColor="@color/gray"
         app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/activity_user_restaurant_list_drawer"
+        app:menu="@menu/drawer_menu"
         app:theme="@style/AppTheme"/>
 
 </android.support.v4.widget.DrawerLayout>

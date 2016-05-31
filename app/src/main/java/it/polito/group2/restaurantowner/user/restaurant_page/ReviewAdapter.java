@@ -27,6 +27,10 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         this.context = context;
     }
 
+    public void addReview(Review review){
+        this.reviews.add(0, review);
+        notifyItemInserted(0);
+    }
     public void setReviewData(ArrayList<Review> reviews) {
         this.reviews = reviews;
         notifyDataSetChanged();

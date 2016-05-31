@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -584,9 +585,10 @@ public class Restaurant_page extends AppCompatActivity
         Uri imageUri = Uri.fromFile(f);
         // Create a child reference
         // imagesRef now points to "images"
-        photo_reference = user_storage_reference.child("images/restaurants/" + restaurant_id);
+        Calendar c = Calendar.getInstance();
+        photo_reference = user_storage_reference.child("restaurants/" + restaurant_id + "/" + c.getTimeInMillis() + ".jpg");
         //upload
-        UploadTask uploadTask = user_storage_reference.putFile(imageUri);
+        UploadTask uploadTask = photo_reference.putFile(imageUri);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             //public void onFailure(@NonNull Throwable throwable) {

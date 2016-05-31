@@ -34,11 +34,10 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
 
                     <ImageView
                         android:id="@+id/user_restaurant_image"
-                        android:src="@drawable/no_image"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:scaleType="centerCrop"
@@ -87,10 +86,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:itemIconTint="@color/colorAccent"
-
-        app:menu="@menu/activity_user_restaurant_list_drawer"
+        app:headerLayout="@layout/nav_header_login"
+        app:menu="@menu/drawer_menu"
         app:itemTextColor="@color/gray"
         app:theme="@style/AppTheme"/>
-    <!--app:headerLayout="@layout/nav_header_login"-->
 
 </android.support.v4.widget.DrawerLayout>

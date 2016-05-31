@@ -25,16 +25,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
-import it.polito.group2.restaurantowner.login.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class MainActivity extends AppCompatActivity

@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.login;
+package it.polito.group2.restaurantowner.Utils;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;

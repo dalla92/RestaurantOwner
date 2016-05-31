@@ -78,7 +78,7 @@ public class DataInitialization {
         meal_addition_fake_initialization();
         meal_category_fake_initialization();
         meal_fake_initialization();
-        offer_fake_initialization();
+        //offer_fake_initialization();
         order_fake_initialization();
         restaurant_time_slot_fake_initialization();
         restaurant_fake_initialization();

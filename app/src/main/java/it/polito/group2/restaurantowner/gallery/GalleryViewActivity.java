@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.ImageUtils;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantGallery;
 
 /**
@@ -353,7 +354,7 @@ public class GalleryViewActivity extends AppCompatActivity {
                 protected void onPostExecute(Uri imageUri) {
                     // image here is compressed & ready to be saved
                     galleryAddPic();
-                    final Calendar c = Calendar.getInstance();
+                    Calendar c = Calendar.getInstance();
                     StorageReference imageRef = storageRef.child("restaurants/" + restaurantID + "/" +
                             c.getTimeInMillis() + ".jpg");
 

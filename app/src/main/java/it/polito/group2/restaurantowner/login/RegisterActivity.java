@@ -18,7 +18,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -33,6 +37,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
@@ -46,6 +51,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
@@ -64,6 +70,7 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
     private GoogleApiClient mGoogleApiClient;
     private DatabaseReference userRef;
     private String userID;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +81,7 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
 
         mAuth = FirebaseAuth.getInstance();
         firebase = FirebaseDatabase.getInstance();
+        callbackManager = CallbackManager.Factory.create();
         userRef = firebase.getReference("users");
 
         // Configure Google Sign In
@@ -176,13 +184,14 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                                 target.setUser_telephone_number(inputPhoneNumber.getText().toString().trim());
                                 HashMap<String, Boolean> providers = target.getProviders();
                                 if (!providers.containsKey("password")) {
+
                                     providers.put("password", true);
                                     userRef.child(target.getUser_id()).setValue(target);
                                     if(providers.containsKey("google")){
                                         signInWithGoogle();
                                     }
                                     if (providers.containsKey("facebook")){
-                                        //TODO facebook merge
+                                        signInWithFacebook();
                                     }
                                 }
                                 else{
@@ -238,33 +247,6 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }*/
-
-    private void signInWithGoogle() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Confirmation!");
-        alert.setMessage("You have already logged in with Google using this email," +
-                "\nIt's not possible to have more then one account with the same email." +
-                "Click yes to choose your google account and merge the data.");
-        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
-                dialog.dismiss();
-            }
-        });
-        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                userRef.child(userID + "/providers/password").setValue(null);
-                dialog.dismiss();
-            }
-        });
-
-        alert.show();
-    }
 
     private boolean validateFirstName() {
         if (inputFirstName.getText().toString().trim().isEmpty()) {
@@ -358,13 +340,83 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
         }
     }
 
+    private void signInWithFacebook() {
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.d("prova", "signInWithFacebookSuccess");
+                handleAuthToken("facebook", loginResult.getAccessToken().getToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.d("prova", "facebook login cancelled!");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.d("prova", error.toString());
+            }
+        });
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+    }
+
+    private void signInWithGoogle() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Confirmation!");
+        alert.setMessage("You have already logged in with Google using this email," +
+                "\nIt's not possible to have more then one account with the same email." +
+                "Click yes to use your google account and merge the two account to access the same data.");
+        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+                startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
+                dialog.dismiss();
+            }
+        });
+        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                userRef.child(userID + "/providers/password").setValue(null);
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
+    }
+
     private void handleAuthToken(String provider, String accessToken) {
-        /*if (provider.equals("facebook")) {
+        if (provider.equals("facebook")) {
+            Log.d("prova", "handleAuthTokenFacebook");
             firebaseAuthWithFacebook(accessToken);
-        }*/
+        }
         if (provider.equals("google")) {
             firebaseAuthWithGoogle(accessToken);
         }
+    }
+
+    private void firebaseAuthWithFacebook(String token) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token);
+        mAuth.signInWithCredential(credential)
+                .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult result) {
+                        Log.d("prova", "firebaseAuthWithFacebook Success");
+                        handleFirebaseAuthResult(result);
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                        Log.d("prova", "auth:onFailureFacebook:" + e.getMessage());
+                        handleFirebaseAuthResult(null);
+                    }
+                });
+
     }
 
     private void firebaseAuthWithGoogle(String accessToken) {
@@ -390,10 +442,11 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
             final FirebaseUser user = result.getUser();
             if(user.getDisplayName() != null) {
                 if (!user.getDisplayName().equals(inputFirstName.getText().toString().trim() + " " + inputLastName.getText().toString().trim())) {
+                    Log.d("prova", "different name");
                     signOut();
                     userRef.child(user.getUid() + "/providers/password").setValue(null);
-                    Toast.makeText(RegisterActivity.this, "This email is already register with Google under a different name," +
-                            "\ntry again with the correct First name and Last name to merge the account info!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "This email is already register with Google or Facebook with a different name," +
+                            "\ntry again with the correct First name and Last name to merge the account data!", Toast.LENGTH_LONG).show();
                     return;
                 }
             }
@@ -411,11 +464,7 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
 
                             i.putExtra("login", true);
 
-                            // Closing all the Activities from stack
-                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                            // Add new Flag to start new Activity
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                             // Staring UserRestaurantList Activity
                             startActivity(i);
@@ -430,37 +479,6 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                         }
                     });
 
-
-
-            /*user.updatePassword(inputPassword.getText().toString().trim())
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(RegisterActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
-
-                            signOut();
-
-                            Intent i = new Intent(RegisterActivity.this, LoginManagerActivity.class);
-
-                            i.putExtra("login", true);
-
-                            // Closing all the Activities from stack
-                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                            // Add new Flag to start new Activity
-                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                            // Staring UserRestaurantList Activity
-                            startActivity(i);
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            signOut();
-                            Toast.makeText(RegisterActivity.this, "Registration failed.", Toast.LENGTH_SHORT).show();
-                        }
-                    });*/
         } else {
             userRef.child(userID + "/providers/password").setValue(null);
             Toast.makeText(this, "Registration failed result = null.", Toast.LENGTH_SHORT).show();
@@ -485,6 +503,8 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                 Toast.makeText(RegisterActivity.this, "Error during registration, Try again!", Toast.LENGTH_SHORT).show();
             }
         }
+        else
+            callbackManager.onActivityResult( requestCode, resultCode, data );
     }
 
     private void signOut() {

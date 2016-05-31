@@ -144,7 +144,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         if(provider.equals("password")){
             firebaseAuthWithPassword();
         }
-
     }
 
     private void firebaseAuthWithPassword() {
@@ -332,12 +331,12 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
 
             @Override
             public void onCancel() {
-
+                Log.d("prova", "facebook login cancelled!");
             }
 
             @Override
             public void onError(FacebookException error) {
-
+                Log.d("prova", error.toString());
             }
         });
     }

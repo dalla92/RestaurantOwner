@@ -18,6 +18,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Menu;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -32,6 +34,7 @@ import android.widget.TextView;
 import it.polito.group2.restaurantowner.R;
 
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -42,16 +45,19 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
 
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.User;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
@@ -79,34 +85,30 @@ public class UserRestaurantList extends AppCompatActivity
     /*private GeoFire geoFire;
     private GeoQuery geoQuery;
     HashMap<String,GeoLocation> resNearby = new HashMap<>();*/
-    private String user_id;
-    private ArrayList<User> users = new ArrayList<User>();
-    private Context context;
-    public User current_user;
-    private Drawable d;
+
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_restaurant_list);
-
-        //get data
-        Intent intent = getIntent();
-        if(intent.getExtras()!=null && intent.getExtras().get("user_id")!=null)
-            user_id = (String) intent.getExtras().get("user_id");
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         showProgressDialog();
         firebase = FirebaseDatabase.getInstance();
-        //if location is not active, otherwise should call GeoFire
-        Query resturantReference = firebase.getReference("restaurants").orderByChild("rating");
 
-        resturantReference.addChildEventListener(new ChildEventListener() {
+        //if location is not active, otherwise should call GeoFire
+        Query restaurantReference = firebase.getReference("restaurants").orderByChild("rating");
+
+        restaurantReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 resList.add(dataSnapshot.getValue(Restaurant.class));
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
@@ -118,6 +120,7 @@ public class UserRestaurantList extends AppCompatActivity
                     }
                 }
             }
+
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 Restaurant removedRes = dataSnapshot.getValue(Restaurant.class);
@@ -128,19 +131,18 @@ public class UserRestaurantList extends AppCompatActivity
                     }
                 }
             }
+
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
                 //TODO capire quando si verifica
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 //TODO capire quando si verifica
             }
         });
         hideProgressDialog();
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         ImageView filter_icon = (ImageView) findViewById(R.id.icon_filter);
         assert filter_icon != null;
@@ -202,7 +204,6 @@ public class UserRestaurantList extends AppCompatActivity
                         Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
                         String id = resList.get(position).getRestaurant_id();
                         mIntent.putExtra("restaurant_id", id);
-                        mIntent.putExtra("user_id", user_id);
                         startActivity(mIntent);
                     }
                 })
@@ -211,8 +212,10 @@ public class UserRestaurantList extends AppCompatActivity
         mAdapter = new UserRestaurantPreviewAdapter(resList, this);
         mRecyclerView.setAdapter(mAdapter);
 
+        setDrawer();
+
         //navigation drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        /*DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -232,7 +235,7 @@ public class UserRestaurantList extends AppCompatActivity
         else{ //logged
             //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
         }
-        */
+
         //TODO Rearrange the following code
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
             user_id = getIntent().getExtras().getString("user_id");
@@ -264,7 +267,7 @@ public class UserRestaurantList extends AppCompatActivity
         /*
         BorderedTextView nav_username = (BorderedTextView) nav_email_textview;
         BorderedTextView nav_email = (BorderedTextView) nav_email_textview;
-        */
+
         ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
         if(current_user!=null) {
             if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
@@ -287,14 +290,157 @@ public class UserRestaurantList extends AppCompatActivity
             navigationView.getHeaderView(0).setBackground(d);
         }
         else
-            nav_photo.setImageResource(R.drawable.blank_profile);
+        nav_photo.setImageResource(R.drawable.blank_profile);*/
     }
 
+    private void setDrawer() {
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        final MenuItem ownerItem = menu.findItem(R.id.nav_owner);
+        MenuItem loginItem = menu.findItem(R.id.nav_login);
+        MenuItem logoutItem = menu.findItem(R.id.nav_logout);
+        MenuItem myProfileItem = menu.findItem(R.id.nav_my_profile);
+        MenuItem myOrdersItem = menu.findItem(R.id.nav_my_orders);
+        MenuItem mrResItem =  menu.findItem(R.id.nav_my_reservations);
+        MenuItem myReviewsItem = menu.findItem(R.id.nav_my_reviews);
+        MenuItem myFavItem = menu.findItem(R.id.nav_my_favourites);
+
+        ownerItem.setVisible(false);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
+            loginItem.setVisible(false);
+            logoutItem.setVisible(true);
+            myProfileItem.setVisible(true);
+            myOrdersItem.setVisible(true);
+            mrResItem.setVisible(true);
+            myReviewsItem.setVisible(true);
+            myFavItem.setVisible(true);
+            //navigationView.inflateHeaderView(R.layout.nav_header_login);
+
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    it.polito.group2.restaurantowner.firebasedata.User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
+
+                    if (target.getOwnerUser())
+                        ownerItem.setVisible(true);
+
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
+
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(getApplicationContext())
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                    else{
+                        Glide
+                                .with(getApplicationContext())
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
+
+        }
+        else{
+            loginItem.setVisible(true);
+            logoutItem.setVisible(false);
+            myProfileItem.setVisible(false);
+            myOrdersItem.setVisible(false);
+            mrResItem.setVisible(false);
+            myReviewsItem.setVisible(false);
+            myFavItem.setVisible(false);
+
+        }
+
+        navigationView.setNavigationItemSelectedListener(this);
+    }
+
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        d = null;
-        System.gc();
+    public void onResume(){
+        super.onResume();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START))
+            drawer.closeDrawer(GravityCompat.START);
+    }
+
+
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(id==R.id.nav_owner){
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            return true;
+        }
+        else if(id==R.id.nav_home){
+            Intent intent = new Intent(this, UserRestaurantList.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return true;
+        }
+        else if(id==R.id.nav_login){
+            Intent intent = new Intent(this, LoginManagerActivity.class);
+            intent.putExtra("login", true);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_logout){
+            Intent intent = new Intent(this, LoginManagerActivity.class);
+            intent.putExtra("login", false);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        } else if(id==R.id.nav_my_profile) {
+            Intent intent = new Intent(this, UserProfile.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_orders) {
+            Intent intent = new Intent(this, MyOrdersActivity.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_reservations){
+            Intent intent = new Intent(this, UserMyReservations.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_reviews){
+            Intent intent = new Intent(this, MyReviewsActivity.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_favourites){
+            Intent intent = new Intent(this, UserMyFavourites.class);
+            startActivity(intent);
+            return true;
+        }
+
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     private String getRealPathFromURI(Uri contentURI) {
@@ -420,7 +566,7 @@ public class UserRestaurantList extends AppCompatActivity
         }
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
+    /*@SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -501,7 +647,7 @@ public class UserRestaurantList extends AppCompatActivity
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
+    }*/
 
     /*    @Override
         public void onMapReady(GoogleMap googleMap) {

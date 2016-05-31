@@ -22,6 +22,6 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/order_activity_navheader"
-        app:menu="@menu/activity_user_restaurant_list_drawer" />
+        app:menu="@menu/drawer_menu" />
 
 </android.support.v4.widget.DrawerLayout>

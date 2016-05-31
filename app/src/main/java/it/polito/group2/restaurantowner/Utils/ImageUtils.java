@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.gallery;
+package it.polito.group2.restaurantowner.Utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,7 +8,6 @@ import android.graphics.Paint;
 import android.media.ExifInterface;
 import android.net.Uri;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
