@@ -1,5 +1,7 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 /**
@@ -8,69 +10,141 @@ import java.util.GregorianCalendar;
 
 public class Offer {
 
-    private String offer_id;
-    private String restaurant_id;
-    private String offer_name;
-    private String offer_description;
-    private GregorianCalendar offer_start_date;
-    private GregorianCalendar offer_end_date;
-    private Boolean offerAtLunch;
-    private Boolean offerAtDinner;
-    private String offer_meal_id;
-    private String offer_meal_name;
-    private String offer_meal_thumbnail; //for meal preview with Glide in AsyncTask
-    private String offer_meal_photo_firebase_URL; //for enlarging image with Glide in AsyncTask
+    private String offerID;
+    private String restaurantID;
+    private String offerName;
+    private String offerDescription;
 
-    public Offer() {
+    private Boolean offerAtLunch = false;
+    private Boolean offerAtDinner = false;
+    private Boolean offerIsWeekly = false;
+    private Calendar offerStartDate;
+    private Calendar offerStopDate;
+    private ArrayList<Integer> offerOnWeekDays = new ArrayList<Integer>();
 
+    private Boolean offerForTotal = false;
+    private Boolean offerForMeal = false;
+    private Boolean offerForCategory = false;
+
+    private ArrayList<MealCategory> offerOnCategories = new ArrayList<MealCategory>();
+    private ArrayList<Meal> offerOnMeals = new ArrayList<Meal>();
+
+    private Integer offerPercentage;
+
+    public Offer() {}
+
+    public Double getNewMealPrice(Meal meal, Calendar day) {
+        Double price = meal.getMeal_price();
+        if(isDayInOffer(day)) {
+            if(isMealInOffer(meal)) {
+                price = (Double)(meal.getMeal_price()*offerPercentage)/100;
+            }
+        }
+        return price;
     }
 
-    public String getOffer_id() {
-        return offer_id;
+    public Boolean isDayInOffer(Calendar day) {
+        int timeOfDay = day.get(Calendar.HOUR_OF_DAY);
+
+        if(timeOfDay >= 6 && timeOfDay < 16){
+            return isDayLunchInOffer(day);
+        } else if(timeOfDay >= 16 && timeOfDay < 6){
+            return isDayDinnerInOffer(day);
+        }
+
+        return false;
     }
 
-    public void setOffer_id(String offer_id) {
-        this.offer_id = offer_id;
+    public Boolean isDayLunchInOffer(Calendar day) {
+        if(offerAtLunch) {
+            Calendar start = Calendar.getInstance();
+            start.setTimeInMillis(offerStartDate.getTimeInMillis() - 60000);
+            Calendar stop = Calendar.getInstance();
+            stop.setTimeInMillis(offerStopDate.getTimeInMillis() + 60000);
+            if(day.after(start) && day.before(stop)) {
+                if(offerIsWeekly) {
+                    for(Integer weekDay : offerOnWeekDays) {
+                        if(day.get(Calendar.DAY_OF_WEEK) == weekDay)
+                            return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    public String getRestaurant_id() {
-        return restaurant_id;
+    public Boolean isDayDinnerInOffer(Calendar day) {
+        if(offerAtDinner) {
+            Calendar start = Calendar.getInstance();
+            start.setTimeInMillis(offerStartDate.getTimeInMillis() - 60000);
+            Calendar stop = Calendar.getInstance();
+            stop.setTimeInMillis(offerStopDate.getTimeInMillis() + 60000);
+            if(day.after(start) && day.before(stop)) {
+                if(offerIsWeekly) {
+                    for(Integer weekDay : offerOnWeekDays) {
+                        if(day.get(Calendar.DAY_OF_WEEK) == weekDay)
+                            return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
-    public void setRestaurant_id(String restaurant_id) {
-        this.restaurant_id = restaurant_id;
+    public Boolean isMealInOffer(Meal meal) {
+        if(offerForMeal) {
+            for(Meal m : offerOnMeals) {
+                if(meal.getMeal_id().equals(m.getMeal_id()))
+                    return true;
+            }
+        }
+        return isCategoryInOffer(meal.getMeal_category());
     }
 
-    public String getOffer_name() {
-        return offer_name;
+    public Boolean isCategoryInOffer(String categoryName) {
+        if(offerForCategory) {
+            for(MealCategory c : offerOnCategories) {
+                if(c.getMeal_category_name().equals(categoryName))
+                    return true;
+            }
+        }
+        return false;
     }
 
-    public void setOffer_name(String offer_name) {
-        this.offer_name = offer_name;
+    public String getOfferID() {
+        return offerID;
     }
 
-    public String getOffer_description() {
-        return offer_description;
+    public void setOfferID(String offerID) {
+        this.offerID = offerID;
     }
 
-    public void setOffer_description(String offer_description) {
-        this.offer_description = offer_description;
+    public String getRestaurantID() {
+        return restaurantID;
     }
 
-    public GregorianCalendar getOffer_start_date() {
-        return offer_start_date;
+    public void setRestaurantID(String restaurantID) {
+        this.restaurantID = restaurantID;
     }
 
-    public void setOffer_start_date(GregorianCalendar offer_start_date) {
-        this.offer_start_date = offer_start_date;
+    public String getOfferName() {
+        return offerName;
     }
 
-    public GregorianCalendar getOffer_end_date() {
-        return offer_end_date;
+    public void setOfferName(String offerName) {
+        this.offerName = offerName;
     }
 
-    public void setOffer_end_date(GregorianCalendar offer_end_date) {
-        this.offer_end_date = offer_end_date;
+    public String getOfferDescription() {
+        return offerDescription;
+    }
+
+    public void setOfferDescription(String offerDescription) {
+        this.offerDescription = offerDescription;
     }
 
     public Boolean getOfferAtLunch() {
@@ -89,35 +163,83 @@ public class Offer {
         this.offerAtDinner = offerAtDinner;
     }
 
-    public String getOffer_meal_id() {
-        return offer_meal_id;
+    public Boolean getOfferIsWeekly() {
+        return offerIsWeekly;
     }
 
-    public void setOffer_meal_id(String offer_meal_id) {
-        this.offer_meal_id = offer_meal_id;
+    public void setOfferIsWeekly(Boolean offerIsWeekly) {
+        this.offerIsWeekly = offerIsWeekly;
     }
 
-    public String getOffer_meal_name() {
-        return offer_meal_name;
+    public Calendar getOfferStartDate() {
+        return offerStartDate;
     }
 
-    public void setOffer_meal_name(String offer_meal_name) {
-        this.offer_meal_name = offer_meal_name;
+    public void setOfferStartDate(Calendar offerStartDate) {
+        this.offerStartDate = offerStartDate;
     }
 
-    public String getOffer_meal_thumbnail() {
-        return offer_meal_thumbnail;
+    public Calendar getOfferStopDate() {
+        return offerStopDate;
     }
 
-    public void setOffer_meal_thumbnail(String offer_meal_thumbnail) {
-        this.offer_meal_thumbnail = offer_meal_thumbnail;
+    public void setOfferStopDate(Calendar offerStopDate) {
+        this.offerStopDate = offerStopDate;
     }
 
-    public String getOffer_meal_photo_firebase_URL() {
-        return offer_meal_photo_firebase_URL;
+    public ArrayList<Integer> getOfferOnWeekDays() {
+        return offerOnWeekDays;
     }
 
-    public void setOffer_meal_photo_firebase_URL(String offer_meal_photo_firebase_URL) {
-        this.offer_meal_photo_firebase_URL = offer_meal_photo_firebase_URL;
+    public void setOfferOnWeekDays(ArrayList<Integer> offerOnWeekDays) {
+        this.offerOnWeekDays = offerOnWeekDays;
+    }
+
+    public Boolean getOfferForTotal() {
+        return offerForTotal;
+    }
+
+    public void setOfferForTotal(Boolean offerForTotal) {
+        this.offerForTotal = offerForTotal;
+    }
+
+    public Boolean getOfferForMeal() {
+        return offerForMeal;
+    }
+
+    public void setOfferForMeal(Boolean offerForMeal) {
+        this.offerForMeal = offerForMeal;
+    }
+
+    public Boolean getOfferForCategory() {
+        return offerForCategory;
+    }
+
+    public void setOfferForCategory(Boolean offerForCategory) {
+        this.offerForCategory = offerForCategory;
+    }
+
+    public ArrayList<MealCategory> getOfferOnCategories() {
+        return offerOnCategories;
+    }
+
+    public void setOfferOnCategories(ArrayList<MealCategory> offerOnCategories) {
+        this.offerOnCategories = offerOnCategories;
+    }
+
+    public ArrayList<Meal> getOfferOnMeals() {
+        return offerOnMeals;
+    }
+
+    public void setOfferOnMeals(ArrayList<Meal> offerOnMeals) {
+        this.offerOnMeals = offerOnMeals;
+    }
+
+    public Integer getOfferPercentage() {
+        return offerPercentage;
+    }
+
+    public void setOfferPercentage(Integer offerPercentage) {
+        this.offerPercentage = offerPercentage;
     }
 }

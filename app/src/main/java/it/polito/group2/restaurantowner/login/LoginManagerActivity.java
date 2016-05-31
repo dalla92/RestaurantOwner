@@ -132,94 +132,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
 
 
         mAuth = FirebaseAuth.getInstance();
-
-        /*mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    String fullName = user.getDisplayName();
-                    String email = user.getEmail();
-                    final String userID = user.getUid();
-                    String providerId = null;
-                    for (UserInfo profile : user.getProviderData()) {
-                        // Id of the provider (ex: google.com)
-                        providerId = profile.getProviderId();
-                    }
-
-                    if(providerId == null)
-                        providerId = "password";
-
-                    final String targetProvider = providerId.equals("google.com")? "google" : providerId;
-                    if(!providerId.equals("password")) {
-
-                        final User myUser = new User(userID, fullName, "", email);
-                        myUser.getProviders().put(providerId, true);
-
-                        final DatabaseReference userRef = firebase.getReference("users");
-                        final Query userQuery = userRef.orderByChild("user_email").equalTo(email);
-                        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (!dataSnapshot.hasChildren()) {
-                                    userRef.child(userID).setValue(myUser, new DatabaseReference.CompletionListener() {
-                                        @Override
-                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                            if (databaseError != null)
-                                                Log.d("prova", "write error");
-                                            else {
-                                                Log.d("prova", "done");
-                                                finish();
-                                            }
-
-                                        }
-                                    });
-                                }
-                                else{
-                                    User target = null;
-                                    for(DataSnapshot data : dataSnapshot.getChildren()) {
-                                        target = data.getValue(User.class);
-                                    }
-                                    Log.d("prova", target.getUser_email() + " " + target.getUser_full_name() + " " + target.getUser_id() + " " + target.getProviders());
-                                    HashMap<String, Boolean> providers = target.getProviders();
-                                    if(!providers.containsKey(targetProvider)) {
-                                        providers.put(targetProvider, true);
-                                        userRef.child(userID).child("providers").setValue(providers);
-                                    }
-                                }
-
-
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                Log.d("prova", "check user calcelled!");
-                            }
-                        });
-                    }
-
-                    sessionManager.createUserLoginSession(userID, providerId);
-
-                    Intent i = new Intent(LoginManagerActivity.this, UserRestaurantActivity.class);
-
-                    i.putExtra("restaurant_id", "-KI35BWFjfamV1gY4l3G");
-
-                    // Closing all the Activities from stack
-                    i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                    // Add new Flag to start new Activity
-                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                    // Staring UserRestaurantList Activity
-                    startActivity(i);
-
-                    Log.d("prova", fullName + " " + email + " " + userID + " " + providerId);
-                } else {
-                    // User is signed out
-                    Log.d("prova", "Login: onAuthStateChanged:signed_out");
-                }
-            }
-        };*/
     }
 
     private void handleAuthToken(String provider, String accessToken) {
@@ -252,22 +164,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                         handleFirebaseAuthResult(null);
                     }
                 });
-        /*mAuth.signInWithEmailAndPassword(inputEmail.getText().toString().trim(), inputPassword.getText().toString().trim())
-                    .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-
-                            // If sign in fails, display a message to the user. If sign in succeeds
-                            // the auth state listener will be notified and logic to handle the
-                            // signed in user can be handled in the listener.
-                            if (!task.isSuccessful()) {
-                                task.getException().printStackTrace();
-                                Toast.makeText(LoginManagerActivity.this, "Authentication with password failed on firebase.",
-                                        Toast.LENGTH_SHORT).show();
-                                hideProgressDialog();
-                            }
-                        }
-                    });*/
     }
 
     private void handleFirebaseAuthResult(AuthResult result) {
@@ -286,8 +182,12 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 providerId = "password";
             if(providerId.equals("google.com"))
                 providerId = "google";
+            if(providerId.equals("facebook.com"))
+                providerId = "facebook";
 
             final String targetProvider = providerId;
+
+            Log.d("prova", targetProvider);
 
             final DatabaseReference userRef = firebase.getReference("users");
             final Query userQuery = userRef.orderByChild("user_email").equalTo(email);
@@ -298,7 +198,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                         Log.d("prova", fullName + " " + email + " " + userID);
 
                         User user = new User(userID, fullName, "", email);
-                        user.getProviders().put("google", true);
+                        user.getProviders().put(targetProvider, true);
                         userRef.child(userID).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -324,7 +224,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                             target = data.getValue(User.class);
                         }
                         HashMap<String, Boolean> providers = target.getProviders();
-                        if(!targetProvider.contains(targetProvider)){
+                        if(!providers.containsKey(targetProvider)){
                             providers.put(targetProvider, true);
                         }
                         userRef.child(target.getUser_id()).child("providers").setValue(providers);
@@ -371,61 +271,28 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                         handleFirebaseAuthResult(null);
                     }
                 });
-        /*mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-
-                        hideProgressDialog();
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            task.getException().printStackTrace();
-                            FirebaseUser user =task.getResult().getUser();
-                            Log.d("prova", user.getDisplayName() + " " + user.getProviderId() + " " +user.getEmail());
-                            Toast.makeText(LoginManagerActivity.this, "Authentication with google failed on firebase.",
-                                    Toast.LENGTH_SHORT).show();
-                            hideProgressDialog();
-                        }
-                    }
-                });*/
     }
 
     private void firebaseAuthWithFacebook(String token) {
         AuthCredential credential = FacebookAuthProvider.getCredential(token);
         mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
                     @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            task.getException().printStackTrace();
-                            Toast.makeText(LoginManagerActivity.this, "Authentication with facebook failed on firebase",
-                                    Toast.LENGTH_SHORT).show();
-                            hideProgressDialog();
-                        }
+                    public void onSuccess(AuthResult result) {
+                        handleFirebaseAuthResult(result);
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                        //TODO collision check and merge
+                        Log.d("prova", "auth:onFailureFacebook:" + e.getMessage());
+                        handleFirebaseAuthResult(null);
                     }
                 });
-    }
 
-    /*@Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
     }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        hideProgressDialog();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }*/
 
     private void showProgressDialog() {
         if (mProgressDialog == null) {
@@ -532,6 +399,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 handleAuthToken("google", account.getIdToken());
             } else {
                 // Google Sign In failed
+
                 hideProgressDialog();
                 Toast.makeText(LoginManagerActivity.this, "LogIn Failed result, Try again!", Toast.LENGTH_SHORT).show();
             }

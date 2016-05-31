@@ -2,7 +2,6 @@ package it.polito.group2.restaurantowner.user.order;
 
 
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -15,9 +14,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,16 +31,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
-import it.polito.group2.restaurantowner.firebasedata.MealCategory;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
+import it.polito.group2.restaurantowner.login.FirebaseUtil;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
@@ -77,11 +74,14 @@ public class OrderActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.order_activity);
 
+        userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
+        if(userID == null) {
+            Log.d("FILIPPO", "utente non loggato");
+            //TODO utende disconnesso: blocca tutto
+        }
+
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
-        }
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            userID = getIntent().getExtras().getString("user_id");
         }
 
         showProgressDialog();
@@ -99,6 +99,7 @@ public class OrderActivity extends AppCompatActivity
                 //TODO controllare se takeAwayAllowed is true
                 //TODO controllare se restaurant_orders_per_hour non ha raggiunto il limite
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 //TODO gestire se il ristorante viene cancellato
@@ -119,6 +120,7 @@ public class OrderActivity extends AppCompatActivity
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 mealList.add(dataSnapshot.getValue(Meal.class));
+                Log.d("FILIPPO", "onChildAdded");
             }
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
@@ -130,6 +132,7 @@ public class OrderActivity extends AppCompatActivity
                         break;
                     }
                 }
+                Log.d("FILIPPO", "onChildChanged");
             }
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
@@ -140,6 +143,7 @@ public class OrderActivity extends AppCompatActivity
                         break;
                     }
                 }
+                Log.d("FILIPPO", "onChildRemoved");
             }
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
@@ -217,7 +221,6 @@ public class OrderActivity extends AppCompatActivity
                 //TODO controllare quando vieni dal mealList
                 Intent intent = new Intent(this, UserRestaurantActivity.class);
                 intent.putExtra("restaurant_id", restaurantID);
-                intent.putExtra("user_id", userID);
                 startActivity(intent);
             } else {
                 super.onBackPressed();
@@ -235,18 +238,12 @@ public class OrderActivity extends AppCompatActivity
             Intent intent1 = new Intent(
                     getApplicationContext(),
                     MainActivity.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", userID);
-            intent1.putExtras(b1);
             startActivity(intent1);
             return true;
         } else if(id==R.id.nav_home){
             Intent intent1 = new Intent(
                     getApplicationContext(),
                     UserRestaurantList.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", userID);
-            intent1.putExtras(b1);
             startActivity(intent1);
             return true;
         } else if(id==R.id.nav_login){
@@ -259,45 +256,30 @@ public class OrderActivity extends AppCompatActivity
             Intent intent1 = new Intent(
                     getApplicationContext(),
                     UserProfile.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", userID);
-            intent1.putExtras(b1);
             startActivity(intent1);
             return true;
         } else if(id==R.id.nav_my_orders) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
                     UserRestaurantList.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", userID);
-            intent1.putExtras(b1);
             startActivity(intent1);
             return true;
         } else if(id==R.id.nav_my_reservations){
             Intent intent3 = new Intent(
                     getApplicationContext(),
                     UserMyReservations.class);
-            Bundle b3 = new Bundle();
-            b3.putString("user_id", userID);
-            intent3.putExtras(b3);
             startActivity(intent3);
             return true;
         } else if(id==R.id.nav_my_reviews){
             Intent intent3 = new Intent(
                     getApplicationContext(),
                     MyReviewsActivity.class);
-            Bundle b3 = new Bundle();
-            b3.putString("user_id", userID);
-            intent3.putExtras(b3);
             startActivity(intent3);
             return true;
         } else if(id==R.id.nav_my_favourites){
             Intent intent3 = new Intent(
                     getApplicationContext(),
                     UserMyFavourites.class);
-            Bundle b3 = new Bundle();
-            b3.putString("user_id", userID);
-            intent3.putExtras(b3);
             startActivity(intent3);
             return true;
         }
@@ -389,7 +371,6 @@ public class OrderActivity extends AppCompatActivity
         this.order = setNewOrder();
 
         Intent intent = new Intent(this, MyOrdersActivity.class);
-        intent.putExtra("user_id", userID);
         startActivity(intent);
     }
 
@@ -428,7 +409,6 @@ public class OrderActivity extends AppCompatActivity
         transaction.commit();
         Intent intent = new Intent(this, UserRestaurantActivity.class);
         intent.putExtra("restaurant_id", restaurantID);
-        intent.putExtra("user_id", userID);
         startActivity(intent);
     }
 
@@ -448,7 +428,7 @@ public class OrderActivity extends AppCompatActivity
     private Order setNewOrder() {
         Order o = new Order();
         o.setUser_id(userID);
-        o.setUser_full_name(user.getUser_full_name());
+        o.setUser_full_name(user != null ? user.getUser_full_name() : "");
         o.setRestaurant_id(restaurantID);
         o.setOrder_price(0.0);
         ArrayList<Meal> mealList = new ArrayList<Meal>();
@@ -462,6 +442,7 @@ public class OrderActivity extends AppCompatActivity
             if(categoryList.indexOf(m.getMeal_category()) == -1)
                 categoryList.add(m.getMeal_category());
         }
+
         return categoryList;
     }
 

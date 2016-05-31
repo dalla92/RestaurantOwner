@@ -36,7 +36,7 @@ import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.data.TableReservation;
 import it.polito.group2.restaurantowner.data.Order;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
-import it.polito.group2.restaurantowner.owner.offer.OfferListActivity;
+import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class StatisticsActivity extends AppCompatActivity
@@ -581,7 +581,7 @@ public class StatisticsActivity extends AppCompatActivity
         } else if(id==R.id.action_offers) {
             Intent intent2 = new Intent(
                     getApplicationContext(),
-                    OfferListActivity.class);
+                    MyOffersActivity.class);
             Bundle b2 = new Bundle();
             b2.putString("restaurant_id", restaurantID);
             intent2.putExtras(b2);

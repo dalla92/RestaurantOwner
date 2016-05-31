@@ -29,6 +29,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
@@ -85,14 +86,14 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".owner.offer.OfferListActivity"
+            android:name=".owner.my_offers.MyOffersActivity"
             android:label="@string/title_activity_offer_list"
             android:parentActivityName=".owner.Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".owner.offer.AddOfferActivity"
+            android:name=".owner.offer.OfferActivity"
             android:label="@string/title_activity_add_offer"
-            android:parentActivityName=".owner.offer.OfferListActivity"
+            android:parentActivityName=".owner.my_offers.MyOffersActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity

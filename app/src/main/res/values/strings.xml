@@ -160,6 +160,7 @@
     <string name="reviews_activity">Reviews</string>
     <string name="title_add_offer">Add new Offer</string>
     <string name="title_activity_user_restaurant">UserRestaurantActivity</string>
+    <string name="no_reviews">No Reviews</string>
 
     <!-- UserRestaurantPage Activity -->
     <string name="times_Mon">Monday</string>
