@@ -47,7 +47,7 @@ public class MealFragment extends ListFragment {
         setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
-                    getResources().getString(R.string.order_meal_title));
+                    getResources().getString(R.string.user_order_meal_title));
         } catch (Exception e) {
             Log.d("FILIPPO", e.getMessage());
         }

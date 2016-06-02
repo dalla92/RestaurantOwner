@@ -95,7 +95,7 @@ public class OfferFragment extends Fragment {
             if(offer.getOfferStartDate().get(Calendar.YEAR) == year &&
                     offer.getOfferStartDate().get(Calendar.MONTH) == month &&
                     offer.getOfferStartDate().get(Calendar.DAY_OF_MONTH) == day) {
-                start.setText(getString(R.string.owner_offer_fragment_init_label_today));
+                start.setText(getString(R.string.owner_offer_fragment_offer_label_today));
             } else {
                 start.setText(dateFormat.format(offer.getOfferStartDate().getTime()));
             }
@@ -110,7 +110,7 @@ public class OfferFragment extends Fragment {
             if(offer.getOfferStopDate().get(Calendar.YEAR) == year &&
                     offer.getOfferStopDate().get(Calendar.MONTH) == month &&
                     offer.getOfferStopDate().get(Calendar.DAY_OF_MONTH) == day) {
-                stop.setText(getString(R.string.owner_offer_fragment_init_label_today));
+                stop.setText(getString(R.string.owner_offer_fragment_offer_label_today));
             } else {
                 stop.setText(dateFormat.format(offer.getOfferStopDate().getTime()));
             }
@@ -280,7 +280,7 @@ public class OfferFragment extends Fragment {
                 TextView date = (TextView) view.findViewById(R.id.text_from_date);
                 Calendar c = Calendar.getInstance();
                 if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
-                    date.setText(getString(R.string.owner_offer_fragment_init_label_today));
+                    date.setText(getString(R.string.owner_offer_fragment_offer_label_today));
                 else {
                     c.set(Calendar.YEAR, year);
                     c.set(Calendar.MONTH, monthOfYear);
@@ -306,7 +306,7 @@ public class OfferFragment extends Fragment {
                 TextView date = (TextView) view.findViewById(R.id.text_to_date);
                 Calendar c = Calendar.getInstance();
                 if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
-                    date.setText(getString(R.string.owner_offer_fragment_init_label_today));
+                    date.setText(getString(R.string.owner_offer_fragment_offer_label_today));
                 else {
                     c.set(Calendar.YEAR, year);
                     c.set(Calendar.MONTH, monthOfYear);
@@ -339,7 +339,7 @@ public class OfferFragment extends Fragment {
         this.offer.setOfferDescription(offerDescription.getText().toString());
 
         TextView start = (TextView) view.findViewById(R.id.text_from_date);
-        if(start.getText().toString().equals(getString(R.string.owner_offer_fragment_init_label_today))) {
+        if(start.getText().toString().equals(getString(R.string.owner_offer_fragment_offer_label_today))) {
             Calendar today = Calendar.getInstance();
             today.set(Calendar.HOUR_OF_DAY, 0);
             today.set(Calendar.MINUTE, 0);
@@ -359,7 +359,7 @@ public class OfferFragment extends Fragment {
         }
 
         TextView stop = (TextView) view.findViewById(R.id.text_to_date);
-        if(stop.getText().toString().equals(getString(R.string.owner_offer_fragment_init_label_today))) {
+        if(stop.getText().toString().equals(getString(R.string.owner_offer_fragment_offer_label_today))) {
             Calendar today = Calendar.getInstance();
             today.set(Calendar.HOUR_OF_DAY, 0);
             today.set(Calendar.MINUTE, 0);

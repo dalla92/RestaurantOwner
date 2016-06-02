@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/goto_cart"
-        android:title="@string/order_cart_button"
+        android:title="@string/user_order_cart_button"
         android:icon="@drawable/ic_cart_white_24dp"
         app:showAsAction="ifRoom"
         />

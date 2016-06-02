@@ -49,7 +49,7 @@ public class CartFragment extends ListFragment {
 
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
-                    getResources().getString(R.string.order_cart_title));
+                    getResources().getString(R.string.user_order_cart_title));
         } catch (Exception e) {
             Log.d("FILIPPO", e.getMessage());
         }
@@ -87,8 +87,8 @@ public class CartFragment extends ListFragment {
             confirm_btn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     new AlertDialog.Builder(getContext())
-                            .setTitle(getContext().getResources().getString(R.string.order_confirm_title))
-                            .setMessage(getContext().getResources().getString(R.string.order_confirm_message))
+                            .setTitle(getContext().getResources().getString(R.string.user_order_confirm_title))
+                            .setMessage(getContext().getResources().getString(R.string.user_order_confirm_message))
                             .setIcon(android.R.drawable.ic_dialog_info)
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int whichButton) {
@@ -106,8 +106,8 @@ public class CartFragment extends ListFragment {
         cancel_btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 new AlertDialog.Builder(getContext())
-                        .setTitle(getContext().getResources().getString(R.string.order_cancel_title))
-                        .setMessage(getContext().getResources().getString(R.string.order_cancel_message))
+                        .setTitle(getContext().getResources().getString(R.string.user_order_cancel_title))
+                        .setMessage(getContext().getResources().getString(R.string.user_order_cancel_message))
                         .setIcon(android.R.drawable.ic_dialog_info)
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
@@ -129,8 +129,8 @@ public class CartFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, final int position, long id) {
         new AlertDialog.Builder(getContext())
-                .setTitle(getContext().getResources().getString(R.string.order_cart_deltitle))
-                .setMessage(getContext().getResources().getString(R.string.order_cart_delmessage))
+                .setTitle(getContext().getResources().getString(R.string.user_order_cart_deltitle))
+                .setMessage(getContext().getResources().getString(R.string.user_order_cart_delmessage))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {

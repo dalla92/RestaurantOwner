@@ -27,7 +27,7 @@ public class QuantityFragment extends Fragment {
         setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
-                    getResources().getString(R.string.order_info_title));
+                    getResources().getString(R.string.user_order_info_title));
         } catch (Exception e) {
             Log.d("FILIPPO", e.getMessage());
         }

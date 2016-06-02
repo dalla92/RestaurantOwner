@@ -89,37 +89,6 @@
     <string name="rating">Rating</string>
     <string name="number_reservations">Number reservation</string>
 
-    <!-- Offer strings -->
-    <string name="add">Add</string>
-    <string name="from">From:</string>
-    <string name="to">To:</string>
-    <string name="valid_for">Valid for </string>
-    <string name="lunch">Lunch</string>
-    <string name="info">Info</string>
-    <string name="validity">Validity</string>
-    <string name="today">Today</string>
-    <string name="dinner">Dinner</string>
-    <string name="title_activity_offer_list">Offer List</string>
-    <string name="title_activity_add_offer">Add a new offer</string>
-    <string name="description">Description</string>
-    <string name="january">January</string>
-    <string name="february">February</string>
-    <string name="march">March</string>
-    <string name="april">April</string>
-    <string name="may">May</string>
-    <string name="june">June</string>
-    <string name="july">July</string>
-    <string name="august">August</string>
-    <string name="september">September</string>
-    <string name="october">October</string>
-    <string name="november">November</string>
-    <string name="december">December</string>
-    <string name="offer_name_error">Insert a name!</string>
-    <string name="offer_desc_error">Insert a description!</string>
-    <string name="title_activity_reservation">Reservations</string>
-    <string name="done">Done</string>
-    <string name="no_offer">No Offers</string>
-
     <!-- ReservationActivity strings -->
     <string name="table_section">Table</string>
     <string name="takeaway_section">Take Away</string>
@@ -220,32 +189,6 @@
     <string name="profile_vat_number">VAT Number</string>
     <string name="action_cancel">Cancel</string>
 
-
-    <!-- Order Activity -->
-    <string name="order_nextstep">Next</string>
-    <string name="order_addtocart">Add</string>
-    <string name="order_mealquantity">Add quantity</string>
-    <string name="order_mealnote">Additional note</string>
-    <string name="order_category_title">What do you want to eat?</string>
-    <string name="order_meal_title">Select it</string>
-    <string name="order_addition_title">Any additions?</string>
-    <string name="order_cart_button">Cart</string>
-    <string name="order_cart_title">Here\'s your order:</string>
-    <string name="order_cart_btn_confirm">Confirm order</string>
-    <string name="order_cart_btn_continue">Continue order</string>
-    <string name="order_cart_btn_cancel">Cancel order</string>
-    <string name="order_cart_hint_note">Additional order info</string>
-    <string name="order_info_title">How many?</string>
-    <string name="order_confirm_title">Order confirm</string>
-    <string name="order_confirm_message">Are you sure to confirm your order?</string>
-    <string name="order_info_alert_title">Attention!</string>
-    <string name="order_info_alert_message">You must enter the quantity to add the meal to the cart.</string>
-    <string name="order_cancel_title">Attention!</string>
-    <string name="order_cancel_message">Do you want to delete the order?</string>
-    <string name="order_cart_deltitle">Delete meal</string>
-    <string name="order_cart_delmessage">Do you want to delete this meal?</string>
-
-
     <string name="title_activity_my_orders">My Orders</string>
     <string name="call_confirmation">Call confirmation</string>
     <string name="call_confirmation_message">Sure to call the restaurant?</string>
@@ -291,7 +234,7 @@
     <string name="profile_full_name">Full name</string>
     <string name="title_activity_search">SearchActivity</string>
 
-    <!-- Strings related to offer -->
+    <!-- Strings related to owner.offer -->
     <string name="owner_offer_fragment_offer_title">Offer initialization</string>
     <string name="owner_offer_fragment_offer_switchtext_enable">Enabled</string>
     <string name="owner_offer_fragment_offer_switchtext_lunch">Lunch offer</string>
@@ -299,26 +242,58 @@
     <string name="owner_offer_fragment_offer_hint_offername">Offer name</string>
     <string name="owner_offer_fragment_offer_hint_offerdescription">Offer description</string>
     <string name="owner_offer_fragment_offer_calendartext_offerstart">Offer start on</string>
-    <string name="owner_offer_fragment_init_calendartext_offerstop">Offer stop on</string>
-    <string name="owner_offer_fragment_init_label_today">Today</string>
-    <string name="owner_offer_fragment_init_label_sun">S</string>
-    <string name="owner_offer_fragment_init_label_mon">M</string>
-    <string name="owner_offer_fragment_init_label_tue">T</string>
-    <string name="owner_offer_fragment_init_label_wed">W</string>
-    <string name="owner_offer_fragment_init_label_thu">T</string>
-    <string name="owner_offer_fragment_init_label_fri">F</string>
-    <string name="owner_offer_fragment_init_label_sat">S</string>
-    <string name="owner_offer_fragment_init_label_weekly">Weekdays availability</string>
-    <string name="owner_offer_fragment_init_label_offerpercentage">Apply discount</string>
-    <string name="owner_offer_fragment_init_label_offerapplication">on:</string>
-    <string name="owner_offer_fragment_init_label_categoryselected">Include categories</string>
-    <string name="owner_offer_fragment_init_label_mealselected">Include meals</string>
-    <string name="owner_offer_fragment_init_option_all">Everything</string>
-    <string name="owner_offer_fragment_init_option_categories">Category list</string>
-    <string name="owner_offer_fragment_init_option_meals">Meal list</string>
+    <string name="owner_offer_fragment_offer_calendartext_offerstop">Offer stop on</string>
+    <string name="owner_offer_fragment_offer_label_today">Today</string>
+    <string name="owner_offer_fragment_offer_label_sun">S</string>
+    <string name="owner_offer_fragment_offer_label_mon">M</string>
+    <string name="owner_offer_fragment_offer_label_tue">T</string>
+    <string name="owner_offer_fragment_offer_label_wed">W</string>
+    <string name="owner_offer_fragment_offer_label_thu">T</string>
+    <string name="owner_offer_fragment_offer_label_fri">F</string>
+    <string name="owner_offer_fragment_offer_label_sat">S</string>
+    <string name="owner_offer_fragment_offer_label_weekly">Weekdays availability</string>
+    <string name="owner_offer_fragment_offer_label_offerpercentage">Apply discount</string>
+    <string name="owner_offer_fragment_offer_label_offerapplication">on:</string>
+    <string name="owner_offer_fragment_offer_label_categoryselected">Include categories</string>
+    <string name="owner_offer_fragment_offer_label_mealselected">Include meals</string>
+    <string name="owner_offer_fragment_offer_option_all">Everything</string>
+    <string name="owner_offer_fragment_offer_option_categories">Category list</string>
+    <string name="owner_offer_fragment_offer_option_meals">Meal list</string>
+    <string name="owner_offer_fragment_category_title">Applied on categories: </string>
+    <string name="owner_offer_fragment_meal_title">Applied on meals: </string>
 
-    <string name="owner_offer_fragment_category_title">Applied on categories... </string>
-    <string name="owner_offer_fragment_meal_title">Applied on meals... </string>
+    <!-- Strings related to owner.my_offers -->
+
+    <!-- Strings related to user.order -->
+    <string name="user_order_nextstep">Next</string>
+    <string name="user_order_addtocart">Add</string>
+    <string name="user_order_mealquantity">Add quantity</string>
+    <string name="user_order_mealnote">Additional note</string>
+    <string name="user_order_category_title">What do you want to eat?</string>
+    <string name="user_order_meal_title">Select it</string>
+    <string name="user_order_addition_title">Any additions?</string>
+    <string name="user_order_cart_button">Cart</string>
+    <string name="user_order_cart_title">Here\'s your order:</string>
+    <string name="user_order_cart_btn_confirm">Confirm order</string>
+    <string name="user_order_cart_btn_continue">Continue order</string>
+    <string name="user_order_cart_btn_cancel">Cancel order</string>
+    <string name="user_order_cart_hint_note">Additional order info</string>
+    <string name="user_order_info_title">How many?</string>
+    <string name="user_order_confirm_title">Order confirm</string>
+    <string name="user_order_confirm_message">Are you sure to confirm your order?</string>
+    <string name="user_order_info_alert_title">Attention!</string>
+    <string name="user_order_info_alert_message">You must enter the quantity to add the meal to the cart.</string>
+    <string name="user_order_cancel_title">Attention!</string>
+    <string name="user_order_cancel_message">Do you want to delete the order?</string>
+    <string name="user_order_cart_deltitle">Delete meal</string>
+    <string name="user_order_cart_delmessage">Do you want to delete this meal?</string>
+
+    <!-- Strings related to user.my_orders -->
+
+
+
+
+
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
