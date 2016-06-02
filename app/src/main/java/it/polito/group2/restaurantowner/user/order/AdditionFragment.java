@@ -46,7 +46,7 @@ public class AdditionFragment extends ListFragment {
         setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
-                    getResources().getString(R.string.order_addition_title));
+                    getResources().getString(R.string.user_order_addition_title));
         } catch (Exception e) {
             Log.d("FILIPPO", e.getMessage());
         }

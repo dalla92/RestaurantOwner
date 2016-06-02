@@ -30,6 +30,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import it.polito.group2.restaurantowner.R;
 
@@ -38,7 +39,11 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -46,11 +51,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.clustering.ClusterManager;
 
 import org.json.JSONException;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.data.JSONUtil;
@@ -70,11 +78,10 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActiv
 
 public class UserRestaurantList extends AppCompatActivity
 //      DatabaseReferenceLoginBaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
+        implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
 /*        , OnMapReadyCallback, GeoQueryEventListener
 */{
 
-    GoogleMap map;
     final static int ACTION_FILTER = 1;
     private UserRestaurantPreviewAdapter mAdapter;
     private RecyclerView mRecyclerView;
@@ -89,6 +96,9 @@ public class UserRestaurantList extends AppCompatActivity
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private Toolbar toolbar;
+
+    private GoogleMap mMap;
+    private ClusterManager<MyItem> mClusterManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -214,6 +224,8 @@ public class UserRestaurantList extends AppCompatActivity
 
         setDrawer();
 
+        setUpMap();
+
         //navigation drawer
         /*DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -291,6 +303,51 @@ public class UserRestaurantList extends AppCompatActivity
         }
         else
         nav_photo.setImageResource(R.drawable.blank_profile);*/
+    }
+
+    @Override
+    public void onMapReady(GoogleMap map) {
+        if (mMap != null) {
+            return;
+        }
+        mMap = map;
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                Intent intent = new Intent(
+                        getApplicationContext(),
+                        MapsActivity.class);
+                Bundle b = new Bundle();
+                //TODO add range_value
+                //b.putString("range", range_value);
+                intent.putExtras(b);
+                startActivity(intent);
+            }
+        });
+        maps_stuff();
+    }
+
+    private void setUpMap() {
+        ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
+    }
+
+    public void maps_stuff(){
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
+
+        mClusterManager = new ClusterManager<MyItem>(this, mMap);
+        mMap.setOnCameraChangeListener(mClusterManager);
+
+        try {
+            readItems();
+        } catch (JSONException e) {
+            Toast.makeText(this, "Problem reading list of markers.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void readItems() throws JSONException {
+        InputStream inputStream = getResources().openRawResource(R.raw.radar_search);
+        List<MyItem> items = new MyItemReader().read(inputStream);
+        mClusterManager.addItems(items);
     }
 
     private void setDrawer() {

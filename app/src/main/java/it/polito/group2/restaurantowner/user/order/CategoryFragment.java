@@ -45,7 +45,7 @@ public class CategoryFragment extends Fragment {
         setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
-                    getResources().getString(R.string.order_category_title));
+                    getResources().getString(R.string.user_order_category_title));
         } catch (Exception e) {
             Log.d("FILIPPO", e.getMessage());
         }

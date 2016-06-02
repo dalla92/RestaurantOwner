@@ -3,7 +3,21 @@ package it.polito.group2.restaurantowner.firebasedata;
 /**
  * Created by Alessio on 16/05/2016.
  */
-public class RestaurantPreview {
+import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.clustering.ClusterItem;
+
+/**
+ * Created by Alessio on 16/05/2016.
+ */
+public class RestaurantPreview implements ClusterItem {
+    public LatLng mPosition;
+    public Double lat;
+    public Double lon;
 
     private String restaurant_id; //to pass to the new Activity to open the right restaurant
 
@@ -15,6 +29,12 @@ public class RestaurantPreview {
 
     public RestaurantPreview(){
 
+    }
+
+    @Override
+    public LatLng getPosition() {
+        //return this.mPosition;
+        return new LatLng(getLat(), getLon());
     }
 
     public String getRestaurant_id() {
@@ -63,5 +83,61 @@ public class RestaurantPreview {
 
     public void setTables_number(int tables_number) {
         this.tables_number = tables_number;
+    }
+
+    public LatLng getmPosition() {
+        //TODO Decomment maybe after integration
+        /*
+        //get only latitude
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+getRestaurant_id()+"/restaurant_latitude_position");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot res_latSnapshot : snapshot.getChildren()) {
+                    Double snap_lat = (Double) res_latSnapshot.getValue();
+                    lat = snap_lat;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+        //get only longitude
+        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+getRestaurant_id()+"/restaurant_longitude_position");
+        ref2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot res_longSnapshot : snapshot.getChildren()) {
+                    Double snap_long = (Double) res_longSnapshot.getValue();
+                    lon = snap_long;
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+        */
+        mPosition = new LatLng(lat, lon);
+        return mPosition;
+    }
+
+    public Double getLat() {
+        return lat;
+    }
+
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+
+    public Double getLon() {
+        return lon;
+    }
+
+    public void setLon(Double lon) {
+        this.lon = lon;
     }
 }
