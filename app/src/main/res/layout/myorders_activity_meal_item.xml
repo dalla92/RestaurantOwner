@@ -4,6 +4,6 @@
     android:orientation="vertical"
     android:layout_marginBottom="10dp">
 
-    <include layout="@layout/order_fragment_cart_meal" />
+    <include layout="@layout/user_order_fragment_cart_meal" />
 
 </LinearLayout>

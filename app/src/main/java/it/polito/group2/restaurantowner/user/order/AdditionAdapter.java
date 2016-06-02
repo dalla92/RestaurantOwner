@@ -4,7 +4,6 @@ package it.polito.group2.restaurantowner.user.order;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -47,7 +46,7 @@ public class AdditionAdapter extends RecyclerView.Adapter<AdditionAdapter.Additi
 
     @Override
     public AdditionAdapter.AdditionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.order_fragment_addition_item, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_order_fragment_addition_item, parent, false);
         return new AdditionViewHolder(itemView);
     }
 

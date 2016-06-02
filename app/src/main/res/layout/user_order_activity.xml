@@ -9,7 +9,7 @@
     tools:openDrawer="start">
 
     <include
-        layout="@layout/order_activity_appbar"
+        layout="@layout/user_order_activity_appbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -21,7 +21,7 @@
         app:itemTextColor="@color/gray"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/order_activity_navheader"
+        app:headerLayout="@layout/user_order_activity_navheader"
         app:menu="@menu/drawer_menu" />
 
 </android.support.v4.widget.DrawerLayout>

@@ -1,37 +1,70 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 /**
  * Created by Alessio on 16/05/2016.
  */
 
-public class Offer {
+public class Offer implements Serializable {
 
     private String offerID;
     private String restaurantID;
+    private String userID;
     private String offerName;
     private String offerDescription;
 
     private Boolean offerAtLunch = false;
     private Boolean offerAtDinner = false;
-    private Boolean offerIsWeekly = false;
     private Calendar offerStartDate;
     private Calendar offerStopDate;
     private ArrayList<Integer> offerOnWeekDays = new ArrayList<Integer>();
 
-    private Boolean offerForTotal = false;
+    private Boolean offerForTotal = true;
     private Boolean offerForMeal = false;
     private Boolean offerForCategory = false;
 
-    private ArrayList<MealCategory> offerOnCategories = new ArrayList<MealCategory>();
+    private ArrayList<String> offerOnCategories = new ArrayList<String>();
     private ArrayList<Meal> offerOnMeals = new ArrayList<Meal>();
 
+    private Boolean offerEnabled = true;
     private Integer offerPercentage;
 
-    public Offer() {}
+    public Offer() {
+        offerOnWeekDays.add(Calendar.MONDAY);
+        offerOnWeekDays.add(Calendar.TUESDAY);
+        offerOnWeekDays.add(Calendar.WEDNESDAY);
+        offerOnWeekDays.add(Calendar.THURSDAY);
+        offerOnWeekDays.add(Calendar.FRIDAY);
+        offerOnWeekDays.add(Calendar.SATURDAY);
+        offerOnWeekDays.add(Calendar.SUNDAY);
+    }
+
+    public Boolean isWeekDayInOffer(Integer weekDay) {
+        if(this.offerOnWeekDays.size()>0) {
+            for(Integer n : this.offerOnWeekDays) {
+                if(n.equals(weekDay)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void addWeekDayInOffer(Integer weekDay) {
+        if(!isWeekDayInOffer(weekDay)) {
+            offerOnWeekDays.add(weekDay);
+        }
+    }
+
+    public void delWeekDayInOffer(Integer weekDay) {
+        if(isWeekDayInOffer(weekDay)) {
+            offerOnWeekDays.remove(weekDay);
+        }
+    }
+
 
     public Double getNewMealPrice(Meal meal, Calendar day) {
         Double price = meal.getMeal_price();
@@ -56,19 +89,15 @@ public class Offer {
     }
 
     public Boolean isDayLunchInOffer(Calendar day) {
-        if(offerAtLunch) {
+        if(offerAtLunch && offerEnabled) {
             Calendar start = Calendar.getInstance();
             start.setTimeInMillis(offerStartDate.getTimeInMillis() - 60000);
             Calendar stop = Calendar.getInstance();
             stop.setTimeInMillis(offerStopDate.getTimeInMillis() + 60000);
             if(day.after(start) && day.before(stop)) {
-                if(offerIsWeekly) {
-                    for(Integer weekDay : offerOnWeekDays) {
-                        if(day.get(Calendar.DAY_OF_WEEK) == weekDay)
-                            return true;
-                    }
-                } else {
-                    return true;
+                for(Integer weekDay : offerOnWeekDays) {
+                    if(day.get(Calendar.DAY_OF_WEEK) == weekDay)
+                        return true;
                 }
             }
         }
@@ -76,19 +105,15 @@ public class Offer {
     }
 
     public Boolean isDayDinnerInOffer(Calendar day) {
-        if(offerAtDinner) {
+        if(offerAtDinner && offerEnabled) {
             Calendar start = Calendar.getInstance();
             start.setTimeInMillis(offerStartDate.getTimeInMillis() - 60000);
             Calendar stop = Calendar.getInstance();
             stop.setTimeInMillis(offerStopDate.getTimeInMillis() + 60000);
             if(day.after(start) && day.before(stop)) {
-                if(offerIsWeekly) {
-                    for(Integer weekDay : offerOnWeekDays) {
-                        if(day.get(Calendar.DAY_OF_WEEK) == weekDay)
-                            return true;
-                    }
-                } else {
-                    return true;
+                for(Integer weekDay : offerOnWeekDays) {
+                    if(day.get(Calendar.DAY_OF_WEEK) == weekDay)
+                        return true;
                 }
             }
         }
@@ -96,23 +121,53 @@ public class Offer {
     }
 
     public Boolean isMealInOffer(Meal meal) {
-        if(offerForMeal) {
+        if(offerForMeal && offerEnabled) {
             for(Meal m : offerOnMeals) {
                 if(meal.getMeal_id().equals(m.getMeal_id()))
                     return true;
             }
         }
-        return isCategoryInOffer(meal.getMeal_category());
+        return isInCategoryList(meal.getMeal_category());
     }
 
-    public Boolean isCategoryInOffer(String categoryName) {
-        if(offerForCategory) {
-            for(MealCategory c : offerOnCategories) {
-                if(c.getMeal_category_name().equals(categoryName))
+    public Boolean isInMealList(Meal meal) {
+        if(offerForMeal && offerEnabled) {
+            for(Meal m : offerOnMeals) {
+                if(meal.getMeal_id().equals(m.getMeal_id()))
                     return true;
             }
         }
         return false;
+    }
+
+    public Boolean isInCategoryList(String categoryName) {
+        if(offerForCategory && offerEnabled) {
+            for(String c : offerOnCategories) {
+                if(c.equals(categoryName))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    public void addCategoryInOffer(String categoryName) {
+        if(!isInCategoryList(categoryName))
+            offerOnCategories.add(categoryName);
+    }
+
+    public void delCategoryInOffer(String categoryName) {
+        if(isInCategoryList(categoryName))
+            offerOnCategories.remove(categoryName);
+    }
+
+    public void addMealInOffer(Meal meal) {
+        if(!isInMealList(meal))
+            offerOnMeals.add(meal);
+    }
+
+    public void delMealInOffer(Meal meal) {
+        if(isInMealList(meal))
+            offerOnMeals.remove(meal);
     }
 
     public String getOfferID() {
@@ -129,6 +184,14 @@ public class Offer {
 
     public void setRestaurantID(String restaurantID) {
         this.restaurantID = restaurantID;
+    }
+
+    public String getUserID() {
+        return userID;
+    }
+
+    public void setUserID(String userID) {
+        this.userID = userID;
     }
 
     public String getOfferName() {
@@ -161,14 +224,6 @@ public class Offer {
 
     public void setOfferAtDinner(Boolean offerAtDinner) {
         this.offerAtDinner = offerAtDinner;
-    }
-
-    public Boolean getOfferIsWeekly() {
-        return offerIsWeekly;
-    }
-
-    public void setOfferIsWeekly(Boolean offerIsWeekly) {
-        this.offerIsWeekly = offerIsWeekly;
     }
 
     public Calendar getOfferStartDate() {
@@ -219,11 +274,11 @@ public class Offer {
         this.offerForCategory = offerForCategory;
     }
 
-    public ArrayList<MealCategory> getOfferOnCategories() {
+    public ArrayList<String> getOfferOnCategories() {
         return offerOnCategories;
     }
 
-    public void setOfferOnCategories(ArrayList<MealCategory> offerOnCategories) {
+    public void setOfferOnCategories(ArrayList<String> offerOnCategories) {
         this.offerOnCategories = offerOnCategories;
     }
 
@@ -233,6 +288,14 @@ public class Offer {
 
     public void setOfferOnMeals(ArrayList<Meal> offerOnMeals) {
         this.offerOnMeals = offerOnMeals;
+    }
+
+    public Boolean getOfferEnabled() {
+        return offerEnabled;
+    }
+
+    public void setOfferEnabled(Boolean offerEnabled) {
+        this.offerEnabled = offerEnabled;
     }
 
     public Integer getOfferPercentage() {

@@ -1,0 +1,301 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center_horizontal|top"
+    tools:context=".owner.offer.OfferFragment">
+
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/owner_offer_fragment_offer_switchtext_enable"
+        android:textSize="20sp"
+        android:id="@+id/enabled"
+        android:checked="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="20dp">
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/owner_offer_fragment_offer_switchtext_lunch"
+            android:textSize="20sp"
+            android:id="@+id/lunch"
+            android:layout_marginEnd="25dp"
+            android:checked="true"/>
+        <Switch
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/owner_offer_fragment_offer_switchtext_dinner"
+            android:textSize="20sp"
+            android:id="@+id/dinner"
+            android:checked="true"/>
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/offer_name"
+        android:inputType="text"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:hint="@string/owner_offer_fragment_offer_hint_offername" />
+
+    <EditText
+        android:id="@+id/offer_description"
+        android:inputType="textMultiLine"
+        android:minLines="1"
+        android:gravity="top|start"
+        android:maxLines="10"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:scrollbars="vertical"
+        android:layout_marginTop="10dp"
+        android:hint="@string/owner_offer_fragment_offer_hint_offerdescription" />
+
+    <LinearLayout
+        android:baselineAligned="false"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="4dp"
+        android:layout_marginTop="15dp" >
+
+        <LinearLayout
+            android:id="@+id/date_picker_from"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:layout_weight="1"
+            android:onClick="showFromDatePickerDialog"
+            android:background="?android:attr/selectableItemBackground">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_calendar_black_24dp"
+                android:layout_gravity="center"
+                android:padding="4dp" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_offer_fragment_offer_calendartext_offerstart"
+                    android:textSize="20sp"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:id="@+id/text_from_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_offer_fragment_init_label_today"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/date_picker_to"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:layout_weight="1"
+            android:onClick="showToDatePickerDialog"
+            android:background="?android:attr/selectableItemBackground">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_calendar_black_24dp"
+                android:layout_gravity="center"
+                android:padding="4dp"/>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_offer_fragment_offer_calendartext_offerstart"
+                    android:textSize="20sp"
+                    android:layout_gravity="center" />
+
+                <TextView
+                    android:id="@+id/text_to_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_offer_fragment_init_label_today"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textSize="25sp"
+        android:paddingTop="20dp"
+        android:text="@string/owner_offer_fragment_init_label_weekly"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content">
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOn="@string/owner_offer_fragment_init_label_mon"
+            android:textOff="@string/owner_offer_fragment_init_label_mon"
+            android:textSize="20sp"
+            android:id="@+id/mon_selected"/>
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOn="@string/owner_offer_fragment_init_label_tue"
+            android:textOff="@string/owner_offer_fragment_init_label_tue"
+            android:textSize="20sp"
+            android:id="@+id/tue_selected"/>
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOn="@string/owner_offer_fragment_init_label_wed"
+            android:textOff="@string/owner_offer_fragment_init_label_wed"
+            android:textSize="20sp"
+            android:id="@+id/wed_selected"/>
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOn="@string/owner_offer_fragment_init_label_thu"
+            android:textOff="@string/owner_offer_fragment_init_label_thu"
+            android:textSize="20sp"
+            android:id="@+id/thu_selected"/>
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOn="@string/owner_offer_fragment_init_label_fri"
+            android:textOff="@string/owner_offer_fragment_init_label_fri"
+            android:textSize="20sp"
+            android:id="@+id/fri_selected"/>
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOn="@string/owner_offer_fragment_init_label_sat"
+            android:textOff="@string/owner_offer_fragment_init_label_sat"
+            android:textSize="20sp"
+            android:id="@+id/sat_selected"/>
+        <ToggleButton
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOn="@string/owner_offer_fragment_init_label_sun"
+            android:textOff="@string/owner_offer_fragment_init_label_sun"
+            android:textSize="20sp"
+            android:id="@+id/sun_selected"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="15dp"
+        android:layout_gravity="center_horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:text="@string/owner_offer_fragment_init_label_offerpercentage"/>
+        <EditText
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="20"
+            android:textSize="25sp"
+            android:id="@+id/discount"
+            android:textAlignment="center"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:textColor="@color/black"
+            android:text="%"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="25sp"
+            android:paddingLeft="10dp"
+            android:text="@string/owner_offer_fragment_init_label_offerapplication"/>
+    </LinearLayout>
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/apply_option"
+        android:layout_gravity="center_horizontal">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/owner_offer_fragment_init_option_all"
+                android:checked="true"
+                android:id="@+id/apply_all" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/owner_offer_fragment_init_option_categories"
+                android:id="@+id/apply_categories" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/owner_offer_fragment_init_option_meals"
+                android:id="@+id/apply_meals" />
+
+        </LinearLayout>
+    </RadioGroup>
+
+
+</LinearLayout>

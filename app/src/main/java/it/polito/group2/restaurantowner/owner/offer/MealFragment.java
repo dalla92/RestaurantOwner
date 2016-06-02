@@ -1,9 +1,9 @@
-package it.polito.group2.restaurantowner.user.order;
-
+package it.polito.group2.restaurantowner.owner.offer;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,25 +14,28 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
+import it.polito.group2.restaurantowner.firebasedata.Offer;
 
-public class MealFragment extends ListFragment {
+public class MealFragment extends Fragment {
 
     public static final String LIST = "mealList";
+    public static final String OFFER = "offer";
     private ArrayList<Meal> mealList;
+    private Offer offer;
     private OnActionListener mCallback;
 
     public MealFragment() {}
 
-    public static MealFragment newInstance(ArrayList<Meal> mList) {
+    public static MealFragment newInstance(ArrayList<Meal> list, Offer offer) {
         MealFragment fragment = new MealFragment();
         Bundle args = new Bundle();
-        args.putParcelableArrayList(LIST, mList);
+        args.putParcelableArrayList(LIST, list);
+        args.putSerializable(OFFER, offer);
         fragment.setArguments(args);
         return fragment;
     }
@@ -42,12 +45,12 @@ public class MealFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mealList = getArguments().getParcelableArrayList(LIST);
+            offer = (Offer) getArguments().getSerializable(OFFER);
         }
-
         setHasOptionsMenu(true);
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
-                    getResources().getString(R.string.order_meal_title));
+                    getResources().getString(R.string.owner_offer_fragment_meal_title));
         } catch (Exception e) {
             Log.d("FILIPPO", e.getMessage());
         }
@@ -56,7 +59,7 @@ public class MealFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.user_order_fragment_meal, container, false);
+        View view = inflater.inflate(R.layout.owner_offer_fragment_meal, container, false);
         return view;
     }
 
@@ -64,11 +67,6 @@ public class MealFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setMealList();
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        mCallback.onMealSelected(mealList.get(position));
     }
 
     @Override
@@ -89,13 +87,12 @@ public class MealFragment extends ListFragment {
     }
 
     public interface OnActionListener {
-        public void onMealSelected(Meal meal);
-        public void onCartClicked();
+        public void onSaveListClicked(Offer offer);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.user_order_fragment_meal_menu, menu);
+        inflater.inflate(R.menu.owner_offer_fragment_meal_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -103,8 +100,8 @@ public class MealFragment extends ListFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if(id == R.id.goto_cart){
-            mCallback.onCartClicked();
+        if(id == R.id.action_save){
+            mCallback.onSaveListClicked(offer);
             return true;
         }
 
@@ -116,8 +113,7 @@ public class MealFragment extends ListFragment {
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         list.setNestedScrollingEnabled(false);
-        MealAdapter adapter = new MealAdapter(getContext(), mealList);
+        MealAdapter adapter = new MealAdapter(getContext(), mealList, offer);
         list.setAdapter(adapter);
     }
-
 }

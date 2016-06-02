@@ -291,5 +291,36 @@
     <string name="profile_full_name">Full name</string>
     <string name="title_activity_search">SearchActivity</string>
 
+    <!-- Strings related to offer -->
+    <string name="owner_offer_fragment_offer_title">Offer initialization</string>
+    <string name="owner_offer_fragment_offer_switchtext_enable">Enabled</string>
+    <string name="owner_offer_fragment_offer_switchtext_lunch">Lunch offer</string>
+    <string name="owner_offer_fragment_offer_switchtext_dinner">Dinner offer</string>
+    <string name="owner_offer_fragment_offer_hint_offername">Offer name</string>
+    <string name="owner_offer_fragment_offer_hint_offerdescription">Offer description</string>
+    <string name="owner_offer_fragment_offer_calendartext_offerstart">Offer start on</string>
+    <string name="owner_offer_fragment_init_calendartext_offerstop">Offer stop on</string>
+    <string name="owner_offer_fragment_init_label_today">Today</string>
+    <string name="owner_offer_fragment_init_label_sun">S</string>
+    <string name="owner_offer_fragment_init_label_mon">M</string>
+    <string name="owner_offer_fragment_init_label_tue">T</string>
+    <string name="owner_offer_fragment_init_label_wed">W</string>
+    <string name="owner_offer_fragment_init_label_thu">T</string>
+    <string name="owner_offer_fragment_init_label_fri">F</string>
+    <string name="owner_offer_fragment_init_label_sat">S</string>
+    <string name="owner_offer_fragment_init_label_weekly">Weekdays availability</string>
+    <string name="owner_offer_fragment_init_label_offerpercentage">Apply discount</string>
+    <string name="owner_offer_fragment_init_label_offerapplication">on:</string>
+    <string name="owner_offer_fragment_init_label_categoryselected">Include categories</string>
+    <string name="owner_offer_fragment_init_label_mealselected">Include meals</string>
+    <string name="owner_offer_fragment_init_option_all">Everything</string>
+    <string name="owner_offer_fragment_init_option_categories">Category list</string>
+    <string name="owner_offer_fragment_init_option_meals">Meal list</string>
+
+    <string name="owner_offer_fragment_category_title">Applied on categories... </string>
+    <string name="owner_offer_fragment_meal_title">Applied on meals... </string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

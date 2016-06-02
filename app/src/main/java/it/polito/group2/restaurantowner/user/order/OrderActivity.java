@@ -71,7 +71,7 @@ public class OrderActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.order_activity);
+        setContentView(R.layout.user_order_activity);
 
         userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
         if(userID == null) {

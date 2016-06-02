@@ -11,7 +11,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.NumberPicker;
 
 import it.polito.group2.restaurantowner.R;
@@ -37,7 +36,7 @@ public class QuantityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.order_fragment_quantity, container, false);
+        View view = inflater.inflate(R.layout.user_order_fragment_quantity, container, false);
         NumberPicker qty = (NumberPicker)view.findViewById(R.id.meal_quantity);
         qty.setMinValue(1);
         qty.setMaxValue(30);
@@ -69,7 +68,7 @@ public class QuantityFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.order_fragment_quantity_menu, menu);
+        inflater.inflate(R.menu.user_order_fragment_quantity_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

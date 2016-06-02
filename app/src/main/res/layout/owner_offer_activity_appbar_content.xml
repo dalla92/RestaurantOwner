@@ -10,8 +10,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".user.order.OrderActivity"
-    tools:showIn="@layout/order_activity_appbar">
+    tools:context=".owner.offer.OfferActivity"
+    tools:showIn="@layout/owner_offer_activity_appbar">
 
     <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/fragment_container"

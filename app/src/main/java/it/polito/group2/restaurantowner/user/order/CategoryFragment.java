@@ -54,7 +54,7 @@ public class CategoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.order_fragment_category, container, false);
+        View view = inflater.inflate(R.layout.user_order_fragment_category, container, false);
         return view;
     }
 
@@ -93,7 +93,7 @@ public class CategoryFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.order_fragment_category_menu, menu);
+        inflater.inflate(R.menu.user_order_fragment_category_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 

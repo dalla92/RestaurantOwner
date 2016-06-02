@@ -3,6 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
-    <include layout="@layout/order_fragment_cart_meal_addition" />
+    <include layout="@layout/user_order_fragment_cart_meal_addition" />
 
 </RelativeLayout>
