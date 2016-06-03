@@ -169,7 +169,7 @@ public class CartFragment extends ListFragment {
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         list.setNestedScrollingEnabled(false);
-        CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.getOrder_meals());
+        CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.getMealList());
         list.setAdapter(adapter);
 
         //TODO controllare in restaurant se fidelityProgramAccepted è abilitato e l'utente se può avere sconto

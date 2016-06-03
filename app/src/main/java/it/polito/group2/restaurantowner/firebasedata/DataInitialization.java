@@ -600,7 +600,7 @@ public class DataInitialization {
         or.setOrder_id(order_id);
         ArrayList<Meal> order_meals = new ArrayList<>();
         order_meals.add(m);
-        or.setOrder_meals(order_meals);
+        //or.setOrder_meals(order_meals);
         or.setOrder_date(Calendar.getInstance());
         or.setOrder_notes("Portali il prima possibile");
         or.setUser_full_name("Alessando Del Piero");
@@ -611,7 +611,7 @@ public class DataInitialization {
         or2.setOrder_id(order_id2);
         //ArrayList<Meal> order_meals2 = new ArrayList<>();
         order_meals.add(m2);
-        or2.setOrder_meals(order_meals);
+        //or2.setOrder_meals(order_meals);
         or2.setOrder_date(Calendar.getInstance());
         or2.setOrder_notes("Bella calda, grazie!");
         or2.setUser_full_name("Alessando Del Piero");

@@ -339,7 +339,7 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onQuantitySelected(Integer quantity) {
         this.meal.setMeal_quantity(quantity);
-        this.order.getOrder_meals().add(this.meal);
+        this.order.addMeal(this.meal);
         this.meal = null;
         updatePrice();
 
@@ -386,9 +386,7 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onMealDeleted(Order order, Meal meal) {
         this.order = order;
-        if(this.order.getOrder_meals().indexOf(meal) != -1) {
-            this.order.getOrder_meals().remove(meal);
-        }
+        this.order.delMeal(meal);
         updatePrice();
 
         CartFragment cartFragment = CartFragment.newInstance(this.order);
@@ -414,7 +412,7 @@ public class OrderActivity extends AppCompatActivity
     private void updatePrice() {
         Double price = 0.0;
         Double mealprice = 0.0;
-        for(Meal m : this.order.getOrder_meals()) {
+        for(Meal m : this.order.getMealList()) {
             mealprice = m.getMeal_price();
             for(MealAddition a : m.getMeal_additions()) {
                 mealprice += a.getMeal_addition_price();
@@ -430,8 +428,6 @@ public class OrderActivity extends AppCompatActivity
         o.setUser_full_name(user != null ? user.getUser_full_name() : "");
         o.setRestaurant_id(restaurantID);
         o.setOrder_price(0.0);
-        ArrayList<Meal> mealList = new ArrayList<Meal>();
-        o.setOrder_meals(mealList);
         return o;
     }
 

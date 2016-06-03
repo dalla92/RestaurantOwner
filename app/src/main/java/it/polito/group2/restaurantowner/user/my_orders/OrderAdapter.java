@@ -68,7 +68,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.price.setText(formatEuro(orderList.get(position).getOrder_price()));
         holder.mealList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.mealList.setNestedScrollingEnabled(false);
-        MealAdapter adapter = new MealAdapter(context, orderList.get(position).getOrder_meals());
+        MealAdapter adapter = new MealAdapter(context, orderList.get(position).getMealList());
         holder.mealList.setAdapter(adapter);
 
 
