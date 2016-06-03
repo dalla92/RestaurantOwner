@@ -61,4 +61,32 @@ public class MealAddition implements Serializable, Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         //TODO implementare
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MealAddition that = (MealAddition) o;
+
+        if (Double.compare(that.meal_addition_price, meal_addition_price) != 0) return false;
+        if (meal_addition_id != null ? !meal_addition_id.equals(that.meal_addition_id) : that.meal_addition_id != null)
+            return false;
+        if (meal_addition_name != null ? !meal_addition_name.equals(that.meal_addition_name) : that.meal_addition_name != null)
+            return false;
+        return !(additionSelected != null ? !additionSelected.equals(that.additionSelected) : that.additionSelected != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = meal_addition_id != null ? meal_addition_id.hashCode() : 0;
+        result = 31 * result + (meal_addition_name != null ? meal_addition_name.hashCode() : 0);
+        temp = Double.doubleToLongBits(meal_addition_price);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + (additionSelected != null ? additionSelected.hashCode() : 0);
+        return result;
+    }
 }
