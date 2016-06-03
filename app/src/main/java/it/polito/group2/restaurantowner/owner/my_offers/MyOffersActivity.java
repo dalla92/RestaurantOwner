@@ -46,7 +46,20 @@ import it.polito.group2.restaurantowner.owner.ReviewsActivity;
 import it.polito.group2.restaurantowner.owner.StatisticsActivity;
 import it.polito.group2.restaurantowner.owner.offer.OfferActivity;
 
-public class MyOffersActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MyOffersActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
+
+
+
+
+
+
+
+
+
+
+
+
 
     private static final int ADD_REQUEST = 1;
     private ArrayList<Offer> offer_list;

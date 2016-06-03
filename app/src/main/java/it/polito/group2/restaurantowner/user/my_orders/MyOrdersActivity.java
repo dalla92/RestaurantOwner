@@ -42,7 +42,8 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 
-public class MyOrdersActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class MyOrdersActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private String userID;
     private User user;
