@@ -45,6 +45,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.ChildEventListener;
@@ -54,6 +55,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import org.json.JSONException;
@@ -101,6 +103,7 @@ public class UserRestaurantList extends AppCompatActivity
     private Toolbar toolbar;
 
     private GoogleMap mMap;
+    private final float DEFAULT_ZOOM1 = 11.0f;
     private ClusterManager<MyItem> mClusterManager;
 
     @Override
@@ -119,7 +122,8 @@ public class UserRestaurantList extends AppCompatActivity
         restaurantReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                resList.add(dataSnapshot.getValue(Restaurant.class));
+                Restaurant r = dataSnapshot.getValue(Restaurant.class);
+                resList.add(r);
             }
 
             @Override
@@ -315,44 +319,27 @@ public class UserRestaurantList extends AppCompatActivity
         }
 
         mMap = map;
-
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(false);
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                Intent intent = new Intent(
-                        getApplicationContext(),
-                        MapsActivity.class);
-                Bundle b = new Bundle();
-                //TODO add range_value
-                //b.putString("range", range_value);
-                intent.putExtras(b);
-                startActivity(intent);
+                call_maps_activity();
+
             }
         });
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                Intent intent = new Intent(
-                        getApplicationContext(),
-                        MapsActivity.class);
-                Bundle b = new Bundle();
-                //TODO add range_value
-                //b.putString("range", range_value);
-                intent.putExtras(b);
-                startActivity(intent);
+                call_maps_activity();
+
             }
         });
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                Intent intent = new Intent(
-                        getApplicationContext(),
-                        MapsActivity.class);
-                Bundle b = new Bundle();
-                //TODO add range_value
-                //b.putString("range", range_value);
-                intent.putExtras(b);
-                startActivity(intent);
+                call_maps_activity();
                 return false;
             }
         });
@@ -360,27 +347,105 @@ public class UserRestaurantList extends AppCompatActivity
         maps_stuff();
     }
 
+    private void call_maps_activity(){
+        Intent intent = new Intent(
+                getApplicationContext(),
+                MapsActivity.class);
+        Bundle b = new Bundle();
+        //TODO add range_value
+        //b.putString("range", range_value);
+        //TODO add restaurant_preview_list
+        //b.putParcelable("restaurant_preview_list", restaurant_preview_list);
+        intent.putExtras(b);
+        //TODO decomment after integration
+        //if(restaurant_preview_list!=null)
+            startActivity(intent);
+    }
+
     private void setUpMap() {
         ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMapAsync(this);
     }
 
     public void maps_stuff(){
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(51.503186, -0.126446), 10));
+        //Camera in Turin
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.063911, 7.658844), DEFAULT_ZOOM1));
 
         mClusterManager = new ClusterManager<MyItem>(this, mMap);
+        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MyItem>() {
+            @Override
+            public boolean onClusterItemClick(MyItem myItem) {
+                call_maps_activity();
+                return false;
+            }
+        });
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<MyItem>() {
+            @Override
+            public boolean onClusterClick(Cluster<MyItem> cluster) {
+                call_maps_activity();
+                return false;
+            }
+        });
         mMap.setOnCameraChangeListener(mClusterManager);
 
+        readItems();
+        /*
         try {
             readItems();
         } catch (JSONException e) {
             Toast.makeText(this, "Problem reading list of markers.", Toast.LENGTH_LONG).show();
         }
+        */
     }
 
-    private void readItems() throws JSONException {
+    private void readItems(){
+        /*
         InputStream inputStream = getResources().openRawResource(R.raw.radar_search);
         List<MyItem> items = new MyItemReader().read(inputStream);
         mClusterManager.addItems(items);
+        */
+        //TODO Restaurant must become RestaurantPreview
+        mClusterManager.clearItems();
+        for(Restaurant r : resList){
+            mClusterManager.addItem(new MyItem(r.getRestaurant_latitude_position(), r.getRestaurant_longitude_position()));
+            /*
+            final String restaurant_id = r.getRestaurant_id();
+            //get only latitude
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id+"/restaurant_latitude_position");
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    for (DataSnapshot res_latSnapshot : snapshot.getChildren()) {
+                        Double snap_lat = (Double) res_latSnapshot.getValue();
+                        final Double lat = snap_lat;
+                        //get only longitude
+                        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id+"/restaurant_longitude_position");
+                        ref2.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                for (DataSnapshot res_longSnapshot : snapshot.getChildren()) {
+                                    Double snap_long = (Double) res_longSnapshot.getValue();
+                                    final Double lon = snap_long;
+                                    mClusterManager.addItem(new MyItem(lat, lon));
+                                    mClusterManager.cluster();
+                                }
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError firebaseError) {
+                                System.out.println("The read failed: " + firebaseError.getMessage());
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError firebaseError) {
+                    System.out.println("The read failed: " + firebaseError.getMessage());
+                }
+            });
+            */
+        }
+        mClusterManager.cluster();
+
     }
 
     private void setDrawer() {
@@ -652,6 +717,8 @@ public class UserRestaurantList extends AppCompatActivity
                 boolean price3 = (boolean) data.getExtras().get("ThreeEuro");
                 boolean price4 = (boolean) data.getExtras().get("FourEuro");
                 mAdapter.filter(cat,time, price1, price2, price3, price4);
+
+                readItems();
             }
         }
     }

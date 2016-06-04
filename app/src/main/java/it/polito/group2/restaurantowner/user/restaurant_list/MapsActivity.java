@@ -16,6 +16,7 @@
 
 package it.polito.group2.restaurantowner.user.restaurant_list;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -56,6 +57,7 @@ import com.google.android.gms.location.LocationServices;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.Collection;
 import java.util.Date;
 import android.Manifest;
 import android.content.Intent;
@@ -106,8 +108,10 @@ import android.view.animation.BounceInterpolator;
 import android.view.animation.Interpolator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
@@ -123,66 +127,48 @@ public class MapsActivity extends AppCompatActivity implements
 {
 
     protected static final String TAG = "location-updates-sample";
-    /**
-     * The desired interval for location updates. Inexact. Updates may be more or less frequent.
-     */
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000;
-    /**
-     * The fastest rate for active location updates. Exact. Updates will never be more frequent
-     * than this value.
-     */
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS * 3;
-
-    private double DEFAULT_RADIUS = 1000;
-
-    // Keys for storing activity state in the Bundle.
-    protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
-    protected final static String LOCATION_KEY = "location-key";
-    protected final static String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
-
-    protected Button mStartUpdatesButton;
-    protected Button mStopUpdatesButton;
-    protected TextView mLastUpdateTimeTextView;
-    protected String mLastUpdateTimeLabel;
-    /**
-     * Tracks the status of the location updates request. Value changes when the user presses the
-     * Start Updates and Stop Updates buttons.
-     */
-    protected Boolean mRequestingLocationUpdates;
-
-    private GoogleMap mMap;
-    private ClusterManager<RestaurantPreview> mClusterManager;
-    private final Random mRandom = new Random();
-    PermissionListener dialogPermissionListener_gps;
-    PermissionListener dialogPermissionListener_wifi;
+    protected Boolean mRequestingLocationUpdates; //Tracks the status of the location updates request if started or not
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000; //The desired interval for location updates. Inexact. Updates may be more or less frequent.
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS * 3; //The fastest rate for active location updates. Exact. Updates will never be more frequent than this value.
     protected Location mCurrentLocation;
     private Marker mLastSelectedMarker;
     private Marker mLastUserMarker;
     private String mLastUpdateTime;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    private Marker marker;
+    // Keys for storing activity state in the Bundle.
+    protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
+    protected final static String LOCATION_KEY = "location-key";
+    protected final static String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
+    //UI
+    protected Button mStartUpdatesButton;
+    protected Button mStopUpdatesButton;
+    protected TextView mLastUpdateTimeTextView;
+    protected String mLastUpdateTimeLabel;
 
+    private GoogleMap mMap;
+    private ClusterManager<RestaurantPreview> mClusterManager;
+    private Set<Marker> all_markers = new HashSet<Marker>();
     private final int REQUEST_CHECK_SETTINGS = 1;
-    private final float DEFAULT_ZOOM = 14.7f;
-    private final int DEFAULT_PADDING = 10;
+    private final float DEFAULT_ZOOM2 = 14.0f;
+    private final int DEFAULT_PADDING = 100;
+    private double DEFAULT_RADIUS = 0; ///1000 m is 1 km
 
+    private final Random mRandom = new Random();
+    PermissionListener dialogPermissionListener_gps;
+    PermissionListener dialogPermissionListener_wifi;
     private ProgressDialog progressDialog;
     private int d_height;
     private int d_width;
-    private List<RestaurantPreview> restaurants_previews_list = new ArrayList<>();
     private List<RestaurantPreview> near_restaurants_previews_list = new ArrayList<>();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.maps_activity);
 
-        Bundle b = getIntent().getExtras();
-        if(b!=null && b.getDouble("range")!=0){
-            DEFAULT_RADIUS = b.getDouble("range");
-        }
+        updateValuesFromBundle(savedInstanceState);
 
         // Locate the UI widgets.
         mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
@@ -192,9 +178,6 @@ public class MapsActivity extends AppCompatActivity implements
         mLastUpdateTimeLabel = getResources().getString(R.string.last_update_time_label);
         mRequestingLocationUpdates = false;
         mLastUpdateTime = "";
-
-        // Update values using data stored in the Bundle.
-        updateValuesFromBundle(savedInstanceState);
 
         buildGoogleApiClient();
 
@@ -206,35 +189,55 @@ public class MapsActivity extends AppCompatActivity implements
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         setUpMap();
-
-
     }
 
     private void updateValuesFromBundle(Bundle savedInstanceState) {
-        Log.i(TAG, "Updating values from bundle");
+        Bundle b = getIntent().getExtras();
+        if(b!=null && b.getDouble("range")!=0){
+            DEFAULT_RADIUS = b.getDouble("range");
+        }
+        if(b!=null && b.getParcelable("restaurant_preview_list")!=null){ //it must be always this way, because otherwise this activity is not started
+            near_restaurants_previews_list = b.getParcelable("restaurant_preview_list");
+        }
+        //TODO delete this after integration
+        else{ //just for debugging purpose
+            RestaurantPreview r_p = new RestaurantPreview();
+            r_p.setRestaurant_id("-KIMqPtRSEdm0Cvfc3Za");
+            r_p.setRestaurant_name("Bella Italia");
+            r_p.setRating((float) 3.7);
+            r_p.setReservations_number(16);
+            r_p.setRestaurant_cover_firebase_URL("https://firebasestorage.googleapis.com/v0/b/have-break-9713d.appspot.com/o/restaurants%2F-KIMqPtRSEdm0Cvfc3Za%2Fcover.jpg?alt=media&token=1977eb09-a51c-440c-b64c-e6d48fe7c316");
+            r_p.setTables_number(100);
+            r_p.setLat(45.0650655);
+            r_p.setLon(7.645966);
+            near_restaurants_previews_list.add(r_p);
+            RestaurantPreview r_p2 = new RestaurantPreview();
+            r_p2.setRestaurant_id("-KIMqPtRSEdm0Cvfc3Za");
+            r_p2.setRestaurant_name("Istanbul");
+            r_p2.setRating((float) 4.7);
+            r_p2.setReservations_number(40);
+            r_p2.setRestaurant_cover_firebase_URL("https://www.flickr.com/photos/142675931@N04/26796728940/in/dateposted-public/");
+            r_p2.setTables_number(50);
+            r_p2.setLat(45.0613068);
+            r_p2.setLon(7.6501717);
+            near_restaurants_previews_list.add(r_p2);
+
+            //add_restaurant_preview_if_near();
+        }
+
         if (savedInstanceState != null) {
-            // Update the value of mRequestingLocationUpdates from the Bundle, and make sure that
-            // the Start Updates and Stop Updates buttons are correctly enabled or disabled.
             if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
-                mRequestingLocationUpdates = savedInstanceState.getBoolean(
-                        REQUESTING_LOCATION_UPDATES_KEY);
+                mRequestingLocationUpdates = savedInstanceState.getBoolean(REQUESTING_LOCATION_UPDATES_KEY);
                 //setButtonsEnabledState();
             }
-
-            // Update the value of mCurrentLocation from the Bundle and update the UI to show the
-            // correct latitude and longitude.
+            // Update the value of mCurrentLocation
             if (savedInstanceState.keySet().contains(LOCATION_KEY)) {
-                // Since LOCATION_KEY was found in the Bundle, we can be sure that mCurrentLocation
-                // is not null.
                 mCurrentLocation = savedInstanceState.getParcelable(LOCATION_KEY);
             }
-
-            // Update the value of mLastUpdateTime from the Bundle and update the UI.
             if (savedInstanceState.keySet().contains(LAST_UPDATED_TIME_STRING_KEY)) {
                 mLastUpdateTime = savedInstanceState.getString(LAST_UPDATED_TIME_STRING_KEY);
             }
-
-            updateUI();
+            //updateUI();
         }
     }
 
@@ -296,33 +299,25 @@ public class MapsActivity extends AppCompatActivity implements
     private void updateUI() {
         if(mMap!=null) {
             mMap.clear();
-
             if (mCurrentLocation != null) {
-                mLastUpdateTimeTextView.setText(String.format("%s: %s", mLastUpdateTimeLabel,
-                        mLastUpdateTime));
-
-                if (mLastSelectedMarker == null) {
-                    mLastUserMarker = mMap.addMarker(new MarkerOptions()
-                                    .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
-                                    .title("Your position")
-                                            //.snippet("Population: 2,074,200")
-                                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
-                    );
-                    add_restaurant_preview_if_near();
-                    prepare_clustering();
-                    //enlarge_camera();
-                    //add circle
-                    Circle circle = mMap.addCircle(new CircleOptions()
-                                    .center(new LatLng(mLastUserMarker.getPosition().latitude, mLastUserMarker.getPosition().longitude))
-                                    .radius(DEFAULT_RADIUS)
-                                    .strokeColor(Color.BLACK)
-                            //.fillColor(Color.BLUE)
-                    );
-                } else {
-                    mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
-                }
-
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), DEFAULT_ZOOM));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), DEFAULT_ZOOM2));
+                mLastUpdateTimeTextView.setText(String.format("%s: %s", mLastUpdateTimeLabel, mLastUpdateTime));
+                mLastUserMarker = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
+                                .title("Your position")
+                                        //.snippet("Population: 2,074,200")
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
+                );
+                mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+                prepare_clustering();
+            }
+            if(DEFAULT_RADIUS!=0){
+                //add circle
+                Circle circle = mMap.addCircle(new CircleOptions()
+                        .center(new LatLng(mLastUserMarker.getPosition().latitude, mLastUserMarker.getPosition().longitude))
+                        .radius(DEFAULT_RADIUS)
+                        .strokeColor(Color.BLACK));
+                        //.fillColor(Color.BLUE)
             }
         }
     }
@@ -360,13 +355,11 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         mGoogleApiClient.disconnect();
-
         super.onStop();
     }
 
-    //Runs when a GoogleApiClient object successfully connects.
     @Override
-    public void onConnected(Bundle connectionHint) {
+    public void onConnected(Bundle connectionHint) { //Runs when a GoogleApiClient object successfully connects.
         Log.i(TAG, "Connected to GoogleApiClient");
 
         // If the initial location was never previously requested, we use
@@ -397,12 +390,8 @@ public class MapsActivity extends AppCompatActivity implements
         }
 
         updateUI();
-
     }
 
-    /**
-     * Callback that fires when the location changes.
-     */
     @Override
     public void onLocationChanged(Location location) {
         mCurrentLocation = location;
@@ -570,104 +559,52 @@ public class MapsActivity extends AppCompatActivity implements
         }
 
         mMap = map;
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setCompassEnabled(true);
         //focus camera on Turin
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.116177, 7.742615), DEFAULT_ZOOM));
-        //read radar_search.json
-        read_restaurants_previews_from_firebase();
-        //addMarkersToMap();
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.063911, 7.658844), DEFAULT_ZOOM2));
+        //mMap.getUiSettings().setZoomControlsEnabled(false); hide controls
 
-        // Hide the zoom controls as the button panel will cover it.
-        mMap.getUiSettings().setZoomControlsEnabled(false);
-
-        // Setting an info window adapter allows us to change the both the contents and look of the info window.
-        //mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
-
-        // Set listeners for marker events.  See the bottom of this class for their behavior.
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
         //mMap.setOnMarkerDragListener(this);
-        //mMap.setOnInfoWindowCloseListener(this);
 
-
-        // Override the default content description on the view, for accessibility mode.
+        // Override the default content description on the view
         map.setContentDescription(" 'Map Description' ");
+    }
 
-        // Pan to see all markers in view.
-        // Cannot zoom to bounds until the map has a size.
-        /*
+    public void enlarge_camera(){
+        // Pan to see all markers in view (cannot zoom to bounds until the map has a size)
         final View mapView = getSupportFragmentManager().findFragmentById(R.id.map).getView();
         if (mapView.getViewTreeObserver().isAlive()) {
-            mapView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+            mapView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
                 @SuppressWarnings("deprecation") // We use the new method when supported
                 @SuppressLint("NewApi") // We check which build version we are using.
                 @Override
                 public void onGlobalLayout() {
-                    LatLngBounds bounds = new LatLngBounds.Builder()
-                            .include(PERTH)
-                            .include(SYDNEY)
-                            .include(ADELAIDE)
-                            .include(BRISBANE)
-                            .include(MELBOURNE)
-                            .build();
+                    LatLngBounds bounds = null;
+
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                    if(mLastUserMarker!=null)
+                        builder.include(mLastUserMarker.getPosition());
+                    for (Marker marker : all_markers) {
+                        builder.include(marker.getPosition());
+                    }
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
                         mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                     } else {
                         mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     }
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 50));
+                    if(bounds != null) {
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, DEFAULT_PADDING));
+                    }
                 }
             });
         }
-        */
     }
 
-    public void read_restaurants_previews_from_firebase(){
-        //TODO Decomment maybe after integration
-        /*
-        progress_dialog();
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/");
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot res_prevSnapshot : snapshot.getChildren()) {
-                    RestaurantPreview snap_restaurant_preview = res_prevSnapshot.getValue(RestaurantPreview.class);
-                    //force to get position
-                    snap_restaurant_preview.getmPosition();
-                    add_restaurant_preview_if_near(snap_restaurant_preview);
-                }
-
-                progressDialog.dismiss();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
-        */
-        RestaurantPreview r_p = new RestaurantPreview();
-        r_p.setRestaurant_id("-KIMqPtRSEdm0Cvfc3Za");
-        r_p.setRestaurant_name("Bella Italia");
-        r_p.setRating((float) 3.7);
-        r_p.setReservations_number(16);
-        r_p.setRestaurant_cover_firebase_URL("https://firebasestorage.googleapis.com/v0/b/have-break-9713d.appspot.com/o/restaurants%2F-KIMqPtRSEdm0Cvfc3Za%2Fcover.jpg?alt=media&token=1977eb09-a51c-440c-b64c-e6d48fe7c316");
-        r_p.setTables_number(100);
-        r_p.setLat(45.0650655);
-        r_p.setLon(7.645966);
-        restaurants_previews_list.add(r_p);
-
-        RestaurantPreview r_p2 = new RestaurantPreview();
-        r_p2.setRestaurant_id("-KIMqPtRSEdm0Cvfc3Za");
-        r_p2.setRestaurant_name("Istanbul");
-        r_p2.setRating((float) 4.7);
-        r_p2.setReservations_number(40);
-        r_p2.setRestaurant_cover_firebase_URL("https://www.flickr.com/photos/142675931@N04/26796728940/in/dateposted-public/");
-        r_p2.setTables_number(50);
-        r_p2.setLat(45.0613068);
-        r_p2.setLon(7.6501717);
-        restaurants_previews_list.add(r_p2);
-    }
-
+    /*
     public void add_restaurant_preview_if_near(){
         for(RestaurantPreview r : restaurants_previews_list){
             String distance_string_formatted = calculate_distance(r.getPosition(), mLastUserMarker);
@@ -679,29 +616,13 @@ public class MapsActivity extends AppCompatActivity implements
                 near_restaurants_previews_list.add(r);
         }
     }
-
-    public void enlarge_camera(){
-        LatLngBounds bounds = null;
-        for(RestaurantPreview r_p : near_restaurants_previews_list) {
-            bounds = LatLngBounds.builder().include(r_p.getPosition()).build();
-        }
-
-        if(bounds != null)
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, DEFAULT_PADDING));
-    }
+    */
 
     public void prepare_clustering(){
         mClusterManager = new ClusterManager<RestaurantPreview>(this, mMap);
         mMap.setOnCameraChangeListener(mClusterManager);
         mClusterManager.setRenderer(new MyClusterRenderer(this, mMap, mClusterManager));
-        /*
-        InputStream inputStream = getResources().openRawResource(R.raw.radar_search);
-        List<RestaurantPreview> items = new RestaurantPreviewReader().read(inputStream);
-        */
         mClusterManager.addItems(near_restaurants_previews_list);
-        /*
-        mClusterManager.setRenderer(new MyClusterRenderer(this, mMap, mClusterManager));
-        */
     }
 
     public void onStreetView(View view){
@@ -710,7 +631,7 @@ public class MapsActivity extends AppCompatActivity implements
             Intent intent = new Intent(
                     getApplicationContext(),
                     StreetViewActivity.class);
-            b.putParcelable("STREET_VIEW_POSITION", mCurrentLocation);
+            b.putParcelable("STREET_VIEW_POSITION", new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
             intent.putExtras(b);
             startActivity(intent);
         }
@@ -722,10 +643,9 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     public boolean onMarkerClick(final Marker marker) {
-        // This causes the marker at Adelaide to change color and alpha.
+        // This causes the marker to change color
         marker.setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
-        // or random color:
-        // marker.setIcon(BitmapDescriptorFactory.defaultMarker(mRandom.nextFloat() * 360));
+        // or random color: marker.setIcon(BitmapDescriptorFactory.defaultMarker(mRandom.nextFloat() * 360));
 
         show_restaurant_popup(marker);
 
@@ -748,26 +668,6 @@ public class MapsActivity extends AppCompatActivity implements
             //d.setTitle("Select");
             //d.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
             d.setContentView(R.layout.restaurant_preview_map);
-            /*
-            d.setOnShowListener(new DialogInterface.OnShowListener() {
-                @Override
-                public void onShow(DialogInterface dialog) {
-                    d_height = d.getWindow().getDecorView().getHeight();
-                    d_width = d.getWindow().getDecorView().getWidth();
-                    Glide.with(getApplicationContext()).load(restaurant_preview.getRestaurant_cover_firebase_URL()).asBitmap().into(new SimpleTarget<Bitmap>(
-                            d_width, d_height) {
-                        @Override
-                        public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            Drawable drawable = new BitmapDrawable(resource);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                                d.findViewById(R.id.father_linear_layout).setBackground(drawable);
-                                d.findViewById(R.id.father_linear_layout).setAlpha(0.75f);
-                            }
-                        }
-                    });
-                }
-            });
-            */
             TextView resName;
             RatingBar rating;
             TextView tablesNumber;
@@ -795,7 +695,7 @@ public class MapsActivity extends AppCompatActivity implements
                     Drawable drawable = new BitmapDrawable(resource);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
                         d.findViewById(R.id.father_linear_layout).setBackground(drawable);
-                        d.findViewById(R.id.father_linear_layout).setAlpha(0.75f);
+                        d.findViewById(R.id.father_linear_layout).setAlpha(0.88f);
                     }
                 }
             });
@@ -812,22 +712,22 @@ public class MapsActivity extends AppCompatActivity implements
             String string_result = String.valueOf(rounded_value) + " " + parts_to_round[1];
             distance.setText(string_result);
             //TODO decomment after integration
-                            /*
-                            button_get_info.setOnClickListener(
-                                    new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            Intent intent = new Intent(
-                                                    getApplicationContext(),
-                                                    UserRestaurantPage.class);
-                                            Bundle b = new Bundle();
-                                            b.putString("restaurant_id", restaurant_preview.getRestaurant_id());
-                                            intent.putExtras(b);
-                                            startActivity(intent);
-                                        }
-                                    }
-                            );
-                            */
+            /*
+            button_get_info.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            Intent intent = new Intent(
+                                    getApplicationContext(),
+                                    UserRestaurantPage.class);
+                            Bundle b = new Bundle();
+                            b.putString("restaurant_id", restaurant_preview.getRestaurant_id());
+                            intent.putExtras(b);
+                            startActivity(intent);
+                        }
+                    }
+            );
+            */
             button_get_street_view.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
@@ -855,7 +755,6 @@ public class MapsActivity extends AppCompatActivity implements
 
             //TODO add price_range into DB: calculate it in the owner when a new meal is added with the function "calculate_range" in UserRestaurantPreviewAdapter
 
-
             d.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
@@ -880,7 +779,6 @@ public class MapsActivity extends AppCompatActivity implements
                     });
                 }
             });
-
 
             d.show();
         }
@@ -1023,6 +921,11 @@ public class MapsActivity extends AppCompatActivity implements
         }
 
         @Override
+        protected  void onClusterRendered(Cluster<RestaurantPreview> cluster, Marker marker){
+            enlarge_camera();
+        }
+
+        @Override
         protected void onBeforeClusterItemRendered(RestaurantPreview item, MarkerOptions markerOptions) {
             BitmapDescriptor markerDescriptor = BitmapDescriptorFactory.defaultMarker(mRandom.nextFloat() * 360);
             markerOptions.icon(markerDescriptor);
@@ -1030,6 +933,7 @@ public class MapsActivity extends AppCompatActivity implements
 
         @Override
         protected void onClusterItemRendered(RestaurantPreview clusterItem, Marker marker) {
+            all_markers.add(marker);
             super.onClusterItemRendered(clusterItem, marker);
         }
 
