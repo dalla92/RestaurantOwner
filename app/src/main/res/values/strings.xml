@@ -261,6 +261,11 @@
     <string name="owner_offer_fragment_offer_option_meals">Meal list</string>
     <string name="owner_offer_fragment_category_title">Applied on categories: </string>
     <string name="owner_offer_fragment_meal_title">Applied on meals: </string>
+    <string name="owner_offer_fragment_offer_lable_categorylist">Selected categories: </string>
+    <string name="owner_offer_fragment_offer_lable_meallist">Selected meals: </string>
+    <string name="owner_offer_fragment_offer_lable_listempty">Selected meals: </string>
+    <string name="owner_offer_fragment_offer_title_alert">Useless offer</string>
+    <string name="owner_offer_fragment_offer_message_alert">The offer is enabled but it is applied on anything. Do you want to save it anyway?</string>
 
     <!-- Strings related to owner.my_offers -->
 

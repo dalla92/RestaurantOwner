@@ -261,7 +261,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="25sp"
-            android:paddingLeft="10dp"
+            android:paddingStart="10dp"
             android:text="@string/owner_offer_fragment_offer_label_offerapplication"/>
     </LinearLayout>
 
@@ -297,5 +297,67 @@
         </LinearLayout>
     </RadioGroup>
 
+    <LinearLayout
+        android:id="@+id/category_block"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/owner_offer_fragment_offer_lable_categorylist"
+            android:textSize="20sp"
+            android:layout_marginBottom="5dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/category_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/nocategory_lable"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/owner_offer_fragment_offer_lable_listempty"
+            android:textSize="20sp"
+            android:layout_marginBottom="5dp"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/meal_block"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/owner_offer_fragment_offer_lable_meallist"
+            android:textSize="20sp"
+            android:layout_marginBottom="5dp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/meal_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/nomeal_lable"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="@string/owner_offer_fragment_offer_lable_listempty"
+            android:textSize="20sp"
+            android:layout_marginBottom="5dp"/>
+
+    </LinearLayout>
 </LinearLayout>

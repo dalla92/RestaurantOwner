@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.File;
 import java.util.ArrayList;
 
+import it.polito.group2.restaurantowner.HaveBreak;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
@@ -45,8 +46,9 @@ public class OfferActivity extends AppCompatActivity
 
     private Offer offer;
 
-    private String userID;
-    private String restaurantID;
+    private String userID = null;
+    private String restaurantID = null;
+    private String offerID = null;
 
     private User user;
 
@@ -61,17 +63,21 @@ public class OfferActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_offer_activity);
 
-        //TODO prevedere pure che viene passato un OfferID perché potrebbe essere richiamato per modifiche
-
-
         userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
-        if(userID == null) {
-            Log.d("FILIPPO", "utente non loggato");
-            //TODO utende disconnesso: blocca tutto
-        }
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
+        }
+
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("offer_id")!=null) {
+            offerID = getIntent().getExtras().getString("offer_id");
+        }
+
+        if(userID == null || restaurantID == null) {
+            Log.d("FILIPPO", "utente non loggato o restaurantID non ricevuto");
+            Intent intent = new Intent(this, HaveBreak.class);
+            finish();
+            startActivity(intent);
         }
 
         showProgressDialog();
@@ -79,6 +85,10 @@ public class OfferActivity extends AppCompatActivity
         restaurantMealList = new ArrayList<Meal>();
         DatabaseReference userReference = firebase.getReference("users/" + userID);
         Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
+        DatabaseReference offerReference = null;
+        if(offerID != null) {
+            offerReference = firebase.getReference("offers/" + offerID);
+        }
         hideProgressDialog();
 
         mealsReference.addChildEventListener(new ChildEventListener() {
@@ -87,7 +97,6 @@ public class OfferActivity extends AppCompatActivity
                 restaurantMealList.add(dataSnapshot.getValue(Meal.class));
                 Log.d("FILIPPO", "onChildAdded");
             }
-
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Meal changedMeal = dataSnapshot.getValue(Meal.class);
@@ -100,7 +109,6 @@ public class OfferActivity extends AppCompatActivity
                 }
                 Log.d("FILIPPO", "onChildChanged");
             }
-
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 Meal changedMeal = dataSnapshot.getValue(Meal.class);
@@ -112,16 +120,10 @@ public class OfferActivity extends AppCompatActivity
                 }
                 Log.d("FILIPPO", "onChildRemoved");
             }
-
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                //Log.d("prova", "child moved");
-            }
-
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //Log.d("prova", "child cancelled");
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
 
         userReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -131,12 +133,21 @@ public class OfferActivity extends AppCompatActivity
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //TODO gestire se l'utente viene cancellato
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
 
-        offer = setNewOffer();
+        if(offerID != null && offerReference != null) {
+            offerReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    offer = dataSnapshot.getValue(Offer.class);
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {}
+            });
+        } else {
+            offer = setNewOffer();
+        }
 
         //Toolbar setting
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -177,7 +188,7 @@ public class OfferActivity extends AppCompatActivity
             if (savedInstanceState != null) {
                 return;
             }
-            OfferFragment offerFragment = OfferFragment.newInstance(this.offer);
+            OfferFragment offerFragment = OfferFragment.newInstance(this.offer, this.restaurantMealList);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.fragment_container, offerFragment, "OFFER");
             transaction.commit();
@@ -221,7 +232,6 @@ public class OfferActivity extends AppCompatActivity
         this.offer.setOfferID(keyReference.getKey());
         keyReference.setValue(this.offer);
         this.offer = setNewOffer();
-
         Intent intent = new Intent(this, MyOffersActivity.class);
         startActivity(intent);
     }
@@ -229,7 +239,7 @@ public class OfferActivity extends AppCompatActivity
     @Override
     public void onSaveListClicked(Offer offer) {
         this.offer = offer;
-        OfferFragment offerFragment = OfferFragment.newInstance(offer);
+        OfferFragment offerFragment = OfferFragment.newInstance(offer, this.restaurantMealList);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, offerFragment, "OFFER");
         transaction.addToBackStack(null);

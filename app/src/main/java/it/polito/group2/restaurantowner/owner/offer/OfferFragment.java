@@ -1,10 +1,14 @@
 package it.polito.group2.restaurantowner.owner.offer;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -14,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
@@ -22,26 +27,31 @@ import android.widget.ToggleButton;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 
 public class OfferFragment extends Fragment {
 
     public static final String OFFER = "offer";
+    public static final String LIST = "restaurantMealList";
     private Offer offer;
+    private ArrayList<Meal> restaurantMealList;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN);
 
     private OnActionListener mCallback;
 
     public OfferFragment() {}
 
-    public static OfferFragment newInstance(Offer offer) {
+    public static OfferFragment newInstance(Offer offer, ArrayList<Meal> meals) {
         OfferFragment fragment = new OfferFragment();
         Bundle args = new Bundle();
         args.putSerializable(OFFER, offer);
+        args.putParcelableArrayList(LIST, meals);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,6 +61,7 @@ public class OfferFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             offer = (Offer)getArguments().getSerializable(OFFER);
+            restaurantMealList = getArguments().getParcelableArrayList(LIST);
         }
 
         setHasOptionsMenu(true);
@@ -221,8 +232,6 @@ public class OfferFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setCategoryList();
-        setMealList();
     }
 
     @Override
@@ -260,7 +269,33 @@ public class OfferFragment extends Fragment {
 
         if(id == R.id.action_save){
             saveData();
-            mCallback.onSaveClicked(this.offer);
+            boolean alert = false;
+            if(offer.getOfferEnabled()) {
+                if(!offer.getOfferAtDinner() && !offer.getOfferAtLunch())
+                    alert = true;
+                if(!offer.getOfferForTotal() && !offer.getOfferForCategory() && !offer.getOfferForMeal())
+                    alert = true;
+                if(offer.getOfferForCategory() && offer.getOfferOnCategories().size() <= 0)
+                    alert = true;
+                if(offer.getOfferForMeal() && offer.getOfferOnMeals().size() <= 0)
+                    alert = true;
+            }
+
+            if(alert) {
+                final View view = getView();
+                if(view != null) {
+                    new AlertDialog.Builder(getContext())
+                            .setTitle(getContext().getResources().getString(R.string.owner_offer_fragment_offer_title_alert))
+                            .setMessage(getContext().getResources().getString(R.string.owner_offer_fragment_offer_message_alert))
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    mCallback.onSaveClicked(offer);
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null).show();
+                }
+            }
             return true;
         }
 
@@ -449,27 +484,84 @@ public class OfferFragment extends Fragment {
     }
 
     private void hideCategoryList() {
-        //TODO nascondere la listview delle categorie selezionate
+        View view = getView();
+        if(view != null) {
+            LinearLayout list = (LinearLayout) view.findViewById(R.id.category_block);
+            list.setVisibility(View.GONE);
+        } else {
+            Log.d("FILIPPO", "Oggetto view risulta null");
+        }
     }
 
     private void hideMealList() {
-        //TODO nascondere la listview dei meal selezionati
+        View view = getView();
+        if(view != null) {
+            LinearLayout list = (LinearLayout) view.findViewById(R.id.meal_block);
+            list.setVisibility(View.GONE);
+        } else {
+            Log.d("FILIPPO", "Oggetto view risulta null");
+        }
     }
 
     private void showCategoryList() {
-        //TODO visualizzare la listview delle categorie selezionate
+        View view = getView();
+        if(view != null) {
+            LinearLayout list = (LinearLayout) view.findViewById(R.id.category_block);
+            list.setVisibility(View.VISIBLE);
+            TextView label = (TextView) view.findViewById((R.id.nocategory_lable));
+            if(offer.getOfferOnCategories().values().size() > 0) {
+                label.setVisibility(View.GONE);
+            } else {
+                label.setVisibility(View.VISIBLE);
+            }
+            setCategoryList();
+        } else {
+            Log.d("FILIPPO", "Oggetto view risulta null");
+        }
     }
 
     private void showMealList() {
-        //TODO visualizzare la listview dei meal selezionati
+        View view = getView();
+        if(view != null) {
+            LinearLayout list = (LinearLayout) view.findViewById(R.id.meal_block);
+            list.setVisibility(View.VISIBLE);
+            TextView label = (TextView) view.findViewById((R.id.nomeal_lable));
+            if(offer.getOfferOnMeals().values().size() > 0) {
+                label.setVisibility(View.GONE);
+            } else {
+                label.setVisibility(View.VISIBLE);
+            }
+            setMealList();
+        } else {
+            Log.d("FILIPPO", "Oggetto view risulta null");
+        }
     }
 
     private void setCategoryList() {
-        //TODO popolare la category list
+        final RecyclerView list = (RecyclerView) getView().findViewById(R.id.category_list);
+        assert list != null;
+        list.setLayoutManager(new LinearLayoutManager(getContext()));
+        list.setNestedScrollingEnabled(false);
+        ArrayList<String> categoryList = new ArrayList<String>();
+        categoryList.addAll(offer.getOfferOnCategories().keySet());
+        OfferCategoryAdapter adapter = new OfferCategoryAdapter(categoryList);
+        list.setAdapter(adapter);
     }
 
     private void setMealList() {
-        //TODO popolare la meal list
+        final RecyclerView list = (RecyclerView) getView().findViewById(R.id.meal_list);
+        assert list != null;
+        list.setLayoutManager(new LinearLayoutManager(getContext()));
+        list.setNestedScrollingEnabled(false);
+        //ArrayList<String> mealIDList = new ArrayList<String>();
+        //mealIDList.addAll(offer.getOfferOnMeals().keySet());
+        ArrayList<String> mealList = new ArrayList<String>();
+        for(Meal m : restaurantMealList) {
+            if(offer.getOfferOnMeals().containsKey(m.getMeal_id()))
+                mealList.add(m.getMeal_name());
+        }
+        OfferMealAdapter adapter = new OfferMealAdapter(mealList);
+        list.setAdapter(adapter);
     }
 
 }
