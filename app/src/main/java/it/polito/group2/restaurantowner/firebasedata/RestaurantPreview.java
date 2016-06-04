@@ -3,6 +3,9 @@ package it.polito.group2.restaurantowner.firebasedata;
 /**
  * Created by Alessio on 16/05/2016.
  */
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -14,13 +17,11 @@ import com.google.maps.android.clustering.ClusterItem;
 /**
  * Created by Alessio on 16/05/2016.
  */
-public class RestaurantPreview implements ClusterItem {
+public class RestaurantPreview implements ClusterItem, Parcelable {
     public LatLng mPosition;
     public Double lat;
     public Double lon;
-
     private String restaurant_id; //to pass to the new Activity to open the right restaurant
-
     private String restaurant_cover_firebase_URL; //with Glide in AsyncTask
     private String restaurant_name;
     private float rating; //android:stepSize="0.01"
@@ -140,4 +141,52 @@ public class RestaurantPreview implements ClusterItem {
     public void setLon(Double lon) {
         this.lon = lon;
     }
+
+    //Parcelable part
+    public RestaurantPreview(Parcel in){
+        String[] data = new String[9];
+
+        in.readStringArray(data);
+        String[] parts = data[0].split(",");
+        this.mPosition = new LatLng (Double.valueOf(parts[0]), Double.valueOf(parts[1]));
+        this.lat = Double.valueOf(data[1]);
+        this.lon = Double.valueOf(data[2]);
+        this.restaurant_id = data[3];
+        this.restaurant_cover_firebase_URL = data[4];
+        this.restaurant_name = data[5];
+        this.rating = Float.valueOf(data[6]);
+        this.reservations_number = Integer.valueOf(data[7]);
+        this.tables_number = Integer.valueOf(data[8]);
+
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeStringArray(new String[] {
+                String.valueOf(this.mPosition),
+                String.valueOf(this.lat),
+                String.valueOf(this.lon),
+                this.restaurant_id,
+                this.restaurant_cover_firebase_URL,
+                this.restaurant_name,
+                String.valueOf(this.rating),
+                String.valueOf(this.reservations_number),
+                String.valueOf(this.tables_number)
+                });
+    }
+
+    @Override
+    public int describeContents(){
+        return 0;
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public RestaurantPreview createFromParcel(Parcel in) {
+            return new RestaurantPreview(in);
+        }
+
+        public RestaurantPreview[] newArray(int size) {
+            return new RestaurantPreview[size];
+        }
+    };
 }

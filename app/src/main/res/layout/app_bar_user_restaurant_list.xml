@@ -18,6 +18,8 @@
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+            app:layout_collapseMode="parallax"
             android:focusable="true"
             android:focusableInTouchMode="true">
 
@@ -66,6 +68,35 @@
             </LinearLayout>
 
         </android.support.v7.widget.Toolbar>
+
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar"
+            android:title="@string/restaurant_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fitsSystemWindows="true"
+            app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleMarginStart="148dp"
+            app:expandedTitleMarginEnd="164dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <LinearLayout
+                android:id="@+id/map_layout"
+                android:layout_width="match_parent"
+                android:layout_height="160dp">
+                <fragment
+                    app:layout_collapseMode="parallax"
+                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+                    android:id="@+id/map"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:name="com.google.android.gms.maps.SupportMapFragment"/>
+            </LinearLayout>
+
+
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+
 
     </android.support.design.widget.AppBarLayout>
 

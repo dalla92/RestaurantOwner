@@ -20,6 +20,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -41,9 +42,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -310,7 +313,9 @@ public class UserRestaurantList extends AppCompatActivity
         if (mMap != null) {
             return;
         }
+
         mMap = map;
+
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -324,6 +329,34 @@ public class UserRestaurantList extends AppCompatActivity
                 startActivity(intent);
             }
         });
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                Intent intent = new Intent(
+                        getApplicationContext(),
+                        MapsActivity.class);
+                Bundle b = new Bundle();
+                //TODO add range_value
+                //b.putString("range", range_value);
+                intent.putExtras(b);
+                startActivity(intent);
+            }
+        });
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Intent intent = new Intent(
+                        getApplicationContext(),
+                        MapsActivity.class);
+                Bundle b = new Bundle();
+                //TODO add range_value
+                //b.putString("range", range_value);
+                intent.putExtras(b);
+                startActivity(intent);
+                return false;
+            }
+        });
+
         maps_stuff();
     }
 
