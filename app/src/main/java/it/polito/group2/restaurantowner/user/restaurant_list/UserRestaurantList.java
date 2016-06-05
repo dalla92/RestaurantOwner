@@ -55,6 +55,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.RemoteMessage;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
@@ -64,6 +66,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.data.JSONUtil;
@@ -123,6 +126,12 @@ public class UserRestaurantList extends AppCompatActivity
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Restaurant r = dataSnapshot.getValue(Restaurant.class);
+                FirebaseMessaging.getInstance().subscribeToTopic(r.getRestaurant_id());
+                RemoteMessage.Builder builder =  new RemoteMessage.Builder("/topics/" + r.getRestaurant_id());
+                builder.setMessageId(UUID.randomUUID().toString());
+                builder.addData("message","Hai una notifica per un'offerta");
+                RemoteMessage msg = new RemoteMessage.Builder(r.getRestaurant_id()).build();
+                FirebaseMessaging.getInstance().send(msg);
                 resList.add(r);
             }
 

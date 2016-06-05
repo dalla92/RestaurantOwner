@@ -29,7 +29,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text=""
             android:textColor="#F50057"
-            android:background="#ffffff"
+            android:background="#00ffffff"
             android:id="@+id/textViewName"
             android:textSize="35dp"
             android:textStyle="bold"
@@ -73,27 +73,11 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text=""
             android:textColor="#3F51B5"
-            android:background="#ffffff"
+            android:background="#00ffffff"
             android:id="@+id/textViewAddress"
             android:textStyle="bold"
             android:layout_alignParentStart="true"
             />
-
-        <ImageView
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:src="@mipmap/ic_distance"
-            />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text=""
-            android:textColor="#FF80AB"
-            android:background="#ffffff"
-            android:id="@+id/textViewDistance"
-            android:textStyle="bold"
-            android:layout_alignParentStart="true" />
 
     </LinearLayout>
 
@@ -115,11 +99,34 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:paddingStart="4dp"
             android:text=""
-            android:textColor="#3F81B5"
-            android:background="#ffffff"
+            android:textColor="#3F51B5"
+            android:background="#00ffffff"
             android:id="@+id/textViewTablesNumber"
             android:textStyle="bold"
-            android:layout_alignParentEnd="true"/>
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text=""
+            />
+
+        <ImageView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@mipmap/ic_distance" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=""
+            android:textColor="#3F51B5"
+            android:background="#00ffffff"
+            android:id="@+id/textViewDistance"
+            android:textStyle="bold"
+             />
 
 
     </LinearLayout>

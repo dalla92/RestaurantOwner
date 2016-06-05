@@ -427,7 +427,7 @@ public class MapsActivity extends AppCompatActivity implements
         if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
             // only for Marshmallow and newer versions
             //I want that first I request GPS, but if rejected, request WIFI
-            dialogPermissionListener_gps =
+    /*        dialogPermissionListener_gps =
                     DialogOnDeniedPermissionListener.Builder
                             .withContext(this)
                             .withTitle("GPS permission")
@@ -435,8 +435,8 @@ public class MapsActivity extends AppCompatActivity implements
                             .withButtonText(android.R.string.ok)
                             .withIcon(R.mipmap.ic_launcher)
                             .build();
-            Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
-
+            Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
+*/
             Dexter.checkPermission(new PermissionListener() {
                 @Override public void onPermissionGranted(PermissionGrantedResponse response) {
                     permission_granted();
@@ -694,7 +694,7 @@ public class MapsActivity extends AppCompatActivity implements
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     Drawable drawable = new BitmapDrawable(resource);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        d.findViewById(R.id.father_linear_layout).setBackground(drawable);
+                        //d.findViewById(R.id.father_linear_layout).setBackground(drawable);
                         d.findViewById(R.id.father_linear_layout).setAlpha(0.88f);
                     }
                 }
