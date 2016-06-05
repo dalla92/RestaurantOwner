@@ -305,12 +305,25 @@
         android:layout_height="wrap_content"
         android:paddingTop="10dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:clickable="true"
+            android:onClick="editCategoryList"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
             android:layout_height="wrap_content"
-            android:text="@string/owner_offer_fragment_offer_lable_categorylist"
-            android:textSize="20sp"
-            android:layout_marginBottom="5dp"/>
+            android:layout_marginBottom="5dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:src="@android:drawable/ic_menu_edit"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/owner_offer_fragment_offer_lable_categorylist"
+                android:textSize="20sp"/>
+        </LinearLayout>
+
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/category_list"
@@ -337,12 +350,24 @@
         android:layout_height="wrap_content"
         android:paddingTop="10dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:clickable="true"
+            android:onClick="editMealList"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
             android:layout_height="wrap_content"
-            android:text="@string/owner_offer_fragment_offer_lable_meallist"
-            android:textSize="20sp"
-            android:layout_marginBottom="5dp"/>
+            android:layout_marginBottom="5dp">
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:src="@android:drawable/ic_menu_edit"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/owner_offer_fragment_offer_lable_meallist"
+                android:textSize="20sp"/>
+        </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/meal_list"
