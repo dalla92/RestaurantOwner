@@ -48,6 +48,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
 
@@ -806,6 +807,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         user_bookmark.setRestaurant_id(userID);*/
                     ArrayList<Bookmark> bookmarks_temp;
                     if(!bookmark) {
+                        FirebaseMessaging.getInstance().subscribeToTopic(restaurantID);
                         //read, add and write
                         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_on_24dp));
                         bookmark = true;
@@ -819,6 +821,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         }
                     }
                     else{
+                        FirebaseMessaging.getInstance().unsubscribeFromTopic(restaurantID);
                         //read, remove and write
                         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this,R.drawable.ic_star_off_24dp));
                         bookmark = false;

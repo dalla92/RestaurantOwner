@@ -199,7 +199,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <!-- [START firebase_service] -->
         <service
-            android:name="user.restaurant_list.MyFirebaseMessagingService">
+            android:name=".user.restaurant_list.MyFirebaseMessagingService">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>
             </intent-filter>

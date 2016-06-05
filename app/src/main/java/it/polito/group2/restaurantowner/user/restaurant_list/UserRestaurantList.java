@@ -61,12 +61,24 @@ import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.data.JSONUtil;
@@ -126,12 +138,11 @@ public class UserRestaurantList extends AppCompatActivity
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Restaurant r = dataSnapshot.getValue(Restaurant.class);
-                FirebaseMessaging.getInstance().subscribeToTopic(r.getRestaurant_id());
-                RemoteMessage.Builder builder =  new RemoteMessage.Builder("/topics/" + r.getRestaurant_id());
-                builder.setMessageId(UUID.randomUUID().toString());
-                builder.addData("message","Hai una notifica per un'offerta");
-                RemoteMessage msg = new RemoteMessage.Builder(r.getRestaurant_id()).build();
-                FirebaseMessaging.getInstance().send(msg);
+        /*
+        //TODO mettere le subsciption quando si completa un ordine e mandare la notifica quando si crea una nuova offerta
+                FirebaseMessaging.getInstance().subscribeToTopic("asd");
+                new SendNotificationAsync().execute(r.getRestaurant_name(),r.getRestaurant_id());
+*/
                 resList.add(r);
             }
 
