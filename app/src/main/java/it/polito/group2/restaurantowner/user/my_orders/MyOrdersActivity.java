@@ -56,7 +56,7 @@ public class MyOrdersActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.myorders_activity);
+        setContentView(R.layout.user_myorders_activity);
 
         userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
         if(userID == null) {
@@ -156,7 +156,7 @@ public class MyOrdersActivity extends AppCompatActivity
 
     private void setOrderList() {
         final RecyclerView list = (RecyclerView) findViewById(R.id.order_list);
-        assert orderList != null;
+        assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         list.setNestedScrollingEnabled(false);
         OrderAdapter adapter = new OrderAdapter(this, orderList);
@@ -188,14 +188,6 @@ public class MyOrdersActivity extends AppCompatActivity
             mProgressDialog.hide();
         }
     }
-/*
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        d = null;
-        System.gc();
-    }
-*/
 
     @Override
     public void onBackPressed() {

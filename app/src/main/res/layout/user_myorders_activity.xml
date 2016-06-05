@@ -9,7 +9,7 @@
     tools:openDrawer="start">
 
     <include
-        layout="@layout/myorders_activity_appbar"
+        layout="@layout/user_myorders_activity_appbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
