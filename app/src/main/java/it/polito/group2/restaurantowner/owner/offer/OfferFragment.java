@@ -195,7 +195,7 @@ public class OfferFragment extends Fragment {
                             applyMeals.setChecked(false);
                             hideCategoryList();
                             hideMealList();
-                            saveData();
+                            saveData(view);
                         }
                         break;
                     case R.id.apply_categories:
@@ -204,7 +204,7 @@ public class OfferFragment extends Fragment {
                             applyMeals.setChecked(false);
                             hideMealList();
                             showCategoryList();
-                            saveData();
+                            saveData(view);
                             if(offer.getOfferOnCategories().size() <= 0) {
                                 mCallback.onCategoryListRq(offer);
                             }
@@ -216,7 +216,7 @@ public class OfferFragment extends Fragment {
                             applyCategories.setChecked(false);
                             hideCategoryList();
                             showMealList();
-                            saveData();
+                            saveData(view);
                             if(offer.getOfferOnMeals().size() <= 0) {
                                 mCallback.onMealListRq(offer);
                             }
@@ -268,7 +268,7 @@ public class OfferFragment extends Fragment {
         int id = item.getItemId();
 
         if(id == R.id.action_save){
-            saveData();
+            saveData(getView());
             boolean alert = false;
             if(offer.getOfferEnabled()) {
                 if(!offer.getOfferAtDinner() && !offer.getOfferAtLunch())
@@ -300,6 +300,16 @@ public class OfferFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public void editCategoryList(View v) {
+        saveData(v);
+        mCallback.onCategoryListRq(offer);
+    }
+
+    public void editMealList(View v) {
+        saveData(v);
+        mCallback.onMealListRq(offer);
     }
 
     public void showFromDatePickerDialog(View v) {
@@ -355,8 +365,7 @@ public class OfferFragment extends Fragment {
         dialog.show();
     }
 
-    private void saveData() {
-        View view = getView();
+    private void saveData(View view) {
 
         Switch enabled = (Switch) view.findViewById(R.id.enabled);
         this.offer.setOfferEnabled(enabled.isEnabled());
@@ -553,8 +562,6 @@ public class OfferFragment extends Fragment {
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         list.setNestedScrollingEnabled(false);
-        //ArrayList<String> mealIDList = new ArrayList<String>();
-        //mealIDList.addAll(offer.getOfferOnMeals().keySet());
         ArrayList<String> mealList = new ArrayList<String>();
         for(Meal m : restaurantMealList) {
             if(offer.getOfferOnMeals().containsKey(m.getMeal_id()))

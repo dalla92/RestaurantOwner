@@ -1,11 +1,15 @@
 package it.polito.group2.restaurantowner.user.restaurant_list;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.IntentSender;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -13,15 +17,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -29,34 +30,43 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.places.PlaceFilter;
-import com.google.android.gms.location.places.PlaceLikelihood;
-import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
-import com.google.android.gms.location.places.Places;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.firebasedata.Restaurant;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
-public class SearchActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class SearchActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks {
+
+    protected static final int REQUEST_CHECK_SETTINGS = 0x1;
 
     private GoogleApiClient mGoogleApiClient;
     private boolean isFirstChar = true;
-    private CardView placesCard, restaurantsCard, tagCard;
+    private CardView restaurantsCard, placesCard, tagCard;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
-    private ArrayList<String> names;
+    private HashMap<String, String> restaurantNamesIDMap, tagNamesIDMap;
     private RecyclerView restaurantRecyclerView, placesRecyclerView, tagsRecyclerView;
-    private RestaurantSearchAdapter restaurantAdapter;
+    private SearchAdapter restaurantAdapter, tagAdapter;
+    private Location mLastLocation;
+    private LocationSettingsRequest.Builder builder;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,12 +80,21 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
 
         mGoogleApiClient = new GoogleApiClient
                 .Builder(this)
-                .enableAutoManage(this, this)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
                 .build();
 
-        names = new ArrayList<>();
+        LocationRequest mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(10);
+        mLocationRequest.setFastestInterval(10);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        builder = new LocationSettingsRequest.Builder().addLocationRequest(mLocationRequest);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+
+        restaurantNamesIDMap = new HashMap<>();
+        tagNamesIDMap = new HashMap<>();
         placesCard = (CardView) findViewById(R.id.places_card);
         restaurantsCard = (CardView) findViewById(R.id.restaurant_card);
         tagCard = (CardView) findViewById(R.id.tag_card);
@@ -84,21 +103,26 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         tagsRecyclerView = (RecyclerView) findViewById(R.id.search_tag_list);
 
 
-        restaurantAdapter = new RestaurantSearchAdapter(names);
+        restaurantAdapter = new SearchAdapter(restaurantNamesIDMap, this);
+        restaurantRecyclerView.setHasFixedSize(true);
         restaurantRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         restaurantRecyclerView.setAdapter(restaurantAdapter);
 
+        tagAdapter = new SearchAdapter(tagNamesIDMap, this);
+        tagsRecyclerView.setHasFixedSize(true);
+        tagsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        tagsRecyclerView.setAdapter(tagAdapter);
 
         showProgressDialog();
 
-        firebase.getReference("restaurant_names").addListenerForSingleValueEvent(new ValueEventListener() {
+        /*firebase.getReference("restaurant_names").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Boolean> namesMap = (Map<String, Boolean>) dataSnapshot.getValue();
-                if(namesMap != null)
-                    names.addAll(namesMap.keySet());
+                restaurantNamesIDMap = (HashMap<String, String>) dataSnapshot.getValue();
+                if(restaurantNamesIDMap != null)
+                    names.addAll(restaurantNamesIDMap.keySet());
 
-                for(String name: namesMap.keySet())
+                for(String name: restaurantNamesIDMap.keySet())
                     Log.d("prova", name);
                 hideProgressDialog();
             }
@@ -107,7 +131,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        });*/
 
         EditText textView = (EditText) findViewById(R.id.search_text);
         assert textView != null;
@@ -124,23 +148,47 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                     placesCard.setVisibility(View.GONE);
                     tagCard.setVisibility(View.GONE);
                 }
-                if (s.length() > 1 && s.charAt(0) != '#') {
+                if (s.length() > 0 && s.charAt(0) != '#') {
+                    progressBar.setVisibility(View.VISIBLE);
                     tagCard.setVisibility(View.GONE);
 
-                    if (names.size() > 0) {
-                        ArrayList<String> matches = new ArrayList<>();
+                    Query restaurantQuery = firebase.getReference("/restaurant_names").orderByKey().startAt(s.toString()).endAt(s.toString()+"\uf8ff");
+                    restaurantQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            HashMap<String, String> matches = (HashMap<String, String>) dataSnapshot.getValue();
+                            if(matches != null && matches.size() > 0) {
+                                restaurantAdapter.setData(matches);
+                                restaurantsCard.setVisibility(View.VISIBLE);
+                            }
+                            else{
+                                restaurantsCard.setVisibility(View.GONE);
+                            }
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Log.d("prova", "cancelled");
+                        }
+                    });
+                    /*if (names.size() > 0) {
+                        HashMap<String, String> matches = new HashMap<>();
                         for (int i = 0; i < names.size(); i++) {
                             String name = names.get(i);
                             if (name.toLowerCase().startsWith(s.toString().toLowerCase())) {
-                                matches.add(name);
+                                matches.put(name, restaurantNamesIDMap.get(name));
                             }
                         }
+                        for(String id: matches.values())
+                            Log.d("prova", id);
                         if (matches.size() > 0) {
                             restaurantAdapter.setData(matches);
                             restaurantsCard.setVisibility(View.VISIBLE);
                         } else
                             restaurantsCard.setVisibility(View.GONE);
-                    }
+                    }*/
                     //placesCard.setVisibility(View.VISIBLE);
 
                 }
@@ -151,33 +199,51 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             }
         });
 
-        ImageView icon_location = (ImageView) findViewById(R.id.icon_location);
+        /*ImageView icon_location = (ImageView) findViewById(R.id.icon_location);
         assert icon_location != null;
         icon_location.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (ContextCompat.checkSelfPermission(SearchActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
-                    Log.d("prova", "no permission");
-                }
+                showProgressDialog();
+                PendingResult<LocationSettingsResult> result =
+                        LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
 
-                PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi.getCurrentPlace(mGoogleApiClient, null);
-
-                result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+                result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
                     @Override
-                    public void onResult(@NotNull PlaceLikelihoodBuffer likelyPlaces) {
+                    public void onResult(@NotNull LocationSettingsResult locationSettingsResult) {
 
-                        Log.d("prova", likelyPlaces.getStatus().toString());
+                        final Status status = locationSettingsResult.getStatus();
+                        final LocationSettingsStates LS_state = locationSettingsResult.getLocationSettingsStates();
+                        switch (status.getStatusCode()) {
+                            case LocationSettingsStatusCodes.SUCCESS:
+                                Log.d("prova", "success");
+                               getLocation();
 
-                        for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                            Log.i("prova", String.format("Place '%s' has likelihood: %g",
-                                    placeLikelihood.getPlace().getName(),
-                                    placeLikelihood.getLikelihood()));
+                                break;
+                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                                // Location settings are not satisfied. But could be fixed by showing the user
+                                // a dialog.
+                                try {
+                                    // Show the dialog by calling startResolutionForResult(),
+                                    // and check the result in onActivityResult().
+                                    status.startResolutionForResult(SearchActivity.this, REQUEST_CHECK_SETTINGS);
+
+                                } catch (IntentSender.SendIntentException e) {
+                                    // Ignore the error.
+                                }
+                                break;
+                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                                // Location settings are not satisfied. However, we have no way to fix the
+                                // settings so we won't show the dialog.
+                                hideProgressDialog();
+                                Log.d("prova", "error with location");
+                                break;
                         }
-                        likelyPlaces.release();
                     }
                 });
+
             }
-        });
+        });*/
 
         ImageView iconBack = (ImageView) findViewById(R.id.icon_back);
         assert iconBack != null;
@@ -189,9 +255,62 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         });
     }
 
+    private void getLocation() {
+        if (ContextCompat.checkSelfPermission(SearchActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.d("prova", "no permission");
+        }
+
+        Geocoder geocoder = new Geocoder(SearchActivity.this, Locale.getDefault());
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        if (mLastLocation != null) {
+            double latitude = mLastLocation.getLatitude();
+            double longitude = mLastLocation.getLongitude();
+            try {
+                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 5);
+                for(Address address: addresses)
+                    Log.d("prova", address.toString());
+            } catch (IOException e) {
+                Log.e("prova", "Service Not Available", e);
+                hideProgressDialog();
+            }
+        } else {
+            hideProgressDialog();
+            Log.d("prova", "location null");
+        }
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        final LocationSettingsStates states = LocationSettingsStates.fromIntent(data);
+        switch (requestCode) {
+            case REQUEST_CHECK_SETTINGS:
+                switch (resultCode) {
+                    case Activity.RESULT_OK:
+                        Log.d("prova", "resultOk");
+                       getLocation();
+                        break;
+                    case Activity.RESULT_CANCELED:
+                        Log.d("prova", "result_canceled");
+                        hideProgressDialog();
+                        break;
+                    default:
+                        break;
+                }
+                break;
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
+        if( mGoogleApiClient != null )
+            mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         if( mGoogleApiClient != null )
             mGoogleApiClient.connect();
     }
@@ -226,5 +345,14 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         Toast.makeText(SearchActivity.this, "Connection to the google API failed!", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public void onConnected(Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
 }
 
