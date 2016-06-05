@@ -39,7 +39,7 @@ public class AdditionAdapter extends RecyclerView.Adapter<AdditionAdapter.Additi
 
     @Override
     public AdditionAdapter.AdditionViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.myorders_activity_addition_item, parent, false);
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_myorders_activity_addition_item, parent, false);
         return new AdditionViewHolder(itemView);
     }
 

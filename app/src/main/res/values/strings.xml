@@ -268,6 +268,11 @@
     <string name="owner_offer_fragment_offer_message_alert">The offer is enabled but it is applied on anything. Do you want to save it anyway?</string>
 
     <!-- Strings related to owner.my_offers -->
+    <string name="owner_myoffers_lable_disable">(disabled)</string>
+
+
+
+
 
     <!-- Strings related to user.order -->
     <string name="user_order_nextstep">Next</string>
