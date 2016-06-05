@@ -202,9 +202,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 hideProgressDialog();
-                                Intent i = new Intent(LoginManagerActivity.this, UserRestaurantActivity.class);
-
-                                i.putExtra("restaurant_id", "-KI35BWFjfamV1gY4l3G");
+                                Intent i = new Intent(LoginManagerActivity.this, UserRestaurantList.class);
 
                                 // Closing all the Activities from stack
                                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -229,9 +227,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                         userRef.child(target.getUser_id()).child("providers").setValue(providers);
 
                         hideProgressDialog();
-                        Intent i = new Intent(LoginManagerActivity.this, UserRestaurantActivity.class);
-
-                        i.putExtra("restaurant_id", "-KI35BWFjfamV1gY4l3G");
+                        Intent i = new Intent(LoginManagerActivity.this, UserRestaurantList.class);
 
                         // Closing all the Activities from stack
                         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
