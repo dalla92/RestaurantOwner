@@ -18,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 
 /**
@@ -26,12 +27,14 @@ import it.polito.group2.restaurantowner.firebasedata.Offer;
 public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHolder> {
 
     private final ArrayList<Offer> offerList;
+    private final ArrayList<Meal> mealRestaurantList;
     private final Context context;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN);
 
-    public OfferAdapter(Context context, ArrayList<Offer> list) {
+    public OfferAdapter(Context context, ArrayList<Offer> list, ArrayList<Meal> meals) {
         this.context = context;
         this.offerList = list;
+        this.mealRestaurantList = meals;
     }
 
     public class OfferViewHolder extends RecyclerView.ViewHolder {
@@ -47,8 +50,6 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
         public TextView applied;
         public RecyclerView categoriesList;
         public RecyclerView mealsList;
-
-        //TODO aggiungere tutti gli altri campi
 
         public OfferViewHolder(View view) {
             super(view);
@@ -124,10 +125,9 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
             holder.categoriesList.setVisibility(View.GONE);
             holder.mealsList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
             holder.mealsList.setNestedScrollingEnabled(false);
-            OfferMealAdapter adapter = new OfferMealAdapter(getMealNameList(offerList.get(position).getMealList()));
+            OfferMealAdapter adapter = new OfferMealAdapter(getMealNameList(position));
             holder.mealsList.setAdapter(adapter);
         }
-
     }
 
     @Override
@@ -135,9 +135,12 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
         return offerList.size();
     }
 
-    private ArrayList<String> getMealNameList(ArrayList<String> mealIdList) {
+    private ArrayList<String> getMealNameList(int position) {
         ArrayList<String> list = new ArrayList<String>();
-        //TODO recuperare i nomi dei meals avendo i loro id
+        for(Meal m : mealRestaurantList) {
+            if(offerList.get(position).getOfferOnMeals().get(m.getMeal_id()))
+                list.add(m.getMeal_name());
+        }
         return list;
     }
 

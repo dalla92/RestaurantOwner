@@ -41,6 +41,7 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.HaveBreak;
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
@@ -61,6 +62,7 @@ public class MyOffersActivity extends AppCompatActivity
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private ArrayList<Offer> offerList;             //offer list got from firebase
+    private ArrayList<Meal> restaurantMealList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,7 @@ public class MyOffersActivity extends AppCompatActivity
         firebase = FirebaseDatabase.getInstance();
         offerList = new ArrayList<Offer>();
         Query offersReference = firebase.getReference("offers").orderByChild("restaurant_id").equalTo(restaurantID);
+        Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
         DatabaseReference userReference = firebase.getReference("users/" + userID);
         hideProgressDialog();
 
@@ -93,8 +96,10 @@ public class MyOffersActivity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
                 user = dataSnapshot.getValue(User.class);
             }
+
             @Override
-            public void onCancelled(DatabaseError databaseError) {}
+            public void onCancelled(DatabaseError databaseError) {
+            }
         });
 
         offersReference.addChildEventListener(new ChildEventListener() {
@@ -102,6 +107,7 @@ public class MyOffersActivity extends AppCompatActivity
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 offerList.add(dataSnapshot.getValue(Offer.class));
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Offer changedOffer = dataSnapshot.getValue(Offer.class);
@@ -113,12 +119,49 @@ public class MyOffersActivity extends AppCompatActivity
                     }
                 }
             }
+
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
                 Offer changedOffer = dataSnapshot.getValue(Offer.class);
                 for (Offer o : offerList) {
                     if (o.getOfferID().equals(changedOffer.getOfferID())) {
                         offerList.remove(o);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
+        mealsReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                restaurantMealList.add(dataSnapshot.getValue(Meal.class));
+            }
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Meal changedMeal = dataSnapshot.getValue(Meal.class);
+                for (Meal m : restaurantMealList) {
+                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
+                        restaurantMealList.remove(m);
+                        restaurantMealList.add(changedMeal);
+                        break;
+                    }
+                }
+            }
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Meal changedMeal = dataSnapshot.getValue(Meal.class);
+                for (Meal m : restaurantMealList) {
+                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
+                        restaurantMealList.remove(m);
                         break;
                     }
                 }
@@ -171,7 +214,7 @@ public class MyOffersActivity extends AppCompatActivity
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         list.setNestedScrollingEnabled(false);
-        OfferAdapter adapter = new OfferAdapter(this, offerList);
+        OfferAdapter adapter = new OfferAdapter(this, offerList, restaurantMealList);
         list.setAdapter(adapter);
     }
 
