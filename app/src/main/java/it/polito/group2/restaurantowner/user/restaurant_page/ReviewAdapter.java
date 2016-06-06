@@ -31,11 +31,14 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         this.reviews.add(0, review);
         notifyItemInserted(0);
     }
-    public void setReviewData(ArrayList<Review> reviews) {
-        this.reviews = reviews;
-        notifyDataSetChanged();
-    }
 
+    public void removeReview(Review review){
+        int index = this.reviews.indexOf(review);
+        if(index == -1)
+            return;
+        this.reviews.remove(index);
+        notifyItemRemoved(index);
+    }
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView username, date, comment;

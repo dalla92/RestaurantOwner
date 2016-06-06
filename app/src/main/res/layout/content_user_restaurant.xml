@@ -110,8 +110,7 @@
                                     android:id="@+id/restaurant_stars_text"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginRight="6dp"
-                                    android:text="4.0" />
+                                    android:layout_marginRight="6dp" />
 
                                 <RatingBar
                                     android:id="@+id/restaurant_stars"
@@ -120,8 +119,8 @@
                                     android:layout_marginTop="6dp"
                                     android:layout_marginEnd="10dp"
                                     android:isIndicator="true"
+                                    android:stepSize="0.1"
                                     android:numStars="5"
-                                    android:rating="4"
                                     style="@style/Widget.AppCompat.RatingBar.Small" />
 
                             </LinearLayout>

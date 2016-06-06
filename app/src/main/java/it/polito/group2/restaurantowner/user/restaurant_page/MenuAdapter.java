@@ -9,19 +9,21 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Meal;
-import it.polito.group2.restaurantowner.data.MenuCategory;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 
 /**
  * Created by TheChuck on 07/05/2016.
  */
 public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder>{
 
-    private ArrayList<MenuCategory> categories;
+    private ArrayList<String> categories;
+    private ArrayList<Meal> meals;
     private Context context;
 
-    public MenuAdapter(ArrayList<MenuCategory> categories, Context context) {
+
+    public MenuAdapter(ArrayList<String> categories, ArrayList<Meal> meals, Context context) {
         this.categories = categories;
+        this.meals = meals;
         this.context = context;
     }
 
@@ -45,8 +47,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
 
     @Override
     public void onBindViewHolder(MenuAdapter.MenuViewHolder holder, int position) {
-        holder.name.setText(categories.get(position).getName());
-        ArrayList<Meal> meals = getMealsFromCategory();
+        String category = categories.get(position);
+        ArrayList<Meal> meals = getMealsFromCategory(category);
+
+        holder.name.setText(category);
         holder.meals.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.meals.setNestedScrollingEnabled(false);
 
@@ -54,22 +58,14 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         holder.meals.setAdapter(adapter);
     }
 
-    private ArrayList<Meal> getMealsFromCategory() {
-        ArrayList<Meal> meals = new ArrayList<>();
-        Meal m1 = new Meal();
-        m1.setMeal_name("Pasta alla carbonara");
-        m1.setMeal_price(4.5);
-        Meal m2 = new Meal();
-        m2.setMeal_name("Tonno alla piastra");
-        m2.setMeal_price(4.5);
-        Meal m3 = new Meal();
-        m3.setMeal_name("Tiramisù");
-        m3.setMeal_price(4.5);
-        meals.add(m1);
-        meals.add(m2);
-        meals.add(m3);
+    private ArrayList<Meal> getMealsFromCategory(String category) {
+        ArrayList<Meal> targetMeals = new ArrayList<>();
+        for(Meal m: meals){
+            if(m.getMeal_category().equals(category))
+                targetMeals.add(m);
+        }
 
-        return meals;
+        return targetMeals;
     }
 
     @Override

@@ -5,11 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import java.util.ArrayList;
-
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Meal;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 
 /**
  * Created by TheChuck on 07/05/2016.

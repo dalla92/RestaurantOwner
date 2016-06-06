@@ -2,14 +2,11 @@ package it.polito.group2.restaurantowner.user.restaurant_list;
 
 import android.Manifest;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -20,7 +17,6 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -31,7 +27,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import it.polito.group2.restaurantowner.R;
 
@@ -42,10 +37,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.ChildEventListener;
@@ -55,35 +48,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.RemoteMessage;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import javax.net.ssl.HttpsURLConnection;
 
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.User;
-import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
@@ -95,6 +65,7 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
+import it.polito.group2.restaurantowner.user.search.SearchActivity;
 
 public class UserRestaurantList extends AppCompatActivity
 //      DatabaseReferenceLoginBaseActivity

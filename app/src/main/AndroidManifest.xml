@@ -186,7 +186,7 @@
             android:label="@string/title_activity_register"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".user.restaurant_list.SearchActivity"
+            android:name=".user.search.SearchActivity"
             android:label="@string/title_activity_search"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

@@ -1,10 +1,9 @@
-package it.polito.group2.restaurantowner.user.restaurant_list;
+package it.polito.group2.restaurantowner.user.search;
 
 import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -27,15 +26,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStates;
-import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -45,7 +39,6 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -61,12 +54,15 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
     private CardView restaurantsCard, placesCard, tagCard;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
-    private HashMap<String, String> restaurantNamesIDMap, tagNamesIDMap;
+    private HashMap<String, String> restaurantNamesIDMap;
+    private HashMap<String, HashMap<String, Boolean>> tagNamesIDMap;
     private RecyclerView restaurantRecyclerView, placesRecyclerView, tagsRecyclerView;
-    private SearchAdapter restaurantAdapter, tagAdapter;
+    private RestaurantSuggestionAdapter restaurantAdapter;
+    private TagSuggestionAdapter tagAdapter;
     private Location mLastLocation;
     private LocationSettingsRequest.Builder builder;
     private ProgressBar progressBar;
+    private boolean empty = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,17 +99,15 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         tagsRecyclerView = (RecyclerView) findViewById(R.id.search_tag_list);
 
 
-        restaurantAdapter = new SearchAdapter(restaurantNamesIDMap, this);
+        restaurantAdapter = new RestaurantSuggestionAdapter(restaurantNamesIDMap, this);
         restaurantRecyclerView.setHasFixedSize(true);
         restaurantRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         restaurantRecyclerView.setAdapter(restaurantAdapter);
 
-        tagAdapter = new SearchAdapter(tagNamesIDMap, this);
+        tagAdapter = new TagSuggestionAdapter(tagNamesIDMap, this);
         tagsRecyclerView.setHasFixedSize(true);
         tagsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         tagsRecyclerView.setAdapter(tagAdapter);
-
-        showProgressDialog();
 
         /*firebase.getReference("restaurant_names").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -138,17 +132,18 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         textView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(s.length() < 1){
+                    empty = true;
                     restaurantsCard.setVisibility(View.GONE);
                     placesCard.setVisibility(View.GONE);
                     tagCard.setVisibility(View.GONE);
                 }
                 if (s.length() > 0 && s.charAt(0) != '#') {
+                    empty = false;
                     progressBar.setVisibility(View.VISIBLE);
                     tagCard.setVisibility(View.GONE);
 
@@ -156,13 +151,45 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                     restaurantQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            HashMap<String, String> matches = (HashMap<String, String>) dataSnapshot.getValue();
+                            if(!empty) {
+                                HashMap<String, String> matches = (HashMap<String, String>) dataSnapshot.getValue();
+                                if (matches != null && matches.size() > 0) {
+                                    restaurantAdapter.setData(matches);
+                                    restaurantsCard.setVisibility(View.VISIBLE);
+                                } else {
+                                    restaurantsCard.setVisibility(View.GONE);
+                                }
+                                progressBar.setVisibility(View.INVISIBLE);
+                            }
+                            else
+                                progressBar.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            Log.d("prova", "cancelled");
+                        }
+                    });
+                }
+
+                if(s.length() > 1 && s.charAt(0) == '#'){
+                    progressBar.setVisibility(View.VISIBLE);
+                    restaurantsCard.setVisibility(View.GONE);
+                    placesCard.setVisibility(View.GONE);
+
+                    Query tagsQuery = firebase.getReference("/tag_names").orderByKey().startAt(s.toString().substring(1)).endAt(s.toString().substring(1)+"\uf8ff");
+                    tagsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            HashMap<String, HashMap<String, Boolean>> matches = (HashMap<String, HashMap<String, Boolean>>)dataSnapshot.getValue();
+
                             if(matches != null && matches.size() > 0) {
-                                restaurantAdapter.setData(matches);
-                                restaurantsCard.setVisibility(View.VISIBLE);
+                                tagAdapter.setData(matches);
+                                tagCard.setVisibility(View.VISIBLE);
                             }
                             else{
-                                restaurantsCard.setVisibility(View.GONE);
+                                tagCard.setVisibility(View.GONE);
                             }
                             progressBar.setVisibility(View.INVISIBLE);
                         }
@@ -173,24 +200,6 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                             Log.d("prova", "cancelled");
                         }
                     });
-                    /*if (names.size() > 0) {
-                        HashMap<String, String> matches = new HashMap<>();
-                        for (int i = 0; i < names.size(); i++) {
-                            String name = names.get(i);
-                            if (name.toLowerCase().startsWith(s.toString().toLowerCase())) {
-                                matches.put(name, restaurantNamesIDMap.get(name));
-                            }
-                        }
-                        for(String id: matches.values())
-                            Log.d("prova", id);
-                        if (matches.size() > 0) {
-                            restaurantAdapter.setData(matches);
-                            restaurantsCard.setVisibility(View.VISIBLE);
-                        } else
-                            restaurantsCard.setVisibility(View.GONE);
-                    }*/
-                    //placesCard.setVisibility(View.VISIBLE);
-
                 }
             }
 

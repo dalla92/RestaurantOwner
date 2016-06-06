@@ -1,12 +1,14 @@
-package it.polito.group2.restaurantowner.user.restaurant_list;
+package it.polito.group2.restaurantowner.user.search;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,15 +16,15 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 /**
- * Created by TheChuck on 30/05/2016.
+ * Created by TheChuck on 06/06/2016.
  */
-public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.RestaurantSearchViewHolder> {
+public class TagSuggestionAdapter extends RecyclerView.Adapter<TagSuggestionAdapter.TagSearchViewHolder> {
 
     private ArrayList<String> names;
-    private HashMap<String, String> namesAndId;
+    private HashMap<String, HashMap<String, Boolean>> namesAndId;
     private Activity activity;
 
-    public SearchAdapter(HashMap<String, String> namesAndId, Activity activity) {
+    public TagSuggestionAdapter(HashMap<String, HashMap<String, Boolean>> namesAndId, Activity activity) {
         this.names = new ArrayList<>();
         this.names.addAll(namesAndId.keySet());
         this.namesAndId = namesAndId;
@@ -30,10 +32,10 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.Restaurant
     }
 
 
-    public class RestaurantSearchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class TagSearchViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public TextView searchSuggestion;
 
-        public RestaurantSearchViewHolder(View view){
+        public TagSearchViewHolder(View view){
             super(view);
             searchSuggestion = (TextView) itemView.findViewById(R.id.search_suggestion);
             searchSuggestion.setOnClickListener(this);
@@ -42,22 +44,29 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.Restaurant
         @Override
         public void onClick(View v) {
             String key = names.get(this.getLayoutPosition());
-            String restaurantId = namesAndId.get(key);
-            Intent intent = new Intent(activity, UserRestaurantActivity.class);
+            ArrayList<String> restaurantIDs = new ArrayList<>();
+            HashMap<String, Boolean> mapIds = namesAndId.get(key);
+            restaurantIDs.addAll(mapIds.keySet());
+
+            for(String s: restaurantIDs)
+                Log.d("prova", s);
+
+            //TODO update the list of restaurant in UserRestaurantList
+            /*Intent intent = new Intent(activity, UserRestaurantActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             intent.putExtra("restaurant_id", restaurantId);
-            activity.startActivity(intent);
+            activity.startActivity(intent);*/
         }
     }
 
     @Override
-    public RestaurantSearchViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public TagSearchViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.search_suggestion_item, parent, false);
-        return new RestaurantSearchViewHolder(itemView);
+        return new TagSearchViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(RestaurantSearchViewHolder holder, int position) {
+    public void onBindViewHolder(TagSearchViewHolder holder, int position) {
         holder.searchSuggestion.setText(names.get(position));
     }
 
@@ -66,7 +75,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.Restaurant
         return names.size();
     }
 
-    public void setData(HashMap<String, String> namesAndId){
+    public void setData(HashMap<String, HashMap<String, Boolean>> namesAndId){
         this.namesAndId = namesAndId;
         this.names = new ArrayList<>();
         this.names.addAll(namesAndId.keySet());
@@ -74,3 +83,4 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.Restaurant
     }
 
 }
+
