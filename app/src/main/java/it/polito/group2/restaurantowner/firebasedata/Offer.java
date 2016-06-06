@@ -136,6 +136,26 @@ public class Offer implements Serializable {
             offerOnMeals.remove(meal.getMeal_id());
     }
 
+    public ArrayList<String> getCategoryList() {
+        ArrayList<String> list = new ArrayList<String>();
+        for(String key : offerOnCategories.keySet()) {
+            if(offerOnCategories.get(key)) {
+                list.add(key);
+            }
+        }
+        return list;
+    }
+
+    public ArrayList<String> getMealList() {
+        ArrayList<String> list = new ArrayList<String>();
+        for(String key : offerOnMeals.keySet()) {
+            if(offerOnMeals.get(key)) {
+                list.add(key);
+            }
+        }
+        return list;
+    }
+
     public String getOfferID() {
         return offerID;
     }

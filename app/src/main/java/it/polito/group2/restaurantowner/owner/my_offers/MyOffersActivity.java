@@ -22,6 +22,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -170,7 +171,7 @@ public class MyOffersActivity extends AppCompatActivity
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         list.setNestedScrollingEnabled(false);
-        OfferAdapter adapter = new OfferAdapter(offerList);
+        OfferAdapter adapter = new OfferAdapter(this, offerList);
         list.setAdapter(adapter);
     }
 
@@ -289,6 +290,25 @@ public class MyOffersActivity extends AppCompatActivity
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void openOfferDatails(View v) {
+        v.findViewById(R.id.offer_details).setVisibility(View.VISIBLE);
+    }
+
+    public void closeOfferDatails(View v) {
+        v.findViewById(R.id.offer_details).setVisibility(View.GONE);
+    }
+
+    public void editOffer(View v) {
+        TextView offerID = (TextView) v.findViewById(R.id.offer_id);
+        String id = offerID.getText().toString();
+        Intent intent = new Intent(getApplicationContext(), OfferActivity.class);
+        Bundle b = new Bundle();
+        b.putString("restaurant_id", restaurantID);
+        b.putString("offer_id", id);
+        intent.putExtras(b);
+        startActivity(intent);
     }
 
 }

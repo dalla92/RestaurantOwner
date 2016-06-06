@@ -5,58 +5,206 @@
     android:orientation="vertical"
     android:layout_marginTop="10dp">
 
-    <RelativeLayout
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp">
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:clickable="true"
-                android:onClick="openOfferDatails"
-                android:id="@+id/offer_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="OfferName"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="5dp"
-                android:textSize="20sp" />
-            <TextView
-                android:visibility="gone"
-                android:id="@+id/offer_enabled"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/owner_myoffers_lable_disable"
-                android:textSize="15sp"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="5dp"/>
-        </LinearLayout>
-
-
-        <ImageView
-            android:src="@android:drawable/ic_menu_edit"
-            android:id="@+id/edit_offer"
-            android:clickable="true"
-            android:onClick="editOffer"
-            android:layout_width="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp">
+        <RelativeLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_marginEnd="5dp" />
+            android:paddingBottom="5dp">
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:clickable="true"
+                    android:onClick="openOfferDatails"
+                    android:id="@+id/offer_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="OfferName"
+                    android:layout_marginTop="5dp"
+                    android:textSize="20sp" />
+                <TextView
+                    android:visibility="gone"
+                    android:id="@+id/offer_enabled"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_disable"
+                    android:textSize="15sp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"/>
+                <TextView
+                    android:visibility="invisible"
+                    android:id="@+id/offer_id"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+            <ImageView
+                android:src="@android:drawable/ic_menu_edit"
+                android:id="@+id/edit_offer"
+                android:clickable="true"
+                android:onClick="editOffer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
 
-        <!-- renderla visibility GONE -->
         <LinearLayout
+            android:clickable="true"
+            android:onClick="closeOfferDatails"
             android:id="@+id/offer_details"
             android:orientation="vertical"
             android:layout_width="match_parent"
+            android:visibility="gone"
             android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/offer_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OfferDescription"
+                android:textSize="16sp"
+                android:paddingBottom="2dp"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="2dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_offertarget"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/offer_target"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_wholeday"
+                    android:layout_marginStart="5dp"
+                    android:textSize="16sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="2dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_offerperiod"
+                    android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_offerfrom"
+                    android:textSize="16sp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"/>
+                <TextView
+                    android:id="@+id/offer_from"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="11/07/2016"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"
+                    android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_offerto"
+                    android:textSize="16sp"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="5dp"/>
+                <TextView
+                    android:id="@+id/offer_to"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="21/07/2016"
+                    android:layout_marginStart="5dp"
+                    android:textSize="16sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="2dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_weekdays"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/offer_weekdays"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="mon, thu, sat, sun"
+                    android:layout_marginStart="10dp"
+                    android:textSize="16sp" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="2dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_discount"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/offer_discount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="20"
+                    android:layout_marginStart="10dp"
+                    android:textSize="16sp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="%"
+                    android:textSize="16sp"
+                    android:layout_marginStart="3dp"/>
+            </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="2dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_applied"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/offer_on_what"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/owner_myoffers_lable_everything"
+                    android:layout_marginStart="10dp"
+                    android:textSize="16sp" />
+            </LinearLayout>
 
+            <android.support.v7.widget.RecyclerView
+                android:paddingStart="20dp"
+                android:visibility="gone"
+                android:id="@+id/category_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <android.support.v7.widget.RecyclerView
+                android:paddingStart="20dp"
+                android:visibility="gone"
+                android:id="@+id/meal_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <View
         android:layout_width="match_parent"

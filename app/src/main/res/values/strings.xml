@@ -272,15 +272,35 @@
     <string name="owner_offer_fragment_meal_title">Applied on meals: </string>
     <string name="owner_offer_fragment_offer_lable_categorylist">Selected categories: </string>
     <string name="owner_offer_fragment_offer_lable_meallist">Selected meals: </string>
-    <string name="owner_offer_fragment_offer_lable_listempty">Selected meals: </string>
+    <string name="owner_offer_fragment_offer_lable_listempty">nothing is selected</string>
     <string name="owner_offer_fragment_offer_title_alert">Useless offer</string>
     <string name="owner_offer_fragment_offer_message_alert">The offer is enabled but it is applied on anything. Do you want to save it anyway?</string>
 
     <!-- Strings related to owner.my_offers -->
     <string name="owner_myoffers_lable_disable">(disabled)</string>
-
-
-
+    <string name="owner_myoffers_lable_offertarget">Offer target:</string>
+    <string name="owner_myoffers_lable_targetdinner">only at dinner</string>
+    <string name="owner_myoffers_lable_targetlunch">only at lunch</string>
+    <string name="owner_myoffers_lable_wholeday">lunch and dinner</string>
+    <string name="owner_myoffers_lable_never">never applied</string>
+    <string name="owner_myoffers_lable_offerperiod">Offer period:</string>
+    <string name="owner_myoffers_lable_offerfrom">from</string>
+    <string name="owner_myoffers_lable_offerto">to</string>
+    <string name="owner_myoffers_lable_weekdays">Weekdays applications:</string>
+    <string-array name="owner_myoffers_lable_weekdaysnames">
+        <item>sun</item>
+        <item>mon</item>
+        <item>tue</item>
+        <item>wed</item>
+        <item>thu</item>
+        <item>fri</item>
+        <item>sat</item>
+    </string-array>
+    <string name="owner_myoffers_lable_discount">Offer discount:</string>
+    <string name="owner_myoffers_lable_applied">Offer applied on:</string>
+    <string name="owner_myoffers_lable_everything">the total of the order</string>
+    <string name="owner_myoffers_lable_meals">the following meals</string>
+    <string name="owner_myoffers_lable_categories">the following categories</string>
 
 
     <!-- Strings related to user.order -->
