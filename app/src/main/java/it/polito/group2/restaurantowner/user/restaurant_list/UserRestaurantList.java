@@ -144,18 +144,19 @@ public class UserRestaurantList extends AppCompatActivity
                 new SendNotificationAsync().execute(r.getRestaurant_name(),r.getRestaurant_id());
 */
                 resList.add(r);
+                hideProgressDialog();
             }
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
+                /*Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
                 for (Restaurant r : resList) {
                     if (r.getRestaurant_id().equals(changedRes.getRestaurant_id())) {
                         resList.remove(r);
                         resList.add(changedRes);
                         break;
                     }
-                }
+                }*/
             }
 
             @Override
@@ -179,7 +180,7 @@ public class UserRestaurantList extends AppCompatActivity
                 //TODO capire quando si verifica
             }
         });
-        hideProgressDialog();
+
 
         ImageView filter_icon = (ImageView) findViewById(R.id.icon_filter);
         assert filter_icon != null;

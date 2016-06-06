@@ -17,7 +17,7 @@ public class Restaurant implements Serializable {
     private String restaurant_telephone_number;
     private float restaurant_rating; //android:stepSize="0.01"
     private ArrayList<RestaurantTimeSlot> restaurant_time_slot;
-    private HashMap<String, Boolean> favouriteUsers;
+    private HashMap<String, Boolean> favourite_users;
     private String restaurant_photo_firebase_URL; //with Glide in AsyncTask
     private String restaurant_category;
     private Boolean fidelityProgramAccepted;
@@ -42,8 +42,8 @@ public class Restaurant implements Serializable {
 
     }
 
-    public HashMap<String, Boolean> getFavouriteUsers() {
-        return favouriteUsers;
+    public HashMap<String, Boolean> getFavourite_users() {
+        return favourite_users;
     }
 
     public Boolean getFidelityProgramAccepted() {
@@ -82,8 +82,8 @@ public class Restaurant implements Serializable {
         return airConditionedPresent;
     }
 
-    public void setFavouriteUsers(HashMap<String, Boolean> favouriteUsers) {
-        this.favouriteUsers = favouriteUsers;
+    public void setFavourite_users(HashMap<String, Boolean> favourite_users) {
+        this.favourite_users = favourite_users;
     }
 
     public String getRestaurant_id() {

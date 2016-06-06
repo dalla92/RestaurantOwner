@@ -139,6 +139,15 @@
     <string name="times_Fri">Friday</string>
     <string name="times_Sat">Saturday</string>
     <string name="times_Sun">Sunday</string>
+    <string name="close">close</string>
+    <string name="extra">Extra Info</string>
+    <string name="services">Services</string>
+    <string name="gluten_free">Gluten Free</string>
+    <string name="animal_allowed">Animal allowed</string>
+    <string name="air_conditioned">A/C</string>
+    <string name="near">near</string>
+    <string name="bus_stop">bus stop</string>
+    <string name="metro_stop">metro stop</string>
     <string name="title_activity_user_restaurant_list">UserRestaurantList</string>
     <string name="filter">Filter the restaurant list</string>
     <string name="forgot_password">Forgot password?</string>

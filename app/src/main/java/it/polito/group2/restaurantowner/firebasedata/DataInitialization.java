@@ -619,7 +619,7 @@ public class DataInitialization {
 
     public void restaurant_time_slot_fake_initialization() {
         r_t_s = new RestaurantTimeSlot();
-        r_t_s.setRestaurant_id(restaurant_id);
+        //r_t_s.setRestaurant_id(restaurant_id);
         r_t_s.setClose_dinner_time("23:00");
         r_t_s.setClose_lunch_time("15:00");
         r_t_s.setDay_of_week(0);
@@ -629,7 +629,7 @@ public class DataInitialization {
         r_t_s.setOpen_lunch_time("12:00");
 
         r_t_s2 = new RestaurantTimeSlot();
-        r_t_s2.setRestaurant_id(restaurant_id);
+        //r_t_s2.setRestaurant_id(restaurant_id);
         //r_t_s2.setClose_dinner_time("23:00");
         r_t_s2.setClose_lunch_time("16:00");
         r_t_s2.setDay_of_week(0);
@@ -647,7 +647,7 @@ public class DataInitialization {
         favourites_users.put("fake_user_id", true);
         favourites_users.put("fake_user_id3", true);
         favourites_users.put("fake_user_id2", true);
-        res.setFavouriteUsers(favourites_users);
+        res.setFavourite_users(favourites_users);
         res.setAirConditionedPresent(true);
         res.setAnimalAllowed(true);
         res.setCeliacFriendly(true);

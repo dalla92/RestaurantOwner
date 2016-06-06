@@ -206,47 +206,10 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                         }
                     });
 
-                    /*mAuth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-
-                                    // If sign in fails, display a message to the user. If sign in succeeds
-                                    // the auth state listener will be notified and logic to handle the
-                                    // signed in user can be handled in the listener.
-                                    if (!task.isSuccessful()) {
-                                        if(task.getException() instanceof FirebaseAuthUserCollisionException){
-                                            Toast.makeText(RegisterActivity.this, "This email is already registered!", Toast.LENGTH_SHORT).show();
-                                            hideProgressDialog();
-                                        }
-                                        else {
-                                            Toast.makeText(RegisterActivity.this, "Registration failed.", Toast.LENGTH_SHORT).show();
-                                            showProgressDialog();
-                                        }
-                                    }
-
-                                }
-                            });*/
-
                 }
             }
         });
     }
-
-
-   /* @Override
-    public void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(mAuthListener);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }*/
 
     private boolean validateFirstName() {
         if (inputFirstName.getText().toString().trim().isEmpty()) {
@@ -365,8 +328,8 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Confirmation!");
         alert.setMessage("You have already logged in with Google using this email," +
-                "\nIt's not possible to have more then one account with the same email." +
-                "Click yes to use your google account and merge the two account to access the same data.");
+                "It's not possible to have more then one account with the same email." +
+                "\nClick yes to use your google account and merge the two account to access the same data.");
         alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
             @Override

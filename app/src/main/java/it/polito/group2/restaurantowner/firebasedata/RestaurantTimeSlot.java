@@ -7,7 +7,6 @@ import java.io.Serializable;
  */
 public class RestaurantTimeSlot implements Serializable{
 
-    private String restaurant_id;
     private Boolean lunch;
     private Boolean dinner; //is_open is not needed anymore because lunch and dinner are both false when close
     private int day_of_week;
@@ -20,13 +19,6 @@ public class RestaurantTimeSlot implements Serializable{
 
     }
 
-    public String getRestaurant_id() {
-        return restaurant_id;
-    }
-
-    public void setRestaurant_id(String restaurant_id) {
-        this.restaurant_id = restaurant_id;
-    }
 
     public Boolean getLunch() {
         return lunch;
@@ -82,5 +74,37 @@ public class RestaurantTimeSlot implements Serializable{
 
     public void setClose_dinner_time(String close_dinner_time) {
         this.close_dinner_time = close_dinner_time;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        RestaurantTimeSlot that = (RestaurantTimeSlot) o;
+
+        if (lunch != null ? !lunch.equals(that.lunch) : that.lunch != null) return false;
+        if (dinner != null ? !dinner.equals(that.dinner) : that.dinner != null) return false;
+        if (open_lunch_time != null ? !open_lunch_time.equals(that.open_lunch_time) : that.open_lunch_time != null)
+            return false;
+        if (close_lunch_time != null ? !close_lunch_time.equals(that.close_lunch_time) : that.close_lunch_time != null)
+            return false;
+        if (open_dinner_time != null ? !open_dinner_time.equals(that.open_dinner_time) : that.open_dinner_time != null)
+            return false;
+        if (close_dinner_time != null ? !close_dinner_time.equals(that.close_dinner_time) : that.close_dinner_time != null)
+            return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = lunch != null ? lunch.hashCode() : 0;
+        result = 31 * result + (dinner != null ? dinner.hashCode() : 0);
+        result = 31 * result + (open_lunch_time != null ? open_lunch_time.hashCode() : 0);
+        result = 31 * result + (close_lunch_time != null ? close_lunch_time.hashCode() : 0);
+        result = 31 * result + (open_dinner_time != null ? open_dinner_time.hashCode() : 0);
+        result = 31 * result + (close_dinner_time != null ? close_dinner_time.hashCode() : 0);
+        return result;
     }
 }

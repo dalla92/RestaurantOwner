@@ -7,11 +7,10 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -19,6 +18,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -36,11 +36,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -51,13 +54,13 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Bookmark;
 import it.polito.group2.restaurantowner.data.MenuCategory;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Offer;
@@ -87,6 +90,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private FirebaseDatabase firebase;
     private Toolbar toolbar;
     private ImageView coverPicture;
+    private FloatingActionButton fab;
 
 
     @Override
@@ -102,7 +106,9 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         initializeUserReviewList();
         final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
         coverPicture = (ImageView) findViewById(R.id.user_restaurant_image);
+        fab = (FloatingActionButton) findViewById(R.id.bookmark_fab);
         firebase = FirebaseDatabase.getInstance();
+
         showProgressDialog();
 
         //FirebaseAuth.getInstance().signOut();
@@ -123,8 +129,35 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 restaurantID = targetRestaurant.getRestaurant_id();
                 reviews = new ArrayList<>();
                 collapsing.setTitle(targetRestaurant.getRestaurant_name());
-                setButtons();
-                setRestaurantInfo();
+
+                Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo(restaurantID);
+                reviewsRef.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        Log.d("prova", "child added");
+                        reviewAdapter.addReview(dataSnapshot.getValue(Review.class));
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                        Log.d("prova", "child changed");
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        Log.d("prova", "child removed");
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                        Log.d("prova", "child moved");
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d("prova", "child cancelled");
+                    }
+                });
 
                 String photoURL = targetRestaurant.getRestaurant_photo_firebase_URL();
                 if (photoURL == null || photoURL.equals("")) {
@@ -167,35 +200,17 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                             .into(coverPicture);
                 }
 
-                Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo(restaurantID);
-                reviewsRef.addChildEventListener(new ChildEventListener() {
-                    @Override
-                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                        Log.d("prova", "child added");
-                        //reviews.add(0, dataSnapshot.getValue(Review.class));
-                        reviewAdapter.addReview(dataSnapshot.getValue(Review.class));
-                    }
+                String userID = FirebaseUtil.getCurrentUserId();
+                HashMap<String, Boolean> favouriteUsers = targetRestaurant.getFavourite_users();
+                if(userID != null && favouriteUsers != null && favouriteUsers.containsKey(userID))
+                    fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_on_24dp));
+                else
+                    fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
 
-                    @Override
-                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                        Log.d("prova", "child changed");
-                    }
-
-                    @Override
-                    public void onChildRemoved(DataSnapshot dataSnapshot) {
-                        Log.d("prova", "child removed");
-                    }
-
-                    @Override
-                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                        Log.d("prova", "child moved");
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                        Log.d("prova", "child cancelled");
-                    }
-                });
+                setButtons();
+                setRestaurantInfo();
+                setTimesList(targetRestaurant.getRestaurant_time_slot());
+                setRestaurantExtraInfo();
             }
 
             @Override
@@ -207,17 +222,16 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         offers = getOffersJSON();
         categories = getCategoriesJson();
 
-        setBookmarkButton();
+        addBookmarkButtonClick();
         addInfoExpandAnimation();
         addTimesExpandAnimation();
-        setTimesList();
         setCallAction();
+
         setRestaurantOffers();
         setRestaurantMenu();
         setDrawer();
-
-
     }
+
 
     private void showProgressDialog() {
         if (mProgressDialog == null) {
@@ -399,16 +413,55 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         return true;
     }
 
-    /*private String getRealPathFromURI(Uri contentURI) {
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            return contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
+    private void setRestaurantExtraInfo() {
+        TextView category = (TextView) findViewById(R.id.restaurant_category);
+        TextView extras = (TextView) findViewById(R.id.restaurant_extras);
+        TextView services = (TextView) findViewById(R.id.restaurant_services);
+        assert category != null;
+        assert extras != null;
+        assert services != null;
+
+        StringBuilder servicesBuilder = new StringBuilder();
+        if(targetRestaurant.getCreditCardAccepted()) {
+            servicesBuilder.append(getString(R.string.credit_card));
+            servicesBuilder.append(", ");
         }
-    }*/
+        if(targetRestaurant.getTvPresent()) {
+            servicesBuilder.append(getString(R.string.credit_card));
+            servicesBuilder.append(", ");
+        }
+        if(targetRestaurant.getAnimalAllowed()){
+            servicesBuilder.append(getString(R.string.animal_allowed));
+            servicesBuilder.append(", ");
+        }
+        if(targetRestaurant.getWifiPresent()){
+            servicesBuilder.append(getString(R.string.wifi));
+            servicesBuilder.append(", ");
+        }
+        if(targetRestaurant.getAirConditionedPresent())
+            servicesBuilder.append(getString(R.string.air_conditioned));
+
+        StringBuilder extrasBuilder = new StringBuilder();
+        if(targetRestaurant.getCeliacFriendly()) {
+            extrasBuilder.append(getString(R.string.gluten_free));
+            extrasBuilder.append(", ");
+        }
+        if(targetRestaurant.getRestaurant_closest_bus() != null) {
+            extrasBuilder.append(getString(R.string.near));
+            extrasBuilder.append(targetRestaurant.getRestaurant_closest_bus());
+            extrasBuilder.append(getString(R.string.bus_stop));
+            extrasBuilder.append(", ");
+        }
+        if(targetRestaurant.getRestaurant_closest_metro() !=null){
+            extrasBuilder.append(getString(R.string.near));
+            extrasBuilder.append(targetRestaurant.getRestaurant_closest_metro());
+            extrasBuilder.append(getString(R.string.metro_stop));
+        }
+
+        category.setText(targetRestaurant.getRestaurant_category());
+        services.setText(servicesBuilder.toString());
+        extras.setText(extrasBuilder.toString());
+    }
 
     private void setRestaurantMenu() {
         final RecyclerView menu = (RecyclerView) findViewById(R.id.user_restaurant_menu);
@@ -681,44 +734,15 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         });
     }
 
-    private void setTimesList() {
+    private void setTimesList(ArrayList<RestaurantTimeSlot> restaurant_time_slot) {
         RecyclerView timesList = (RecyclerView) findViewById(R.id.user_time_list);
         assert timesList != null;
         timesList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         timesList.setNestedScrollingEnabled(false);
-        timesList.setAdapter(new RecyclerView.Adapter<TimesViewHolder>() {
-            String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-
-            @Override
-            public TimesViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.time_item, parent, false);
-                return new TimesViewHolder(itemView);
-            }
-
-            @Override
-            public void onBindViewHolder(TimesViewHolder holder, int position) {
-                holder.time_day.setText(days[position]);
-                holder.time_lunch.setText("10:00AM-14:30AM");
-                holder.time_dinner.setText("19:00-23:30");
-            }
-
-            @Override
-            public int getItemCount() {
-                return days.length;
-            }
-        });
+        TimesAdapter adapter = new TimesAdapter(restaurant_time_slot, this);
+        timesList.setAdapter(adapter);
     }
 
-    private class TimesViewHolder extends RecyclerView.ViewHolder {
-        public TextView time_day, time_lunch, time_dinner;
-
-        public TimesViewHolder(View view) {
-            super(view);
-            time_day = (TextView) view.findViewById(R.id.time_day);
-            time_lunch = (TextView) view.findViewById(R.id.time_lunch);
-            time_dinner = (TextView) view.findViewById(R.id.time_dinner);
-        }
-    }
 
     private void addInfoExpandAnimation() {
         LinearLayout fixedLayout = (LinearLayout) findViewById(R.id.fixed_layout);
@@ -792,51 +816,90 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         });
     }
 
-
-    private void setBookmarkButton() {
-        final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.bookmark_fab);
-        if (fab != null) {
-            //fab.setBackgroundTintList(ColorStateList.valueOf(ContextCompat.getColor(this, android.R.color.white)));
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Bookmark user_bookmark = new Bookmark();
-                    if(restaurantID!=null)
-                        user_bookmark.setRestaurant_id(restaurantID);
-                    /*if(userID!=null)
-                        user_bookmark.setRestaurant_id(userID);*/
-                    ArrayList<Bookmark> bookmarks_temp;
-                    if(!bookmark) {
-                        FirebaseMessaging.getInstance().subscribeToTopic(restaurantID);
-                        //read, add and write
-                        fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_on_24dp));
-                        bookmark = true;
-                        try {
-                            bookmarks_temp = JSONUtil.readBookmarkList(context, null);
-                            bookmarks_temp.add(user_bookmark);
-                            JSONUtil.saveBookmarksList(context, bookmarks_temp);
-                        }
-                        catch(JSONException e){
-                            e.printStackTrace();
-                        }
-                    }
-                    else{
-                        FirebaseMessaging.getInstance().unsubscribeFromTopic(restaurantID);
-                        //read, remove and write
-                        fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this,R.drawable.ic_star_off_24dp));
-                        bookmark = false;
-                        try {
-                            bookmarks_temp = JSONUtil.readBookmarkList(context, null);
-                            bookmarks_temp.remove(user_bookmark);
-                            JSONUtil.saveBookmarksList(context, bookmarks_temp);
-                        }
-                        catch(JSONException e){
-                            e.printStackTrace();
-                        }
-                    }
+    private void addBookmarkButtonClick() {
+        final String userID = FirebaseUtil.getCurrentUserId();
+        Log.d("prova", "" + userID);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (userID == null) {
+                    Log.d("prova", "null");
+                    showLoginDialog();
                 }
-            });
-        }
+                else {
+                    Log.d("prova", "not null");
+                    showProgressDialog();
+                    final DatabaseReference restaurantBookmarksRef = firebase.getReference("restaurants/" + restaurantID + "/favourite_users/" + userID);
+                    final DatabaseReference userBookmarksRef = firebase.getReference("users/" + userID + "/favourites_restaurants/" + restaurantID);
+                    restaurantBookmarksRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.getValue() == null) {
+                                FirebaseMessaging.getInstance().subscribeToTopic(restaurantID);
+                                updateBookmark(restaurantBookmarksRef, userBookmarksRef, true);
+                            }
+                            else {
+                                FirebaseMessaging.getInstance().unsubscribeFromTopic(restaurantID);
+                                updateBookmark(restaurantBookmarksRef, userBookmarksRef, false);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            hideProgressDialog();
+                            Log.d("prova", "bookmark cancelled");
+                            fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    private void updateBookmark(DatabaseReference restaurantBookmarksRef, final DatabaseReference userBookmarksRef, final boolean bookmark) {
+        restaurantBookmarksRef.setValue(bookmark? true: null)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        if (bookmark)
+                            fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_on_24dp));
+                        else
+                            fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
+
+                        userBookmarksRef.setValue(bookmark? true : null);
+                        hideProgressDialog();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(Exception e) {
+                        hideProgressDialog();
+                        Toast.makeText(UserRestaurantActivity.this, "Technical Problem, try again or restart the app!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void showLoginDialog() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Do you want to log in?");
+        alert.setMessage("You must be logged in to perform this action");
+
+        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Intent intent = new Intent(UserRestaurantActivity.this, LoginManagerActivity.class);
+                intent.putExtra("login", true);
+                startActivity(intent);
+            }
+        });
+        alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        alert.show();
     }
 
 

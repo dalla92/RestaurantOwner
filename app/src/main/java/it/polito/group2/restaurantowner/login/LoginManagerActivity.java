@@ -1,13 +1,16 @@
 package it.polito.group2.restaurantowner.login;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +21,8 @@ import android.widget.Toast;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -28,8 +33,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -39,6 +42,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.UserInfo;
@@ -49,12 +54,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Arrays;
 import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class LoginManagerActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
@@ -68,6 +76,8 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
     private ProgressDialog mProgressDialog;
     private TextInputLayout inputLayoutPassword, inputLayoutEmail;
     private EditText inputEmail, inputPassword;
+    private String fbEmail;
+    private DatabaseReference userRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +90,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 .build();
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+                .enableAutoManage(this /* FragmentActiStringvity */, this /* OnConnectionFailedListener */)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
 
@@ -109,9 +119,10 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         //sessionManager = new UserSessionManager(this);
         callbackManager = CallbackManager.Factory.create();
         firebase = FirebaseDatabase.getInstance();
+        userRef = firebase.getReference("users");
 
         LoginButton fbButton = (LoginButton) findViewById(R.id.fb_login_button);
-        fbButton.setReadPermissions("public_profile", "email");
+        fbButton.setReadPermissions(Arrays.asList("public_profile", "email"));
         fbButton.setOnClickListener(this);
 
         SignInButton googleBtn = (SignInButton) findViewById(R.id.google_login_button);
@@ -159,6 +170,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 .addOnFailureListener(this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
                         Log.d("prova", "auth:onFailure:" + e.getMessage());
                         handleFirebaseAuthResult(null);
                     }
@@ -246,6 +258,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 }
             });
         } else {
+            hideProgressDialog();
             Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show();
         }
     }
@@ -268,7 +281,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 });
     }
 
-    private void firebaseAuthWithFacebook(String token) {
+    private void firebaseAuthWithFacebook(final String token) {
         AuthCredential credential = FacebookAuthProvider.getCredential(token);
         mAuth.signInWithCredential(credential)
                 .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
@@ -280,13 +293,133 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 .addOnFailureListener(this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        e.printStackTrace();
-                        //TODO collision check and merge
-                        Log.d("prova", "auth:onFailureFacebook:" + e.getMessage());
-                        handleFirebaseAuthResult(null);
+                        /*if (e instanceof FirebaseAuthUserCollisionException) {
+                            checkAndMerge(token);
+                        } else {*/
+                            e.printStackTrace();
+                            Log.d("prova", "auth:onFailureFacebook:" + e.getMessage());
+                            handleFirebaseAuthResult(null);
+                        //}
                     }
                 });
 
+    }
+
+
+    private void checkAndMerge(final String token) {
+        Log.d("prova", ""+ fbEmail);
+        Query userQuery = userRef.orderByChild("user_email").equalTo(fbEmail);
+        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User target = null;
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    target = data.getValue(User.class);
+                }
+                assert target != null;
+                final HashMap<String, Boolean> providers = target.getProviders();
+
+                final AlertDialog.Builder alert = new AlertDialog.Builder(LoginManagerActivity.this);
+                alert.setTitle("Confirmation!");
+                alert.setMessage("You have already an account with email: " + fbEmail +
+                        "\nClick yes to use link your account and access your data or no to log in with another method.");
+
+                alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (providers.containsKey("password")) {
+                            AlertDialog.Builder alert = new AlertDialog.Builder(LoginManagerActivity.this);
+                            alert.setTitle("Insert your password!");
+
+                            final EditText input = new EditText(LoginManagerActivity.this);
+                            input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                            alert.setView(input);
+
+                            alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String password = input.getText().toString();
+                                    if (providers.containsKey("google"))
+                                        mergeWithPassword(password, true, token);
+                                    else
+                                        mergeWithPassword(password, false, token);
+                                }
+                            });
+                            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    hideProgressDialog();
+                                    Log.d("prova", "input password cancelled");
+                                    Toast.makeText(LoginManagerActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            alert.show();
+                        }
+
+                    }
+                });
+                alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        hideProgressDialog();
+                        Log.d("prova", "link account refused");
+                        Toast.makeText(LoginManagerActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    }
+                });
+
+                alert.show();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                hideProgressDialog();
+                Toast.makeText(LoginManagerActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void mergeWithPassword(String password, final boolean mergeWithGoogle, final String token) {
+        AuthCredential credential = EmailAuthProvider.getCredential(fbEmail, password);
+        mAuth.signInWithCredential(credential)
+                .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
+                    @Override
+                    public void onSuccess(AuthResult result) {
+                        FirebaseUser user = result.getUser();
+                        AuthCredential credential = FacebookAuthProvider.getCredential(token);
+                        user.linkWithCredential(credential)
+                                .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                                    @Override
+                                    public void onSuccess(AuthResult authResult) {
+                                        if (!mergeWithGoogle) {
+                                            handleFirebaseAuthResult(authResult);
+                                        }
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(LoginManagerActivity.this, "Account linking failed", Toast.LENGTH_SHORT).show();
+                                        signOut();
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        if (e instanceof FirebaseAuthInvalidCredentialsException)
+                            Toast.makeText(LoginManagerActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
+                        else {
+                            e.printStackTrace();
+                            Log.d("prova", "auth:onFailure:" + e.getMessage());
+                            Toast.makeText(LoginManagerActivity.this, "Error during login!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 
     private void showProgressDialog() {
@@ -322,6 +455,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+                requestFacebookUserProfile(loginResult);
                 handleAuthToken("facebook", loginResult.getAccessToken().getToken());
             }
 
@@ -335,6 +469,28 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 Log.d("prova", error.toString());
             }
         });
+    }
+
+    public void requestFacebookUserProfile(LoginResult loginResult){
+        GraphRequest.newMeRequest(
+                loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject me, GraphResponse response) {
+                        if (response.getError() != null) {
+                           Log.e("prova", response.getError().toString());
+                        } else {
+                            try {
+                                fbEmail = response.getJSONObject().get("email").toString();
+                                Log.e("prova", fbEmail);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            // send email and id to your web server
+                            Log.e("prova", response.getRawResponse());
+                            Log.e("prova", me.toString());
+                        }
+                    }
+                }).executeAsync();
     }
 
     private boolean validateEmail() {

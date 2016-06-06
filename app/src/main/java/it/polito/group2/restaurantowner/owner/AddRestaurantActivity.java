@@ -138,7 +138,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         for(int i=0;i<7;i++){
 
             RestaurantTimeSlot daySlot = new RestaurantTimeSlot();
-            daySlot.setRestaurant_id(res.getRestaurant_id());
+            //daySlot.setRestaurant_id(res.getRestaurant_id());
             daySlot.setDay_of_week(i);
             if(!lunchClosure[i]){
                 daySlot.setLunch(true);
