@@ -20,19 +20,24 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
+import it.polito.group2.restaurantowner.firebasedata.Offer;
 
 public class MealFragment extends ListFragment {
 
     public static final String LIST = "mealList";
+    private static final String OFFER = "offer";
     private ArrayList<Meal> mealList;
+    private Offer offer;
+
     private OnActionListener mCallback;
 
     public MealFragment() {}
 
-    public static MealFragment newInstance(ArrayList<Meal> mList) {
+    public static MealFragment newInstance(ArrayList<Meal> mList, Offer offer) {
         MealFragment fragment = new MealFragment();
         Bundle args = new Bundle();
         args.putParcelableArrayList(LIST, mList);
+        args.putSerializable(OFFER, offer);
         fragment.setArguments(args);
         return fragment;
     }
@@ -42,6 +47,7 @@ public class MealFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mealList = getArguments().getParcelableArrayList(LIST);
+            offer = (Offer) getArguments().getSerializable(OFFER);
         }
 
         setHasOptionsMenu(true);
@@ -116,7 +122,7 @@ public class MealFragment extends ListFragment {
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         list.setNestedScrollingEnabled(false);
-        MealAdapter adapter = new MealAdapter(getContext(), mealList);
+        MealAdapter adapter = new MealAdapter(getContext(), mealList, offer);
         list.setAdapter(adapter);
     }
 

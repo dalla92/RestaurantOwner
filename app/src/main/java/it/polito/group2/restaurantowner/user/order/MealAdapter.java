@@ -6,12 +6,15 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
+import it.polito.group2.restaurantowner.firebasedata.Offer;
 
 /**
  * Created by Filippo on 10/05/2016.
@@ -19,23 +22,27 @@ import it.polito.group2.restaurantowner.firebasedata.Meal;
 public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder> {
 
     private final ArrayList<Meal> mealList;
+    private final Offer offer;
     private final Context context;
 
-    public MealAdapter(Context context, ArrayList<Meal> list) {
+    public MealAdapter(Context context, ArrayList<Meal> list, Offer offer) {
         this.context = context;
         this.mealList = list;
+        this.offer = offer;
     }
 
     public class MealViewHolder extends RecyclerView.ViewHolder {
         public TextView name;
         public TextView category;
         public TextView price;
+        public ImageView offer_active;
 
         public MealViewHolder(View view){
             super(view);
             name = (TextView) itemView.findViewById(R.id.meal_name);
             category = (TextView) itemView.findViewById(R.id.category_name);
             price = (TextView) itemView.findViewById(R.id.meal_price);
+            offer_active = (ImageView) itemView.findViewById(R.id.offer_active);
         }
     }
 
@@ -49,7 +56,14 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
     public void onBindViewHolder(MealAdapter.MealViewHolder holder, int position) {
         holder.name.setText(mealList.get(position).getMeal_name());
         holder.category.setText(mealList.get(position).getMeal_category());
-        holder.price.setText(formatEuro(mealList.get(position).getMeal_price()));
+        if(isInOffer(mealList.get(position))) {
+            Calendar c = Calendar.getInstance();
+            holder.price.setText(formatEuro(offer.getNewMealPrice(mealList.get(position),c)));
+            holder.offer_active.setVisibility(View.VISIBLE);
+        } else {
+            holder.price.setText(formatEuro(mealList.get(position).getMeal_price()));
+            holder.offer_active.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -59,5 +73,12 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
 
     private String formatEuro(double number) {
         return "€ "+String.format("%10.2f", number);
+    }
+
+    private boolean isInOffer(Meal meal) {
+        if(offer != null) {
+            return offer.isMealInOffer(meal);
+        }
+        return false;
     }
 }

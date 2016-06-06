@@ -20,19 +20,15 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.HaveBreak;
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -52,10 +48,9 @@ public class OfferActivity extends AppCompatActivity
 
     private User user;
 
-    private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
 
-    private ArrayList<Meal> restaurantMealList;
+    private ArrayList<Meal> mealList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +58,9 @@ public class OfferActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_offer_activity);
 
-        //TODO corregere quando viene passato un utente corretto
-        userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
-
+        userID = FirebaseUtil.getCurrentUserId();
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
-        }
-
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("offer_id")!=null) {
-            offerID = getIntent().getExtras().getString("offer_id");
         }
 
         if(userID == null || restaurantID == null) {
@@ -81,74 +70,19 @@ public class OfferActivity extends AppCompatActivity
             startActivity(intent);
         }
 
-        showProgressDialog();
-        firebase = FirebaseDatabase.getInstance();
-        restaurantMealList = new ArrayList<Meal>();
-        DatabaseReference userReference = firebase.getReference("users/" + userID);
-        Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
-        DatabaseReference offerReference = null;
-        if(offerID != null) {
-            offerReference = firebase.getReference("offers/" + offerID);
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("offer_id")!=null) {
+            offerID = getIntent().getExtras().getString("offer_id");
         }
-        hideProgressDialog();
 
-        mealsReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                restaurantMealList.add(dataSnapshot.getValue(Meal.class));
-                Log.d("FILIPPO", "onChildAdded");
-            }
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                for (Meal m : restaurantMealList) {
-                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                        restaurantMealList.remove(m);
-                        restaurantMealList.add(changedMeal);
-                        break;
-                    }
-                }
-                Log.d("FILIPPO", "onChildChanged");
-            }
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                for (Meal m : restaurantMealList) {
-                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                        restaurantMealList.remove(m);
-                        break;
-                    }
-                }
-                Log.d("FILIPPO", "onChildRemoved");
-            }
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
-
-        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
-
-        if(offerID != null && offerReference != null) {
-            offerReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    offer = dataSnapshot.getValue(Offer.class);
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {}
-            });
+        showProgressDialog();
+        user = FirebaseUtil.getCurrentUser();
+        mealList = FirebaseUtil.getMealsByRestaurant(restaurantID);
+        if(offerID != null) {
+            offer = FirebaseUtil.getOffer(offerID);
         } else {
             offer = setNewOffer();
         }
+        hideProgressDialog();
 
         //Toolbar setting
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -189,7 +123,7 @@ public class OfferActivity extends AppCompatActivity
             if (savedInstanceState != null) {
                 return;
             }
-            OfferFragment offerFragment = OfferFragment.newInstance(this.offer, this.restaurantMealList);
+            OfferFragment offerFragment = OfferFragment.newInstance(this.offer, this.mealList);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.fragment_container, offerFragment, "OFFER");
             transaction.commit();
@@ -228,6 +162,7 @@ public class OfferActivity extends AppCompatActivity
     @Override
     public void onSaveClicked(Offer offer) {
         this.offer = offer;
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         DatabaseReference offersReference = firebase.getReference("offers/");
         DatabaseReference keyReference= offersReference.push();
         this.offer.setOfferID(keyReference.getKey());
@@ -240,7 +175,7 @@ public class OfferActivity extends AppCompatActivity
     @Override
     public void onSaveListClicked(Offer offer) {
         this.offer = offer;
-        OfferFragment offerFragment = OfferFragment.newInstance(offer, this.restaurantMealList);
+        OfferFragment offerFragment = OfferFragment.newInstance(offer, this.mealList);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, offerFragment, "OFFER");
         transaction.addToBackStack(null);
@@ -260,7 +195,7 @@ public class OfferActivity extends AppCompatActivity
     @Override
     public void onMealListRq(Offer offer) {
         this.offer = offer;
-        MealFragment mealFragment = MealFragment.newInstance(restaurantMealList, offer);
+        MealFragment mealFragment = MealFragment.newInstance(mealList, offer);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, mealFragment, "MEAL");
         transaction.addToBackStack(null);
@@ -303,7 +238,7 @@ public class OfferActivity extends AppCompatActivity
 
     private ArrayList<String> getCategoryList() {
         ArrayList<String> categoryList = new ArrayList<String>();
-        for(Meal m : restaurantMealList) {
+        for(Meal m : mealList) {
             if(categoryList.indexOf(m.getMeal_category()) == -1)
                 categoryList.add(m.getMeal_category());
         }

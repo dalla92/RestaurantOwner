@@ -2,12 +2,7 @@ package it.polito.group2.restaurantowner.user.my_orders;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -23,15 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.HaveBreak;
@@ -54,7 +41,6 @@ public class MyOrdersActivity extends AppCompatActivity
     private String userID;
     private User user;
 
-    private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private ArrayList<Order> orderList;             //order list got from firebase
     private Toolbar toolbar;
@@ -68,73 +54,19 @@ public class MyOrdersActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //TODO corregere quando viene passato un utente corretto
-        userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
+        userID = FirebaseUtil.getCurrentUserId();
 
         if(userID == null) {
-            Log.d("FILIPPO", "utente non loggato o restaurantID non ricevuto");
+            Log.d("FILIPPO", "utente non loggato");
             Intent intent = new Intent(this, HaveBreak.class);
             finish();
             startActivity(intent);
         }
 
         showProgressDialog();
-        firebase = FirebaseDatabase.getInstance();
-        orderList = new ArrayList<Order>();
-        Query ordersReference = firebase.getReference("orders").orderByChild("user_id").equalTo(userID);
-        DatabaseReference userReference = firebase.getReference("users/" + userID);
+        user = FirebaseUtil.getCurrentUser();
+        orderList = FirebaseUtil.getOrdersByUser(userID);
         hideProgressDialog();
-
-        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //TODO gestire se l'utente viene cancellato
-            }
-        });
-
-        ordersReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                orderList.add(dataSnapshot.getValue(Order.class));
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Order changedOrder = dataSnapshot.getValue(Order.class);
-                for (Order o : orderList) {
-                    if (o.getOrder_id().equals(changedOrder.getOrder_id())) {
-                        orderList.remove(o);
-                        orderList.add(changedOrder);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Order changedOrder = dataSnapshot.getValue(Order.class);
-                for (Order o : orderList) {
-                    if (o.getOrder_id().equals(changedOrder.getOrder_id())) {
-                        orderList.remove(o);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                //TODO capire quando si verifica
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //TODO capire quando si verifica
-            }
-        });
 
         setOrderList();
         setDrawer();
@@ -202,46 +134,31 @@ public class MyOrdersActivity extends AppCompatActivity
         mrResItem.setVisible(true);
         myReviewsItem.setVisible(true);
         myFavItem.setVisible(true);
-        //navigationView.inflateHeaderView(R.layout.nav_header_login);
 
-        DatabaseReference userRef = firebase.getReference("users/" + userID);
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-                TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-                ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
-                User target = dataSnapshot.getValue(User.class);
+        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+        ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
 
-                if (target.getOwnerUser())
-                    ownerItem.setVisible(true);
+        if (user.getOwnerUser())
+            ownerItem.setVisible(true);
 
-                nav_username.setText(target.getUser_full_name());
-                nav_email.setText(target.getUser_email());
+        nav_username.setText(user.getUser_full_name());
+        nav_email.setText(user.getUser_email());
+        String photoUri = user.getUser_photo_firebase_URL();
 
-                String photoUri = target.getUser_photo_firebase_URL();
-                if(photoUri == null || photoUri.equals("")) {
-                    Glide
-                            .with(MyOrdersActivity.this)
-                            .load(R.drawable.blank_profile_nav)
-                            .centerCrop()
-                            .into(nav_picture);
-                }
-                else{
-                    Glide
-                            .with(MyOrdersActivity.this)
-                            .load(photoUri)
-                            .centerCrop()
-                            .into(nav_picture);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d("prova", "cancelled");
-            }
-        });
-
+        if(photoUri == null || photoUri.equals("")) {
+            Glide
+                    .with(MyOrdersActivity.this)
+                    .load(R.drawable.blank_profile_nav)
+                    .centerCrop()
+                    .into(nav_picture);
+        } else {
+            Glide
+                    .with(MyOrdersActivity.this)
+                    .load(photoUri)
+                    .centerCrop()
+                    .into(nav_picture);
+        }
 
         navigationView.setNavigationItemSelectedListener(this);
     }

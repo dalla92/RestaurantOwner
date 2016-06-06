@@ -31,12 +31,14 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.HaveBreak;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
+import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -68,6 +70,7 @@ public class OrderActivity extends AppCompatActivity
     private ProgressDialog mProgressDialog;
     private ArrayList<Meal> mealList;
     private ArrayList<Order> orderList;
+    private ArrayList<Offer> offerList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +95,7 @@ public class OrderActivity extends AppCompatActivity
         restaurant = FirebaseUtil.getRestaurant(restaurantID);
         mealList = FirebaseUtil.getMealsByRestaurant(restaurantID);
         orderList = FirebaseUtil.getOrdersByRestaurant(restaurantID);
+        offerList = FirebaseUtil.getOffersByRestaurant(restaurantID);
         hideProgressDialog();
 
         if(!restaurant.getTakeAwayAllowed()) {
@@ -146,7 +150,7 @@ public class OrderActivity extends AppCompatActivity
             if (savedInstanceState != null) {
                 return;
             }
-            CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList());
+            CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(), getActiveOffer());
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.add(R.id.fragment_container, categoryFragment, "CATEGORY");
             transaction.commit();
@@ -160,15 +164,14 @@ public class OrderActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             if(getSupportFragmentManager().findFragmentByTag("CART") != null){
-                CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList());
+                CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(), getActiveOffer());
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
                 transaction.addToBackStack(null);
                 transaction.commit();
             } else if(getSupportFragmentManager().findFragmentByTag("CATEGORY") != null) {
-                //TODO controllare quando vieni da un'altra activity
-                //TODO controllare quando vieni dal carrello
-                //TODO controllare quando vieni dal mealList
+                //TODO lanciare un alert che se si fa indietro qui si perde l'ordine
+                this.order = null;
                 Intent intent = new Intent(this, UserRestaurantActivity.class);
                 intent.putExtra("restaurant_id", restaurantID);
                 startActivity(intent);
@@ -246,7 +249,7 @@ public class OrderActivity extends AppCompatActivity
         ArrayList<MealAddition> additionList = new ArrayList<MealAddition>();
         this.meal.setMeal_additions(additionList);
 
-        MealFragment mealFragment = MealFragment.newInstance(getMealListByCategory(categoryName));
+        MealFragment mealFragment = MealFragment.newInstance(getMealListByCategory(categoryName), getActiveOffer());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, mealFragment, "MEAL");
         transaction.addToBackStack(null);
@@ -292,9 +295,10 @@ public class OrderActivity extends AppCompatActivity
         this.meal.setMeal_quantity(quantity);
         this.order.addMeal(this.meal);
         this.meal = null;
-        updatePrice();
+        Calendar now = Calendar.getInstance();
+        updatePrice(now);
 
-        CartFragment cartFragment = CartFragment.newInstance(this.order);
+        CartFragment cartFragment = CartFragment.newInstance(this.order, getActiveOffer());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, cartFragment, "CART");
         transaction.addToBackStack(null);
@@ -303,7 +307,7 @@ public class OrderActivity extends AppCompatActivity
 
     @Override
     public void onCartClicked() {
-        CartFragment cartFragment = CartFragment.newInstance(this.order);
+        CartFragment cartFragment = CartFragment.newInstance(this.order, getActiveOffer());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, cartFragment, "CART");
         transaction.addToBackStack(null);
@@ -313,6 +317,11 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onConfirmOrderClicked(Order order){
         this.order = order;
+        Calendar now = Calendar.getInstance();
+        updatePrice(now);
+        savePricesInOffer(now);
+        this.order.setOrder_date(now);
+
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         DatabaseReference ordersReference = firebase.getReference("orders/");
         DatabaseReference keyReference= ordersReference.push();
@@ -322,12 +331,14 @@ public class OrderActivity extends AppCompatActivity
 
         Intent intent = new Intent(this, MyOrdersActivity.class);
         startActivity(intent);
+
+        //TODO vedere come attivare il fedelity program
     }
 
     @Override
     public void onContinueOrderClicked(Order order){
         this.order = order;
-        CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList());
+        CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(), getActiveOffer());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
         transaction.addToBackStack(null);
@@ -338,9 +349,10 @@ public class OrderActivity extends AppCompatActivity
     public void onMealDeleted(Order order, Meal meal) {
         this.order = order;
         this.order.delMeal(meal);
-        updatePrice();
+        Calendar now = Calendar.getInstance();
+        updatePrice(now);
 
-        CartFragment cartFragment = CartFragment.newInstance(this.order);
+        CartFragment cartFragment = CartFragment.newInstance(this.order, getActiveOffer());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, cartFragment, "CART");
         transaction.addToBackStack(null);
@@ -350,7 +362,7 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onCancelOrderClicked() {
         this.order = setNewOrder();
-        CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList());
+        CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(),getActiveOffer());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
         transaction.addToBackStack(null);
@@ -360,17 +372,33 @@ public class OrderActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    private void updatePrice() {
+    private void updatePrice(Calendar now) {
         Double price = 0.0;
         Double mealprice = 0.0;
+
         for(Meal m : this.order.getMealList()) {
-            mealprice = m.getMeal_price();
+            mealprice = getRightMealPrice(m, now);
             for(MealAddition a : m.getMeal_additions()) {
                 mealprice += a.getMeal_addition_price();
             }
             mealprice *= m.getMeal_quantity();
             price += mealprice;
         }
+        order.setOrder_price(price);
+    }
+
+    private void savePricesInOffer(Calendar now) {
+        for(int i=0; i < this.order.getMealList().size(); i++) {
+            this.order.getMealList().get(i).setMeal_price(getRightMealPrice(this.order.getMealList().get(i), now));
+        }
+    }
+
+    private double getRightMealPrice(Meal meal, Calendar time) {
+        Offer offer = getActiveOffer();
+        if(offer != null) {
+            return offer.getNewMealPrice(meal, time);
+        }
+        return meal.getMeal_price();
     }
 
     private Order setNewOrder() {
@@ -430,7 +458,28 @@ public class OrderActivity extends AppCompatActivity
     }
 
     private boolean restaurantOrderLimit() {
-        //TODO implementare
+        Calendar now = Calendar.getInstance();
+        Calendar start = Calendar.getInstance();
+        Calendar stop = Calendar.getInstance();
+        start.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY), 0, 0);
+        stop.setTimeInMillis(start.getTimeInMillis()+65*60*1000);
+        int orderCounter = 0;
+        for(Order o : orderList) {
+            if(o.getOrder_date().after(start.getTime()) && o.getOrder_date().before(stop.getTime())) {
+                orderCounter++;
+            }
+        }
+        if(restaurant.getRestaurant_orders_per_hour()<=orderCounter)
+            return true;
         return false;
+    }
+
+    private Offer getActiveOffer() {
+        Calendar c = Calendar.getInstance();
+        for(Offer o : offerList) {
+            if(o.isNowInOffer(c))
+                return o;
+        }
+        return null;
     }
 }

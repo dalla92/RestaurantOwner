@@ -21,21 +21,25 @@ import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
+import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 
 public class CartFragment extends ListFragment {
 
     public static final String ORDER = "order";
+    private static final String OFFER = "offer";
     private Order order;
+    private Offer offer;
 
     private OnActionListener mCallback;
 
     public CartFragment() {}
 
-    public static CartFragment newInstance(Order order) {
+    public static CartFragment newInstance(Order order, Offer offer) {
         CartFragment fragment = new CartFragment();
         Bundle args = new Bundle();
         args.putSerializable(ORDER, order);
+        args.putSerializable(OFFER, offer);
         fragment.setArguments(args);
         return fragment;
     }
@@ -45,6 +49,7 @@ public class CartFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             order = (Order)getArguments().getSerializable(ORDER);
+            offer = (Offer) getArguments().getSerializable(OFFER);
         }
 
         try {
@@ -81,7 +86,7 @@ public class CartFragment extends ListFragment {
         });
 
         if(order.getOrder_meals().size() == 0) {
-            confirm_btn.setVisibility(View.INVISIBLE);
+            confirm_btn.setVisibility(View.GONE);
         } else {
             confirm_btn.setVisibility(View.VISIBLE);
             confirm_btn.setOnClickListener(new View.OnClickListener() {
@@ -169,10 +174,8 @@ public class CartFragment extends ListFragment {
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         list.setNestedScrollingEnabled(false);
-        CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.getMealList());
+        CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.getMealList(), offer);
         list.setAdapter(adapter);
-
-        //TODO controllare in restaurant se fidelityProgramAccepted è abilitato e l'utente se può avere sconto
     }
 
     private String formatEuro(double number) {

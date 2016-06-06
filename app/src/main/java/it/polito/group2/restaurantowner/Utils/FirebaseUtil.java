@@ -16,6 +16,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.firebasedata.Meal;
+import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -73,6 +74,24 @@ public class FirebaseUtil {
                 public void onCancelled(DatabaseError databaseError) {}
             });
             return restaurant[0];
+        }
+        return null;
+    }
+
+    public static Offer getOffer(String offerID) {
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        DatabaseReference ref = firebase.getReference("offers/" + offerID);
+        final Offer[] offer = new Offer[1];
+        if(ref != null) {
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    offer[0] = dataSnapshot.getValue(Offer.class);
+                }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {}
+            });
+            return offer[0];
         }
         return null;
     }
@@ -161,6 +180,88 @@ public class FirebaseUtil {
                 public void onCancelled(DatabaseError databaseError) {}
             });
             return orders;
+        }
+        return null;
+    }
+
+    public static ArrayList<Order> getOrdersByUser(String userID) {
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        Query ref = firebase.getReference("orders").orderByChild("user_id").equalTo(userID);
+        final ArrayList<Order> orders = new ArrayList<Order>();
+        if(ref != null) {
+            ref.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    orders.add(dataSnapshot.getValue(Order.class));
+                }
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    Order changedOrder = dataSnapshot.getValue(Order.class);
+                    for (Order m : orders) {
+                        if (m.getOrder_id().equals(changedOrder.getOrder_id())) {
+                            orders.remove(m);
+                            orders.add(changedOrder);
+                            break;
+                        }
+                    }
+                }
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    Order changedOrder = dataSnapshot.getValue(Order.class);
+                    for (Order m : orders) {
+                        if (m.getOrder_id().equals(changedOrder.getOrder_id())) {
+                            orders.remove(m);
+                            break;
+                        }
+                    }
+                }
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+                @Override
+                public void onCancelled(DatabaseError databaseError) {}
+            });
+            return orders;
+        }
+        return null;
+    }
+
+    public static ArrayList<Offer> getOffersByRestaurant(String restaurantID) {
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        Query ref = firebase.getReference("offers").orderByChild("restaurant_id").equalTo(restaurantID);
+        final ArrayList<Offer> offers = new ArrayList<Offer>();
+        if(ref != null) {
+            ref.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    offers.add(dataSnapshot.getValue(Offer.class));
+                }
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                    Offer changedOffer = dataSnapshot.getValue(Offer.class);
+                    for (Offer m : offers) {
+                        if (m.getOfferID().equals(changedOffer.getOfferID())) {
+                            offers.remove(m);
+                            offers.add(changedOffer);
+                            break;
+                        }
+                    }
+                }
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+                    Offer changedOffer = dataSnapshot.getValue(Offer.class);
+                    for (Offer m : offers) {
+                        if (m.getOfferID().equals(changedOffer.getOfferID())) {
+                            offers.remove(m);
+                            break;
+                        }
+                    }
+                }
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+                @Override
+                public void onCancelled(DatabaseError databaseError) {}
+            });
+            return offers;
         }
         return null;
     }

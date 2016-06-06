@@ -41,6 +41,7 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.HaveBreak;
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -59,10 +60,9 @@ public class MyOffersActivity extends AppCompatActivity
     private String restaurantID;
     private User user;
 
-    private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private ArrayList<Offer> offerList;             //offer list got from firebase
-    private ArrayList<Meal> restaurantMealList;
+    private ArrayList<Meal> mealList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +70,7 @@ public class MyOffersActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_myoffers_activity);
 
-        //TODO corregere quando viene passato un utente corretto
-        userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
-
+        userID = FirebaseUtil.getCurrentUserId();
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
         }
@@ -85,94 +83,10 @@ public class MyOffersActivity extends AppCompatActivity
         }
 
         showProgressDialog();
-        firebase = FirebaseDatabase.getInstance();
-        offerList = new ArrayList<Offer>();
-        Query offersReference = firebase.getReference("offers").orderByChild("restaurant_id").equalTo(restaurantID);
-        Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
-        DatabaseReference userReference = firebase.getReference("users/" + userID);
+        user = FirebaseUtil.getCurrentUser();
+        mealList = FirebaseUtil.getMealsByRestaurant(restaurantID);
+        offerList = FirebaseUtil.getOffersByRestaurant(restaurantID);
         hideProgressDialog();
-
-
-        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
-        offersReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                offerList.add(dataSnapshot.getValue(Offer.class));
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Offer changedOffer = dataSnapshot.getValue(Offer.class);
-                for (Offer o : offerList) {
-                    if (o.getOfferID().equals(changedOffer.getOfferID())) {
-                        offerList.remove(o);
-                        offerList.add(changedOffer);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Offer changedOffer = dataSnapshot.getValue(Offer.class);
-                for (Offer o : offerList) {
-                    if (o.getOfferID().equals(changedOffer.getOfferID())) {
-                        offerList.remove(o);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
-        mealsReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                restaurantMealList.add(dataSnapshot.getValue(Meal.class));
-            }
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                for (Meal m : restaurantMealList) {
-                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                        restaurantMealList.remove(m);
-                        restaurantMealList.add(changedMeal);
-                        break;
-                    }
-                }
-            }
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                for (Meal m : restaurantMealList) {
-                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                        restaurantMealList.remove(m);
-                        break;
-                    }
-                }
-            }
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
 
         //Toolbar setting
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -216,7 +130,7 @@ public class MyOffersActivity extends AppCompatActivity
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         list.setNestedScrollingEnabled(false);
-        OfferAdapter adapter = new OfferAdapter(this, offerList, restaurantMealList);
+        OfferAdapter adapter = new OfferAdapter(this, offerList, mealList);
         list.setAdapter(adapter);
     }
 

@@ -18,20 +18,24 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.firebasedata.Offer;
 
 public class CategoryFragment extends Fragment {
 
     private static final String LIST = "categoryList";
+    private static final String OFFER = "offer";
     private ArrayList<String> categoryList;
+    private Offer offer;
 
     private OnActionListener mCallback;
 
     public CategoryFragment() {}
 
-    public static CategoryFragment newInstance(ArrayList<String> catList) {
+    public static CategoryFragment newInstance(ArrayList<String> catList, Offer offer) {
         CategoryFragment fragment = new CategoryFragment();
         Bundle args = new Bundle();
         args.putStringArrayList(LIST, catList);
+        args.putSerializable(OFFER, offer);
         fragment.setArguments(args);
         return fragment;
     }
@@ -41,6 +45,7 @@ public class CategoryFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             categoryList = getArguments().getStringArrayList(LIST);
+            offer = (Offer) getArguments().getSerializable(OFFER);
         }
         setHasOptionsMenu(true);
         try {
@@ -114,7 +119,7 @@ public class CategoryFragment extends Fragment {
         assert catList != null;
         catList.setLayoutManager(new LinearLayoutManager(getContext()));
         catList.setNestedScrollingEnabled(false);
-        CategoryAdapter adapter = new CategoryAdapter(getContext(), categoryList);
+        CategoryAdapter adapter = new CategoryAdapter(getContext(), categoryList, offer);
         catList.setAdapter(adapter);
     }
 
