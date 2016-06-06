@@ -63,6 +63,7 @@ public class OfferActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.owner_offer_activity);
 
+        //TODO corregere quando viene passato un utente corretto
         userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {

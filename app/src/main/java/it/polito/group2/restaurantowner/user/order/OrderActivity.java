@@ -32,7 +32,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.File;
 import java.util.ArrayList;
 
+import it.polito.group2.restaurantowner.HaveBreak;
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Order;
@@ -63,9 +65,9 @@ public class OrderActivity extends AppCompatActivity
 
     private Restaurant restaurant;
     private User user;
-    private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private ArrayList<Meal> mealList;
+    private ArrayList<Order> orderList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,86 +75,35 @@ public class OrderActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_order_activity);
 
-        userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
-        if(userID == null) {
-            Log.d("FILIPPO", "utente non loggato");
-            //TODO utende disconnesso: blocca tutto
-        }
-
+        userID = FirebaseUtil.getCurrentUserId();
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
         }
 
+        if(userID == null || restaurantID == null) {
+            Log.d("FILIPPO", "utente non loggato o restaurantID non ricevuto");
+            Intent intent = new Intent(this, HaveBreak.class);
+            finish();
+            startActivity(intent);
+        }
+
         showProgressDialog();
-        firebase = FirebaseDatabase.getInstance();
-        mealList = new ArrayList<Meal>();
-        DatabaseReference restaurantReference = firebase.getReference("restaurants/"+restaurantID);
-        DatabaseReference userReference = firebase.getReference("users/" + userID);
-        Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
+        user = FirebaseUtil.getCurrentUser();
+        restaurant = FirebaseUtil.getRestaurant(restaurantID);
+        mealList = FirebaseUtil.getMealsByRestaurant(restaurantID);
+        orderList = FirebaseUtil.getOrdersByRestaurant(restaurantID);
         hideProgressDialog();
 
-        restaurantReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                restaurant = dataSnapshot.getValue(Restaurant.class);
-                //TODO controllare se takeAwayAllowed is true
-                //TODO controllare se restaurant_orders_per_hour non ha raggiunto il limite
-            }
+        if(!restaurant.getTakeAwayAllowed()) {
+            Log.d("FILIPPO", "l'tente non sarebbe dovuto arrivare a questa pagina");
+            Intent intent = new Intent(this, HaveBreak.class);
+            finish();
+            startActivity(intent);
+        }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //TODO gestire se il ristorante viene cancellato
-            }
-        });
-        userReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                user = dataSnapshot.getValue(User.class);
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //TODO gestire se l'utente viene cancellato
-            }
-        });
-
-        mealsReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mealList.add(dataSnapshot.getValue(Meal.class));
-                Log.d("FILIPPO", "onChildAdded");
-            }
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                for (Meal m : mealList) {
-                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                        mealList.remove(m);
-                        mealList.add(changedMeal);
-                        break;
-                    }
-                }
-                Log.d("FILIPPO", "onChildChanged");
-            }
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                for (Meal m : mealList) {
-                    if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                        mealList.remove(m);
-                        break;
-                    }
-                }
-                Log.d("FILIPPO", "onChildRemoved");
-            }
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                //Log.d("prova", "child moved");
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //Log.d("prova", "child cancelled");
-            }
-        });
+        if(restaurantOrderLimit()) {
+            //TODO lanciare un alert perché il massimo numero di prenotazioni in un'ora è stato raggiunto
+        }
 
         order = setNewOrder();
 
@@ -362,7 +313,7 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onConfirmOrderClicked(Order order){
         this.order = order;
-
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         DatabaseReference ordersReference = firebase.getReference("orders/");
         DatabaseReference keyReference= ordersReference.push();
         this.order.setOrder_id(keyReference.getKey());
@@ -476,5 +427,10 @@ public class OrderActivity extends AppCompatActivity
             int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
             return cursor.getString(idx);
         }
+    }
+
+    private boolean restaurantOrderLimit() {
+        //TODO implementare
+        return false;
     }
 }

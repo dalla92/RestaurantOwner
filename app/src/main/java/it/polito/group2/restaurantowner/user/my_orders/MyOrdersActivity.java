@@ -34,6 +34,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.File;
 import java.util.ArrayList;
 
+import it.polito.group2.restaurantowner.HaveBreak;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Order;
@@ -67,9 +68,14 @@ public class MyOrdersActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        //TODO corregere quando viene passato un utente corretto
         userID = "-KITUg8848bUzejyV7oD";// = FirebaseUtil.getCurrentUserId();
+
         if(userID == null) {
-            //TODO utende disconnesso: blocca tutto
+            Log.d("FILIPPO", "utente non loggato o restaurantID non ricevuto");
+            Intent intent = new Intent(this, HaveBreak.class);
+            finish();
+            startActivity(intent);
         }
 
         showProgressDialog();
