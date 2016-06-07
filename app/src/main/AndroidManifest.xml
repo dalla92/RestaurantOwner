@@ -97,7 +97,7 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".owner.ReservationActivity"
+            android:name=".owner.reservations.ReservationActivity"
             android:label="@string/title_activity_reservation"
             android:parentActivityName=".owner.Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />

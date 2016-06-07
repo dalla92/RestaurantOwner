@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.owner.reservations;
 
 import android.content.DialogInterface;
 import android.os.Bundle;

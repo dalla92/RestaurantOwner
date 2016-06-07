@@ -6,11 +6,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import it.polito.group2.restaurantowner.owner.reservations.TableFragment;
+import it.polito.group2.restaurantowner.owner.reservations.OrderFragment;
+
 public class FragmentPageAdapter extends FragmentStatePagerAdapter {
     private int mNumOfTabs;
     private long date;
     private TableFragment table_fragment;
-    private TakeAwayFragment takeaway_fragment;
+    private OrderFragment takeaway_fragment;
     private String restaurantId;
 
     public FragmentPageAdapter(FragmentManager fm, int NumOfTabs, long date, String restaurantId) {
@@ -32,7 +35,7 @@ public class FragmentPageAdapter extends FragmentStatePagerAdapter {
                 table_fragment.setArguments(bundle);
                 return table_fragment;
             case 1:
-                takeaway_fragment = new TakeAwayFragment();
+                takeaway_fragment = new OrderFragment();
                 takeaway_fragment.setArguments(bundle);
                 return takeaway_fragment;
             default:
@@ -49,7 +52,7 @@ public class FragmentPageAdapter extends FragmentStatePagerAdapter {
         return table_fragment;
     }
 
-    public TakeAwayFragment getTakeaway_fragment() {
+    public OrderFragment getTakeaway_fragment() {
         return takeaway_fragment;
     }
 }

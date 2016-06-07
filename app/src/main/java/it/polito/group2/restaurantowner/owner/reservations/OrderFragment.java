@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.owner.reservations;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -20,14 +20,14 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.OrderMeal;
 import it.polito.group2.restaurantowner.data.Order;
+import it.polito.group2.restaurantowner.owner.MealListDialog;
 
-public class TakeAwayFragment extends Fragment {
+public class OrderFragment extends Fragment {
 
     private ArrayList<Order> reservation_list;
     private BaseAdapter adapter;

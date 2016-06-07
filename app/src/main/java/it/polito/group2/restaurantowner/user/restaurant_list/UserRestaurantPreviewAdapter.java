@@ -6,9 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import org.json.JSONException;
 
@@ -116,6 +120,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         public TextView rating;
         public TextView reservationNumber;
         public TextView distance;
+        private ProgressBar progressBar;
         public Restaurant current;
         public int position;
 
@@ -126,14 +131,34 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             rating = (TextView) v.findViewById(R.id.textViewRating);
             reservationNumber = (TextView) v.findViewById(R.id.textViewReservationNumber);
             distance = (TextView) v.findViewById(R.id.textViewDistance);
+            progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
         }
 
         public void setData(Restaurant restaurant, int position){
 
-            if(restaurant.getRestaurant_photo_firebase_URL() == null || restaurant.getRestaurant_photo_firebase_URL().equals(""))
+            progressBar.setVisibility(View.VISIBLE);
+            if(restaurant.getRestaurant_photo_firebase_URL() == null || restaurant.getRestaurant_photo_firebase_URL().equals("")) {
                 Glide.with(mContext).load(R.drawable.no_image).into(this.image);
+                progressBar.setVisibility(View.GONE);
+            }
             else
-                Glide.with(mContext).load(restaurant.getRestaurant_photo_firebase_URL()).into(this.image);
+                Glide
+                        .with(mContext)
+                        .load(restaurant.getRestaurant_photo_firebase_URL())
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .into(this.image);
 
             /*
             SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);

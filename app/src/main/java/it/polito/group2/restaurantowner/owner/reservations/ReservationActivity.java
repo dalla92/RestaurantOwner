@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.owner.reservations;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -27,6 +27,12 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
+import it.polito.group2.restaurantowner.owner.AddRestaurantActivity;
+import it.polito.group2.restaurantowner.owner.FragmentPageAdapter;
+import it.polito.group2.restaurantowner.owner.MainActivity;
+import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
+import it.polito.group2.restaurantowner.owner.ReviewsActivity;
+import it.polito.group2.restaurantowner.owner.StatisticsActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 
 public class ReservationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{

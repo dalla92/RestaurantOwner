@@ -10,8 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -32,13 +37,14 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder  {
         // each data item is just a string in this case
-        public ImageView image;
-        public TextView resName;
-        public TextView rating;
-        public TextView reservationNumber;
-        public TextView reservedPercentage;
-        public Restaurant current;
-        public int position;
+        private ImageView image;
+        private TextView resName;
+        private TextView rating;
+        private TextView reservationNumber;
+        private TextView reservedPercentage;
+        private ProgressBar progressBar;
+        private Restaurant current;
+        private int position;
 
         public ViewHolder(View v) {
             super(v);
@@ -47,6 +53,7 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
             rating = (TextView) v.findViewById(R.id.textViewRating);
             reservationNumber = (TextView) v.findViewById(R.id.textViewReservationNumber);
             reservedPercentage = (TextView) v.findViewById(R.id.textViewReservedPercentage);
+            progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
         }
         public void setData(Restaurant obj, int position){
            /* TODO if(obj.getPhotoUri()!="") {
@@ -68,14 +75,39 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
                 }
             }
             */
-            SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);
+
+            /*SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);
             if(userDetails != null) {
                 if (userDetails.getString(obj.getRestaurant_id(), null) != null) {
                     Uri photouri = Uri.parse(userDetails.getString(obj.getRestaurant_id(), null));
                     if (photouri != null)
                         this.image.setImageURI(photouri);
                 }
+            }*/
+
+            if(obj.getRestaurant_photo_firebase_URL() == null || obj.getRestaurant_photo_firebase_URL().equals("")) {
+                Glide.with(mContext).load(R.drawable.no_image).into(this.image);
+                progressBar.setVisibility(View.GONE);
             }
+            else
+                Glide
+                        .with(mContext)
+                        .load(obj.getRestaurant_photo_firebase_URL())
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .into(this.image);
+
             this.resName.setText(obj.getRestaurant_name());
             this.rating.setText(String.valueOf(obj.getRestaurant_rating()));
             if(obj.getTableReservationAllowed())
