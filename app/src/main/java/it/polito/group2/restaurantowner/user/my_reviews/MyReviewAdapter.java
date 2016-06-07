@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -159,7 +160,12 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
             c.setTimeInMillis(reviews.get(position).getReview_timestamp());
             reviewHolder.date.setText(format.format(c.getTime()));
 
-            Glide.with(context).load(reviews.get(position).getUser_thumbnail()).into(reviewHolder.picture);
+            String thumbnail = reviews.get(position).getUser_thumbnail();
+
+            if(thumbnail != null && !thumbnail.equals(""))
+                Glide.with(context).load(thumbnail).into(reviewHolder.picture);
+            else
+                Glide.with(context).load(R.drawable.blank_profile).into(reviewHolder.picture);
 
             if (reviews.get(position).getReview_comment().equals(""))
                 reviewHolder.comment.setVisibility(View.GONE);

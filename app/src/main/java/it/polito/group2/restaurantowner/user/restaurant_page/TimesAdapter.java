@@ -61,19 +61,19 @@ public class TimesAdapter extends  RecyclerView.Adapter<TimesAdapter.TimesViewHo
 
     private String getNameFromInt(int day_of_week) {
         switch(day_of_week){
-            case 0:
-                return context.getString(R.string.times_Mon);
             case 1:
-                return context.getString(R.string.times_Tue);
+                return context.getString(R.string.times_Mon);
             case 2:
-                return context.getString(R.string.times_Wed);
+                return context.getString(R.string.times_Tue);
             case 3:
-                return context.getString(R.string.times_Thu);
+                return context.getString(R.string.times_Wed);
             case 4:
-                return context.getString(R.string.times_Fri);
+                return context.getString(R.string.times_Thu);
             case 5:
-                return context.getString(R.string.times_Sat);
+                return context.getString(R.string.times_Fri);
             case 6:
+                return context.getString(R.string.times_Sat);
+            case 0:
                 return context.getString(R.string.times_Sun);
             default:
                 return "";

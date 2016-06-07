@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner.user.restaurant_page;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -85,7 +86,12 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         c.setTimeInMillis(reviews.get(position).getReview_timestamp());
         holder.date.setText(format.format(c.getTime()));
 
-        Glide.with(context).load(reviews.get(position).getUser_thumbnail()).into(holder.picture);
+        String thumbnail = reviews.get(position).getUser_thumbnail();
+
+        if(thumbnail != null && !thumbnail.equals(""))
+            Glide.with(context).load(thumbnail).into(holder.picture);
+        else
+            Glide.with(context).load(R.drawable.blank_profile).into(holder.picture);
 
         if(reviews.get(position).getReview_comment().equals(""))
             holder.comment.setVisibility(View.GONE);
