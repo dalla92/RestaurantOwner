@@ -14,7 +14,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.clustering.ClusterItem;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by Alessio on 16/05/2016.
@@ -128,6 +132,43 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
 
     public void setRestaurant_time_slot(ArrayList<RestaurantTimeSlot> restaurant_time_slot) {
         this.restaurant_time_slot = restaurant_time_slot;
+    }
+
+    public boolean isOpenNow() {
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+        Calendar openTime = Calendar.getInstance();
+        Calendar closeTime = Calendar.getInstance();
+
+        Calendar now = Calendar.getInstance();
+        RestaurantTimeSlot tSlot = null;
+        for(RestaurantTimeSlot s : restaurant_time_slot) {
+            if(s.getDay_of_week() == now.get(Calendar.DAY_OF_WEEK)) {
+                tSlot = s;
+                break;
+            }
+        }
+        assert tSlot != null;
+        if(tSlot.getLunch()) {
+            try {
+                openTime.setTime(sdf.parse(tSlot.getOpen_lunch_time()));
+                closeTime.setTime(sdf.parse(tSlot.getClose_lunch_time()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if(openTime.before(now.getTime()) && closeTime.after(now.getTime()))
+                return true;
+        }
+        if(tSlot.getDinner()) {
+            try {
+                openTime.setTime(sdf.parse(tSlot.getOpen_dinner_time()));
+                closeTime.setTime(sdf.parse(tSlot.getClose_dinner_time()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if(openTime.before(now.getTime()) && closeTime.after(now.getTime()))
+                return true;
+        }
+        return false;
     }
 
     //Parcelable part
