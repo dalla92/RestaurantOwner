@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner.user.restaurant_list;
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -19,6 +20,9 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
+
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -126,14 +130,15 @@ public class UserRestaurantList extends AppCompatActivity
     ArrayList<RestaurantPreview> restaurants_previews_list = new ArrayList<>();
     private static final int VERTICAL_ITEM_SPACE = 5;
     private final int REQUEST_CHECK_SETTINGS = 1;
-    private double range = 2000; //dafault range is 2 km
+    private double DEFAULT_RANGE = 5000; //dafault range is 2 km
+    private double range;
     private GoogleMap mMap;
     private final float DEFAULT_ZOOM1 = 11.0f;
     private ClusterManager<MyItem> mClusterManager;
     private Marker mLastUserMarker;
     final static int LOCATION_REQUEST = 4;
     protected static final String TAG = "location-updates-sample";
-    protected Boolean mRequestingLocationUpdates; //Tracks the status of the location updates request if started or not
+    protected boolean mRequestingLocationUpdates = false; //Tracks the status of the location updates request if started or not
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000; //The desired interval for location updates. Inexact. Updates may be more or less frequent.
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS * 3; //The fastest rate for active location updates. Exact. Updates will never be more frequent than this value.
     protected Location mCurrentLocation;
@@ -144,7 +149,7 @@ public class UserRestaurantList extends AppCompatActivity
     /*private GeoFire geoFire;
     private GeoQuery geoQuery;
     HashMap<String,GeoLocation> resNearby = new HashMap<>();*/
-
+    private int current_index, total_index;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private Toolbar toolbar;
@@ -157,79 +162,230 @@ public class UserRestaurantList extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //showProgressDialog();
-        ImageView filter_icon = (ImageView) findViewById(R.id.icon_filter);
-        assert filter_icon != null;
-        filter_icon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(UserRestaurantList.this, Filter.class);
-                startActivityForResult(intent, ACTION_FILTER);
+        if (!haveNetworkConnection()) {
+            create_dialog(this);
+        }
+        else {
+            // Create an instance of GoogleAPIClient.
+            if (mGoogleApiClient == null) {
+                mGoogleApiClient = new GoogleApiClient.Builder(this)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this)
+                        .addApi(LocationServices.API)
+                        .build();
             }
-        });
+            createLocationRequest();
 
-        TextView search = (TextView) findViewById(R.id.search_text);
-        assert search != null;
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(UserRestaurantList.this, SearchActivity.class);
-                startActivityForResult(intent, ACTION_FILTER);
-            }
-        });
+            grantPermissions();
+
+            ImageView filter_icon = (ImageView) findViewById(R.id.icon_filter);
+            assert filter_icon != null;
+            filter_icon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(UserRestaurantList.this, Filter.class);
+                    startActivityForResult(intent, ACTION_FILTER);
+                }
+            });
+
+            TextView search = (TextView) findViewById(R.id.search_text);
+            assert search != null;
+            search.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(UserRestaurantList.this, SearchActivity.class);
+                    startActivityForResult(intent, ACTION_FILTER);
+                }
+            });
 
 /*        DatabaseReference.setAndroidContext(this);
         geoFire = new GeoFire(new DatabaseReference("https://flickering-fire-455.firebaseio.com/"));
 */
-        // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
-        createLocationRequest();
+            // GoogleMapOptions options = new GoogleMapOptions().liteMode(true);
+            //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            ////SupportMapFragment mapFragment = SupportMapFragment.newInstance(options);
+            // mapFragment.getMapAsync(this);
 
-        // GoogleMapOptions options = new GoogleMapOptions().liteMode(true);
-        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        ////SupportMapFragment mapFragment = SupportMapFragment.newInstance(options);
-        // mapFragment.getMapAsync(this);
+            mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+            // use this setting to improve performance if you know that changes
+            // in content do not change the layout size of the RecyclerView
+            mRecyclerView.setHasFixedSize(true);
+            // use a linear layout manager
+            GridLayoutManager mLayoutManager = null;
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                mLayoutManager = new GridLayoutManager(this, 1);
+                mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1, 5, true));
+            }
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                mLayoutManager = new GridLayoutManager(this, 2);
+                mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, 5, true));
+            }
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-        // use a linear layout manager
-        GridLayoutManager mLayoutManager = null;
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            mLayoutManager = new GridLayoutManager(this, 1);
-            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1, 5, true));
-        }
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mLayoutManager = new GridLayoutManager(this, 2);
-            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, 5, true));
-        }
+            mRecyclerView.setLayoutManager(mLayoutManager);
+            mRecyclerView.addOnItemTouchListener(
+                    new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
+                            String id = restaurants_previews_list.get(position).getRestaurant_id();
+                            mIntent.putExtra("restaurant_id", id);
+                            startActivity(mIntent);
+                        }
+                    })
+            );
 
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
-                        String id = restaurants_previews_list.get(position).getRestaurant_id();
-                        mIntent.putExtra("restaurant_id", id);
-                        startActivity(mIntent);
+            mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
+            mRecyclerView.setAdapter(mAdapter);
+
+            setDrawer();
+
+            setUpMap();
+        }
+    }
+
+    public void create_dialog(Context context){
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                context);
+        // set title
+        alertDialogBuilder.setTitle("Attention");
+        // set dialog message
+        alertDialogBuilder
+                .setMessage("You need to provide internet access")
+                .setCancelable(false)
+                .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        // if this button is clicked, close
+                        // current activity
+                        UserRestaurantList.this.finish();
                     }
-                })
-        );
+                });
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
+    }
 
-        mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
-        mRecyclerView.setAdapter(mAdapter);
+    private boolean haveNetworkConnection() {
+        boolean haveConnectedWifi = false;
+        boolean haveConnectedMobile = false;
 
-        setDrawer();
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI"))
+                if (ni.isConnected())
+                    haveConnectedWifi = true;
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE"))
+                if (ni.isConnected())
+                    haveConnectedMobile = true;
+        }
+        return haveConnectedWifi || haveConnectedMobile;
+    }
 
-        setUpMap();
+    @Override
+    public void onConnected(Bundle connectionHint) { //Runs when a GoogleApiClient object successfully connects.
+        Log.i(TAG, "Connected to GoogleApiClient");
+        mRequestingLocationUpdates = true;
+        // If the initial location was never previously requested, we use
+        // FusedLocationApi.getLastLocation() to get it. If it was previously requested, we store
+        // its value in the Bundle and check for it in onCreate(). We
+        // do not request it again unless the user specifically requests location updates by pressing
+        // the Start Updates button.
+        //
+        // Because we cache the value of the initial location in the Bundle, it means that if the
+        // user launches the activity,
+        // moves to a new location, and then changes the device orientation, the original location
+        // is displayed as the activity is re-created.
+        if (mCurrentLocation == null) {
+            try {
+                mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            }
+            catch(SecurityException e){
+                Log.d("aaa", "Exception in onConnected");
+            }
+        }
+
+        // If the user presses the Start Updates button before GoogleApiClient connects, we set
+        // mRequestingLocationUpdates to true (see startUpdatesButtonHandler()). Here, we check
+        // the value of mRequestingLocationUpdates and if it is true, we start location updates.
+        if (mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+
+        updateUI();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mCurrentLocation = location;
+        updateUI();
+        /*
+        Toast.makeText(this, getResources().getString(R.string.location_updated_message),
+                Toast.LENGTH_SHORT).show();
+        */
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        // The connection to Google Play services was lost for some reason.
+        Log.i(TAG, "Connection suspended");
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        // Refer to the javadoc for ConnectionResult to see what error codes might be returned
+        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + result.getErrorCode());
+    }
+
+    public void grantPermissions() {
+        if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
+            // only for Marshmallow and newer versions
+            //I want that first I request GPS, but if rejected, request WIFI
+            /*
+            dialogPermissionListener_gps =
+    /*        dialogPermissionListener_gps =
+                    DialogOnDeniedPermissionListener.Builder
+                            .withContext(this)
+                            .withTitle("GPS permission")
+                            .withMessage("GPS permission is needed to take your accurate position")
+                            .withButtonText(android.R.string.ok)
+                            .withIcon(R.mipmap.ic_launcher)
+                            .build();
+            Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
+            */
+            Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
+
+            Dexter.checkPermission(new PermissionListener() {
+                @Override public void onPermissionGranted(PermissionGrantedResponse response) {
+                    permission_granted();
+                }
+                @Override public void onPermissionDenied(PermissionDeniedResponse response) {
+                    gps_denied();
+                }
+                @Override public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                    token.continuePermissionRequest();
+                }
+            }, Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        else{
+            mGoogleApiClient.connect();
+
+            settingsrequest();
+        }
+    }
+
+    public void permission_granted(){
+        //get actual/last position
+        mGoogleApiClient.connect();
+    }
+
+    public void permission_denied(){
+        //does nothing
+    }
+
+    public void gps_denied(){
+        //does nothing
     }
 
     @Override
@@ -265,68 +421,71 @@ public class UserRestaurantList extends AppCompatActivity
         });
 
         maps_stuff();
-        read_restaurants_from_firebase();
+        if(mRequestingLocationUpdates==true)
+            read_restaurants_from_firebase();
     }
 
     public void read_restaurants_from_firebase(){
         showProgressDialog();
         firebase = FirebaseDatabase.getInstance();
-
+        current_index = 0;
         //I want to get all restaurants within 2Km: I get all the ids of the restaurants, for each id I get its latitude and longitude, and if distance<2km I add it to restaurant_preview_list and cluster_manager
         DatabaseReference ref = firebase.getReference("restaurant_names");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        final String restaurant_id = (String) dataSnapshot.getValue();
-                        DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_latitude_position");
-                        ref.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot snapshot) {
-                                    Double snap_lat = (Double) snapshot.getValue();
-                                    final Double lat = snap_lat;
-                                    //get only longitude
-                                    DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_longitude_position");
-                                    ref2.addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot snapshot) {
-                                                Double snap_long = (Double) snapshot.getValue();
-                                                final Double lon = snap_long;
-                                                if (is_restaurant_near(new LatLng(lat, lon), range)) {
-                                                    DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
-                                                    ref2.addValueEventListener(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(DataSnapshot snapshot) {
-                                                                RestaurantPreview snap_r_p = (RestaurantPreview) snapshot.getValue();
-                                                                restaurants_previews_list.add(snap_r_p);
-                                                                mClusterManager.addItem(new MyItem(lat, lon));
-                                                                mClusterManager.cluster();
+                        total_index = (int) snapshot.getChildrenCount();
+                    final String restaurant_id = (String) dataSnapshot.getValue();
+                    DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_latitude_position");
+                    ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            Double snap_lat = (Double) snapshot.getValue();
+                            final Double lat = snap_lat;
+                            //get only longitude
+                            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_longitude_position");
+                            ref2.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    Double snap_long = (Double) snapshot.getValue();
+                                    final Double lon = snap_long;
+                                    if (is_restaurant_near(new LatLng(lat, lon), range)) {
+                                        DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
+                                        ref2.addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot snapshot) {
+                                                RestaurantPreview snap_r_p = (RestaurantPreview) snapshot.getValue();
+                                                restaurants_previews_list.add(snap_r_p);
+                                                mClusterManager.addItem(new MyItem(lat, lon));
+                                                mClusterManager.cluster();
+                                                                current_index++;
+                                                                if(total_index==current_index)
+                                                                    hideProgressDialog();
+                                            }
 
-                                                                hideProgressDialog();
-                                                        }
+                                            @Override
+                                            public void onCancelled(DatabaseError firebaseError) {
+                                                System.out.println("The read failed: " + firebaseError.getMessage());
+                                            }
+                                        });
+                                    }
+                                }
 
-                                                        @Override
-                                                        public void onCancelled(DatabaseError firebaseError) {
-                                                            System.out.println("The read failed: " + firebaseError.getMessage());
-                                                        }
-                                                    });
-                                                }
-                                        }
+                                @Override
+                                public void onCancelled(DatabaseError firebaseError) {
+                                    System.out.println("The read failed: " + firebaseError.getMessage());
+                                }
+                            });
+                        }
 
-                                        @Override
-                                        public void onCancelled(DatabaseError firebaseError) {
-                                            System.out.println("The read failed: " + firebaseError.getMessage());
-                                        }
-                                    });
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError firebaseError) {
-                                System.out.println("The read failed: " + firebaseError.getMessage());
-                            }
-                        });
-                    }
+                        @Override
+                        public void onCancelled(DatabaseError firebaseError) {
+                            System.out.println("The read failed: " + firebaseError.getMessage());
+                        }
+                    });
                 }
+            }
 
             @Override
             public void onCancelled(DatabaseError firebaseError) {
@@ -354,6 +513,9 @@ public class UserRestaurantList extends AppCompatActivity
                 getApplicationContext(),
                 MapsActivity.class);
         Bundle b = new Bundle();
+        if(range == 0.0){
+            range = DEFAULT_RANGE;
+        }
         b.putDouble("range", range);
         b.putParcelableArrayList("restaurants_previews_list", restaurants_previews_list);
         intent.putExtras(b);
@@ -550,45 +712,6 @@ public class UserRestaurantList extends AppCompatActivity
         grantPermissions();
     }
 
-    public void grantPermissions() {
-        if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
-            // only for Marshmallow and newer versions
-            //I want that first I request GPS, but if rejected, request WIFI
-            /*
-            dialogPermissionListener_gps =
-                    DialogOnDeniedPermissionListener.Builder
-                            .withContext(this)
-                            .withTitle("GPS permission")
-                            .withMessage("GPS permission is needed to take your accurate position")
-                            .withButtonText(android.R.string.ok)
-                            .withIcon(R.mipmap.ic_launcher)
-                            .build();
-            Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
-            */
-            Dexter.checkPermission(new PermissionListener() {
-                @Override
-                public void onPermissionGranted(PermissionGrantedResponse response) {
-                    permission_granted();
-                }
-
-                @Override
-                public void onPermissionDenied(PermissionDeniedResponse response) {
-                    gps_denied();
-                }
-
-                @Override
-                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                    token.continuePermissionRequest();
-                }
-            }, Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-        else{
-            mGoogleApiClient.connect();
-
-            settingsrequest();
-        }
-    }
-
     public void settingsrequest(){
         LocationRequest locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -709,16 +832,19 @@ public class UserRestaurantList extends AppCompatActivity
                 boolean price2 = (boolean) data.getExtras().get("TwoEuro");
                 boolean price3 = (boolean) data.getExtras().get("ThreeEuro");
                 boolean price4 = (boolean) data.getExtras().get("FourEuro");
-                range = (double) data.getExtras().get("range");
+                double range;
+                if(data.getExtras().get("range")!=null) {
+                    range = (double) data.getExtras().get("range");
+                }
+                else{
+                    range = DEFAULT_RANGE;
+                }
                 restaurants_previews_list = new ArrayList<RestaurantPreview>();
                 mClusterManager.clearItems();
-                restaurants_previews_list.addAll(mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4));
+                restaurants_previews_list.addAll(mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range));
                 for(RestaurantPreview r_p : restaurants_previews_list){
-                    if(is_restaurant_near(new LatLng(r_p.getLat(), r_p.getLon()), range)){
-                        restaurants_previews_list.add(r_p);
-                        mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
-                        mClusterManager.cluster();
-                    }
+                    mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
+                    mClusterManager.cluster();
                 }
             }
         }
@@ -988,66 +1114,6 @@ public class UserRestaurantList extends AppCompatActivity
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        new AlertDialog.Builder(this)
-                .setTitle("Error")
-                .setMessage("Connection failed, retry again.")
-                .setPositiveButton(android.R.string.ok, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
-
-    @Override
-    public void onConnected(Bundle connectionHint) { //Runs when a GoogleApiClient object successfully connects.
-        Log.i(TAG, "Connected to GoogleApiClient");
-
-        // If the initial location was never previously requested, we use
-        // FusedLocationApi.getLastLocation() to get it. If it was previously requested, we store
-        // its value in the Bundle and check for it in onCreate(). We
-        // do not request it again unless the user specifically requests location updates by pressing
-        // the Start Updates button.
-        //
-        // Because we cache the value of the initial location in the Bundle, it means that if the
-        // user launches the activity,
-        // moves to a new location, and then changes the device orientation, the original location
-        // is displayed as the activity is re-created.
-        if (mCurrentLocation == null) {
-            try {
-                mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            }
-            catch(SecurityException e){
-                Log.d("aaa", "Exception in onConnected");
-            }
-        }
-
-        // If the user presses the Start Updates button before GoogleApiClient connects, we set
-        // mRequestingLocationUpdates to true (see startUpdatesButtonHandler()). Here, we check
-        // the value of mRequestingLocationUpdates and if it is true, we start location updates.
-        //if (mRequestingLocationUpdates) {startLocationUpdates
-        startLocationUpdates();
-        //}
-
-        updateUI();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        mCurrentLocation = location;
-        updateUI();
-        /*
-        Toast.makeText(this, getResources().getString(R.string.location_updated_message),
-                Toast.LENGTH_SHORT).show();
-        */
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-        // The connection to Google Play services was lost for some reason.
-        Log.i(TAG, "Connection suspended");
-        mGoogleApiClient.connect();
-    }
-
 /*
 @Override
 public void onConnected(Bundle bundle) {
@@ -1068,42 +1134,5 @@ if (mLastLocation != null) {
 }
 */
 
-    public void gps_denied(){
-        dialogPermissionListener_wifi =
-                DialogOnDeniedPermissionListener.Builder
-                        .withContext(this)
-                        .withTitle("WIFI permission")
-                        .withMessage("WIFI permission is needed to locate your city")
-                        .withButtonText(android.R.string.ok)
-                        .withIcon(R.mipmap.ic_launcher)
-                        .build();
-        Dexter.checkPermissionOnSameThread(dialogPermissionListener_wifi, Manifest.permission.ACCESS_COARSE_LOCATION);
-
-        Dexter.checkPermission(new PermissionListener() {
-            @Override
-            public void onPermissionGranted(PermissionGrantedResponse response) {
-                permission_granted();
-            }
-
-            @Override
-            public void onPermissionDenied(PermissionDeniedResponse response) {
-                permission_denied();
-            }
-
-            @Override
-            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                token.continuePermissionRequest();
-            }
-        }, Manifest.permission.ACCESS_COARSE_LOCATION);
-    }
-
-    public void permission_granted(){
-        //get actual/last position
-        mGoogleApiClient.connect();
-    }
-
-    public void permission_denied(){
-        //does nothing
-    }
 
 }
