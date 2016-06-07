@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.user.restaurant_page;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -19,11 +20,26 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.firebasedata.Review;
 
 public class AddReviewActivity extends AppCompatActivity {
+
+    private String reviewID;
+    private EditText comment;
+    private RatingBar stars;
+    private ProgressDialog mProgressDialog;
+    private FirebaseDatabase firebase;
+    private String restaurantID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +49,39 @@ public class AddReviewActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("review")!=null)
+            reviewID = getIntent().getExtras().getString("review");
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null)
+            restaurantID = getIntent().getExtras().getString("restaurant_id");
+
+        comment = (EditText) findViewById(R.id.edit_review_comment);
+        stars = (RatingBar) findViewById(R.id.user_review_rating_bar);
+
+        firebase = FirebaseDatabase.getInstance();
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+        
+        if(reviewID != null && restaurantID != null){
+            Query reviewQuery = firebase.getReference("reviews/" + restaurantID).orderByChild("review_id").equalTo(reviewID);
+            reviewQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Review review = null;
+                    for(DataSnapshot data: dataSnapshot.getChildren())
+                        review = data.getValue(Review.class);
+
+                    if (review != null) {
+                        comment.setText(review.getReview_comment());
+                        stars.setRating(review.getReview_rating());
+                        FirebaseUtil.hideProgressDialog(mProgressDialog);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    FirebaseUtil.hideProgressDialog(mProgressDialog);
+                }
+            });
+        }
     }
 
     @Override
@@ -51,9 +100,6 @@ public class AddReviewActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_add_offer) {
-
-            EditText comment = (EditText) findViewById(R.id.edit_review_comment);
-            RatingBar stars = (RatingBar) findViewById(R.id.user_review_rating_bar);
 
             if(stars.getRating() == 0.0f){
                 AlertDialog alertDialog = new AlertDialog.Builder(AddReviewActivity.this).create();

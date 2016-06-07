@@ -436,56 +436,56 @@ public class UserRestaurantList extends AppCompatActivity
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         total_index = (int) snapshot.getChildrenCount();
-                        final String restaurant_id = (String) dataSnapshot.getValue();
-                        DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_latitude_position");
-                        ref.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot snapshot) {
-                                    Double snap_lat = (Double) snapshot.getValue();
-                                    final Double lat = snap_lat;
-                                    //get only longitude
-                                    DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_longitude_position");
-                                    ref2.addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot snapshot) {
-                                                Double snap_long = (Double) snapshot.getValue();
-                                                final Double lon = snap_long;
-                                                if (is_restaurant_near(new LatLng(lat, lon), range)) {
-                                                    DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
-                                                    ref2.addValueEventListener(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(DataSnapshot snapshot) {
-                                                                RestaurantPreview snap_r_p = (RestaurantPreview) snapshot.getValue();
-                                                                restaurants_previews_list.add(snap_r_p);
-                                                                mClusterManager.addItem(new MyItem(lat, lon));
-                                                                mClusterManager.cluster();
+                    final String restaurant_id = (String) dataSnapshot.getValue();
+                    DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_latitude_position");
+                    ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            Double snap_lat = (Double) snapshot.getValue();
+                            final Double lat = snap_lat;
+                            //get only longitude
+                            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_longitude_position");
+                            ref2.addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    Double snap_long = (Double) snapshot.getValue();
+                                    final Double lon = snap_long;
+                                    if (is_restaurant_near(new LatLng(lat, lon), range)) {
+                                        DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
+                                        ref2.addValueEventListener(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot snapshot) {
+                                                RestaurantPreview snap_r_p = (RestaurantPreview) snapshot.getValue();
+                                                restaurants_previews_list.add(snap_r_p);
+                                                mClusterManager.addItem(new MyItem(lat, lon));
+                                                mClusterManager.cluster();
                                                                 current_index++;
                                                                 if(total_index==current_index)
                                                                     hideProgressDialog();
-                                                        }
+                                            }
 
-                                                        @Override
-                                                        public void onCancelled(DatabaseError firebaseError) {
-                                                            System.out.println("The read failed: " + firebaseError.getMessage());
-                                                        }
-                                                    });
-                                                }
-                                        }
+                                            @Override
+                                            public void onCancelled(DatabaseError firebaseError) {
+                                                System.out.println("The read failed: " + firebaseError.getMessage());
+                                            }
+                                        });
+                                    }
+                                }
 
-                                        @Override
-                                        public void onCancelled(DatabaseError firebaseError) {
-                                            System.out.println("The read failed: " + firebaseError.getMessage());
-                                        }
-                                    });
-                            }
+                                @Override
+                                public void onCancelled(DatabaseError firebaseError) {
+                                    System.out.println("The read failed: " + firebaseError.getMessage());
+                                }
+                            });
+                        }
 
-                            @Override
-                            public void onCancelled(DatabaseError firebaseError) {
-                                System.out.println("The read failed: " + firebaseError.getMessage());
-                            }
-                        });
-                    }
+                        @Override
+                        public void onCancelled(DatabaseError firebaseError) {
+                            System.out.println("The read failed: " + firebaseError.getMessage());
+                        }
+                    });
                 }
+            }
 
             @Override
             public void onCancelled(DatabaseError firebaseError) {
@@ -826,7 +826,8 @@ public class UserRestaurantList extends AppCompatActivity
                 mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
                 mRecyclerView.setAdapter(mAdapter);
                 String cat = (String) data.getExtras().get("Category");
-                String time = (String) data.getExtras().get("Time");
+                boolean lunch = (boolean) data.getExtras().get("Lunch");
+                boolean dinner = (boolean) data.getExtras().get("Dinner");
                 boolean price1 = (boolean) data.getExtras().get("OneEuro");
                 boolean price2 = (boolean) data.getExtras().get("TwoEuro");
                 boolean price3 = (boolean) data.getExtras().get("ThreeEuro");
@@ -840,7 +841,7 @@ public class UserRestaurantList extends AppCompatActivity
                 }
                 restaurants_previews_list = new ArrayList<RestaurantPreview>();
                 mClusterManager.clearItems();
-                restaurants_previews_list.addAll(mAdapter.filter(cat,time, price1, price2, price3, price4, mLastUserMarker, range));
+                restaurants_previews_list.addAll(mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range));
                 for(RestaurantPreview r_p : restaurants_previews_list){
                     mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
                     mClusterManager.cluster();

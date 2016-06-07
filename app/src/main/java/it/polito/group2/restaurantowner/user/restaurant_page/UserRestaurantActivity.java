@@ -6,9 +6,11 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -16,6 +18,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,8 +42,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -50,10 +55,11 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
@@ -106,8 +112,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         coverPicture = (ImageView) findViewById(R.id.user_restaurant_image);
         fab = (FloatingActionButton) findViewById(R.id.bookmark_fab);
         firebase = FirebaseDatabase.getInstance();
-
-        showProgressDialog();
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
 
         //FirebaseAuth.getInstance().signOut();
 
@@ -116,8 +121,9 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         else
             restaurantID = "-KIMqPtRSEdm0Cvfc3Za";
 
+        FirebaseUtil.showProgressDialog(mProgressDialog);
         Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
-        Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo(restaurantID);
+        Query reviewsQuery = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo(restaurantID);
         DatabaseReference restaurantRef = firebase.getReference("restaurants/" + restaurantID);
 
         restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -125,11 +131,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             public void onDataChange(DataSnapshot dataSnapshot) {
                 targetRestaurant = dataSnapshot.getValue(Restaurant.class);
 
-                restaurantID = targetRestaurant.getRestaurant_id();
+                //restaurantID = targetRestaurant.getRestaurant_id();
                 TextView rating = (TextView) findViewById(R.id.restaurant_stars_text);
                 RatingBar ratingBar = (RatingBar) findViewById(R.id.restaurant_stars);
 
-                rating.setText(String.format("%.1f",targetRestaurant.getRestaurant_rating()));
+                rating.setText(String.format("%.1f", targetRestaurant.getRestaurant_rating()));
                 ratingBar.setRating(targetRestaurant.getRestaurant_rating());
                 collapsing.setTitle(targetRestaurant.getRestaurant_name());
 
@@ -142,13 +148,13 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                             .listener(new RequestListener<Integer, GlideDrawable>() {
                                 @Override
                                 public boolean onException(Exception e, Integer model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                    hideProgressDialog();
+                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                                     return false;
                                 }
 
                                 @Override
                                 public boolean onResourceReady(GlideDrawable resource, Integer model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                    hideProgressDialog();
+                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                                     return false;
                                 }
                             })
@@ -161,13 +167,13 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                             .listener(new RequestListener<String, GlideDrawable>() {
                                 @Override
                                 public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                    hideProgressDialog();
+                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                                     return false;
                                 }
 
                                 @Override
                                 public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                    hideProgressDialog();
+                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                                     return false;
                                 }
                             })
@@ -193,7 +199,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
-        reviewsRef.addChildEventListener(new ChildEventListener() {
+        reviewsQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.d("prova", "review added");
@@ -225,7 +231,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         mealsReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot data: dataSnapshot.getChildren())
+                for (DataSnapshot data : dataSnapshot.getChildren())
                     meals.add(data.getValue(Meal.class));
 
                 categories = getCategoryList();
@@ -237,6 +243,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 Log.d("prova", "meals cancelled");
             }
         });
+
 
         if(targetRestaurant.getUser_id().equals(FirebaseUtil.getCurrentUserId())) {
             theUserIsTheOwner = true;
@@ -267,23 +274,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         setDrawer();
 
         setRestaurantOffers();
-    }
-
-
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(true);
-        }
-
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
     }
 
     @Override
@@ -600,16 +590,40 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             FirebaseUtil.showLoginDialog(this);
         }
         else {
-            Query reviewQuery = firebase.getReference("reviews/" + restaurantID).orderByChild("user_id").equalTo(userID);
+            Query reviewQuery = firebase.getReference("reviews").orderByChild("user_id").equalTo(userID);
             reviewQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+                public void onDataChange(final DataSnapshot dataSnapshot) {
                     if(!dataSnapshot.hasChildren()){
                         Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
                         startActivityForResult(intent, ADD_REQUEST);
                     }
                     else{
+                        AlertDialog.Builder alert = new AlertDialog.Builder(UserRestaurantActivity.this);
+                        alert.setTitle("Warning");
+                        alert.setMessage("You already added a review to this restaurant," +
+                                "\nDo you want to modify it?");
 
+                        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Review review = null;
+                                for(DataSnapshot data: dataSnapshot.getChildren())
+                                    review = data.getValue(Review.class);
+                                Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
+                                intent.putExtra("restaurant_id", restaurantID);
+                                intent.putExtra("review", review.getReview_id());
+                                startActivityForResult(intent, ADD_REQUEST);
+                            }
+                        });
+                        alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+
+                        alert.show();
                     }
                 }
 
@@ -626,48 +640,69 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         Log.d("result", "" + requestCode + " " + resultCode);
         if (requestCode == ADD_REQUEST) {
             if (resultCode == RESULT_OK) {
-                User user = FirebaseUtil.getCurrentUser();
-                if(user == null){
+                String userID = FirebaseUtil.getCurrentUserId();
+                if(userID == null){
                     Toast.makeText(UserRestaurantActivity.this, "Error while adding the review, try again!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                String comment = data.getStringExtra("comment");
-                float starNumber = data.getFloatExtra("starsNumber", 0.0f);
-
-                Calendar date = Calendar.getInstance();
-
-                DatabaseReference reviewsRef = firebase.getReference("reviews/" + restaurantID).push();
-                Review review =new Review();
-                review.setRestaurant_id(restaurantID);
-                review.setReview_comment(comment);
-                review.setReview_timestamp(date.getTimeInMillis());
-                review.setReview_id(reviewsRef.getKey());
-                review.setReview_rating(starNumber);
-                review.setUser_id(user.getUser_id());
-                review.setUser_full_name(user.getUser_full_name());
-                review.setUser_thumbnail(user.getUser_thumbnail());
-                reviewsRef.setValue(review);
-
-                //update restaurant rating
-                DatabaseReference ref = firebase.getReference("reviews/" + restaurantID);
-                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                DatabaseReference userRef = firebase.getReference("users/" + userID);
+                userRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        double total_reviews_rating = 0;
-                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Review r = dataSnapshot.getValue(Review.class);
-                            total_reviews_rating += r.getReview_rating();
-                        }
-                        DatabaseReference ref2 = firebase.getReference("restaurants/" + restaurantID + "/restaurant_rating");
-                        ref2.setValue(total_reviews_rating);
-                        DatabaseReference ref3 = firebase.getReference("restaurants_previews/" + restaurantID + "/restaurant_rating");
-                        ref3.setValue(total_reviews_rating);
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        String comment = data.getStringExtra("comment");
+                        float starNumber = data.getFloatExtra("starsNumber", 0.0f);
+
+                        Calendar date = Calendar.getInstance();
+
+                        DatabaseReference reviewsRef = firebase.getReference("reviews/" + restaurantID).push();
+                        Review review =new Review();
+                        review.setRestaurant_id(restaurantID);
+                        review.setReview_comment(comment);
+                        review.setReview_timestamp(date.getTimeInMillis());
+                        review.setReview_id(reviewsRef.getKey());
+                        review.setReview_rating(starNumber);
+                        review.setUser_id(user.getUser_id());
+                        review.setUser_full_name(user.getUser_full_name());
+                        review.setUser_thumbnail(user.getUser_thumbnail());
+                        reviewsRef.setValue(review)
+                                .addOnCompleteListener(UserRestaurantActivity.this, new OnCompleteListener<Void>() {
+
+                            @Override
+                            public void onComplete(@NotNull Task<Void> task) {
+                                //update restaurant rating
+                                DatabaseReference ref = firebase.getReference("reviews/" + restaurantID);
+                                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot snapshot) {
+                                        double total_reviews_rating = 0;
+                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                            Review r = dataSnapshot.getValue(Review.class);
+                                            total_reviews_rating += r.getReview_rating();
+                                        }
+                                        DatabaseReference ref2 = firebase.getReference("restaurants/" + restaurantID + "/restaurant_rating");
+                                        ref2.setValue(total_reviews_rating);
+                                        DatabaseReference ref3 = firebase.getReference("restaurants_previews/" + restaurantID + "/restaurant_rating");
+                                        ref3.setValue(total_reviews_rating);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError firebaseError) {
+                                    }
+                                });
+                            }
+                        });
                     }
+
                     @Override
-                    public void onCancelled(DatabaseError firebaseError) {
+                    public void onCancelled(DatabaseError databaseError) {
+
                     }
                 });
+
+
+
             }
         }
     }
@@ -923,7 +958,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     FirebaseUtil.showLoginDialog(UserRestaurantActivity.this);
                 } else {
                     Log.d("prova", "not null");
-                    showProgressDialog();
+                    FirebaseUtil.showProgressDialog(mProgressDialog);
                     final DatabaseReference restaurantBookmarksRef = firebase.getReference("restaurants/" + restaurantID + "/favourite_users/" + userID);
                     final DatabaseReference userBookmarksRef = firebase.getReference("users/" + userID + "/favourites_restaurants/" + restaurantID);
                     restaurantBookmarksRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -940,7 +975,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-                            hideProgressDialog();
+                            FirebaseUtil.hideProgressDialog(mProgressDialog);
                             Log.d("prova", "bookmark cancelled");
                             fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
                         }
@@ -960,14 +995,14 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         else
                             fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
 
-                        userBookmarksRef.setValue(bookmark ? true : null);
-                        hideProgressDialog();
+                        userBookmarksRef.setValue(bookmark? true : null);
+                        FirebaseUtil.hideProgressDialog(mProgressDialog);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(Exception e) {
-                        hideProgressDialog();
+                        FirebaseUtil.hideProgressDialog(mProgressDialog);
                         Toast.makeText(UserRestaurantActivity.this, "Technical Problem, try again or restart the app!", Toast.LENGTH_SHORT).show();
                     }
                 });

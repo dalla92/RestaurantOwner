@@ -35,6 +35,8 @@ import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.data.TableReservation;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
+import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 
 /**
  * Created by Daniele on 05/04/2016.
@@ -96,7 +98,6 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         notifyItemRangeChanged(position, mDataset.size());
     }
 
-    protected List<RestaurantPreview> filter(String category, boolean lunch, boolean dinner, boolean price1, boolean price2, boolean price3, boolean price4) {
     protected List<RestaurantPreview> filter(String category, String time, boolean price1, boolean price2, boolean price3, boolean price4, Marker marker, double range) {
         //filter by category
         List<RestaurantPreview> nResList = new ArrayList<RestaurantPreview>();
@@ -108,6 +109,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                     nResList.add(res);
             }
         }
+        //filter by time
         List<RestaurantPreview> n2ResList = new ArrayList<RestaurantPreview>();
         Calendar today = Calendar.getInstance();
         RestaurantTimeSlot timeSlot = null;
@@ -117,6 +119,10 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                     timeSlot = tSlot;
                     break;
                 }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
             boolean addRes = true;
             if (lunch && !timeSlot.getLunch())
@@ -156,7 +162,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         }
 
         int size = mDataset.size();
-        mDataset = n4ResList;
+        mDataset = n3ResList;
         notifyDataSetChanged();
         notifyItemRangeChanged(0, size);
         return mDataset;
@@ -248,8 +254,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             this.current = restaurant;
         }
 
-
-        public void count_bookings_today_and_display(String restaurant_id, RestaurantPreview r, TextView reservationNumber) {
+        public void count_bookings_today_and_display(String restaurant_id, RestaurantPreview r, TextView reservationNumber){
             final TextView res_num_text_view = reservationNumber;
             firebase = FirebaseDatabase.getInstance();
             total_tables_number = r.getTables_number();
@@ -277,6 +282,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             });
         }
 
+
         public String calculate_distance2(LatLng a, Marker b) {
             double distance = SphericalUtil.computeDistanceBetween(a, b.getPosition());
             return formatNumber(distance);
@@ -295,7 +301,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             //trying to add space to split later
             return String.format("%4.3f %s", distance, unit);
         }
-
+    }
         /*
         public static int calculate_reservations_number(Restaurant r) {
             Calendar c = Calendar.getInstance();
@@ -307,7 +313,9 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             }
             return today_reservations.size();
         }
+        */
 
+        /*
         public static int calculate_range(Restaurant r) {
             ArrayList<Meal> meals = null;
             try {
@@ -339,7 +347,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                 return 2;
 
             return 3;
-        }*/
+        }
     }
 
 }

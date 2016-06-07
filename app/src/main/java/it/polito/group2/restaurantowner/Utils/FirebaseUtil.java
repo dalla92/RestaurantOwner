@@ -1,9 +1,11 @@
 package it.polito.group2.restaurantowner.Utils;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -31,6 +33,29 @@ public class FirebaseUtil {
 
     public static DatabaseReference getBaseRef() {
         return FirebaseDatabase.getInstance().getReference();
+    }
+
+    public static ProgressDialog initProgressDialog(Context context){
+        ProgressDialog mProgressDialog = new ProgressDialog(context);
+        mProgressDialog.setMessage("Loading...");
+        mProgressDialog.setIndeterminate(true);
+        //decomment when test are finish
+            /*mProgressDialog.setCancelable(false);
+            mProgressDialog.setCanceledOnTouchOutside(false);*/
+
+        return mProgressDialog;
+    }
+
+    public static void showProgressDialog(ProgressDialog mProgressDialog) {
+        if (mProgressDialog != null && !mProgressDialog.isShowing()) {
+            mProgressDialog.show();
+        }
+    }
+
+    public static void hideProgressDialog(ProgressDialog mProgressDialog) {
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
+        }
     }
 
     public static void showLoginDialog(final Context context) {
