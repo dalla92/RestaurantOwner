@@ -82,8 +82,8 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
             date = (Calendar) getIntent().getExtras().getSerializable("date");
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        tabLayout.addTab(tabLayout.newTab().setText("Table"));
-        tabLayout.addTab(tabLayout.newTab().setText("Take Away"));
+        tabLayout.addTab(tabLayout.newTab().setText("Reservation"));
+        tabLayout.addTab(tabLayout.newTab().setText("Order"));
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);

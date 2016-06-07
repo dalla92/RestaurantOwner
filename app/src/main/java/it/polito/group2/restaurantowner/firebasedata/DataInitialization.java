@@ -801,7 +801,7 @@ public class DataInitialization {
         rev.setReview_id(review_id);
         GregorianCalendar cal = new GregorianCalendar();
         cal.set(2016, 4, 25);
-        rev.setReview_date(cal);
+        rev.setReview_timestamp(cal.getTimeInMillis());
 
         rev2 = new Review();
         rev2.setUser_id(user_id2);
@@ -813,7 +813,7 @@ public class DataInitialization {
         rev2.setReview_id(review_id2);
         GregorianCalendar cal2 = new GregorianCalendar();
         cal2.set(2016, 4, 27);
-        rev2.setReview_date(cal2);
+        rev2.setReview_timestamp(cal.getTimeInMillis());
     }
 
     public void table_reservation_fake_initialization() {

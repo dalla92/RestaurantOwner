@@ -16,8 +16,10 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Review;
+import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.owner.ItemTouchHelperAdapter;
 
 public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHelperAdapter {
@@ -26,6 +28,7 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
 
     private ArrayList<Review> reviews;
     private Context context;
+    private RecyclerView recyclerView;
 
     private int visibleThreshold = 5;
     private int lastVisibleItem, totalItemCount;
@@ -35,28 +38,35 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
     public MyReviewAdapter(ArrayList<Review> reviews, Context context, RecyclerView recyclerView) {
         this.reviews = reviews;
         this.context = context;
+        this.recyclerView = recyclerView;
+    }
 
-        final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+    public void updateScrollListener(boolean moreReviews){
+        if(moreReviews){
+            final LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
+                    totalItemCount = linearLayoutManager.getItemCount();
+                    lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
 
-                totalItemCount = linearLayoutManager.getItemCount();
-                lastVisibleItem = linearLayoutManager.findLastVisibleItemPosition();
-
-                if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
-                    // End has been reached
-                    // Do something
-                    if (onLoadMoreListener != null) {
-                        addNullItem();
-                        onLoadMoreListener.onLoadMore();
+                    if (!loading && totalItemCount <= (lastVisibleItem + visibleThreshold)) {
+                        // End has been reached
+                        // Do something
+                        if (onLoadMoreListener != null) {
+                            addNullItem();
+                            onLoadMoreListener.onLoadMore();
+                        }
+                        loading = true;
                     }
-                    loading = true;
                 }
-            }
-        });
+            });
+        }
+        else{
+            recyclerView.clearOnScrollListeners();
+        }
     }
 
 
@@ -136,19 +146,21 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
         if (holder instanceof ReviewViewHolder) {
 
             ReviewViewHolder reviewHolder = (ReviewViewHolder) holder;
-            reviewHolder.username.setText(reviews.get(position).getUserID());
-            reviewHolder.stars.setRating(reviews.get(position).getStars_number());
+            reviewHolder.username.setText(reviews.get(position).getUser_id());
+            reviewHolder.stars.setRating(reviews.get(position).getReview_rating());
 
             SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
-            reviewHolder.date.setText(format.format(reviews.get(position).getDate().getTime()));
+            Calendar c = Calendar.getInstance();
+            c.setTimeInMillis(reviews.get(position).getReview_timestamp());
+            reviewHolder.date.setText(format.format(c.getTime()));
 
             //TODO get the user picture with the UserID
             reviewHolder.picture.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.blank_profile_thumb));
 
-            if (reviews.get(position).getComment().equals(""))
+            if (reviews.get(position).getReview_comment().equals(""))
                 reviewHolder.comment.setVisibility(View.GONE);
             else
-                reviewHolder.comment.setText(reviews.get(position).getComment());
+                reviewHolder.comment.setText(reviews.get(position).getReview_comment());
         }
         else {
             ((ProgressViewHolder) holder).progressBar.setVisibility(View.VISIBLE);

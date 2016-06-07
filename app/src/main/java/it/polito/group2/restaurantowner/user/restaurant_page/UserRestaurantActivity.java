@@ -6,7 +6,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -52,6 +51,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 import org.json.JSONException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -573,6 +573,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     public void addReview(View v){
+        //TODO review logic
         Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
         startActivityForResult(intent, ADD_REQUEST);
     }
@@ -585,19 +586,18 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 String comment = data.getStringExtra("comment");
                 float starNumber = data.getFloatExtra("starsNumber", 0.0f);
 
-                GregorianCalendar date = new GregorianCalendar();
-                //"EEE dd MMM yyyy 'at' HH:mm
+                Calendar date = Calendar.getInstance();
 
                 DatabaseReference reviewsRef = firebase.getReference("reviews").push();
                 Review review =new Review();
                 review.setRestaurant_id(restaurantID);
                 review.setReview_comment(comment);
-                review.setReview_date(date);
+                review.setReview_timestamp(date.getTimeInMillis());
                 review.setReview_id(reviewsRef.getKey());
                 review.setReview_rating(starNumber);
-                review.setUser_id("-KI8O-d9u-c9zDVk7L5V");
-                review.setUser_full_name("Paolo Parisi");
-                review.setUser_thumbnail("https://www.flickr.com/photos/142675931@N04/26785603890/in/dateposted-public/");
+                review.setUser_id("AKtYOrbvTlW6Tka7hUpW7WcA6LB2");
+                review.setUser_full_name("Andrea Cuiuli");
+                review.setUser_thumbnail("");
                 reviewsRef.setValue(review);
 
                 /*reviews.add(review);

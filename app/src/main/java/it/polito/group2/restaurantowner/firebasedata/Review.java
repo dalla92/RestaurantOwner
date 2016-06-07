@@ -1,10 +1,8 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
-import android.graphics.Bitmap;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.Calendar;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 
 /**
  * Created by Alessio on 16/05/2016.
@@ -17,7 +15,7 @@ public class Review implements Comparable<Review>{
     private String user_thumbnail; //with Glide in AsyncTask
     private String restaurant_id;
     private String review_comment;
-    private GregorianCalendar review_date;
+    private Long review_timestamp;
     private float review_rating; //android:stepSize="0.01"
 
     public Review(){
@@ -25,10 +23,10 @@ public class Review implements Comparable<Review>{
     }
 
     @Override
-    public int compareTo(Review another) {
-        if(this.review_date.before(another.getReview_date()))
+    public int compareTo(@NotNull Review another) {
+        if(this.review_timestamp < another.getReview_timestamp())
             return 1;
-        else if(this.review_date.after(another.getReview_date()))
+        else if(this.review_timestamp > another.getReview_timestamp())
             return -1;
         else
             return 0;
@@ -97,12 +95,12 @@ public class Review implements Comparable<Review>{
         this.review_comment = review_comment;
     }
 
-    public GregorianCalendar getReview_date() {
-        return review_date;
+    public Long getReview_timestamp() {
+        return review_timestamp;
     }
 
-    public void setReview_date(GregorianCalendar review_date) {
-        this.review_date = review_date;
+    public void setReview_timestamp(Long review_timestamp) {
+        this.review_timestamp = review_timestamp;
     }
 
     public float getReview_rating() {

@@ -39,11 +39,10 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
         app:itemIconTint="@color/colorAccent"
-        app:itemTextColor="@color/gray"
-        app:headerLayout="@layout/nav_header_main"
+        app:headerLayout="@layout/nav_header_login"
         app:menu="@menu/drawer_menu"
+        app:itemTextColor="@color/gray"
         app:theme="@style/AppTheme"/>
 
 </android.support.v4.widget.DrawerLayout>

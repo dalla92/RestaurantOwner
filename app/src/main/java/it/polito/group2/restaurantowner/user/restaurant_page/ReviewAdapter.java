@@ -13,9 +13,10 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Review;
-import it.polito.group2.restaurantowner.gallery.GalleryViewItem;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder>  {
 
@@ -78,7 +79,9 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         holder.username.setText(reviews.get(position).getUser_full_name());
         holder.stars.setRating(reviews.get(position).getReview_rating());
         SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
-        holder.date.setText(format.format(reviews.get(position).getReview_date().getTime()));
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(reviews.get(position).getReview_timestamp());
+        holder.date.setText(format.format(c.getTime()));
 
         //TODO get the user picture with the UserID
         holder.picture.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.blank_profile_thumb));

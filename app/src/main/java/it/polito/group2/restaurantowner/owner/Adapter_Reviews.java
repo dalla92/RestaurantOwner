@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Review;
@@ -70,7 +71,9 @@ public class Adapter_Reviews extends RecyclerView.Adapter<Adapter_Reviews.Review
 
         reviewViewHolder.userName.setText(reviews.get(i).getUser_id());
         SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
-        reviewViewHolder.date.setText(format.format(reviews.get(i).getReview_date().getTime()));
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(reviews.get(i).getReview_timestamp());
+        reviewViewHolder.date.setText(format.format(c.getTime()));
         reviewViewHolder.stars.setRating(reviews.get(i).getReview_rating()
         );
 

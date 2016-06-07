@@ -18,12 +18,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -32,7 +34,7 @@ import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
-import it.polito.group2.restaurantowner.data.Review;
+import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
@@ -51,6 +53,9 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
     protected Handler handler;
     private FirebaseDatabase firebase;
     private Toolbar toolbar;
+    private String lastKnownKey;
+    private boolean moreReviews;
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,33 +66,57 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
         handler = new Handler();
 
         userID = FirebaseUtil.getCurrentUserId();
+        Log.d("prova", ""+userID);
         if(userID == null) {
-            //TODO utende disconnesso: blocca tutto
+            Toast.makeText(MyReviewsActivity.this, "Error!", Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, UserRestaurantList.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
         }
 
-        firebase = FirebaseDatabase.getInstance();
-
-        reviews = getReviewsJson();
-
-        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.user_review_list);
+        moreReviews = false;
+        reviews = new ArrayList<>();
+        mRecyclerView = (RecyclerView) findViewById(R.id.user_review_list);
         assert mRecyclerView != null;
-        //mRecyclerView.setHasFixedSize(true);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
-
         mRecyclerView.setNestedScrollingEnabled(false);
         mAdapter = new MyReviewAdapter(reviews, this, mRecyclerView);
         mRecyclerView.setAdapter(mAdapter);
 
-        TextView tvEmptyView = (TextView) findViewById(R.id.empty_view);
-        if (reviews.isEmpty()) {
-            mRecyclerView.setVisibility(View.GONE);
-            tvEmptyView.setVisibility(View.VISIBLE);
+        firebase = FirebaseDatabase.getInstance();
 
-        } else {
-            mRecyclerView.setVisibility(View.VISIBLE);
-            tvEmptyView.setVisibility(View.GONE);
-        }
+        Query reviewsQuery = firebase.getReference("reviews").orderByChild("user_id").equalTo(userID).limitToFirst(10);
+        reviewsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    Review review = data.getValue(Review.class);
+                    reviews.add(review);
+                    mAdapter.notifyItemInserted(reviews.size());
+                    lastKnownKey = data.getKey();
+                }
+
+                moreReviews = reviews.size() == 10;
+                mAdapter.updateScrollListener(moreReviews);
+
+                TextView tvEmptyView = (TextView) findViewById(R.id.empty_view);
+                if (reviews.isEmpty()) {
+                    mRecyclerView.setVisibility(View.GONE);
+                    tvEmptyView.setVisibility(View.VISIBLE);
+
+                } else {
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    tvEmptyView.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("prova", "cancelled");
+            }
+        });
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
@@ -96,12 +125,35 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
         mAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-
-                handler.postDelayed(new Runnable() {
+                Query reviewsQuery = firebase.getReference("reviews").orderByChild("user_id").equalTo(userID).startAt(lastKnownKey).limitToFirst(10);
+                reviewsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
-                    public void run() {
+                    public void onDataChange(DataSnapshot dataSnapshot) {
                         //   remove progress item
                         mAdapter.removeNullItem();
+
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            Review review = data.getValue(Review.class);
+                            reviews.add(review);
+                            mAdapter.notifyItemInserted(reviews.size());
+                            lastKnownKey = data.getKey();
+                        }
+
+                        moreReviews = (reviews.size() % 10) == 0;
+                        mAdapter.setLoaded();
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.d("prova", "cancelled");
+                    }
+                });
+
+
+                /*handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+
 
                         //add items one by one
                         int start = reviews.size();
@@ -114,13 +166,13 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
                             date1.set(Calendar.HOUR_OF_DAY, 12);
                             Review r1 = new Review("1", "Paola C.", date1, c1, UUID.randomUUID().toString(), 4.5f);
                             reviews.add(r1);
-                            mAdapter.notifyItemInserted(reviews.size());
+
                         }
 
-                        mAdapter.setLoaded();
+
                         //or you can add all at once but do not forget to call mAdapter.notifyDataSetChanged();
                     }
-                }, 700);
+                }, 700);*/
 
             }
         });
@@ -268,40 +320,6 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    private ArrayList<Review> getReviewsJson() {
-        ArrayList<Review> reviews = new ArrayList<>();
-
-        for (int i = 1; i <= 5; i++) {
-            String c1 = "Davvero un bel locale, personale accogliente e mangiare davvero sopra la media. I prezzi sono accessibile e data la qualità del cibo sono più che giusti.";
-            Calendar date1 = Calendar.getInstance();
-            date1.set(Calendar.HOUR_OF_DAY, 12);
-            Review r1 = new Review("1", "Paola C.", date1, c1, UUID.randomUUID().toString(), 4.5f);
-
-            String c2 = "Think of Recyclerview not as a ListView 1:1 replacement but rather as a more flexible component for complex use cases. And as you say, your solution is what google expected of you.";
-            Calendar date2 = Calendar.getInstance();
-            date2.set(Calendar.HOUR_OF_DAY, 10);
-            Review r2 = new Review("1", "Mario R.", date2, c2, UUID.randomUUID().toString(), 3f);
-
-
-            Calendar date3 = Calendar.getInstance();
-            date3.set(Calendar.HOUR_OF_DAY, 8);
-            Review r3 = new Review("1", "Antonio V.", date3, "", UUID.randomUUID().toString(), 4f);
-
-            String c4 = "Now look into that last piece of code: onCreateViewHolder(ViewGroup parent, int viewType) the signature already suggest different view types.";
-            Calendar date4 = Calendar.getInstance();
-            date4.set(Calendar.HOUR_OF_DAY, 12);
-            date4.set(Calendar.MINUTE, 30);
-            Review r4 = new Review("1", "Paola F.", date4, c4, UUID.randomUUID().toString(), 2.5f);
-
-            reviews.add(r1);
-            reviews.add(r2);
-            reviews.add(r3);
-            reviews.add(r4);
-        }
-
-        return reviews;
     }
 
 }
