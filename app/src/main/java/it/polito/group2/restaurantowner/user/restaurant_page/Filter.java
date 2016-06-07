@@ -38,7 +38,7 @@ public class Filter extends AppCompatActivity {
     private Spinner category;
     private SeekBar seekBar;
     private TextView textView;
-    private int range = 0;
+    private double range = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,21 +61,20 @@ public class Filter extends AppCompatActivity {
 
         // seekbar and textview management
         seekBar.setMax(5000); //5  km at maximum of range
-        textView.setText("Search range: " + seekBar.getProgress() + "/" + formatNumber(seekBar.getMax()));
+        textView.setText(seekBar.getProgress() + "/" + formatNumber(seekBar.getMax()));
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progresValue, boolean fromUser) {
                 range = progresValue;
-                textView.setText("Search range: " + formatNumber(range) + "/" + seekBar.getMax());
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                Toast.makeText(getApplicationContext(), "Started tracking seekbar", Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                textView.setText("Covered: " + range + "/" + seekBar.getMax());
-                Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_SHORT).show();
+                textView.setText(range + "/" + seekBar.getMax());
             }
         });
 

@@ -300,14 +300,14 @@ public class MapsActivity extends AppCompatActivity implements
                 );
                 mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
                 prepare_clustering();
-            }
-            if(DEFAULT_RADIUS!=0){
-                //add circle
-                Circle circle = mMap.addCircle(new CircleOptions()
-                        .center(new LatLng(mLastUserMarker.getPosition().latitude, mLastUserMarker.getPosition().longitude))
-                        .radius(DEFAULT_RADIUS)
-                        .strokeColor(Color.BLACK));
-                        //.fillColor(Color.BLUE)
+                if(DEFAULT_RADIUS!=0){
+                    //add circle
+                    Circle circle = mMap.addCircle(new CircleOptions()
+                            .center(new LatLng(mLastUserMarker.getPosition().latitude, mLastUserMarker.getPosition().longitude))
+                            .radius(DEFAULT_RADIUS)
+                            .strokeColor(Color.BLACK));
+                    //.fillColor(Color.BLUE)
+                }
             }
         }
     }
@@ -351,7 +351,7 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     public void onConnected(Bundle connectionHint) { //Runs when a GoogleApiClient object successfully connects.
         Log.i(TAG, "Connected to GoogleApiClient");
-
+        mRequestingLocationUpdates = true;
         // If the initial location was never previously requested, we use
         // FusedLocationApi.getLastLocation() to get it. If it was previously requested, we store
         // its value in the Bundle and check for it in onCreate(). We
@@ -457,7 +457,7 @@ public class MapsActivity extends AppCompatActivity implements
         locationRequest.setFastestInterval(5 * 1000);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
                 .addLocationRequest(locationRequest);
-        builder.setAlwaysShow(true); //this is the key ingredient
+        //builder.setAlwaysShow(true); //this is the key ingredient if I want to force this permission
 
         PendingResult<LocationSettingsResult> result =
                 LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
@@ -508,33 +508,9 @@ public class MapsActivity extends AppCompatActivity implements
         }
     }
 
+
     public void gps_denied(){
-        dialogPermissionListener_wifi =
-                DialogOnDeniedPermissionListener.Builder
-                        .withContext(this)
-                        .withTitle("WIFI permission")
-                        .withMessage("WIFI permission is needed to locate your city")
-                        .withButtonText(android.R.string.ok)
-                        .withIcon(R.mipmap.ic_launcher)
-                        .build();
-        Dexter.checkPermissionOnSameThread(dialogPermissionListener_wifi, Manifest.permission.ACCESS_COARSE_LOCATION);
-
-        Dexter.checkPermission(new PermissionListener() {
-            @Override
-            public void onPermissionGranted(PermissionGrantedResponse response) {
-                permission_granted();
-            }
-
-            @Override
-            public void onPermissionDenied(PermissionDeniedResponse response) {
-                permission_denied();
-            }
-
-            @Override
-            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                token.continuePermissionRequest();
-            }
-        }, Manifest.permission.ACCESS_COARSE_LOCATION);
+        //does nothing
     }
 
     public void permission_granted(){
@@ -601,7 +577,7 @@ public class MapsActivity extends AppCompatActivity implements
     /*
     public void add_restaurant_preview_if_near(){
         for(RestaurantPreview r : restaurants_previews_list){
-            String distance_string_formatted = calculate_distance2(r.getPosition(), mLastUserMarker);
+            String distance_string_formatted = calculate_distance(r.getPosition(), mLastUserMarker);
             String[] two_strings = distance_string_formatted.split("\\s+");
             double distance = Double.valueOf(two_strings[0]);
             String unit = two_strings[1];
@@ -688,7 +664,7 @@ public class MapsActivity extends AppCompatActivity implements
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     Drawable drawable = new BitmapDrawable(resource);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        //d.findViewById(R.id.father_linear_layout).setBackground(drawable);
+                        d.findViewById(R.id.father_linear_layout).setBackground(drawable);
                         d.findViewById(R.id.father_linear_layout).setAlpha(0.88f);
                     }
                 }
@@ -700,18 +676,20 @@ public class MapsActivity extends AppCompatActivity implements
             if(restaurant_preview.getTables_number()!=0)
                 tablesNumber.setText(String.valueOf(restaurant_preview.getTables_number()));
             address.setText(retrieve_address_by_geocoding(mLastSelectedMarker.getPosition(), mLastSelectedMarker.getPosition())); //or with one query
-            String string_to_round = calculate_distance2(mLastSelectedMarker.getPosition(), mLastUserMarker);
+            String string_to_round = calculate_distance(mLastSelectedMarker.getPosition(), mLastUserMarker);
             String[] parts_to_round = string_to_round.split("\\s+");
             int rounded_value = Math.round(Float.valueOf(parts_to_round[0]));
             String string_result = String.valueOf(rounded_value) + " " + parts_to_round[1];
             distance.setText(string_result);
+            //TODO decomment after integration
+            /*
             button_get_info.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(
                                     getApplicationContext(),
-                                    UserRestaurantActivity.class);
+                                    UserRestaurantPage.class);
                             Bundle b = new Bundle();
                             b.putString("restaurant_id", restaurant_preview.getRestaurant_id());
                             intent.putExtras(b);
@@ -719,6 +697,7 @@ public class MapsActivity extends AppCompatActivity implements
                         }
                     }
             );
+            */
             button_get_street_view.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
@@ -789,7 +768,7 @@ public class MapsActivity extends AppCompatActivity implements
         return null;
     }
 
-    public String calculate_distance2(LatLng a, Marker b) {
+    public String calculate_distance(LatLng a, Marker b) {
         double distance = SphericalUtil.computeDistanceBetween(a, b.getPosition());
         return formatNumber(distance);
     }
