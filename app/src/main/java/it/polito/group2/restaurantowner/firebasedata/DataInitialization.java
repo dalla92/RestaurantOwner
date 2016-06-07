@@ -735,7 +735,7 @@ public class DataInitialization {
         r_p = new RestaurantPreview();
         r_p.setRestaurant_id(restaurant_id);
         r_p.setRestaurant_name("Bella Italia");
-        r_p.setRating((float)3.7);
+        r_p.setRestaurant_rating((float)3.7);
         r_p.setReservations_number(16);
         r_p.setRestaurant_cover_firebase_URL("https://www.flickr.com/photos/142675931@N04/26785604660/in/dateposted-public/");
         r_p.setTables_number(100);
@@ -743,7 +743,7 @@ public class DataInitialization {
         r_p2 = new RestaurantPreview();
         r_p2.setRestaurant_id(restaurant_id2);
         r_p2.setRestaurant_name("Istanbul");
-        r_p2.setRating((float)4.7);
+        r_p2.setRestaurant_rating((float)4.7);
         r_p2.setReservations_number(40);
         r_p2.setRestaurant_cover_firebase_URL("https://www.flickr.com/photos/142675931@N04/26796728940/in/dateposted-public/");
         r_p2.setTables_number(50);

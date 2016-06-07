@@ -10,6 +10,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.SphericalUtil;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
@@ -30,45 +38,96 @@ import it.polito.group2.restaurantowner.data.Meal;
 import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.data.TableReservation;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 
 /**
  * Created by Daniele on 05/04/2016.
  */
-public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder>{
-    private List<Restaurant> mDataset;
-    private static Context mContext;
+public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder> {
+    private List<RestaurantPreview> mDataset;
+    public static Context mContext;
     private static float PRICE_BOUNDARY_1 = 5;
     private static float PRICE_BOUNDARY_2 = 10;
+    public static Marker mLastUserMarker;
+    private static FirebaseDatabase firebase;
+    public static int table_reservation_today_count = 0;
+    public static int today_day;
+    public static int today_month;
+    public static int today_year;
+    public static int total_tables_number;
 
-    protected int filter(String category, String time, boolean price1, boolean price2, boolean price3, boolean price4) {
-                //filter by category
-                List<Restaurant> nResList = new ArrayList<Restaurant>();
-            if(category.equals("0"))
-                nResList = mDataset;
+    // Provide a suitable constructor (depends on the kind of dataset)
+    public UserRestaurantPreviewAdapter(List<RestaurantPreview> myDataset, Context myContext, Marker mLastUserMarker) {
+        this.mLastUserMarker = mLastUserMarker;
+        mDataset = myDataset;
+        mContext = myContext;
+        final Calendar today = Calendar.getInstance();
+        today_day =  today.get(Calendar.DAY_OF_MONTH);
+        today_month = today.get(Calendar.MONTH);
+        today_year = today.get(Calendar.YEAR);
+    }
 
-                for (Restaurant r : mDataset) {
-                    if (r.getRestaurant_category().equals(category))
-                        nResList.add(r);
-                }
-            //filter by time
-            List<Restaurant> n2ResList = new ArrayList<Restaurant>();
-            if(time!=null) {
-                try {
-                    String timeFormat = new String("HH:mm");
-                    SimpleDateFormat sdf = new SimpleDateFormat(timeFormat, Locale.US);
-                    Date filterTime = sdf.parse(time);
-                    ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(mContext);
-                    for(Restaurant r: nResList) {
-                        Calendar calendar = Calendar.getInstance();
-                        int day = calendar.get(Calendar.DAY_OF_WEEK);
-                        for (OpenTime ot : otList) {
-                            if (ot.getRestaurantId().equals(r.getRestaurant_id()) && ot.getDayOfWeek() == day) {
-                                Date openTime = sdf.parse(ot.getOpenHour());
-                                Date closeTime = sdf.parse(ot.getCloseHour());
-                                if (openTime.before(filterTime) && closeTime.after(filterTime)) {
-                                    n2ResList.add(r);
-                                    break;
-                                }
+    // Create new views (invoked by the layout manager)
+    @Override
+    public UserRestaurantPreviewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // create a new view
+        View v = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.user_restaurant_preview, parent, false);
+        // set the view's size, margins, paddings and layout parameters
+        ViewHolder vh = new ViewHolder(v);
+        return vh;
+    }
+
+    // Replace the contents of a view (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        // - get element from your dataset at this position
+        // - replace the contents of the view with that element
+        RestaurantPreview current = mDataset.get(position);
+        holder.setData(current, position);
+
+    }
+
+    // Return the size of your dataset (invoked by the layout manager)
+    @Override
+    public int getItemCount() {
+        return mDataset.size();
+    }
+
+    public void addItem(int position, RestaurantPreview res) {
+        mDataset.add(position, res);
+        notifyItemInserted(position);
+        notifyItemRangeChanged(position, mDataset.size());
+    }
+
+    protected List<RestaurantPreview> filter(String category, String time, boolean price1, boolean price2, boolean price3, boolean price4) {
+        //filter by category
+        List<RestaurantPreview> nResList = new ArrayList<RestaurantPreview>();
+        if (category.equals("0"))
+            nResList = mDataset;
+
+        for (RestaurantPreview r : mDataset) {
+            if (r.getRestaurant_category().equals(category))
+                nResList.add(r);
+        }
+        //filter by time
+        List<RestaurantPreview> n2ResList = new ArrayList<RestaurantPreview>();
+        if (time != null) {
+            try {
+                String timeFormat = new String("HH:mm");
+                SimpleDateFormat sdf = new SimpleDateFormat(timeFormat, Locale.US);
+                Date filterTime = sdf.parse(time);
+                ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(mContext);
+                for (RestaurantPreview r : nResList) {
+                    Calendar calendar = Calendar.getInstance();
+                    int day = calendar.get(Calendar.DAY_OF_WEEK);
+                    for (OpenTime ot : otList) {
+                        if (ot.getRestaurantId().equals(r.getRestaurant_id()) && ot.getDayOfWeek() == day) {
+                            Date openTime = sdf.parse(ot.getOpenHour());
+                            Date closeTime = sdf.parse(ot.getCloseHour());
+                            if (openTime.before(filterTime) && closeTime.after(filterTime)) {
+                                n2ResList.add(r);
+                                break;
                             }
                         }
                     }
@@ -78,36 +137,35 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                     e.printStackTrace();
                 }
 
+        } else
+            n2ResList = nResList;
+        //filter by price
+        List<RestaurantPreview> n3ResList = new ArrayList<RestaurantPreview>();
+        for (RestaurantPreview r : n2ResList) {
+            if (price1 && r.getRestaurant_price_range() == 1) {
+                n3ResList.add(r);
+                continue;
             }
-            else
-                n2ResList = nResList;
-            //filter by price
-            List<Restaurant> n3ResList = new ArrayList<Restaurant>();
-            for(Restaurant r : n2ResList){
-                if(price1 && r.getRestaurant_price_range()==1) {
-                    n3ResList.add(r);
-                    continue;
-                }
-                if(price2 && r.getRestaurant_price_range()==2) {
-                    n3ResList.add(r);
-                    continue;
-                }
-                if(price3 && r.getRestaurant_price_range()==3) {
-                    n3ResList.add(r);
-                    continue;
-                }
-                if(price4 && r.getRestaurant_price_range()==4) {
-                    n3ResList.add(r);
-                    continue;
-                }
+            if (price2 && r.getRestaurant_price_range() == 2) {
+                n3ResList.add(r);
+                continue;
             }
-
-            int size = mDataset.size();
-            mDataset = n3ResList;
-            notifyDataSetChanged();
-            notifyItemRangeChanged(0,size);
-            return 1;
+            if (price3 && r.getRestaurant_price_range() == 3) {
+                n3ResList.add(r);
+                continue;
+            }
+            if (price4 && r.getRestaurant_price_range() == 4) {
+                n3ResList.add(r);
+                continue;
+            }
         }
+
+        int size = mDataset.size();
+        mDataset = n3ResList;
+        notifyDataSetChanged();
+        notifyItemRangeChanged(0, size);
+        return mDataset;
+    }
 
 
     // Provide a reference to the views for each data item
@@ -122,6 +180,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         public TextView distance;
         private ProgressBar progressBar;
         public Restaurant current;
+        public RestaurantPreview current;
         public int position;
 
         public ViewHolder(View v) {
@@ -134,7 +193,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
         }
 
-        public void setData(Restaurant restaurant, int position){
+        public void setData(RestaurantPreview restaurant, int position) {
 
             progressBar.setVisibility(View.VISIBLE);
             if(restaurant.getRestaurant_photo_firebase_URL() == null || restaurant.getRestaurant_photo_firebase_URL().equals("")) {
@@ -170,111 +229,113 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                 }
             }*/
 
-            //TODO remember to take out, just for testing purpose
+            //TODO calculate price range
             //restaurant.setPriceRange(String.valueOf(calculate_range(restaurant)));
             restaurant.setRestaurant_price_range(2);
 
             this.resName.setText(restaurant.getRestaurant_name());
             this.rating.setText(String.valueOf(restaurant.getRestaurant_rating()));
 
-            //TODO remember to take out, just for testing purpose2
-            /*
-            String seats = String.valueOf(calculate_reservations_number(restaurant)) + "/" + restaurant.getTableNum();
-            //this.reservationNumber.setText(seats);
-            */
-            this.reservationNumber.setText("20/100");
+            count_bookings_today_and_display(restaurant.getRestaurant_id(), restaurant, reservationNumber);
 
-            //TODO calculate distance form current location
-            this.distance.setText("23 KM");
+            if (mLastUserMarker!=null){
+                this.distance.setText(calculate_distance2(restaurant.getPosition() , mLastUserMarker));
+            }
+
             this.position = position;
             this.current = restaurant;
         }
-    }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
-    public UserRestaurantPreviewAdapter(List<Restaurant> myDataset, Context myContext) {
-        mDataset = myDataset;
-        mContext = myContext;
-    }
+        public void count_bookings_today_and_display(String restaurant_id, RestaurantPreview r, TextView reservationNumber){
+            final TextView res_num_text_view = reservationNumber;
+            firebase = FirebaseDatabase.getInstance();
+            total_tables_number = r.getTables_number();
+            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/" + restaurant_id + "");
+            ref2.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        TableReservation snap_t_b = (TableReservation) dataSnapshot.getValue();
+                        Calendar that = snap_t_b.getDate();
+                        int that_day =  that.get(Calendar.DAY_OF_MONTH);
+                        int that_month = that.get(Calendar.MONTH);
+                        int that_year = that.get(Calendar.YEAR);
+                        if(that_day==today_day && that_month==today_month && that_year==today_year){
+                            table_reservation_today_count++;
+                            res_num_text_view.setText(table_reservation_today_count+"/"+total_tables_number);
+                        }
+                    }
+                }
 
-
-    // Create new views (invoked by the layout manager)
-    @Override
-    public UserRestaurantPreviewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
-        View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.user_restaurant_preview, parent, false);
-        // set the view's size, margins, paddings and layout parameters
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
-    }
-
-    // Replace the contents of a view (invoked by the layout manager)
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
-        Restaurant current = mDataset.get(position);
-        holder.setData(current, position);
-
-    }
-
-    // Return the size of your dataset (invoked by the layout manager)
-    @Override
-    public int getItemCount() {
-        return mDataset.size();
-    }
-    public void addItem(int position, Restaurant res){
-        mDataset.add(position,res);
-        notifyItemInserted(position);
-        notifyItemRangeChanged(position, mDataset.size());
-    }
-
-    public static int calculate_reservations_number(Restaurant r) {
-        Calendar c = Calendar.getInstance();
-        ArrayList<TableReservation> today_reservations = null;
-        try{
-            today_reservations = JSONUtil.readJSONTableResList(mContext, c, r.getRestaurant_id());
-        }
-        catch(JSONException e){
-            e.printStackTrace();
-        }
-        return today_reservations.size();
-    }
-
-    public static int calculate_range(Restaurant r){
-        ArrayList<Meal> meals = null;
-        try{
-            meals = JSONUtil.readJSONMeList(mContext, r.getRestaurant_id());
-        }
-        catch(JSONException e){
-            e.printStackTrace();
+                @Override
+                public void onCancelled(DatabaseError firebaseError) {
+                    System.out.println("The read failed: " + firebaseError.getMessage());
+                }
+            });
         }
 
-        int meals_number = meals.size();
-
-        if(meals_number==0)
-            return 1;
-
-        double meals_price_sum=0;
-        for(Meal m : meals){
-            meals_price_sum += m.getMeal_price();
+        public String calculate_distance2(LatLng a, Marker b) {
+            double distance = SphericalUtil.computeDistanceBetween(a, b.getPosition());
+            return formatNumber(distance);
         }
 
-        double ratio=0;
+        private String formatNumber(double distance) {
+            String unit = "m";
+            if (distance < 1) {
+                distance *= 1000;
+                unit = "mm";
+            } else if (distance > 1000) {
+                distance /= 1000;
+                unit = "km";
+            }
+            //return String.format("%4.3f%s", distance, unit);
+            //trying to add space to split later
+            return String.format("%4.3f %s", distance, unit);
+        }
 
-        if(meals_price_sum==0)
-            return 1;
+        public static int calculate_reservations_number(Restaurant r) {
+            Calendar c = Calendar.getInstance();
+            ArrayList<TableReservation> today_reservations = null;
+            try {
+                today_reservations = JSONUtil.readJSONTableResList(mContext, c, r.getRestaurant_id());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return today_reservations.size();
+        }
 
-        ratio = meals_price_sum/meals_number;
+        public static int calculate_range(Restaurant r) {
+            ArrayList<Meal> meals = null;
+            try {
+                meals = JSONUtil.readJSONMeList(mContext, r.getRestaurant_id());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
 
-        if(ratio <= PRICE_BOUNDARY_1)
-            return 1;
-        if(ratio > PRICE_BOUNDARY_1 && ratio < PRICE_BOUNDARY_2)
-            return 2;
+            int meals_number = meals.size();
 
-        return 3;
+            if (meals_number == 0)
+                return 1;
+
+            double meals_price_sum = 0;
+            for (Meal m : meals) {
+                meals_price_sum += m.getMeal_price();
+            }
+
+            double ratio = 0;
+
+            if (meals_price_sum == 0)
+                return 1;
+
+            ratio = meals_price_sum / meals_number;
+
+            if (ratio <= PRICE_BOUNDARY_1)
+                return 1;
+            if (ratio > PRICE_BOUNDARY_1 && ratio < PRICE_BOUNDARY_2)
+                return 2;
+
+            return 3;
+        }
     }
-
 
 }

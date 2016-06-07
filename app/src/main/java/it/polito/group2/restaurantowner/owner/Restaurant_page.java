@@ -105,7 +105,6 @@ public class Restaurant_page extends AppCompatActivity
 
         //get the right restaurant
         Bundle b = getIntent().getExtras();
-        //TODO Decomment after integrations
 
         if(b!=null)
             restaurant_id = b.getString("RestaurantId");
@@ -261,7 +260,6 @@ public class Restaurant_page extends AppCompatActivity
     private void fill_data(){
         ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
         if (my_restaurant.getRestaurant_photo_firebase_URL()!= null) {
-            //TODO put it into AsyncTask
             Glide.with(context)
                     .load(my_restaurant.getRestaurant_photo_firebase_URL())
                     .into(image);
@@ -607,6 +605,8 @@ public class Restaurant_page extends AppCompatActivity
                 my_restaurant.setRestaurant_photo_firebase_URL(downloadUrl.toString());
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id+"/restaurant_photo_firebase_URL");
                 ref.setValue(downloadUrl.toString());
+				DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/"+restaurant_id+"/restaurant_cover_firebase_URL");
+                ref2.setValue(downloadUrl.toString());
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override

@@ -116,6 +116,7 @@ import java.util.Set;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.user.restaurant_list.StreetViewActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class MapsActivity extends AppCompatActivity implements
         OnMarkerClickListener,
@@ -141,8 +142,6 @@ public class MapsActivity extends AppCompatActivity implements
     protected final static String LOCATION_KEY = "location-key";
     protected final static String LAST_UPDATED_TIME_STRING_KEY = "last-updated-time-string-key";
     //UI
-    protected Button mStartUpdatesButton;
-    protected Button mStopUpdatesButton;
     protected TextView mLastUpdateTimeTextView;
     protected String mLastUpdateTimeLabel;
 
@@ -171,8 +170,6 @@ public class MapsActivity extends AppCompatActivity implements
         updateValuesFromBundle(savedInstanceState);
 
         // Locate the UI widgets.
-        mStartUpdatesButton = (Button) findViewById(R.id.start_updates_button);
-        mStopUpdatesButton = (Button) findViewById(R.id.stop_updates_button);
         mLastUpdateTimeTextView = (TextView) findViewById(R.id.last_update_time_text);
         // Set labels.
         mLastUpdateTimeLabel = getResources().getString(R.string.last_update_time_label);
@@ -196,15 +193,16 @@ public class MapsActivity extends AppCompatActivity implements
         if(b!=null && b.getDouble("range")!=0){
             DEFAULT_RADIUS = b.getDouble("range");
         }
-        if(b!=null && b.getParcelable("restaurant_preview_list")!=null){ //it must be always this way, because otherwise this activity is not started
+        if(b!=null && b.getParcelable("restaurants_previews_list")!=null){ //it must be always this way, because otherwise this activity is not started
             near_restaurants_previews_list = b.getParcelable("restaurant_preview_list");
         }
-        //TODO delete this after integration
-        else{ //just for debugging purpose
+        /*
+        //just for debugging purpose
+        else{
             RestaurantPreview r_p = new RestaurantPreview();
             r_p.setRestaurant_id("-KIMqPtRSEdm0Cvfc3Za");
             r_p.setRestaurant_name("Bella Italia");
-            r_p.setRating((float) 3.7);
+            r_p.setRestaurant_rating((float) 3.7);
             r_p.setReservations_number(16);
             r_p.setRestaurant_cover_firebase_URL("https://firebasestorage.googleapis.com/v0/b/have-break-9713d.appspot.com/o/restaurants%2F-KIMqPtRSEdm0Cvfc3Za%2Fcover.jpg?alt=media&token=1977eb09-a51c-440c-b64c-e6d48fe7c316");
             r_p.setTables_number(100);
@@ -214,7 +212,7 @@ public class MapsActivity extends AppCompatActivity implements
             RestaurantPreview r_p2 = new RestaurantPreview();
             r_p2.setRestaurant_id("-KIMqPtRSEdm0Cvfc3Za");
             r_p2.setRestaurant_name("Istanbul");
-            r_p2.setRating((float) 4.7);
+            r_p2.setRestaurant_rating((float) 4.7);
             r_p2.setReservations_number(40);
             r_p2.setRestaurant_cover_firebase_URL("https://www.flickr.com/photos/142675931@N04/26796728940/in/dateposted-public/");
             r_p2.setTables_number(50);
@@ -224,6 +222,7 @@ public class MapsActivity extends AppCompatActivity implements
 
             //add_restaurant_preview_if_near();
         }
+        */
 
         if (savedInstanceState != null) {
             if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
@@ -260,7 +259,7 @@ public class MapsActivity extends AppCompatActivity implements
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-    public void startUpdatesButtonHandler(View view) {
+    public void startUpdatesButtonHandler() {
         if (!mRequestingLocationUpdates) {
             mRequestingLocationUpdates = true;
             //setButtonsEnabledState();
@@ -268,7 +267,7 @@ public class MapsActivity extends AppCompatActivity implements
         }
     }
 
-    public void stopUpdatesButtonHandler(View view) {
+    public void stopUpdatesButtonHandler() {
         if (mRequestingLocationUpdates) {
             mRequestingLocationUpdates = false;
             //setButtonsEnabledState();
@@ -286,16 +285,6 @@ public class MapsActivity extends AppCompatActivity implements
         }
     }
 
-    private void setButtonsEnabledState() {
-        if (mRequestingLocationUpdates) {
-            mStartUpdatesButton.setEnabled(false);
-            mStopUpdatesButton.setEnabled(true);
-        } else {
-            mStartUpdatesButton.setEnabled(true);
-            mStopUpdatesButton.setEnabled(false);
-        }
-    }
-
     private void updateUI() {
         if(mMap!=null) {
             mMap.clear();
@@ -307,6 +296,7 @@ public class MapsActivity extends AppCompatActivity implements
                                 .title("Your position")
                                         //.snippet("Population: 2,074,200")
                                 .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
+                                .visible(false)
                 );
                 mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
                 prepare_clustering();
@@ -332,12 +322,12 @@ public class MapsActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        grantPermissions();
-    }
+            grantPermissions();
+        }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+        @Override
+        public void onResume() {
+            super.onResume();
         if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
             startLocationUpdates();
         }
@@ -427,6 +417,8 @@ public class MapsActivity extends AppCompatActivity implements
         if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
             // only for Marshmallow and newer versions
             //I want that first I request GPS, but if rejected, request WIFI
+            /*
+            dialogPermissionListener_gps =
     /*        dialogPermissionListener_gps =
                     DialogOnDeniedPermissionListener.Builder
                             .withContext(this)
@@ -435,6 +427,8 @@ public class MapsActivity extends AppCompatActivity implements
                             .withButtonText(android.R.string.ok)
                             .withIcon(R.mipmap.ic_launcher)
                             .build();
+            Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
+            */
             Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
 */
             Dexter.checkPermission(new PermissionListener() {
@@ -607,7 +601,7 @@ public class MapsActivity extends AppCompatActivity implements
     /*
     public void add_restaurant_preview_if_near(){
         for(RestaurantPreview r : restaurants_previews_list){
-            String distance_string_formatted = calculate_distance(r.getPosition(), mLastUserMarker);
+            String distance_string_formatted = calculate_distance2(r.getPosition(), mLastUserMarker);
             String[] two_strings = distance_string_formatted.split("\\s+");
             double distance = Double.valueOf(two_strings[0]);
             String unit = two_strings[1];
@@ -702,24 +696,22 @@ public class MapsActivity extends AppCompatActivity implements
 
             //fill_restaurant_preview
             resName.setText(restaurant_preview.getRestaurant_name());
-            rating.setRating(restaurant_preview.getRating());
+            rating.setRating(restaurant_preview.getRestaurant_rating());
             if(restaurant_preview.getTables_number()!=0)
                 tablesNumber.setText(String.valueOf(restaurant_preview.getTables_number()));
             address.setText(retrieve_address_by_geocoding(mLastSelectedMarker.getPosition(), mLastSelectedMarker.getPosition())); //or with one query
-            String string_to_round = calculate_distance(mLastSelectedMarker.getPosition(), mLastUserMarker);
+            String string_to_round = calculate_distance2(mLastSelectedMarker.getPosition(), mLastUserMarker);
             String[] parts_to_round = string_to_round.split("\\s+");
             int rounded_value = Math.round(Float.valueOf(parts_to_round[0]));
             String string_result = String.valueOf(rounded_value) + " " + parts_to_round[1];
             distance.setText(string_result);
-            //TODO decomment after integration
-            /*
             button_get_info.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(
                                     getApplicationContext(),
-                                    UserRestaurantPage.class);
+                                    UserRestaurantActivity.class);
                             Bundle b = new Bundle();
                             b.putString("restaurant_id", restaurant_preview.getRestaurant_id());
                             intent.putExtras(b);
@@ -727,7 +719,6 @@ public class MapsActivity extends AppCompatActivity implements
                         }
                     }
             );
-            */
             button_get_street_view.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
@@ -798,7 +789,7 @@ public class MapsActivity extends AppCompatActivity implements
         return null;
     }
 
-    public String calculate_distance(LatLng a, Marker b) {
+    public String calculate_distance2(LatLng a, Marker b) {
         double distance = SphericalUtil.computeDistanceBetween(a, b.getPosition());
         return formatNumber(distance);
     }

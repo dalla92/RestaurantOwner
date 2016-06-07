@@ -58,6 +58,9 @@ import java.util.HashMap;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
+import it.polito.group2.restaurantowner.data.Bookmark;
+import it.polito.group2.restaurantowner.data.MenuCategory;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Offer;
@@ -70,6 +73,7 @@ import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.order.OrderActivity;
+import it.polito.group2.restaurantowner.user.restaurant_list.MyItem;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class UserRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -579,7 +583,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         Log.d("result", "" + requestCode + " " + resultCode);
         if (requestCode == ADD_REQUEST) {
             if (resultCode == RESULT_OK) {
@@ -599,6 +603,27 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 review.setUser_full_name("Andrea Cuiuli");
                 review.setUser_thumbnail("");
                 reviewsRef.setValue(review);
+
+                //update restaurant rating
+                DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/reviews/" + restaurantID);
+                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        long total_reviews_number = snapshot.getChildrenCount();
+                        double total_reviews_rating = 0;
+                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                            Review r = (Review) dataSnapshot.getValue(Review.class);
+                            total_reviews_rating += r.getReview_rating();
+                        }
+                        DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurantID  + "/restaurant_rating");
+                        ref2.setValue(total_reviews_rating);
+                        DatabaseReference ref3 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurantID  + "/restaurant_rating");
+                        ref3.setValue(total_reviews_rating);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError firebaseError) {
+                    }
+                });
 
                 /*reviews.add(review);
                 Collections.sort(reviews);

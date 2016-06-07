@@ -18,15 +18,17 @@ import com.google.maps.android.clustering.ClusterItem;
  * Created by Alessio on 16/05/2016.
  */
 public class RestaurantPreview implements ClusterItem, Parcelable {
-    public LatLng mPosition;
+
     public Double lat;
     public Double lon;
     private String restaurant_id; //to pass to the new Activity to open the right restaurant
     private String restaurant_cover_firebase_URL; //with Glide in AsyncTask
     private String restaurant_name;
-    private float rating; //android:stepSize="0.01"
+    private int restaurant_price_range;
+    private float restaurant_rating; //android:stepSize="0.01"
     private int reservations_number;
     private int tables_number;
+    private String restaurant_category;
 
     public RestaurantPreview(){
 
@@ -34,7 +36,6 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
 
     @Override
     public LatLng getPosition() {
-        //return this.mPosition;
         return new LatLng(getLat(), getLon());
     }
 
@@ -62,12 +63,12 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
         this.restaurant_name = restaurant_name;
     }
 
-    public float getRating() {
-        return rating;
+    public float getRestaurant_rating() {
+        return restaurant_rating;
     }
 
-    public void setRating(float rating) {
-        this.rating = rating;
+    public void setRestaurant_rating(float restaurant_rating) {
+        this.restaurant_rating = restaurant_rating;
     }
 
     public int getReservations_number() {
@@ -86,46 +87,6 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
         this.tables_number = tables_number;
     }
 
-    public LatLng getmPosition() {
-        //TODO Decomment maybe after integration
-        /*
-        //get only latitude
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+getRestaurant_id()+"/restaurant_latitude_position");
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot res_latSnapshot : snapshot.getChildren()) {
-                    Double snap_lat = (Double) res_latSnapshot.getValue();
-                    lat = snap_lat;
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
-        //get only longitude
-        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+getRestaurant_id()+"/restaurant_longitude_position");
-        ref2.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot res_longSnapshot : snapshot.getChildren()) {
-                    Double snap_long = (Double) res_longSnapshot.getValue();
-                    lon = snap_long;
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
-        */
-        mPosition = new LatLng(lat, lon);
-        return mPosition;
-    }
-
     public Double getLat() {
         return lat;
     }
@@ -142,19 +103,33 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
         this.lon = lon;
     }
 
+    public int getRestaurant_price_range() {
+        return restaurant_price_range;
+    }
+
+    public void setRestaurant_price_range(int restaurant_price_range) {
+        this.restaurant_price_range = restaurant_price_range;
+    }
+
+    public String getRestaurant_category() {
+        return restaurant_category;
+    }
+
+    public void setRestaurant_category(String restaurant_category) {
+        this.restaurant_category = restaurant_category;
+    }
+
     //Parcelable part
     public RestaurantPreview(Parcel in){
         String[] data = new String[9];
 
         in.readStringArray(data);
-        String[] parts = data[0].split(",");
-        this.mPosition = new LatLng (Double.valueOf(parts[0]), Double.valueOf(parts[1]));
         this.lat = Double.valueOf(data[1]);
         this.lon = Double.valueOf(data[2]);
         this.restaurant_id = data[3];
         this.restaurant_cover_firebase_URL = data[4];
         this.restaurant_name = data[5];
-        this.rating = Float.valueOf(data[6]);
+        this.restaurant_rating = Float.valueOf(data[6]);
         this.reservations_number = Integer.valueOf(data[7]);
         this.tables_number = Integer.valueOf(data[8]);
 
@@ -163,13 +138,12 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeStringArray(new String[] {
-                String.valueOf(this.mPosition),
                 String.valueOf(this.lat),
                 String.valueOf(this.lon),
                 this.restaurant_id,
                 this.restaurant_cover_firebase_URL,
                 this.restaurant_name,
-                String.valueOf(this.rating),
+                String.valueOf(this.restaurant_rating),
                 String.valueOf(this.reservations_number),
                 String.valueOf(this.tables_number)
                 });

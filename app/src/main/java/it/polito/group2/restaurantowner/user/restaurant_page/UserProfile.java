@@ -97,32 +97,13 @@ public class UserProfile extends AppCompatActivity{
 
         //get the right user
         Bundle b = getIntent().getExtras();
-        //TODO Decomment after integrations
-        /*
         if(b!=null)
-            restaurant_id = b.getString("user_id");
-        */
+            user_id = b.getString("user_id");
         if(user_id==null)
             user_id = "-KITT2QZqVN7VK2Smof9";
 
         //get and fill related data
         get_user_from_firebase();
-		
-
-        //TODO decomment handle logged/not logged user
-        /*
-        if(user_id==null){ //not logged
-            Menu nav_Menu = navigationView.getMenu();
-            nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reservations).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reviews).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_favorites).setVisible(false);
-        }
-        else{ //logged
-            //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
-        }
-        */
 		
     }
 
@@ -642,15 +623,10 @@ public class UserProfile extends AppCompatActivity{
                                             Uri downloadUrl = taskSnapshot.getDownloadUrl();
                                             new_user.setUser_thumbnail(downloadUrl.toString());
 
-                                            //remove old user and insert new one
-                                            //TODO remove the next line
-                                            String wrong_id = "-KI8xQ4iFbjV_HjmFqU4";
-                                            DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/" + wrong_id);
+                                            DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/" + user_id);
                                             ref.setValue(null);
-                                            DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/");
-                                            DatabaseReference ref3 = ref2.push();
-                                            new_user.setUser_id(ref3.getKey());
-                                            ref3.setValue(new_user);
+                                            DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/" + user_id);
+                                            ref2.setValue(new_user);
                                         }
                                     }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
                                     @Override

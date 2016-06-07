@@ -69,21 +69,6 @@ public class UserMyFavourites extends AppCompatActivity{
 
         get_user_from_firebase();
 
-        //TODO decomment handle logged/not logged user
-        /*
-        if(user_id==null){ //not logged
-            Menu nav_Menu = navigationView.getMenu();
-            nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reservations).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reviews).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_favorites).setVisible(false);
-        }
-        else{ //logged
-            //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
-        }
-        */
-
 
     }
 

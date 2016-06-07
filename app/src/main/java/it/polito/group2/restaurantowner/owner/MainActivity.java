@@ -29,6 +29,7 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
@@ -96,12 +97,10 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                //TODO capire quando si verifica
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                //TODO capire quando si verifica
             }
         });
 
@@ -220,6 +219,21 @@ public class MainActivity extends AppCompatActivity
                 DatabaseReference item = restaurantReference.push();
                 res.setRestaurant_id(item.getKey());
                 item.setValue(res);
+				
+				//save also the restaurant preview
+				DatabaseReference restaurantReference2 = firebase.getReference("restaurants_previews"+res.getRestaurant_id());
+				RestaurantPreview r_p = new RestaurantPreview();
+				if(res.getRestaurant_latitude_position()!=0)
+					r_p.setLat(res.getRestaurant_latitude_position());
+				if(res.getRestaurant_latitude_position()!=0)
+					r_p.setLon(res.getRestaurant_latitude_position());
+				r_p.setRestaurant_id(res.getRestaurant_id());
+				r_p.setRestaurant_name(res.getRestaurant_name());
+				r_p.setRestaurant_price_range(1);
+				r_p.setRestaurant_rating(1);
+				r_p.setTables_number(res.getRestaurant_total_tables_number());
+				r_p.setRestaurant_category(res.getRestaurant_category());
+				restaurantReference2.setValue(r_p);
             }
         }
     }

@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner.user.my_reviews;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -150,12 +155,12 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
             reviewHolder.stars.setRating(reviews.get(position).getReview_rating());
 
             SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
+            reviewHolder.date.setText(format.format(reviews.get(position).getReview_date().getTime()));
             Calendar c = Calendar.getInstance();
             c.setTimeInMillis(reviews.get(position).getReview_timestamp());
             reviewHolder.date.setText(format.format(c.getTime()));
 
-            //TODO get the user picture with the UserID
-            reviewHolder.picture.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.blank_profile_thumb));
+            Glide.with(context).load(reviews.get(position).getUser_thumbnail()).into(reviewHolder.picture);
 
             if (reviews.get(position).getReview_comment().equals(""))
                 reviewHolder.comment.setVisibility(View.GONE);

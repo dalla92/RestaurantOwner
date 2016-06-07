@@ -13,7 +13,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -33,6 +35,9 @@ public class Filter extends AppCompatActivity {
     private CheckBox CBThreeEuro;
     private CheckBox CBFourEuro;
     private Spinner category;
+    private SeekBar seekBar;
+    private TextView textView;
+    private int range = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,28 @@ public class Filter extends AppCompatActivity {
         CBTwoEuro = (CheckBox) findViewById(R.id.CBTwoEuro);
         CBThreeEuro = (CheckBox) findViewById(R.id.CBThreeEuro);
         CBFourEuro = (CheckBox) findViewById(R.id.CBFourEuro);
+        seekBar = (SeekBar) findViewById(R.id.seekBar1);
+        textView = (TextView) findViewById(R.id.textView1);
+
+        // seekbar and textview management
+        seekBar.setMax(5000); //5  km at maximum of range
+        textView.setText("Search range: " + seekBar.getProgress() + "/" + formatNumber(seekBar.getMax()));
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progresValue, boolean fromUser) {
+                range = progresValue;
+                textView.setText("Search range: " + formatNumber(range) + "/" + seekBar.getMax());
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                Toast.makeText(getApplicationContext(), "Started tracking seekbar", Toast.LENGTH_SHORT).show();
+            }
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                textView.setText("Covered: " + range + "/" + seekBar.getMax());
+                Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         CBtime.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,7 +96,6 @@ public class Filter extends AppCompatActivity {
             }
         });
 
-
         // Create an ArrayAdapter using the string array and a default spinner layout
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.filter_categories_array, android.R.layout.simple_spinner_item);
@@ -78,6 +104,21 @@ public class Filter extends AppCompatActivity {
         // Apply the adapter to the spinner
         category.setAdapter(adapter);
 
+    }
+
+    private String formatNumber(double distance) {
+        String unit = "m";
+        if (distance < 1) {
+            distance *= 1000;
+            unit = "mm";
+        } else if (distance > 1000) {
+            distance /= 1000;
+            unit = "km";
+        }
+
+        //return String.format("%4.3f%s", distance, unit);
+        //trying to add space to split later
+        return String.format("%4.3f %s", distance, unit);
     }
 
     @Override
@@ -100,6 +141,7 @@ public class Filter extends AppCompatActivity {
             intent.putExtra("TwoEuro", CBTwoEuro.isChecked());
             intent.putExtra("ThreeEuro", CBThreeEuro.isChecked());
             intent.putExtra("FourEuro", CBFourEuro.isChecked());
+            intent.putExtra("range", range);
             if(CBtime.isChecked())
                 intent.putExtra("Time", CBtime.getText().toString());
             if(category.getSelectedItemPosition()==0)

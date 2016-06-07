@@ -76,11 +76,8 @@ public class UserMyReservations extends AppCompatActivity{
 
         //get the right restaurant
         Bundle b = getIntent().getExtras();
-        //TODO Decomment after integrations
-        /*
         if(b!=null)
             user_id = b.getString("user_id");
-        */
         if(user_id==null)
             user_id = "fake_user_id";
 
@@ -222,21 +219,6 @@ public class UserMyReservations extends AppCompatActivity{
                     }
                 }
 
-                //TODO decomment handle logged/not logged user
-                /*
-                if(user_id==null){ //not logged
-                    Menu nav_Menu = navigationView.getMenu();
-                    nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
-                    nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
-                    nav_Menu.findItem(R.id.nav_my_reservations).setVisible(false);
-                    nav_Menu.findItem(R.id.nav_my_reviews).setVisible(false);
-                    nav_Menu.findItem(R.id.nav_my_favorites).setVisible(false);
-                }
-                else{ //logged
-                    //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
-                }
-                */
-
                 //navigation drawer
                 NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
                 navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -338,39 +320,12 @@ public class UserMyReservations extends AppCompatActivity{
                                 .placeholder(R.drawable.blank_profile)
                                 .into(nav_photo);
                 }
-                    //TODO load photo
-                    /*
-                    if (current_user.getUser_photo_firebase_URL() != null)
-                        Glide.load(current_user.getUser_photo_firebase_URL()).into(nav_photo);
-
-                    SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-                    Uri photouri = null;
-                    if (userDetails.getString("photouri", null) != null) {
-                        photouri = Uri.parse(userDetails.getString("photouri", null));
-                        File f = new File(getRealPathFromURI(photouri));
-                        Drawable d = Drawable.createFromPath(f.getAbsolutePath());
-                        navigationView.getHeaderView(0).setBackground(d);
-                    } else
-                        nav_photo.setImageResource(R.drawable.blank_profile);
-                    */
-
             }
             @Override
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         });
-    }
-
-    private String getRealPathFromURI(Uri contentURI) {
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            return contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
-        }
     }
 
     @Override

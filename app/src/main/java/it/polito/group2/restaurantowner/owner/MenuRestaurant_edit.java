@@ -24,8 +24,11 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
 import com.google.firebase.storage.OnProgressListener;
@@ -46,9 +49,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.MealCategory;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.Review;
 
 /**
  * Created by Alessio on 16/04/2016.
@@ -61,6 +67,10 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     private StorageReference user_storage_reference;
     private Context context;
     private String photouri;
+    private FirebaseDatabase firebase;
+    private static final int PRICE_BOUNDARY_1 = 5;
+    private static final int PRICE_BOUNDARY_2 = 10;
+    private static final int PRICE_BOUNDARY_3 = 15;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +154,48 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         current_meal.setMealVegetarian(is_vegetarian);
         current_meal.setMeal_category(category);
         current_meal.setMealTakeAway(take_away);
+
+        //update restaurant price range
+        firebase = FirebaseDatabase.getInstance();
+        DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + current_meal.getRestaurant_id());
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                long total_meals_number = snapshot.getChildrenCount();
+                double total_meals_price = 0;
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    Meal m = (Meal) dataSnapshot.getValue(Meal.class);
+                    total_meals_price += m.getMeal_price();
+                }
+                int new_price_range = calculate_range(total_meals_number, total_meals_price);
+                DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + current_meal.getRestaurant_id() + "/restaurant_price_range");
+                ref2.setValue(new_price_range);
+                DatabaseReference ref3 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + current_meal.getRestaurant_id() + "/restaurant_price_range");
+                ref3.setValue(new_price_range);
+            }
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+            }
+        });
     }
+
+    public static int calculate_range(long total_meals_number, double total_meals_price) {
+        if (total_meals_number == 0 || total_meals_price == 0)
+            return 1;
+
+        double ratio = 0;
+
+        ratio = total_meals_price / total_meals_number;
+
+        if (ratio <= PRICE_BOUNDARY_1)
+            return 1;
+        if (ratio > PRICE_BOUNDARY_1 && ratio < PRICE_BOUNDARY_2)
+            return 2;
+        if (ratio > PRICE_BOUNDARY_2 && ratio < PRICE_BOUNDARY_3)
+            return 3;
+        return 4;
+    }
+
 
     @Override
     public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealCategory> tags) {

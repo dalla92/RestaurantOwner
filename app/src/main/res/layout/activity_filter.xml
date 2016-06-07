@@ -55,7 +55,7 @@
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="€"
+            android:text="5€"
             android:checked="true"
             android:id="@+id/CBOneEuro" />
 
@@ -63,7 +63,7 @@
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="€€"
+            android:text="10€"
             android:checked="true"
             android:id="@+id/CBTwoEuro" />
 
@@ -71,14 +71,14 @@
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="€€€"
+            android:text="15€"
             android:checked="true"
             android:id="@+id/CBThreeEuro" />
         <CheckBox
             android:layout_weight="1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="€€€€"
+            android:text="20€"
             android:checked="true"
             android:id="@+id/CBFourEuro" />
     </LinearLayout>
@@ -120,6 +120,32 @@
         android:layout_alignParentStart="true"
         android:paddingTop="4dp"/>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_below="@id/checkBoxTime"
+        android:layout_height="wrap_content">
+
+        <SeekBar
+            android:id="@+id/seekBar1"
+            android:layout_width="230dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="26dp"
+            android:max="10"/>
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/seekBar1"
+            android:layout_marginLeft="29dp"
+            android:layout_marginTop="14dp" />
+    </LinearLayout>
+
 </RelativeLayout>
+
+
 
 </android.support.design.widget.CoordinatorLayout>

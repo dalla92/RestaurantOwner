@@ -87,15 +87,9 @@ public class UserTableReservationActivity extends AppCompatActivity{
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         //get data
-        //TODO to decomment after integration
-        /*
         Intent intent = getIntent();
         current_restaurant = (Restaurant) intent.getExtras().get("Restaurant");
         user_id = (String) intent.getExtras().get("user_id");
-        */
-        restaurant_id = "-KI8xQ4PDVSKKjnRGmdG";
-        user_id = "fake_user_id";
-        //DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
         DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+user_id);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
@@ -395,7 +389,7 @@ public class UserTableReservationActivity extends AppCompatActivity{
                             @Override
                             public void onClick(DialogInterface dialog,
                                                 int which) {
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/"+restaurant_id);
                                 DatabaseReference ref2 = ref.push();
                                 current_table_reservation.setTable_reservation_id(ref2.getKey());
                                 ref2.setValue(current_table_reservation);

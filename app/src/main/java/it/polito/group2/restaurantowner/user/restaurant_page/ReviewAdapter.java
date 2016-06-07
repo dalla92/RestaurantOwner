@@ -11,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -83,8 +85,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         c.setTimeInMillis(reviews.get(position).getReview_timestamp());
         holder.date.setText(format.format(c.getTime()));
 
-        //TODO get the user picture with the UserID
-        holder.picture.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.blank_profile_thumb));
+        Glide.with(context).load(reviews.get(position).getUser_thumbnail()).into(holder.picture);
 
         if(reviews.get(position).getReview_comment().equals(""))
             holder.comment.setVisibility(View.GONE);

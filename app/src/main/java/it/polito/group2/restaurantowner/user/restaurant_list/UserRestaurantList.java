@@ -2,12 +2,23 @@ package it.polito.group2.restaurantowner.user.restaurant_list;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
+
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -17,6 +28,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -27,6 +39,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import it.polito.group2.restaurantowner.R;
 
@@ -34,13 +47,24 @@ import it.polito.group2.restaurantowner.R;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResult;
+import com.google.android.gms.location.LocationSettingsStates;
+import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -48,13 +72,33 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener;
+import com.karumi.dexter.listener.single.PermissionListener;
 
+import org.json.JSONException;
+
+import java.io.File;
+import java.io.InputStream;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.data.JSONUtil;
+import it.polito.group2.restaurantowner.data.User;
+import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
@@ -68,18 +112,35 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActiv
 import it.polito.group2.restaurantowner.user.search.SearchActivity;
 
 public class UserRestaurantList extends AppCompatActivity
-//      DatabaseReferenceLoginBaseActivity
-        implements OnMapReadyCallback, NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener
-/*        , OnMapReadyCallback, GeoQueryEventListener
-*/{
+        implements
+        OnMapReadyCallback,
+        NavigationView.OnNavigationItemSelectedListener,
+        GoogleApiClient.OnConnectionFailedListener,
+        GoogleApiClient.ConnectionCallbacks,
+        LocationListener
+{
 
     final static int ACTION_FILTER = 1;
     private UserRestaurantPreviewAdapter mAdapter;
     private RecyclerView mRecyclerView;
-    ArrayList<Restaurant> resList = new ArrayList<>();
+    ArrayList<RestaurantPreview> restaurants_previews_list = new ArrayList<>();
     private static final int VERTICAL_ITEM_SPACE = 5;
-    private GoogleApiClient mGoogleApiClient;
+    private final int REQUEST_CHECK_SETTINGS = 1;
+    private double range = 2000; //dafault range is 2 km
+    private GoogleMap mMap;
+    private final float DEFAULT_ZOOM1 = 11.0f;
+    private ClusterManager<MyItem> mClusterManager;
+    private Marker mLastUserMarker;
     final static int LOCATION_REQUEST = 4;
+    protected static final String TAG = "location-updates-sample";
+    protected Boolean mRequestingLocationUpdates; //Tracks the status of the location updates request if started or not
+    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000; //The desired interval for location updates. Inexact. Updates may be more or less frequent.
+    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS * 3; //The fastest rate for active location updates. Exact. Updates will never be more frequent than this value.
+    protected Location mCurrentLocation;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationRequest mLocationRequest;
+    PermissionListener dialogPermissionListener_gps;
+    PermissionListener dialogPermissionListener_wifi;
     /*private GeoFire geoFire;
     private GeoQuery geoQuery;
     HashMap<String,GeoLocation> resNearby = new HashMap<>();*/
@@ -88,9 +149,6 @@ public class UserRestaurantList extends AppCompatActivity
     private ProgressDialog mProgressDialog;
     private Toolbar toolbar;
 
-    private GoogleMap mMap;
-    private final float DEFAULT_ZOOM1 = 11.0f;
-    private ClusterManager<MyItem> mClusterManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,60 +157,7 @@ public class UserRestaurantList extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        showProgressDialog();
-        firebase = FirebaseDatabase.getInstance();
-
-        //if location is not active, otherwise should call GeoFire
-        Query restaurantReference = firebase.getReference("restaurants").orderByChild("rating");
-
-        restaurantReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Restaurant r = dataSnapshot.getValue(Restaurant.class);
-        /*
-        //TODO mettere le subsciption quando si completa un ordine e mandare la notifica quando si crea una nuova offerta
-                FirebaseMessaging.getInstance().subscribeToTopic("asd");
-                new SendNotificationAsync().execute(r.getRestaurant_name(),r.getRestaurant_id());
-*/
-                resList.add(r);
-                hideProgressDialog();
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                /*Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
-                for (Restaurant r : resList) {
-                    if (r.getRestaurant_id().equals(changedRes.getRestaurant_id())) {
-                        resList.remove(r);
-                        resList.add(changedRes);
-                        break;
-                    }
-                }*/
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Restaurant removedRes = dataSnapshot.getValue(Restaurant.class);
-                for (Restaurant r : resList) {
-                    if (r.getRestaurant_id().equals(removedRes.getRestaurant_id())) {
-                        resList.remove(r);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                //TODO capire quando si verifica
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                //TODO capire quando si verifica
-            }
-        });
-
-
+        //showProgressDialog();
         ImageView filter_icon = (ImageView) findViewById(R.id.icon_filter);
         assert filter_icon != null;
         filter_icon.setOnClickListener(new View.OnClickListener() {
@@ -184,6 +189,7 @@ public class UserRestaurantList extends AppCompatActivity
                     .addApi(LocationServices.API)
                     .build();
         }
+        createLocationRequest();
 
         // GoogleMapOptions options = new GoogleMapOptions().liteMode(true);
         //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -211,97 +217,19 @@ public class UserRestaurantList extends AppCompatActivity
                     @Override
                     public void onItemClick(View view, int position) {
                         Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
-                        String id = resList.get(position).getRestaurant_id();
+                        String id = restaurants_previews_list.get(position).getRestaurant_id();
                         mIntent.putExtra("restaurant_id", id);
                         startActivity(mIntent);
                     }
                 })
         );
 
-        mAdapter = new UserRestaurantPreviewAdapter(resList, this);
+        mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
         mRecyclerView.setAdapter(mAdapter);
 
         setDrawer();
 
         setUpMap();
-
-        //navigation drawer
-        /*DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        //TODO decomment handle logged/not logged user
-        /*
-        if(user_id==null){ //not logged
-            Menu nav_Menu = navigationView.getMenu();
-            nav_Menu.findItem(R.id.nav_my_profile).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_orders).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reservations).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_reviews).setVisible(false);
-            nav_Menu.findItem(R.id.nav_my_favorites).setVisible(false);
-        }
-        else{ //logged
-            //if user is logged does not need to logout for any reason; he could authenticate with another user so Login is still maintained
-        }
-
-        //TODO Rearrange the following code
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("user_id")!=null) {
-            user_id = getIntent().getExtras().getString("user_id");
-            try {
-                users = JSONUtil.readJSONUsersList(this, null);
-            }
-            catch(JSONException e){
-                e.printStackTrace();
-            }
-            for(User u : users){
-                if(u.getId().equals(user_id)){
-                    current_user = u;
-                    break;
-                }
-            }
-        }
-        else{
-            current_user = new User();
-            current_user.setEmail("jkjs@dskj");
-            //current_user.setFidelity_points(110);
-            current_user.setFirst_name("Alex");
-            current_user.setIsOwner(true);
-            current_user.setPassword("tipiacerebbe");
-            current_user.setPhone_number("0989897879789");
-            current_user.setVat_number("sw8d9wd8w9d8w9d9");
-        }
-        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-        /*
-        BorderedTextView nav_username = (BorderedTextView) nav_email_textview;
-        BorderedTextView nav_email = (BorderedTextView) nav_email_textview;
-
-        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(current_user!=null) {
-            if (current_user.getFirst_name() != null && current_user.getLast_name() == null)
-                nav_username.setText(current_user.getFirst_name());
-            else if (current_user.getFirst_name() == null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getLast_name());
-            else if (current_user.getFirst_name() != null && current_user.getLast_name() != null)
-                nav_username.setText(current_user.getFirst_name() + " " + current_user.getLast_name());
-            if (current_user.getEmail() != null)
-                nav_email.setText(current_user.getEmail());
-            if (current_user.getPhoto() != null)
-                nav_photo.setImageBitmap(current_user.getPhoto());
-        }
-        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-        Uri photouri = null;
-        if(userDetails.getString("photouri", null)!=null) {
-            photouri = Uri.parse(userDetails.getString("photouri", null));
-            File f = new File(getRealPathFromURI(photouri));
-            d = Drawable.createFromPath(f.getAbsolutePath());
-            navigationView.getHeaderView(0).setBackground(d);
-        }
-        else
-        nav_photo.setImageResource(R.drawable.blank_profile);*/
     }
 
     @Override
@@ -337,6 +265,88 @@ public class UserRestaurantList extends AppCompatActivity
         });
 
         maps_stuff();
+        read_restaurants_from_firebase();
+    }
+
+    public void read_restaurants_from_firebase(){
+        showProgressDialog();
+        firebase = FirebaseDatabase.getInstance();
+
+        //I want to get all restaurants within 2Km: I get all the ids of the restaurants, for each id I get its latitude and longitude, and if distance<2km I add it to restaurant_preview_list and cluster_manager
+        DatabaseReference ref = firebase.getReference("restaurant_names");
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                        final String restaurant_id = (String) dataSnapshot.getValue();
+                        DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_latitude_position");
+                        ref.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                    Double snap_lat = (Double) snapshot.getValue();
+                                    final Double lat = snap_lat;
+                                    //get only longitude
+                                    DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_longitude_position");
+                                    ref2.addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot snapshot) {
+                                                Double snap_long = (Double) snapshot.getValue();
+                                                final Double lon = snap_long;
+                                                if (is_restaurant_near(new LatLng(lat, lon), range)) {
+                                                    DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
+                                                    ref2.addValueEventListener(new ValueEventListener() {
+                                                        @Override
+                                                        public void onDataChange(DataSnapshot snapshot) {
+                                                                RestaurantPreview snap_r_p = (RestaurantPreview) snapshot.getValue();
+                                                                restaurants_previews_list.add(snap_r_p);
+                                                                mClusterManager.addItem(new MyItem(lat, lon));
+                                                                mClusterManager.cluster();
+
+                                                                hideProgressDialog();
+                                                        }
+
+                                                        @Override
+                                                        public void onCancelled(DatabaseError firebaseError) {
+                                                            System.out.println("The read failed: " + firebaseError.getMessage());
+                                                        }
+                                                    });
+                                                }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError firebaseError) {
+                                            System.out.println("The read failed: " + firebaseError.getMessage());
+                                        }
+                                    });
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError firebaseError) {
+                                System.out.println("The read failed: " + firebaseError.getMessage());
+                            }
+                        });
+                    }
+                }
+
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        });
+    }
+
+    public boolean is_restaurant_near(LatLng res_position, double range){
+        double distance = calculate_distance2(res_position, mLastUserMarker);
+        if(distance<range){
+            return true;
+        }
+        else
+        return false;
+    }
+
+    public double calculate_distance2(LatLng a, Marker b) {
+        double distance = SphericalUtil.computeDistanceBetween(a, b.getPosition());
+        return distance;
     }
 
     private void call_maps_activity(){
@@ -344,13 +354,10 @@ public class UserRestaurantList extends AppCompatActivity
                 getApplicationContext(),
                 MapsActivity.class);
         Bundle b = new Bundle();
-        //TODO add range_value
-        //b.putString("range", range_value);
-        //TODO add restaurant_preview_list
-        //b.putParcelable("restaurant_preview_list", restaurant_preview_list);
+        b.putDouble("range", range);
+        b.putParcelableArrayList("restaurants_previews_list", restaurants_previews_list);
         intent.putExtras(b);
-        //TODO decomment after integration
-        //if(restaurant_preview_list!=null)
+        if(restaurants_previews_list!=null)
             startActivity(intent);
     }
 
@@ -378,66 +385,6 @@ public class UserRestaurantList extends AppCompatActivity
             }
         });
         mMap.setOnCameraChangeListener(mClusterManager);
-
-        readItems();
-        /*
-        try {
-            readItems();
-        } catch (JSONException e) {
-            Toast.makeText(this, "Problem reading list of markers.", Toast.LENGTH_LONG).show();
-        }
-        */
-    }
-
-    private void readItems(){
-        /*
-        InputStream inputStream = getResources().openRawResource(R.raw.radar_search);
-        List<MyItem> items = new MyItemReader().read(inputStream);
-        mClusterManager.addItems(items);
-        */
-        //TODO Restaurant must become RestaurantPreview
-        mClusterManager.clearItems();
-        for(Restaurant r : resList){
-            mClusterManager.addItem(new MyItem(r.getRestaurant_latitude_position(), r.getRestaurant_longitude_position()));
-            /*
-            final String restaurant_id = r.getRestaurant_id();
-            //get only latitude
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id+"/restaurant_latitude_position");
-            ref.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    for (DataSnapshot res_latSnapshot : snapshot.getChildren()) {
-                        Double snap_lat = (Double) res_latSnapshot.getValue();
-                        final Double lat = snap_lat;
-                        //get only longitude
-                        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id+"/restaurant_longitude_position");
-                        ref2.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot snapshot) {
-                                for (DataSnapshot res_longSnapshot : snapshot.getChildren()) {
-                                    Double snap_long = (Double) res_longSnapshot.getValue();
-                                    final Double lon = snap_long;
-                                    mClusterManager.addItem(new MyItem(lat, lon));
-                                    mClusterManager.cluster();
-                                }
-                            }
-                            @Override
-                            public void onCancelled(DatabaseError firebaseError) {
-                                System.out.println("The read failed: " + firebaseError.getMessage());
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError firebaseError) {
-                    System.out.println("The read failed: " + firebaseError.getMessage());
-                }
-            });
-            */
-        }
-        mClusterManager.cluster();
-
     }
 
     private void setDrawer() {
@@ -524,17 +471,6 @@ public class UserRestaurantList extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START))
-            drawer.closeDrawer(GravityCompat.START);
-    }
-
-
-
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -590,17 +526,6 @@ public class UserRestaurantList extends AppCompatActivity
         return true;
     }
 
-    private String getRealPathFromURI(Uri contentURI) {
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            return contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
-        }
-    }
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -612,16 +537,6 @@ public class UserRestaurantList extends AppCompatActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-        // All providers are optional! Remove any you don't want.
-/*        setEnabledAuthProvider(AuthProviderType.FACEBOOK);
-        setEnabledAuthProvider(AuthProviderType.GOOGLE);
-        setEnabledAuthProvider(AuthProviderType.PASSWORD);
-*/    }
-
-    @Override
     protected void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
@@ -629,6 +544,91 @@ public class UserRestaurantList extends AppCompatActivity
             geoQuery.removeAllListeners();
 */    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        grantPermissions();
+    }
+
+    public void grantPermissions() {
+        if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
+            // only for Marshmallow and newer versions
+            //I want that first I request GPS, but if rejected, request WIFI
+            /*
+            dialogPermissionListener_gps =
+                    DialogOnDeniedPermissionListener.Builder
+                            .withContext(this)
+                            .withTitle("GPS permission")
+                            .withMessage("GPS permission is needed to take your accurate position")
+                            .withButtonText(android.R.string.ok)
+                            .withIcon(R.mipmap.ic_launcher)
+                            .build();
+            Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
+            */
+            Dexter.checkPermission(new PermissionListener() {
+                @Override
+                public void onPermissionGranted(PermissionGrantedResponse response) {
+                    permission_granted();
+                }
+
+                @Override
+                public void onPermissionDenied(PermissionDeniedResponse response) {
+                    gps_denied();
+                }
+
+                @Override
+                public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                    token.continuePermissionRequest();
+                }
+            }, Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        else{
+            mGoogleApiClient.connect();
+
+            settingsrequest();
+        }
+    }
+
+    public void settingsrequest(){
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationRequest.setInterval(30 * 1000);
+        locationRequest.setFastestInterval(5 * 1000);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
+                .addLocationRequest(locationRequest);
+        builder.setAlwaysShow(true); //this is the key ingredient
+
+        PendingResult<LocationSettingsResult> result =
+                LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
+        result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
+            @Override
+            public void onResult(LocationSettingsResult result) {
+                final Status status = result.getStatus();
+                final LocationSettingsStates state = result.getLocationSettingsStates();
+                switch (status.getStatusCode()) {
+                    case LocationSettingsStatusCodes.SUCCESS:
+                        // All location settings are satisfied. The client can initialize location
+                        // requests here.
+                        break;
+                    case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        // Location settings are not satisfied. But could be fixed by showing the user
+                        // a dialog.
+                        try {
+                            // Show the dialog by calling startResolutionForResult(),
+                            // and check the result in onActivityResult().
+                            status.startResolutionForResult(UserRestaurantList.this, REQUEST_CHECK_SETTINGS);
+                        } catch (IntentSender.SendIntentException e) {
+                            // Ignore the error.
+                        }
+                        break;
+                    case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
+                        // Location settings are not satisfied. However, we have no way to fix the
+                        // settings so we won't show the dialog.
+                        break;
+                }
+            }
+        });
+    }
 
     /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -664,23 +664,23 @@ public class UserRestaurantList extends AppCompatActivity
     /*    @Override
         protected DatabaseReference getDatabaseReferenceRef() {
             DatabaseReference rootRef = new DatabaseReference("https://flickering-fire-455.firebaseio.com/my/data");
-            // TODO: Return your DatabaseReference ref
+            // Return your DatabaseReference ref
             return rootRef;
         }
 
         @Override
         protected void onDatabaseReferenceLoginProviderError(DatabaseReferenceLoginError firebaseLoginError) {
-            // TODO: Handle an error from the authentication provider
+            // Handle an error from the authentication provider
         }
 
         @Override
         protected void onDatabaseReferenceLoginUserError(DatabaseReferenceLoginError firebaseLoginError) {
-            // TODO: Handle an error from the user
+            // Handle an error from the user
         }
 
         @Override
         public void onDatabaseReferenceLoggedIn(AuthData authData) {
-            // TODO: Handle successful login displaying user info in the drawer
+            // Handle successful login displaying user info in the drawer
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             TextView username = (TextView) drawer.findViewById(R.id.navHeaderUsername);
             TextView email = (TextView) drawer.findViewById(R.id.navHeaderEmail);
@@ -690,7 +690,7 @@ public class UserRestaurantList extends AppCompatActivity
 
         @Override
         public void onDatabaseReferenceLoggedOut() {
-            // TODO: Handle logout
+            // Handle logout
         }
 
     */
@@ -700,7 +700,7 @@ public class UserRestaurantList extends AppCompatActivity
         if (requestCode == ACTION_FILTER) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                mAdapter = new UserRestaurantPreviewAdapter(resList, this);
+                mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
                 mRecyclerView.setAdapter(mAdapter);
                 String cat = (String) data.getExtras().get("Category");
                 String time = (String) data.getExtras().get("Time");
@@ -708,9 +708,17 @@ public class UserRestaurantList extends AppCompatActivity
                 boolean price2 = (boolean) data.getExtras().get("TwoEuro");
                 boolean price3 = (boolean) data.getExtras().get("ThreeEuro");
                 boolean price4 = (boolean) data.getExtras().get("FourEuro");
-                mAdapter.filter(cat,time, price1, price2, price3, price4);
-
-                readItems();
+                range = (double) data.getExtras().get("range");
+                restaurants_previews_list = new ArrayList<RestaurantPreview>();
+                mClusterManager.clearItems();
+                restaurants_previews_list.addAll(mAdapter.filter(cat,time, price1, price2, price3, price4));
+                for(RestaurantPreview r_p : restaurants_previews_list){
+                    if(is_restaurant_near(new LatLng(r_p.getLat(), r_p.getLon()), range)){
+                        restaurants_previews_list.add(r_p);
+                        mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
+                        mClusterManager.cluster();
+                    }
+                }
             }
         }
     }
@@ -808,23 +816,8 @@ public class UserRestaurantList extends AppCompatActivity
             }
         }
     */
-    @Override
-    public void onConnected(Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_REQUEST);
-            return;
-        }
-        else {
-            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-            if (mLastLocation != null) {
-                //TODO order list based on current position or make query to firebase
-/*                geoQuery = geoFire.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 0.6);
-                geoQuery.addGeoQueryEventListener(this);
-*/            }
-        }
-    }
+    /*
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -845,32 +838,18 @@ public class UserRestaurantList extends AppCompatActivity
             // permissions this app might request
         }
     }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        //TODO
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        new AlertDialog.Builder(this)
-                .setTitle("Error")
-                .setMessage("Connection failed, retry again.")
-                .setPositiveButton(android.R.string.ok, null)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
+    */
 
     /*    @Override
         public void onKeyEntered(String key, GeoLocation location) {
-            //TODO search for the restaurant
+            //search for the restaurant
             resNearby.put(key,location);
 
         }
 
         @Override
         public void onKeyExited(String key) {
-            //TODO remove restaurant from the adapter
+            //remove restaurant from the adapter
             resNearby.remove(key);
         }
 
@@ -881,7 +860,7 @@ public class UserRestaurantList extends AppCompatActivity
 
         @Override
         public void onGeoQueryReady() {
-            //TODO query the DatabaseReference database with resNearby
+            //query the DatabaseReference database with resNearby
         }
 
         @Override
@@ -944,4 +923,186 @@ public class UserRestaurantList extends AppCompatActivity
             }
         }
     }
+
+    protected void createLocationRequest() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        // Sets the fastest rate for active location updates. This interval is exact, and your
+        // application will never receive updates faster than this value.
+        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    protected void startLocationUpdates() {
+        try {
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+        }
+        catch(SecurityException e){
+            Log.d("aaa", "Exception in onConnected");
+        }
+    }
+
+    private void updateUI() {
+        if(mMap!=null) {
+            //mMap.clear();
+            if (mCurrentLocation != null) {
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), DEFAULT_ZOOM1));
+                mLastUserMarker = mMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
+                                .title("Your position")
+                                //.snippet("Population: 2,074,200")
+                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
+                                .visible(false)
+                );
+                mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+            }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START))
+            drawer.closeDrawer(GravityCompat.START);
+        if (mGoogleApiClient.isConnected() && mRequestingLocationUpdates) {
+            startLocationUpdates();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
+        if (mGoogleApiClient.isConnected()) {
+            stopLocationUpdates();
+        }
+    }
+
+    protected void stopLocationUpdates() {
+        // It is a good practice to remove location requests when the activity is in a paused or
+        // stopped state. Doing so helps battery performance and is especially
+        // recommended in applications that request frequent location updates.
+        LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        new AlertDialog.Builder(this)
+                .setTitle("Error")
+                .setMessage("Connection failed, retry again.")
+                .setPositiveButton(android.R.string.ok, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) { //Runs when a GoogleApiClient object successfully connects.
+        Log.i(TAG, "Connected to GoogleApiClient");
+
+        // If the initial location was never previously requested, we use
+        // FusedLocationApi.getLastLocation() to get it. If it was previously requested, we store
+        // its value in the Bundle and check for it in onCreate(). We
+        // do not request it again unless the user specifically requests location updates by pressing
+        // the Start Updates button.
+        //
+        // Because we cache the value of the initial location in the Bundle, it means that if the
+        // user launches the activity,
+        // moves to a new location, and then changes the device orientation, the original location
+        // is displayed as the activity is re-created.
+        if (mCurrentLocation == null) {
+            try {
+                mCurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            }
+            catch(SecurityException e){
+                Log.d("aaa", "Exception in onConnected");
+            }
+        }
+
+        // If the user presses the Start Updates button before GoogleApiClient connects, we set
+        // mRequestingLocationUpdates to true (see startUpdatesButtonHandler()). Here, we check
+        // the value of mRequestingLocationUpdates and if it is true, we start location updates.
+        //if (mRequestingLocationUpdates) {startLocationUpdates
+        startLocationUpdates();
+        //}
+
+        updateUI();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mCurrentLocation = location;
+        updateUI();
+        /*
+        Toast.makeText(this, getResources().getString(R.string.location_updated_message),
+                Toast.LENGTH_SHORT).show();
+        */
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        // The connection to Google Play services was lost for some reason.
+        Log.i(TAG, "Connection suspended");
+        mGoogleApiClient.connect();
+    }
+
+/*
+@Override
+public void onConnected(Bundle bundle) {
+if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+ActivityCompat.requestPermissions(this,
+        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_REQUEST);
+return;
+}
+else {
+Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+if (mLastLocation != null) {
+    //order list based on current position or make query to firebase
+   geoQuery = geoFire.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 0.6);
+    geoQuery.addGeoQueryEventListener(this);
+}
+}
+}
+*/
+
+    public void gps_denied(){
+        dialogPermissionListener_wifi =
+                DialogOnDeniedPermissionListener.Builder
+                        .withContext(this)
+                        .withTitle("WIFI permission")
+                        .withMessage("WIFI permission is needed to locate your city")
+                        .withButtonText(android.R.string.ok)
+                        .withIcon(R.mipmap.ic_launcher)
+                        .build();
+        Dexter.checkPermissionOnSameThread(dialogPermissionListener_wifi, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        Dexter.checkPermission(new PermissionListener() {
+            @Override
+            public void onPermissionGranted(PermissionGrantedResponse response) {
+                permission_granted();
+            }
+
+            @Override
+            public void onPermissionDenied(PermissionDeniedResponse response) {
+                permission_denied();
+            }
+
+            @Override
+            public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                token.continuePermissionRequest();
+            }
+        }, Manifest.permission.ACCESS_COARSE_LOCATION);
+    }
+
+    public void permission_granted(){
+        //get actual/last position
+        mGoogleApiClient.connect();
+    }
+
+    public void permission_denied(){
+        //does nothing
+    }
+
 }
