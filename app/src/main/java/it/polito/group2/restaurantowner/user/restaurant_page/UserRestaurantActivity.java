@@ -6,7 +6,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,11 +28,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
@@ -49,31 +49,28 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+
 import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.firebasedata.Meal;
-import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
-import it.polito.group2.restaurantowner.data.Bookmark;
-import it.polito.group2.restaurantowner.data.MenuCategory;
-import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
-import it.polito.group2.restaurantowner.firebasedata.Review;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Offer;
-import it.polito.group2.restaurantowner.firebasedata.User;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
+import it.polito.group2.restaurantowner.firebasedata.Review;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
-import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.order.OrderActivity;
-import it.polito.group2.restaurantowner.user.restaurant_list.MyItem;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class UserRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
@@ -91,6 +88,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private Toolbar toolbar;
     private ImageView coverPicture;
     private FloatingActionButton fab;
+    private boolean theUserIsTheOwner = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -240,6 +238,26 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
+        if(targetRestaurant.getUser_id().equals(FirebaseUtil.getCurrentUserId())) {
+            theUserIsTheOwner = true;
+            ImageView addReview = (ImageView) findViewById(R.id.add_review);
+            addReview.setVisibility(View.GONE);
+        } else {
+            theUserIsTheOwner = false;
+        }
+
+        ImageButton button_get_directions = (ImageButton) findViewById(R.id.button_get_directions);
+        assert button_get_directions != null;
+        button_get_directions.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                Uri.parse("http://maps.google.com/maps?daddr=" + targetRestaurant.getRestaurant_latitude_position() + "," + targetRestaurant.getRestaurant_longitude_position()));
+                        startActivity(intent);
+                    }
+                }
+        );
         offers = getOffersJSON();
 
         addBookmarkButtonClick();
@@ -661,18 +679,22 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         assert ordersButton != null;
         assert reservationsButton != null;
 
-        if(targetRestaurant != null) {
-            if (targetRestaurant.getTableReservationAllowed())
-                reservationsButton.setVisibility(View.VISIBLE);
-            else
-                reservationsButton.setVisibility(View.GONE);
+        if(theUserIsTheOwner) {
+            ordersButton.setVisibility(View.GONE);
+            reservationsButton.setVisibility(View.GONE);
+        } else {
+            if (targetRestaurant != null) {
+                if (targetRestaurant.getTableReservationAllowed())
+                    reservationsButton.setVisibility(View.VISIBLE);
+                else
+                    reservationsButton.setVisibility(View.GONE);
 
-            if (targetRestaurant.getTakeAwayAllowed())
-                ordersButton.setVisibility(View.VISIBLE);
-            else
-                ordersButton.setVisibility(View.GONE);
+                if (targetRestaurant.getTakeAwayAllowed())
+                    ordersButton.setVisibility(View.VISIBLE);
+                else
+                    ordersButton.setVisibility(View.GONE);
+            }
         }
-
 
         ordersButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -938,7 +960,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         else
                             fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
 
-                        userBookmarksRef.setValue(bookmark? true : null);
+                        userBookmarksRef.setValue(bookmark ? true : null);
                         hideProgressDialog();
                     }
                 })

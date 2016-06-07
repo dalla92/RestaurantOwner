@@ -29,7 +29,8 @@ import it.polito.group2.restaurantowner.owner.FragmentServices;
 
 public class Filter extends AppCompatActivity {
 
-    private CheckBox CBtime;
+    private CheckBox CBlunch;
+    private CheckBox CBdinner;
     private CheckBox CBOneEuro;
     private CheckBox CBTwoEuro;
     private CheckBox CBThreeEuro;
@@ -49,7 +50,8 @@ public class Filter extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         category = (Spinner) findViewById(R.id.spinner);
-        CBtime = (CheckBox) findViewById(R.id.checkBoxTime);
+        CBlunch = (CheckBox) findViewById(R.id.checkBoxLunch);
+        CBdinner = (CheckBox) findViewById(R.id.checkBoxDinner);
         CBOneEuro = (CheckBox) findViewById(R.id.CBOneEuro);
         CBTwoEuro = (CheckBox) findViewById(R.id.CBTwoEuro);
         CBThreeEuro = (CheckBox) findViewById(R.id.CBThreeEuro);
@@ -74,25 +76,6 @@ public class Filter extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {
                 textView.setText("Covered: " + range + "/" + seekBar.getMax());
                 Toast.makeText(getApplicationContext(), "Stopped tracking seekbar", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        CBtime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(CBtime.isChecked()){
-                    DialogFragment newFragment = new FragmentServices.TimePickerFragment() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
-                            CBtime.setText(time);
-                        }
-                    };
-                    newFragment.show(getSupportFragmentManager(), "timePicker");
-                }
-                else{
-                    CBtime.setText("Set time");
-                }
             }
         });
 
@@ -142,8 +125,8 @@ public class Filter extends AppCompatActivity {
             intent.putExtra("ThreeEuro", CBThreeEuro.isChecked());
             intent.putExtra("FourEuro", CBFourEuro.isChecked());
             intent.putExtra("range", range);
-            if(CBtime.isChecked())
-                intent.putExtra("Time", CBtime.getText().toString());
+            intent.putExtra("Lunch", CBlunch.isChecked());
+            intent.putExtra("Dinner", CBdinner.isChecked());
             if(category.getSelectedItemPosition()==0)
                 intent.putExtra("Category", "0");
             else

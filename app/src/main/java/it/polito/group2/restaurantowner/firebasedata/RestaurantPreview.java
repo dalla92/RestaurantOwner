@@ -14,6 +14,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.clustering.ClusterItem;
 
+import java.util.ArrayList;
+
 /**
  * Created by Alessio on 16/05/2016.
  */
@@ -29,6 +31,7 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
     private int reservations_number;
     private int tables_number;
     private String restaurant_category;
+    private ArrayList<RestaurantTimeSlot> restaurant_time_slot;
 
     public RestaurantPreview(){
 
@@ -117,6 +120,14 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
 
     public void setRestaurant_category(String restaurant_category) {
         this.restaurant_category = restaurant_category;
+    }
+
+    public ArrayList<RestaurantTimeSlot> getRestaurant_time_slot() {
+        return restaurant_time_slot;
+    }
+
+    public void setRestaurant_time_slot(ArrayList<RestaurantTimeSlot> restaurant_time_slot) {
+        this.restaurant_time_slot = restaurant_time_slot;
     }
 
     //Parcelable part

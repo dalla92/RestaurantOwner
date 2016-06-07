@@ -173,8 +173,10 @@ public class OrderActivity extends AppCompatActivity
                 //TODO lanciare un alert che se si fa indietro qui si perde l'ordine
                 this.order = null;
                 Intent intent = new Intent(this, UserRestaurantActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 intent.putExtra("restaurant_id", restaurantID);
                 startActivity(intent);
+                finish();
             } else {
                 super.onBackPressed();
             }

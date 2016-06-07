@@ -130,37 +130,12 @@ public class FirebaseUtil {
         Query ref = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
         final ArrayList<Meal> meals = new ArrayList<Meal>();
         if(ref != null) {
-            ref.addChildEventListener(new ChildEventListener() {
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    meals.add(dataSnapshot.getValue(Meal.class));
-                }
-
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                    for (Meal m : meals) {
-                        if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                            meals.remove(m);
-                            meals.add(changedMeal);
-                            break;
-                        }
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                        meals.add(d.getValue(Meal.class));
                     }
-                }
-
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    Meal changedMeal = dataSnapshot.getValue(Meal.class);
-                    for (Meal m : meals) {
-                        if (m.getMeal_id().equals(changedMeal.getMeal_id())) {
-                            meals.remove(m);
-                            break;
-                        }
-                    }
-                }
-
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
                 }
 
                 @Override
@@ -177,36 +152,17 @@ public class FirebaseUtil {
         Query ref = firebase.getReference("orders").orderByChild("restaurant_id").equalTo(restaurantID);
         final ArrayList<Order> orders = new ArrayList<Order>();
         if(ref != null) {
-            ref.addChildEventListener(new ChildEventListener() {
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    orders.add(dataSnapshot.getValue(Order.class));
-                }
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    Order changedOrder = dataSnapshot.getValue(Order.class);
-                    for (Order m : orders) {
-                        if (m.getOrder_id().equals(changedOrder.getOrder_id())) {
-                            orders.remove(m);
-                            orders.add(changedOrder);
-                            break;
-                        }
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot d : dataSnapshot.getChildren()) {
+                        orders.add(d.getValue(Order.class));
                     }
                 }
+
                 @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    Order changedOrder = dataSnapshot.getValue(Order.class);
-                    for (Order m : orders) {
-                        if (m.getOrder_id().equals(changedOrder.getOrder_id())) {
-                            orders.remove(m);
-                            break;
-                        }
-                    }
+                public void onCancelled(DatabaseError databaseError) {
                 }
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
-                @Override
-                public void onCancelled(DatabaseError databaseError) {}
             });
             return orders;
         }
@@ -218,34 +174,13 @@ public class FirebaseUtil {
         Query ref = firebase.getReference("orders").orderByChild("user_id").equalTo(userID);
         final ArrayList<Order> orders = new ArrayList<Order>();
         if(ref != null) {
-            ref.addChildEventListener(new ChildEventListener() {
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    orders.add(dataSnapshot.getValue(Order.class));
-                }
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    Order changedOrder = dataSnapshot.getValue(Order.class);
-                    for (Order m : orders) {
-                        if (m.getOrder_id().equals(changedOrder.getOrder_id())) {
-                            orders.remove(m);
-                            orders.add(changedOrder);
-                            break;
-                        }
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(DataSnapshot d : dataSnapshot.getChildren()) {
+                        orders.add(d.getValue(Order.class));
                     }
                 }
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    Order changedOrder = dataSnapshot.getValue(Order.class);
-                    for (Order m : orders) {
-                        if (m.getOrder_id().equals(changedOrder.getOrder_id())) {
-                            orders.remove(m);
-                            break;
-                        }
-                    }
-                }
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
                 @Override
                 public void onCancelled(DatabaseError databaseError) {}
             });
@@ -259,34 +194,13 @@ public class FirebaseUtil {
         Query ref = firebase.getReference("offers").orderByChild("restaurant_id").equalTo(restaurantID);
         final ArrayList<Offer> offers = new ArrayList<Offer>();
         if(ref != null) {
-            ref.addChildEventListener(new ChildEventListener() {
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    offers.add(dataSnapshot.getValue(Offer.class));
-                }
-                @Override
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    Offer changedOffer = dataSnapshot.getValue(Offer.class);
-                    for (Offer m : offers) {
-                        if (m.getOfferID().equals(changedOffer.getOfferID())) {
-                            offers.remove(m);
-                            offers.add(changedOffer);
-                            break;
-                        }
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for(DataSnapshot d : dataSnapshot.getChildren()) {
+                        offers.add(d.getValue(Offer.class));
                     }
                 }
-                @Override
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                    Offer changedOffer = dataSnapshot.getValue(Offer.class);
-                    for (Offer m : offers) {
-                        if (m.getOfferID().equals(changedOffer.getOfferID())) {
-                            offers.remove(m);
-                            break;
-                        }
-                    }
-                }
-                @Override
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
                 @Override
                 public void onCancelled(DatabaseError databaseError) {}
             });

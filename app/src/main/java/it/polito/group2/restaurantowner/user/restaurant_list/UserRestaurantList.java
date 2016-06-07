@@ -703,7 +703,8 @@ public class UserRestaurantList extends AppCompatActivity
                 mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
                 mRecyclerView.setAdapter(mAdapter);
                 String cat = (String) data.getExtras().get("Category");
-                String time = (String) data.getExtras().get("Time");
+                boolean lunch = (boolean) data.getExtras().get("Lunch");
+                boolean dinner = (boolean) data.getExtras().get("Dinner");
                 boolean price1 = (boolean) data.getExtras().get("OneEuro");
                 boolean price2 = (boolean) data.getExtras().get("TwoEuro");
                 boolean price3 = (boolean) data.getExtras().get("ThreeEuro");
@@ -711,7 +712,7 @@ public class UserRestaurantList extends AppCompatActivity
                 range = (double) data.getExtras().get("range");
                 restaurants_previews_list = new ArrayList<RestaurantPreview>();
                 mClusterManager.clearItems();
-                restaurants_previews_list.addAll(mAdapter.filter(cat,time, price1, price2, price3, price4));
+                restaurants_previews_list.addAll(mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4));
                 for(RestaurantPreview r_p : restaurants_previews_list){
                     if(is_restaurant_near(new LatLng(r_p.getLat(), r_p.getLon()), range)){
                         restaurants_previews_list.add(r_p);

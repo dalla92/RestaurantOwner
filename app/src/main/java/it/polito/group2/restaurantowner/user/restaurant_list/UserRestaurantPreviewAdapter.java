@@ -18,23 +18,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 
-import org.json.JSONException;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.Meal;
-import it.polito.group2.restaurantowner.data.OpenTime;
-import it.polito.group2.restaurantowner.data.TableReservation;
-import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
+import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 
 /**
  * Created by Daniele on 05/04/2016.
@@ -58,7 +49,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         mDataset = myDataset;
         mContext = myContext;
         final Calendar today = Calendar.getInstance();
-        today_day =  today.get(Calendar.DAY_OF_MONTH);
+        today_day = today.get(Calendar.DAY_OF_MONTH);
         today_month = today.get(Calendar.MONTH);
         today_year = today.get(Calendar.YEAR);
     }
@@ -96,47 +87,37 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         notifyItemRangeChanged(position, mDataset.size());
     }
 
-    protected List<RestaurantPreview> filter(String category, String time, boolean price1, boolean price2, boolean price3, boolean price4) {
+    protected List<RestaurantPreview> filter(String category, boolean lunch, boolean dinner, boolean price1, boolean price2, boolean price3, boolean price4) {
         //filter by category
         List<RestaurantPreview> nResList = new ArrayList<RestaurantPreview>();
         if (category.equals("0"))
             nResList = mDataset;
-
-        for (RestaurantPreview r : mDataset) {
-            if (r.getRestaurant_category().equals(category))
-                nResList.add(r);
-        }
-        //filter by time
-        List<RestaurantPreview> n2ResList = new ArrayList<RestaurantPreview>();
-        if (time != null) {
-            try {
-                String timeFormat = new String("HH:mm");
-                SimpleDateFormat sdf = new SimpleDateFormat(timeFormat, Locale.US);
-                Date filterTime = sdf.parse(time);
-                ArrayList<OpenTime> otList = JSONUtil.readJSONOpenTimeList(mContext);
-                for (RestaurantPreview r : nResList) {
-                    Calendar calendar = Calendar.getInstance();
-                    int day = calendar.get(Calendar.DAY_OF_WEEK);
-                    for (OpenTime ot : otList) {
-                        if (ot.getRestaurantId().equals(r.getRestaurant_id()) && ot.getDayOfWeek() == day) {
-                            Date openTime = sdf.parse(ot.getOpenHour());
-                            Date closeTime = sdf.parse(ot.getCloseHour());
-                            if (openTime.before(filterTime) && closeTime.after(filterTime)) {
-                                n2ResList.add(r);
-                                break;
-                            }
-                        }
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (ParseException e) {
-                e.printStackTrace();
+        else {
+            for (RestaurantPreview res : mDataset) {
+                if (res.getRestaurant_category().equals(category))
+                    nResList.add(res);
             }
+        }
+        List<RestaurantPreview> n2ResList = new ArrayList<RestaurantPreview>();
+        Calendar today = Calendar.getInstance();
+        RestaurantTimeSlot timeSlot = null;
+        for (RestaurantPreview res : nResList) {
+            for (RestaurantTimeSlot tSlot : res.getRestaurant_time_slot()) {
+                if (tSlot.getDay_of_week() == today.get(Calendar.DAY_OF_WEEK)) {
+                    timeSlot = tSlot;
+                    break;
+                }
+            }
+            boolean addRes = true;
+            if (lunch && !timeSlot.getLunch())
+                addRes = false;
+            if (dinner && !timeSlot.getDinner())
+                addRes = false;
 
-        } else
-            n2ResList = nResList;
-        //filter by price
+            if (addRes)
+                n2ResList.add(res);
+        }
+
         List<RestaurantPreview> n3ResList = new ArrayList<RestaurantPreview>();
         for (RestaurantPreview r : n2ResList) {
             if (price1 && r.getRestaurant_price_range() == 1) {
@@ -213,15 +194,16 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
 
             count_bookings_today_and_display(restaurant.getRestaurant_id(), restaurant, reservationNumber);
 
-            if (mLastUserMarker!=null){
-                this.distance.setText(calculate_distance2(restaurant.getPosition() , mLastUserMarker));
+            if (mLastUserMarker != null) {
+                this.distance.setText(calculate_distance2(restaurant.getPosition(), mLastUserMarker));
             }
 
             this.position = position;
             this.current = restaurant;
         }
 
-        public void count_bookings_today_and_display(String restaurant_id, RestaurantPreview r, TextView reservationNumber){
+
+        public void count_bookings_today_and_display(String restaurant_id, RestaurantPreview r, TextView reservationNumber) {
             final TextView res_num_text_view = reservationNumber;
             firebase = FirebaseDatabase.getInstance();
             total_tables_number = r.getTables_number();
@@ -231,13 +213,13 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                 public void onDataChange(DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         TableReservation snap_t_b = (TableReservation) dataSnapshot.getValue();
-                        Calendar that = snap_t_b.getDate();
-                        int that_day =  that.get(Calendar.DAY_OF_MONTH);
+                        Calendar that = snap_t_b.getTable_reservation_date();
+                        int that_day = that.get(Calendar.DAY_OF_MONTH);
                         int that_month = that.get(Calendar.MONTH);
                         int that_year = that.get(Calendar.YEAR);
-                        if(that_day==today_day && that_month==today_month && that_year==today_year){
+                        if (that_day == today_day && that_month == today_month && that_year == today_year) {
                             table_reservation_today_count++;
-                            res_num_text_view.setText(table_reservation_today_count+"/"+total_tables_number);
+                            res_num_text_view.setText(table_reservation_today_count + "/" + total_tables_number);
                         }
                     }
                 }
@@ -248,6 +230,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                 }
             });
         }
+
 
         public String calculate_distance2(LatLng a, Marker b) {
             double distance = SphericalUtil.computeDistanceBetween(a, b.getPosition());
@@ -267,7 +250,8 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             //trying to add space to split later
             return String.format("%4.3f %s", distance, unit);
         }
-
+    }
+        /*
         public static int calculate_reservations_number(Restaurant r) {
             Calendar c = Calendar.getInstance();
             ArrayList<TableReservation> today_reservations = null;
@@ -278,7 +262,9 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             }
             return today_reservations.size();
         }
+        */
 
+        /*
         public static int calculate_range(Restaurant r) {
             ArrayList<Meal> meals = null;
             try {
@@ -312,5 +298,6 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             return 3;
         }
     }
+    */
 
 }

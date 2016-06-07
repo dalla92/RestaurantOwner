@@ -108,6 +108,24 @@ public class Restaurant_page extends AppCompatActivity
 
         if(b!=null)
             restaurant_id = b.getString("RestaurantId");
+
+        Button showAs = (Button) findViewById(R.id.show_as_button);
+        assert showAs != null;
+        showAs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(restaurant_id != null) {
+                    Intent intent = new Intent(
+                            getApplicationContext(),
+                            UserRestaurantActivity.class);
+                    Bundle b = new Bundle();
+                    b.putString("restaurant_id", restaurant_id);
+                    intent.putExtras(b);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        });
         /*
         if(restaurant_id==null)
             restaurant_id = "-KI8xQ4PDVSKKjnRGmdG";

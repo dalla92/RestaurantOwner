@@ -7,6 +7,7 @@
     <string name="action_statistics">Statistics</string>
 
     <string name="restaurant_page_name">Restaurant Name</string>
+    <string name="show_as">Show this page as a user</string>
     <string name="button_take_photo">Take Photo Now</string>
     <string name="button_choose_photo">Choose From Gallery</string>
     <string name="restaurant_name">Name:</string>
@@ -140,6 +141,8 @@
     <string name="times_Sat">Saturday</string>
     <string name="times_Sun">Sunday</string>
     <string name="close">close</string>
+    <string name="lunch">Lunch</string>
+    <string name="dinner">Dinner</string>
     <string name="extra">Extra Info</string>
     <string name="services">Services</string>
     <string name="gluten_free">Gluten Free</string>
@@ -173,6 +176,7 @@
     <string name="price_range">Price range</string>
     <string name="restaurant_type">Restaurant type</string>
     <string name="time">Time</string>
+    <string name="open_filter">Open at:</string>
     <string name="menu">Menu</string>
     <string name="title_activity_add_review">Add a review</string>
     <string name="comment">Add a Comment</string>
