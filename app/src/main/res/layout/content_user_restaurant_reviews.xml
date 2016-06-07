@@ -39,7 +39,7 @@
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_playlist_add_24dp"
                 android:layout_marginRight="16dp"
-                />
+                android:onClick="addReview"/>
 
         </LinearLayout>
 

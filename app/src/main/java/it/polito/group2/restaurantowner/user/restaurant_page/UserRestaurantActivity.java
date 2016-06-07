@@ -577,9 +577,30 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     public void addReview(View v){
-        //TODO review logic
-        Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
-        startActivityForResult(intent, ADD_REQUEST);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID == null) {
+            FirebaseUtil.showLoginDialog(this);
+        }
+        else {
+            Query reviewQuery = firebase.getReference("reviews/" + restaurantID).orderByChild("user_id").equalTo(userID);
+            reviewQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.hasChildren()){
+                        Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
+                        startActivityForResult(intent, ADD_REQUEST);
+                    }
+                    else{
+
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 
     @Override
@@ -587,48 +608,48 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         Log.d("result", "" + requestCode + " " + resultCode);
         if (requestCode == ADD_REQUEST) {
             if (resultCode == RESULT_OK) {
+                User user = FirebaseUtil.getCurrentUser();
+                if(user == null){
+                    Toast.makeText(UserRestaurantActivity.this, "Error while adding the review, try again!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 String comment = data.getStringExtra("comment");
                 float starNumber = data.getFloatExtra("starsNumber", 0.0f);
 
                 Calendar date = Calendar.getInstance();
 
-                DatabaseReference reviewsRef = firebase.getReference("reviews").push();
+                DatabaseReference reviewsRef = firebase.getReference("reviews/" + restaurantID).push();
                 Review review =new Review();
                 review.setRestaurant_id(restaurantID);
                 review.setReview_comment(comment);
                 review.setReview_timestamp(date.getTimeInMillis());
                 review.setReview_id(reviewsRef.getKey());
                 review.setReview_rating(starNumber);
-                review.setUser_id("AKtYOrbvTlW6Tka7hUpW7WcA6LB2");
-                review.setUser_full_name("Andrea Cuiuli");
-                review.setUser_thumbnail("");
+                review.setUser_id(user.getUser_id());
+                review.setUser_full_name(user.getUser_full_name());
+                review.setUser_thumbnail(user.getUser_thumbnail());
                 reviewsRef.setValue(review);
 
                 //update restaurant rating
-                DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/reviews/" + restaurantID);
+                DatabaseReference ref = firebase.getReference("reviews/" + restaurantID);
                 ref.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot snapshot) {
-                        long total_reviews_number = snapshot.getChildrenCount();
                         double total_reviews_rating = 0;
                         for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                            Review r = (Review) dataSnapshot.getValue(Review.class);
+                            Review r = dataSnapshot.getValue(Review.class);
                             total_reviews_rating += r.getReview_rating();
                         }
-                        DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurantID  + "/restaurant_rating");
+                        DatabaseReference ref2 = firebase.getReference("restaurants/" + restaurantID + "/restaurant_rating");
                         ref2.setValue(total_reviews_rating);
-                        DatabaseReference ref3 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurantID  + "/restaurant_rating");
+                        DatabaseReference ref3 = firebase.getReference("restaurants_previews/" + restaurantID + "/restaurant_rating");
                         ref3.setValue(total_reviews_rating);
                     }
                     @Override
                     public void onCancelled(DatabaseError firebaseError) {
                     }
                 });
-
-                /*reviews.add(review);
-                Collections.sort(reviews);
-                reviewAdapter.notifyDataSetChanged();*/
-
             }
         }
     }
@@ -877,7 +898,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             public void onClick(View v) {
                 if (userID == null) {
                     Log.d("prova", "null");
-                    showLoginDialog();
+                    FirebaseUtil.showLoginDialog(UserRestaurantActivity.this);
                 } else {
                     Log.d("prova", "not null");
                     showProgressDialog();
@@ -928,29 +949,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         Toast.makeText(UserRestaurantActivity.this, "Technical Problem, try again or restart the app!", Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
-
-    private void showLoginDialog() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Do you want to log in?");
-        alert.setMessage("You must be logged in to perform this action");
-
-        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent intent = new Intent(UserRestaurantActivity.this, LoginManagerActivity.class);
-                intent.putExtra("login", true);
-                startActivity(intent);
-            }
-        });
-        alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        alert.show();
     }
 
 

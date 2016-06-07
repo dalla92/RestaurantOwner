@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -18,9 +17,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 
 import org.json.JSONException;
 
@@ -131,11 +127,12 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                             }
                         }
                     }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (ParseException e) {
-                    e.printStackTrace();
                 }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
 
         } else
             n2ResList = nResList;
@@ -171,15 +168,13 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder  {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public ImageView image;
         public TextView resName;
         public TextView rating;
         public TextView reservationNumber;
         public TextView distance;
-        private ProgressBar progressBar;
-        public Restaurant current;
         public RestaurantPreview current;
         public int position;
 
@@ -190,34 +185,14 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             rating = (TextView) v.findViewById(R.id.textViewRating);
             reservationNumber = (TextView) v.findViewById(R.id.textViewReservationNumber);
             distance = (TextView) v.findViewById(R.id.textViewDistance);
-            progressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
         }
 
         public void setData(RestaurantPreview restaurant, int position) {
 
-            progressBar.setVisibility(View.VISIBLE);
-            if(restaurant.getRestaurant_photo_firebase_URL() == null || restaurant.getRestaurant_photo_firebase_URL().equals("")) {
+            if (restaurant.getRestaurant_cover_firebase_URL() == null || restaurant.getRestaurant_cover_firebase_URL().equals(""))
                 Glide.with(mContext).load(R.drawable.no_image).into(this.image);
-                progressBar.setVisibility(View.GONE);
-            }
             else
-                Glide
-                        .with(mContext)
-                        .load(restaurant.getRestaurant_photo_firebase_URL())
-                        .listener(new RequestListener<String, GlideDrawable>() {
-                            @Override
-                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                progressBar.setVisibility(View.GONE);
-                                return false;
-                            }
-
-                            @Override
-                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                progressBar.setVisibility(View.GONE);
-                                return false;
-                            }
-                        })
-                        .into(this.image);
+                Glide.with(mContext).load(restaurant.getRestaurant_cover_firebase_URL()).into(this.image);
 
             /*
             SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);

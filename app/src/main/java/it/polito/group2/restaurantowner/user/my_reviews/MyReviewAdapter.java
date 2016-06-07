@@ -155,7 +155,6 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
             reviewHolder.stars.setRating(reviews.get(position).getReview_rating());
 
             SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
-            reviewHolder.date.setText(format.format(reviews.get(position).getReview_date().getTime()));
             Calendar c = Calendar.getInstance();
             c.setTimeInMillis(reviews.get(position).getReview_timestamp());
             reviewHolder.date.setText(format.format(c.getTime()));

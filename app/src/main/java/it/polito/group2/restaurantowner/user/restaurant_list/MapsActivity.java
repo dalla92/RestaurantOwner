@@ -430,7 +430,7 @@ public class MapsActivity extends AppCompatActivity implements
             Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
             */
             Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
-*/
+
             Dexter.checkPermission(new PermissionListener() {
                 @Override public void onPermissionGranted(PermissionGrantedResponse response) {
                     permission_granted();
