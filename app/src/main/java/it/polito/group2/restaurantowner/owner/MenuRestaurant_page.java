@@ -42,6 +42,7 @@ import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class MenuRestaurant_page extends AppCompatActivity {
     private Menu menu;
@@ -155,6 +156,15 @@ public class MenuRestaurant_page extends AppCompatActivity {
                             Intent intent1 = new Intent(
                                     getApplicationContext(),
                                     MainActivity.class);
+                            startActivity(intent1);
+                            return true;
+                        } else if(id==R.id.action_show_as) {
+                            Intent intent1 = new Intent(
+                                    getApplicationContext(),
+                                    UserRestaurantActivity.class);
+                            Bundle b = new Bundle();
+                            b.putString("restaurant_id", restaurant_id);
+                            intent1.putExtras(b);
                             startActivity(intent1);
                             return true;
                         } else if(id==R.id.action_gallery) {

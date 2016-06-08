@@ -646,6 +646,7 @@ public class MapsActivity extends AppCompatActivity implements
             ImageButton button_get_directions;
             ImageButton button_get_info;
             ImageButton button_get_street_view;
+            TextView open_now;
 
             resName = (TextView) d.findViewById(R.id.textViewName);
             rating = (RatingBar) d.findViewById(R.id.ratingBar);
@@ -655,6 +656,7 @@ public class MapsActivity extends AppCompatActivity implements
             button_get_directions = (ImageButton) d.findViewById(R.id.button_get_directions);
             button_get_info = (ImageButton) d.findViewById(R.id.button_get_info);
             button_get_street_view = (ImageButton) d.findViewById(R.id.button_get_street_view);
+            open_now = (TextView) d.findViewById(R.id.restaurant_today_time);
 
             d_height = getWindow().getDecorView().getHeight();
             d_width = getWindow().getDecorView().getWidth();
@@ -681,6 +683,12 @@ public class MapsActivity extends AppCompatActivity implements
             int rounded_value = Math.round(Float.valueOf(parts_to_round[0]));
             String string_result = String.valueOf(rounded_value) + " " + parts_to_round[1];
             distance.setText(string_result);
+            if(restaurant_preview.isOpenNow()) {
+                open_now.setText("Open now");
+            }
+            else{
+                open_now.setText("Closed now");
+            }
             //TODO decomment after integration
             /*
             button_get_info.setOnClickListener(

@@ -825,6 +825,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private void addTimesExpandAnimation() {
         final TextView timesText = (TextView) findViewById(R.id.restaurant_today_time);
         assert timesText != null;
+        if(targetRestaurant.isOpenNow())
+            timesText.setText("Open now");
+        else{
+            timesText.setText("Closed now");
+        }
         timesText.setOnClickListener(new View.OnClickListener() {
             boolean clicked = false;
 

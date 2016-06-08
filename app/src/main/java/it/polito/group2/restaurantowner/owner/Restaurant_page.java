@@ -108,24 +108,6 @@ public class Restaurant_page extends AppCompatActivity
 
         if(b!=null)
             restaurant_id = b.getString("RestaurantId");
-
-        Button showAs = (Button) findViewById(R.id.show_as_button);
-        assert showAs != null;
-        showAs.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(restaurant_id != null) {
-                    Intent intent = new Intent(
-                            getApplicationContext(),
-                            UserRestaurantActivity.class);
-                    Bundle b = new Bundle();
-                    b.putString("restaurant_id", restaurant_id);
-                    intent.putExtras(b);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        });
         /*
         if(restaurant_id==null)
             restaurant_id = "-KI8xQ4PDVSKKjnRGmdG";
@@ -390,20 +372,22 @@ public class Restaurant_page extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+// Handle navigation view item clicks here.
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.action_user_part) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantActivity.class);
-            startActivity(intent1);
-            return true;
-        }
-        else if(id==R.id.action_my_restaurants){
+        if(id==R.id.action_my_restaurants){
             Intent intent1 = new Intent(
                     getApplicationContext(),
                     MainActivity.class);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_show_as) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantActivity.class);
+            Bundle b = new Bundle();
+            b.putString("restaurant_id", restaurant_id);
+            intent1.putExtras(b);
             startActivity(intent1);
             return true;
         } else if(id==R.id.action_gallery) {
@@ -468,10 +452,6 @@ public class Restaurant_page extends AppCompatActivity
             final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
             appbar.setExpanded(false);
             startActivityForResult(intent6, MODIFY_INFO);
-            return true;
-        } else if(id==R.id.action_edit_cover) {
-            drawer.closeDrawer(GravityCompat.START);
-            show();
             return true;
         }
 

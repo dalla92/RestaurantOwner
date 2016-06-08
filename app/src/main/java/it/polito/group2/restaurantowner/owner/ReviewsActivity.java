@@ -43,7 +43,7 @@ public class ReviewsActivity extends AppCompatActivity
     private RecyclerView.Adapter rvAdapter;
     private RecyclerView.LayoutManager rvLayoutManager;
 
-    private String restaurantID = "0"; //restaurant reference
+    private String restaurant_id = "0"; //restaurant reference
     private ArrayList<Review> reviewList = new ArrayList<Review>();
 
     private Menu menu;
@@ -64,7 +64,7 @@ public class ReviewsActivity extends AppCompatActivity
 
         Bundle b = getIntent().getExtras();
         if(b != null) {
-            restaurantID = b.getString("restaurantID");
+            restaurant_id = b.getString("restaurant_id");
         } else {
             //error on restaurant id
         }
@@ -77,13 +77,13 @@ public class ReviewsActivity extends AppCompatActivity
             e.printStackTrace();
         }
         for(Restaurant r : all_restaurants){
-            if(r.getRestaurantId().equals(restaurantID)){
+            if(r.getRestaurantId().equals(restaurant_id)){
                 current_restaurant = r;
                 break;
             }
         }
 
-        populateCommentList(restaurantID);
+        populateCommentList(restaurant_id);
 
         //navigation drawer
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -125,11 +125,11 @@ public class ReviewsActivity extends AppCompatActivity
 
     }
 
-    public void populateCommentList(String restaurantID){
+    public void populateCommentList(String restaurant_id){
 
         /*
         try {
-            commentList = JSONUtil.readJsonReviewList(this.getApplicationContext(), restaurantID);
+            commentList = JSONUtil.readJsonReviewList(this.getApplicationContext(), restaurant_id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -172,17 +172,19 @@ public class ReviewsActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.action_user_part) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantActivity.class);
-            startActivity(intent1);
-            return true;
-        }
-        else if(id==R.id.action_my_restaurants){
+        if(id==R.id.action_my_restaurants){
             Intent intent1 = new Intent(
                     getApplicationContext(),
                     MainActivity.class);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_show_as) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantActivity.class);
+            Bundle b = new Bundle();
+            b.putString("restaurant_id", restaurant_id);
+            intent1.putExtras(b);
             startActivity(intent1);
             return true;
         } else if(id==R.id.action_gallery) {
@@ -190,7 +192,7 @@ public class ReviewsActivity extends AppCompatActivity
                     getApplicationContext(),
                     GalleryViewActivity.class);
             Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurantID);
+            b.putString("restaurant_id", restaurant_id);
             intent1.putExtras(b);
             startActivity(intent1);
             return true;
@@ -199,7 +201,7 @@ public class ReviewsActivity extends AppCompatActivity
                     getApplicationContext(),
                     MenuRestaurant_page.class);
             Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurantID);
+            b.putString("restaurant_id", restaurant_id);
             intent1.putExtras(b);
             startActivity(intent1);
             return true;
@@ -208,7 +210,7 @@ public class ReviewsActivity extends AppCompatActivity
                     getApplicationContext(),
                     MyOffersActivity.class);
             Bundle b2 = new Bundle();
-            b2.putString("restaurant_id", restaurantID);
+            b2.putString("restaurant_id", restaurant_id);
             intent2.putExtras(b2);
             startActivity(intent2);
             return true;
@@ -217,7 +219,7 @@ public class ReviewsActivity extends AppCompatActivity
                     getApplicationContext(),
                     ReservationActivity.class);
             Bundle b3 = new Bundle();
-            b3.putString("restaurant_id", restaurantID);
+            b3.putString("restaurant_id", restaurant_id);
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
@@ -226,7 +228,7 @@ public class ReviewsActivity extends AppCompatActivity
                     getApplicationContext(),
                     ReviewsActivity.class); //here Filippo must insert his class name
             Bundle b4 = new Bundle();
-            b4.putString("restaurant_id", restaurantID);
+            b4.putString("restaurant_id", restaurant_id);
             intent4.putExtras(b4);
             startActivity(intent4);
             return true;
@@ -235,7 +237,7 @@ public class ReviewsActivity extends AppCompatActivity
                     getApplicationContext(),
                     StatisticsActivity.class); //here Filippo must insert his class name
             Bundle b5 = new Bundle();
-            b5.putString("restaurant_id", restaurantID);
+            b5.putString("restaurant_id", restaurant_id);
             intent5.putExtras(b5);
             startActivity(intent5);
             return true;

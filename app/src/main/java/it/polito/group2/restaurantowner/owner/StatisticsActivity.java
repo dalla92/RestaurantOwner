@@ -43,7 +43,7 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActiv
 public class StatisticsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
-    private String restaurantID;
+    private String restaurant_id;
     private DateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
     public ArrayList<Restaurant> all_restaurants = new ArrayList<Restaurant>();
     public Restaurant current_restaurant;
@@ -62,7 +62,7 @@ public class StatisticsActivity extends AppCompatActivity
         //get the restaurant obj
         Bundle b = getIntent().getExtras();
         if(b!=null) {
-            restaurantID = b.getString("restaurantID");
+            restaurant_id = b.getString("restaurant_id");
             LineData data = new LineData(getDataName(), getDataSet());
             chart.setData(data);
             chart.setDescription(getString(R.string.statistics_chart_title));
@@ -81,7 +81,7 @@ public class StatisticsActivity extends AppCompatActivity
             e.printStackTrace();
         }
         for(Restaurant r : all_restaurants){
-            if(r.getRestaurantId().equals(restaurantID)){
+            if(r.getRestaurantId().equals(restaurant_id)){
                 current_restaurant = r;
                 break;
             }
@@ -377,7 +377,7 @@ public class StatisticsActivity extends AppCompatActivity
         for(int i=0; i < jsonArray.length(); i++){
 
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            if(Integer.getInteger(jsonObject.optString("RestaurantID")).equals(restaurantID)) {
+            if(Integer.getInteger(jsonObject.optString("RestaurantID")).equals(restaurant_id)) {
                 book = new Booking();
                 date = null;
                 try {
@@ -475,7 +475,7 @@ public class StatisticsActivity extends AppCompatActivity
         for(int i=0; i < jsonArray.length(); i++){
 
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            if(Integer.getInteger(jsonObject.optString("RestaurantID")).equals(restaurantID)) {
+            if(Integer.getInteger(jsonObject.optString("RestaurantID")).equals(restaurant_id)) {
                 order = new Order();
                 date = null;
                 try {
@@ -545,20 +545,22 @@ public class StatisticsActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+// Handle navigation view item clicks here.
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.action_user_part) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantActivity.class);
-            startActivity(intent1);
-            return true;
-        }
-        else if(id==R.id.action_my_restaurants){
+        if(id==R.id.action_my_restaurants){
             Intent intent1 = new Intent(
                     getApplicationContext(),
                     MainActivity.class);
+            startActivity(intent1);
+            return true;
+        } else if(id==R.id.action_show_as) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantActivity.class);
+            Bundle b = new Bundle();
+            b.putString("restaurant_id", restaurant_id);
+            intent1.putExtras(b);
             startActivity(intent1);
             return true;
         } else if(id==R.id.action_gallery) {
@@ -566,7 +568,7 @@ public class StatisticsActivity extends AppCompatActivity
                     getApplicationContext(),
                     GalleryViewActivity.class);
             Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurantID);
+            b.putString("restaurant_id", restaurant_id);
             intent1.putExtras(b);
             startActivity(intent1);
             return true;
@@ -575,7 +577,7 @@ public class StatisticsActivity extends AppCompatActivity
                     getApplicationContext(),
                     MenuRestaurant_page.class);
             Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurantID);
+            b.putString("restaurant_id", restaurant_id);
             intent1.putExtras(b);
             startActivity(intent1);
             return true;
@@ -584,7 +586,7 @@ public class StatisticsActivity extends AppCompatActivity
                     getApplicationContext(),
                     MyOffersActivity.class);
             Bundle b2 = new Bundle();
-            b2.putString("restaurant_id", restaurantID);
+            b2.putString("restaurant_id", restaurant_id);
             intent2.putExtras(b2);
             startActivity(intent2);
             return true;
@@ -593,7 +595,7 @@ public class StatisticsActivity extends AppCompatActivity
                     getApplicationContext(),
                     ReservationActivity.class);
             Bundle b3 = new Bundle();
-            b3.putString("restaurant_id", restaurantID);
+            b3.putString("restaurant_id", restaurant_id);
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
@@ -602,7 +604,7 @@ public class StatisticsActivity extends AppCompatActivity
                     getApplicationContext(),
                     ReviewsActivity.class); //here Filippo must insert his class name
             Bundle b4 = new Bundle();
-            b4.putString("restaurant_id", restaurantID);
+            b4.putString("restaurant_id", restaurant_id);
             intent4.putExtras(b4);
             startActivity(intent4);
             return true;
@@ -611,7 +613,7 @@ public class StatisticsActivity extends AppCompatActivity
                     getApplicationContext(),
                     StatisticsActivity.class); //here Filippo must insert his class name
             Bundle b5 = new Bundle();
-            b5.putString("restaurant_id", restaurantID);
+            b5.putString("restaurant_id", restaurant_id);
             intent5.putExtras(b5);
             startActivity(intent5);
             return true;

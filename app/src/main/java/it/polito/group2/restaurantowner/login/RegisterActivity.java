@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -64,6 +65,7 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
 
     private TextInputLayout inputLayoutFirstName, inputLayoutLastName, inputLayoutPassword, inputLayoutConfirmPassword, inputLayoutEmail;
     private EditText inputFirstName, inputLastName, inputPassword, inputConfirmPassword, inputEmail, inputPhoneNumber;
+    private CheckBox is_owner;
     private FirebaseAuth mAuth;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
@@ -108,6 +110,7 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
         inputPhoneNumber = (EditText) findViewById(R.id.input_phone_number);
         inputPassword = (EditText) findViewById(R.id.input_password);
         inputConfirmPassword = (EditText) findViewById(R.id.input_confirm_password);
+        is_owner = (CheckBox) findViewById(R.id.is_owner);
         //adding TextWatcher
 
         inputFirstName.addTextChangedListener(new MyTextWatcher(inputFirstName));
@@ -124,89 +127,127 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                 if (validateFirstName() && validateLastName() && validateEmail() &&
                         validatePassword() && validateConfirmPassword()) {
 
-                    showProgressDialog();
-                    final String email = inputEmail.getText().toString().trim();
-                    final String password = inputConfirmPassword.getText().toString().trim();
-                    final String fullName = inputFirstName.getText().toString().trim() + " " + inputLastName.getText().toString().trim();
-                    final String phoneNumber = inputPhoneNumber.getText().toString().trim();
-
-                    Query userQuery = userRef.orderByChild("user_email").equalTo(email);
-                    userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (!dataSnapshot.hasChildren()) {
-                                mAuth.createUserWithEmailAndPassword(email, password)
-                                        .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
-                                            @Override
-                                            public void onSuccess(AuthResult authResult) {
-                                                User user = new User(authResult.getUser().getUid(), fullName, phoneNumber, email);
-                                                user.getProviders().put("password", true);
-                                                userRef.child(authResult.getUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        hideProgressDialog();
-                                                        Toast.makeText(RegisterActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
-
-                                                        signOut();
-
-                                                        Intent i = new Intent(RegisterActivity.this, LoginManagerActivity.class);
-
-                                                        i.putExtra("login", true);
-
-                                                        // Closing all the Activities from stack
-                                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                                                        // Add new Flag to start new Activity
-                                                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                                                        // Staring UserRestaurantList Activity
-                                                        startActivity(i);
-                                                    }
-                                                });
-                                            }
-                                        })
-                                        .addOnFailureListener(new OnFailureListener() {
-                                            @Override
-                                            public void onFailure(@NonNull Exception e) {
-                                                hideProgressDialog();
-                                                e.printStackTrace();
-                                                Toast.makeText(RegisterActivity.this, "Registration failed, try again!", Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-
-                            } else {
-                                User target = null;
-                                for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                    target = data.getValue(User.class);
-                                }
-                                Log.d("prova", target.getUser_email() + " " + target.getUser_full_name() + " " + target.getUser_id() + " " + target.getProviders());
-                                userID = target.getUser_id();
-                                target.setUser_telephone_number(inputPhoneNumber.getText().toString().trim());
-                                HashMap<String, Boolean> providers = target.getProviders();
-                                if (!providers.containsKey("password")) {
-
-                                    providers.put("password", true);
-                                    userRef.child(target.getUser_id()).setValue(target);
-                                    if(providers.containsKey("google")){
-                                        signInWithGoogle();
+                    if (!validateTelephoneNumber()) {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                                RegisterActivity.this);
+                        // set title
+                        alertDialogBuilder.setTitle("Missing telephone number");
+                        // set dialog message
+                        alertDialogBuilder
+                                .setMessage("You did't provide a telephone number. Do you want to put it in order to be notified by the restaurant owners?")
+                                .setCancelable(false)
+                                .setPositiveButton("Yes, I do", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
                                     }
-                                    if (providers.containsKey("facebook")){
-                                        signInWithFacebook();
+                                })
+                                .setNegativeButton("Register anyway", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
+                                        dialog.cancel();
+                                        continue_registration();
                                     }
-                                }
-                                else{
-                                    Toast.makeText(RegisterActivity.this, "This account already exists!", Toast.LENGTH_SHORT).show();
-                                    hideProgressDialog();
-                                }
-                            }
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            Log.d("prova", "check user calcelled!");
-                        }
-                    });
-
+                                });
+                        // create alert dialog
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        // show it
+                        alertDialog.show();
+                    } else {
+                        continue_registration();
+                    }
                 }
+            }
+        });
+    }
+
+    public boolean validateTelephoneNumber(){
+        if(inputPhoneNumber.getText()==null && inputPhoneNumber.getText().toString().trim().equals(""))
+            return false;
+        else return true;
+    }
+
+    public void continue_registration(){
+        showProgressDialog();
+        final String email = inputEmail.getText().toString().trim();
+        final String password = inputConfirmPassword.getText().toString().trim();
+        final String fullName = inputFirstName.getText().toString().trim() + " " + inputLastName.getText().toString().trim();
+        final String phoneNumber = inputPhoneNumber.getText().toString().trim();
+
+        Query userQuery = userRef.orderByChild("user_email").equalTo(email);
+        userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChildren()) {
+                    mAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                                @Override
+                                public void onSuccess(AuthResult authResult) {
+                                    User user = new User(authResult.getUser().getUid(), fullName, phoneNumber, email);
+                                    user.setOwnerUser(is_owner.isChecked());
+                                    user.getProviders().put("password", true);
+                                    userRef.child(authResult.getUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            hideProgressDialog();
+                                            Toast.makeText(RegisterActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
+
+                                            signOut();
+
+                                            Intent i = new Intent(RegisterActivity.this, LoginManagerActivity.class);
+
+                                            i.putExtra("login", true);
+
+                                            // Closing all the Activities from stack
+                                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+                                            // Add new Flag to start new Activity
+                                            i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                                            // Staring UserRestaurantList Activity
+                                            Log.d("aaaaaaa", "ahajhsjsh");
+                                            startActivity(i);
+                                            finish();
+                                        }
+                                    });
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    hideProgressDialog();
+                                    e.printStackTrace();
+                                    Toast.makeText(RegisterActivity.this, "Registration failed, try again!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                } else {
+                    User target = null;
+                    for (DataSnapshot data : dataSnapshot.getChildren()) {
+                        target = data.getValue(User.class);
+                    }
+                    Log.d("prova", target.getUser_email() + " " + target.getUser_full_name() + " " + target.getUser_id() + " " + target.getProviders());
+                    userID = target.getUser_id();
+                    target.setUser_telephone_number(inputPhoneNumber.getText().toString().trim());
+                    HashMap<String, Boolean> providers = target.getProviders();
+                    if (!providers.containsKey("password")) {
+
+                        providers.put("password", true);
+                        userRef.child(target.getUser_id()).setValue(target);
+                        if(providers.containsKey("google")){
+                            signInWithGoogle();
+                        }
+                        if (providers.containsKey("facebook")){
+                            signInWithFacebook();
+                        }
+                    }
+                    else{
+                        Toast.makeText(RegisterActivity.this, "This account already exists!", Toast.LENGTH_SHORT).show();
+                        hideProgressDialog();
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("prova", "check user calcelled!");
             }
         });
     }

@@ -34,11 +34,12 @@ import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
 import it.polito.group2.restaurantowner.owner.ReviewsActivity;
 import it.polito.group2.restaurantowner.owner.StatisticsActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class ReservationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
     private FragmentPageAdapter adapter;
-    private String restaurantId;
+    private String restaurant_id;
     public ArrayList<Restaurant> all_restaurants = new ArrayList<Restaurant>();
     public Restaurant current_restaurant;
     public Context context;
@@ -50,7 +51,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
         setContentView(R.layout.activity_reservation);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        restaurantId = getIntent().getExtras().getString("restaurant_id");
+        restaurant_id = getIntent().getExtras().getString("restaurant_id");
 
         context = this;
         try {
@@ -60,7 +61,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
             e.printStackTrace();
         }
         for(Restaurant r : all_restaurants){
-            if(r.getRestaurantId().equals(restaurantId)){
+            if(r.getRestaurantId().equals(restaurant_id)){
                 current_restaurant = r;
                 break;
             }
@@ -87,7 +88,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         final ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        adapter = new FragmentPageAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), date.getTimeInMillis(), restaurantId);
+        adapter = new FragmentPageAdapter(getSupportFragmentManager(), tabLayout.getTabCount(), date.getTimeInMillis(), restaurant_id);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -129,7 +130,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+// Handle navigation view item clicks here.
         int id = item.getItemId();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if(id==R.id.action_my_restaurants){
@@ -138,12 +139,21 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     MainActivity.class);
             startActivity(intent1);
             return true;
+        } else if(id==R.id.action_show_as) {
+            Intent intent1 = new Intent(
+                    getApplicationContext(),
+                    UserRestaurantActivity.class);
+            Bundle b = new Bundle();
+            b.putString("restaurant_id", restaurant_id);
+            intent1.putExtras(b);
+            startActivity(intent1);
+            return true;
         } else if(id==R.id.action_gallery) {
             Intent intent1 = new Intent(
                     getApplicationContext(),
                     GalleryViewActivity.class);
             Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurantId);
+            b.putString("restaurant_id", restaurant_id);
             intent1.putExtras(b);
             startActivity(intent1);
             return true;
@@ -152,7 +162,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     getApplicationContext(),
                     MenuRestaurant_page.class);
             Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurantId);
+            b.putString("restaurant_id", restaurant_id);
             intent1.putExtras(b);
             startActivity(intent1);
             return true;
@@ -161,7 +171,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     getApplicationContext(),
                     MyOffersActivity.class);
             Bundle b2 = new Bundle();
-            b2.putString("restaurant_id", restaurantId);
+            b2.putString("restaurant_id", restaurant_id);
             intent2.putExtras(b2);
             startActivity(intent2);
             return true;
@@ -170,7 +180,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     getApplicationContext(),
                     ReservationActivity.class);
             Bundle b3 = new Bundle();
-            b3.putString("restaurant_id", restaurantId);
+            b3.putString("restaurant_id", restaurant_id);
             intent3.putExtras(b3);
             startActivity(intent3);
             return true;
@@ -179,7 +189,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     getApplicationContext(),
                     ReviewsActivity.class); //here Filippo must insert his class name
             Bundle b4 = new Bundle();
-            b4.putString("restaurant_id", restaurantId);
+            b4.putString("restaurant_id", restaurant_id);
             intent4.putExtras(b4);
             startActivity(intent4);
             return true;
@@ -188,7 +198,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     getApplicationContext(),
                     StatisticsActivity.class); //here Filippo must insert his class name
             Bundle b5 = new Bundle();
-            b5.putString("restaurant_id", restaurantId);
+            b5.putString("restaurant_id", restaurant_id);
             intent5.putExtras(b5);
             startActivity(intent5);
             return true;
@@ -229,8 +239,8 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     c.set(Calendar.MONTH, monthOfYear);
                     c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                    adapter.getTakeaway_fragment().changeData(c, restaurantId);
-                    adapter.getTable_fragment().changeData(c, restaurantId);
+                    adapter.getTakeaway_fragment().changeData(c, restaurant_id);
+                    adapter.getTable_fragment().changeData(c, restaurant_id);
 
                     c = Calendar.getInstance();
                     if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)

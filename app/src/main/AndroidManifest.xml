@@ -59,7 +59,8 @@
             android:name=".owner.Restaurant_page"
             android:label="@string/restaurant_page_name"
             android:parentActivityName=".owner.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity
             android:name=".owner.StatisticsActivity"
             android:label="@string/statistics_activity"
@@ -105,10 +106,6 @@
         <activity
             android:name=".user.restaurant_page.UserRestaurantActivity"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".user.restaurant_list.UserRestaurantList"
@@ -116,7 +113,10 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
-
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
             </activity>
         <activity
             android:name=".user.restaurant_page.UserTableReservationActivity"

@@ -124,7 +124,7 @@ public class UserRestaurantList extends AppCompatActivity
         LocationListener
 {
 
-    final static int ACTION_FILTER = 1;
+    final static int ACTION_FILTER = 10;
     private UserRestaurantPreviewAdapter mAdapter;
     private RecyclerView mRecyclerView;
     ArrayList<RestaurantPreview> restaurants_previews_list = new ArrayList<>();
@@ -136,7 +136,6 @@ public class UserRestaurantList extends AppCompatActivity
     private final float DEFAULT_ZOOM1 = 11.0f;
     private ClusterManager<MyItem> mClusterManager;
     private Marker mLastUserMarker;
-    final static int LOCATION_REQUEST = 4;
     protected static final String TAG = "location-updates-sample";
     protected boolean mRequestingLocationUpdates = false; //Tracks the status of the location updates request if started or not
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000; //The desired interval for location updates. Inexact. Updates may be more or less frequent.
@@ -166,6 +165,7 @@ public class UserRestaurantList extends AppCompatActivity
             create_dialog(this);
         }
         else {
+            firebase = FirebaseDatabase.getInstance();
             // Create an instance of GoogleAPIClient.
             if (mGoogleApiClient == null) {
                 mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -207,7 +207,7 @@ public class UserRestaurantList extends AppCompatActivity
             // mapFragment.getMapAsync(this);
 
             mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-            // use this setting to improve performance if you know that changes
+            // use this setting to improve performance if your know that changes
             // in content do not change the layout size of the RecyclerView
             mRecyclerView.setHasFixedSize(true);
             // use a linear layout manager
@@ -427,7 +427,6 @@ public class UserRestaurantList extends AppCompatActivity
 
     public void read_restaurants_from_firebase(){
         showProgressDialog();
-        firebase = FirebaseDatabase.getInstance();
         current_index = 0;
         //I want to get all restaurants within 2Km: I get all the ids of the restaurants, for each id I get its latitude and longitude, and if distance<2km I add it to restaurant_preview_list and cluster_manager
         DatabaseReference ref = firebase.getReference("restaurant_names");
@@ -709,6 +708,9 @@ public class UserRestaurantList extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+        if (!haveNetworkConnection()) {
+            create_dialog(this);
+        }
         grantPermissions();
     }
 
@@ -825,27 +827,21 @@ public class UserRestaurantList extends AppCompatActivity
             if (resultCode == RESULT_OK) {
                 mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
                 mRecyclerView.setAdapter(mAdapter);
-                String cat = (String) data.getExtras().get("Category");
-                boolean lunch = (boolean) data.getExtras().get("Lunch");
-                boolean dinner = (boolean) data.getExtras().get("Dinner");
-                boolean price1 = (boolean) data.getExtras().get("OneEuro");
-                boolean price2 = (boolean) data.getExtras().get("TwoEuro");
-                boolean price3 = (boolean) data.getExtras().get("ThreeEuro");
-                boolean price4 = (boolean) data.getExtras().get("FourEuro");
-                double range;
-                if(data.getExtras().get("range")!=null) {
-                    range = (double) data.getExtras().get("range");
-                }
-                else{
-                    range = DEFAULT_RANGE;
-                }
-                restaurants_previews_list = new ArrayList<RestaurantPreview>();
-                mClusterManager.clearItems();
-                //restaurants_previews_list.addAll(mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range));
-                for(RestaurantPreview r_p : restaurants_previews_list){
-                    mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
-                    mClusterManager.cluster();
-                }
+                    String cat = (String) data.getExtras().get("Category");
+                    boolean lunch = data.getExtras().getBoolean("Lunch");
+                    boolean dinner = data.getExtras().getBoolean("Dinner");
+                    boolean price1 = data.getExtras().getBoolean("OneEuro");
+                    boolean price2 = data.getExtras().getBoolean("TwoEuro");
+                    boolean price3 = data.getExtras().getBoolean("ThreeEuro");
+                    boolean price4 = data.getExtras().getBoolean("FourEuro");
+                    double range = data.getExtras().getDouble("range", DEFAULT_RANGE);
+                    restaurants_previews_list = new ArrayList<RestaurantPreview>();
+                    mClusterManager.clearItems();
+                    restaurants_previews_list.addAll(mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range));
+                    for (RestaurantPreview r_p : restaurants_previews_list) {
+                        mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
+                        mClusterManager.cluster();
+                    }
             }
         }
     }
@@ -1090,6 +1086,9 @@ public class UserRestaurantList extends AppCompatActivity
     @Override
     public void onResume() {
         super.onResume();
+        if (!haveNetworkConnection()) {
+            create_dialog(this);
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START))
             drawer.closeDrawer(GravityCompat.START);
@@ -1101,6 +1100,9 @@ public class UserRestaurantList extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
+        if (!haveNetworkConnection()) {
+            create_dialog(this);
+        }
         // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();

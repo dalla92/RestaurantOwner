@@ -28,6 +28,7 @@
             android:id="@+id/nav_my_profile"
             android:icon="@mipmap/ic_user_profile"
             android:title="@string/my_profile" />
+
         <item
             android:id="@+id/nav_my_orders"
             android:icon="@drawable/ic_cart_black"
