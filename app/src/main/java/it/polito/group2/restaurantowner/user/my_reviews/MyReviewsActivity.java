@@ -87,7 +87,7 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
 
         firebase = FirebaseDatabase.getInstance();
 
-        Query reviewsQuery = firebase.getReference("reviews").orderByChild("user_id").equalTo(userID).limitToFirst(10);
+        Query reviewsQuery = firebase.getReference("reviews/" + userID).orderByPriority().limitToFirst(10);
         reviewsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -125,7 +125,7 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
         mAdapter.setOnLoadMoreListener(new OnLoadMoreListener() {
             @Override
             public void onLoadMore() {
-                Query reviewsQuery = firebase.getReference("reviews").orderByChild("user_id").equalTo(userID).startAt(lastKnownKey).limitToFirst(10);
+                Query reviewsQuery = firebase.getReference("reviews/" + userID).orderByPriority().startAt(lastKnownKey).limitToFirst(10);
                 reviewsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {

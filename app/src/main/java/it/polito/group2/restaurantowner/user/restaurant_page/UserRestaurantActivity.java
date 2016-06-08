@@ -123,7 +123,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         FirebaseUtil.showProgressDialog(mProgressDialog);
         Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
-        Query reviewsQuery = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo(restaurantID);
+        Query reviewsQuery = firebase.getReference("reviews/" + restaurantID).orderByPriority();
         DatabaseReference restaurantRef = firebase.getReference("restaurants/" + restaurantID);
 
         restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -138,6 +138,27 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 rating.setText(String.format("%.1f", targetRestaurant.getRestaurant_rating()));
                 ratingBar.setRating(targetRestaurant.getRestaurant_rating());
                 collapsing.setTitle(targetRestaurant.getRestaurant_name());
+
+                if(targetRestaurant.getUser_id().equals(FirebaseUtil.getCurrentUserId())) {
+                    theUserIsTheOwner = true;
+                    ImageView addReview = (ImageView) findViewById(R.id.add_review);
+                    addReview.setVisibility(View.GONE);
+                } else {
+                    theUserIsTheOwner = false;
+                }
+
+                ImageView button_get_directions = (ImageView) findViewById(R.id.button_get_directions);
+                assert button_get_directions != null;
+                button_get_directions.setOnClickListener(
+                        new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
+                                        Uri.parse("http://maps.google.com/maps?daddr=" + targetRestaurant.getRestaurant_latitude_position() + "," + targetRestaurant.getRestaurant_longitude_position()));
+                                startActivity(intent);
+                            }
+                        }
+                );
 
                 String photoURL = targetRestaurant.getRestaurant_photo_firebase_URL();
                 if (photoURL == null || photoURL.equals("")) {
@@ -209,6 +230,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                 Log.d("prova", "child changed");
+                reviewAdapter.modifyReview(dataSnapshot.getValue(Review.class));
             }
 
             @Override
@@ -245,26 +267,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         });
 
 
-        if(targetRestaurant.getUser_id().equals(FirebaseUtil.getCurrentUserId())) {
-            theUserIsTheOwner = true;
-            ImageView addReview = (ImageView) findViewById(R.id.add_review);
-            addReview.setVisibility(View.GONE);
-        } else {
-            theUserIsTheOwner = false;
-        }
 
-        ImageButton button_get_directions = (ImageButton) findViewById(R.id.button_get_directions);
-        assert button_get_directions != null;
-        button_get_directions.setOnClickListener(
-                new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(android.content.Intent.ACTION_VIEW,
-                                Uri.parse("http://maps.google.com/maps?daddr=" + targetRestaurant.getRestaurant_latitude_position() + "," + targetRestaurant.getRestaurant_longitude_position()));
-                        startActivity(intent);
-                    }
-                }
-        );
         offers = getOffersJSON();
 
         addBookmarkButtonClick();
@@ -591,24 +594,15 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         }
         else {
             FirebaseUtil.showProgressDialog(mProgressDialog);
-            Query reviewQuery = firebase.getReference("reviews").orderByChild("user_id").equalTo(userID);
+            Query reviewQuery = firebase.getReference("reviews/" + userID).orderByChild("restaurant_id").equalTo(restaurantID);
             reviewQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(final DataSnapshot dataSnapshot) {
-                    String reviewId = null;
-                    for(DataSnapshot data: dataSnapshot.getChildren()){
-                        if(data.getValue(Review.class).getRestaurant_id().equals(restaurantID)) {
-                            reviewId = data.getValue(Review.class).getReview_id();
-                            break;
-                        }
-                    }
-
-                    if(reviewId == null){
+                    if(!dataSnapshot.hasChildren()){
                         Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
                         startActivityForResult(intent, ADD_REQUEST);
                     }
                     else{
-                        final String targetReviewID = reviewId;
                         AlertDialog.Builder alert = new AlertDialog.Builder(UserRestaurantActivity.this);
                         alert.setTitle("Warning");
                         alert.setMessage("You already added a review to this restaurant," +
@@ -617,8 +611,14 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                Review review = null;
+                                for(DataSnapshot data: dataSnapshot.getChildren())
+                                    review = data.getValue(Review.class);
+
                                 Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
-                                intent.putExtra("review", targetReviewID);
+                                intent.putExtra("comment", review.getReview_comment());
+                                intent.putExtra("stars", review.getReview_rating());
+                                intent.putExtra("reviewID", review.getReview_id());
                                 startActivityForResult(intent, ADD_REQUEST);
                             }
                         });
@@ -646,7 +646,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         Log.d("result", "" + requestCode + " " + resultCode);
         if (requestCode == ADD_REQUEST) {
             if (resultCode == RESULT_OK) {
-                String userID = FirebaseUtil.getCurrentUserId();
+                final String userID = FirebaseUtil.getCurrentUserId();
                 if(userID == null){
                     Toast.makeText(UserRestaurantActivity.this, "Error while adding the review, try again!", Toast.LENGTH_SHORT).show();
                     return;
@@ -657,7 +657,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         User user = dataSnapshot.getValue(User.class);
-                        String comment = data.getStringExtra("comment");
+                        String comment = data.getStringExtra("comment") != null? data.getStringExtra("comment").trim() : null;
                         float starNumber = data.getFloatExtra("starsNumber", 0.0f);
                         String reviewID = data.getStringExtra("review");
                         Calendar date = Calendar.getInstance();
@@ -671,23 +671,35 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         review.setUser_full_name(user.getUser_full_name());
                         review.setUser_thumbnail(user.getUser_thumbnail());
 
-                        DatabaseReference reviewsRef;
+                        DatabaseReference userReviewsRef, restaurantReviewsRef;
                         if(reviewID == null) {
-                            reviewsRef = firebase.getReference("reviews").push();
-                            review.setReview_id(reviewsRef.getKey());
+                            userReviewsRef = firebase.getReference("reviews/" + userID).push();
+                            restaurantReviewsRef = firebase.getReference("reviews/" + restaurantID + "/" + userReviewsRef.getKey());
+
+                            review.setReview_id(userReviewsRef.getKey());
+                            if(comment != null && !comment.equals("")) {
+                                userReviewsRef.setPriority(-date.getTimeInMillis());
+                                restaurantReviewsRef.setPriority(-date.getTimeInMillis());
+                            }
+                            else {
+                                userReviewsRef.setPriority(Long.toString(date.getTimeInMillis()));
+                                restaurantReviewsRef.setPriority(Long.toString(date.getTimeInMillis()));
+                            }
                         }
                         else{
-                            reviewsRef = firebase.getReference("reviews/" + reviewID);
+                            userReviewsRef = firebase.getReference("reviews/" + userID + "/" + reviewID);
+                            restaurantReviewsRef = firebase.getReference("reviews/" + restaurantID + "/" + reviewID);
                             review.setReview_id(reviewID);
                         }
 
-                        reviewsRef.setValue(review)
+                        restaurantReviewsRef.setValue(review);
+                        userReviewsRef.setValue(review)
                                 .addOnCompleteListener(UserRestaurantActivity.this, new OnCompleteListener<Void>() {
 
                                     @Override
                                     public void onComplete(@NotNull Task<Void> task) {
                                         //update restaurant rating
-                                        Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo(restaurantID);
+                                        Query reviewsRef = firebase.getReference("reviews/" + restaurantID);
                                         reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                             @Override
                                             public void onDataChange(DataSnapshot snapshot) {

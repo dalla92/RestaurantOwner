@@ -32,20 +32,28 @@ public class Review implements Comparable<Review>{
             return 0;
     }
 
-    public static Comparator<Review> ReviewRatingComparator = new Comparator<Review>() {
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        public int compare(Review review1, Review review2) {
+        Review review = (Review) o;
 
-            //ascending order
-            if(review1.getReview_rating() > review2.getReview_rating())
-                return 1;
-            else if(review1.getReview_rating() < review2.getReview_rating())
-                return -1;
-            else
-                return 0;
-        }
+        if (review_id != null ? !review_id.equals(review.review_id) : review.review_id != null)
+            return false;
+        if (user_id != null ? !user_id.equals(review.user_id) : review.user_id != null)
+            return false;
+        return !(restaurant_id != null ? !restaurant_id.equals(review.restaurant_id) : review.restaurant_id != null);
 
-    };
+    }
+
+    @Override
+    public int hashCode() {
+        int result = review_id != null ? review_id.hashCode() : 0;
+        result = 31 * result + (user_id != null ? user_id.hashCode() : 0);
+        result = 31 * result + (restaurant_id != null ? restaurant_id.hashCode() : 0);
+        return result;
+    }
 
     public String getReview_id() {
         return review_id;

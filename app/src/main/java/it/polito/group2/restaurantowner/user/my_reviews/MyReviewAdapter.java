@@ -106,6 +106,7 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
         alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                //TODO remove logic both in userID and restaurantID child on firebase
                 removeItem(position);
                 dialog.dismiss();
 
@@ -165,7 +166,7 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
             if(thumbnail != null && !thumbnail.equals(""))
                 Glide.with(context).load(thumbnail).into(reviewHolder.picture);
             else
-                Glide.with(context).load(R.drawable.blank_profile).into(reviewHolder.picture);
+                Glide.with(context).load(R.drawable.blank_profile_thumb).into(reviewHolder.picture);
 
             if (reviews.get(position).getReview_comment().equals(""))
                 reviewHolder.comment.setVisibility(View.GONE);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +43,15 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
             return;
         this.reviews.remove(index);
         notifyItemRemoved(index);
+    }
+
+    public void modifyReview(Review review) {
+        int index = this.reviews.indexOf(review);
+        if(index == -1)
+            return;
+        this.reviews.get(index).setReview_comment(review.getReview_comment());
+        this.reviews.get(index).setReview_rating(review.getReview_rating());
+        notifyItemChanged(index);
     }
 
     public class ReviewViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
@@ -91,7 +101,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         if(thumbnail != null && !thumbnail.equals(""))
             Glide.with(context).load(thumbnail).into(holder.picture);
         else
-            Glide.with(context).load(R.drawable.blank_profile).into(holder.picture);
+            Glide.with(context).load(R.drawable.blank_profile_thumb).into(holder.picture);
 
         if(reviews.get(position).getReview_comment().equals(""))
             holder.comment.setVisibility(View.GONE);
