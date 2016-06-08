@@ -124,12 +124,16 @@ public class UserRestaurantList extends AppCompatActivity
         LocationListener
 {
 
-    final static int ACTION_FILTER = 10;
+    private final static int ACTION_FILTER = 10;
+    private final static int ACTION_SEARCH = 2;
+    private final static int VERTICAL_ITEM_SPACE = 5;
+    private final static int REQUEST_CHECK_SETTINGS = 1;
+    private final static int LOCATION_REQUEST = 4;
+
     private UserRestaurantPreviewAdapter mAdapter;
     private RecyclerView mRecyclerView;
     ArrayList<RestaurantPreview> restaurants_previews_list = new ArrayList<>();
-    private static final int VERTICAL_ITEM_SPACE = 5;
-    private final int REQUEST_CHECK_SETTINGS = 1;
+
     private double DEFAULT_RANGE = 5000; //dafault range is 2 km
     private double range;
     private GoogleMap mMap;
@@ -152,6 +156,7 @@ public class UserRestaurantList extends AppCompatActivity
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private Toolbar toolbar;
+    private TextView search;
 
 
     @Override
@@ -161,19 +166,20 @@ public class UserRestaurantList extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
+
         if (!haveNetworkConnection()) {
             create_dialog(this);
         }
         else {
             firebase = FirebaseDatabase.getInstance();
             // Create an instance of GoogleAPIClient.
-            if (mGoogleApiClient == null) {
-                mGoogleApiClient = new GoogleApiClient.Builder(this)
-                        .addConnectionCallbacks(this)
-                        .addOnConnectionFailedListener(this)
-                        .addApi(LocationServices.API)
-                        .build();
-            }
             createLocationRequest();
 
             grantPermissions();
@@ -188,13 +194,13 @@ public class UserRestaurantList extends AppCompatActivity
                 }
             });
 
-            TextView search = (TextView) findViewById(R.id.search_text);
+            search = (TextView) findViewById(R.id.search_text);
             assert search != null;
             search.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(UserRestaurantList.this, SearchActivity.class);
-                    startActivityForResult(intent, ACTION_FILTER);
+                    startActivityForResult(intent, ACTION_SEARCH);
                 }
             });
 
@@ -207,7 +213,7 @@ public class UserRestaurantList extends AppCompatActivity
             // mapFragment.getMapAsync(this);
 
             mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-            // use this setting to improve performance if your know that changes
+            // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
             mRecyclerView.setHasFixedSize(true);
             // use a linear layout manager
@@ -421,12 +427,12 @@ public class UserRestaurantList extends AppCompatActivity
         });
 
         maps_stuff();
-        if(mRequestingLocationUpdates==true)
+        if(mRequestingLocationUpdates)
             read_restaurants_from_firebase();
     }
 
     public void read_restaurants_from_firebase(){
-        showProgressDialog();
+        FirebaseUtil.showProgressDialog(mProgressDialog);
         current_index = 0;
         //I want to get all restaurants within 2Km: I get all the ids of the restaurants, for each id I get its latitude and longitude, and if distance<2km I add it to restaurant_preview_list and cluster_manager
         DatabaseReference ref = firebase.getReference("restaurant_names");
@@ -456,11 +462,12 @@ public class UserRestaurantList extends AppCompatActivity
                                             public void onDataChange(DataSnapshot snapshot) {
                                                 RestaurantPreview snap_r_p = (RestaurantPreview) snapshot.getValue();
                                                 restaurants_previews_list.add(snap_r_p);
+                                                mAdapter.addItem(snap_r_p);
                                                 mClusterManager.addItem(new MyItem(lat, lon));
                                                 mClusterManager.cluster();
                                                                 current_index++;
                                                                 if(total_index==current_index)
-                                                                    hideProgressDialog();
+                                                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                                             }
 
                                             @Override
@@ -708,10 +715,10 @@ public class UserRestaurantList extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        if (!haveNetworkConnection()) {
+        if(!haveNetworkConnection())
             create_dialog(this);
-        }
-        grantPermissions();
+        else
+            grantPermissions();
     }
 
     public void settingsrequest(){
@@ -825,23 +832,64 @@ public class UserRestaurantList extends AppCompatActivity
         if (requestCode == ACTION_FILTER) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
-                mRecyclerView.setAdapter(mAdapter);
-                    String cat = (String) data.getExtras().get("Category");
-                    boolean lunch = data.getExtras().getBoolean("Lunch");
-                    boolean dinner = data.getExtras().getBoolean("Dinner");
-                    boolean price1 = data.getExtras().getBoolean("OneEuro");
-                    boolean price2 = data.getExtras().getBoolean("TwoEuro");
-                    boolean price3 = data.getExtras().getBoolean("ThreeEuro");
-                    boolean price4 = data.getExtras().getBoolean("FourEuro");
-                    double range = data.getExtras().getDouble("range", DEFAULT_RANGE);
-                    restaurants_previews_list = new ArrayList<RestaurantPreview>();
-                    mClusterManager.clearItems();
-                    restaurants_previews_list.addAll(mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range));
-                    for (RestaurantPreview r_p : restaurants_previews_list) {
-                        mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
-                        mClusterManager.cluster();
-                    }
+                String cat = data.getExtras().getString("Category");
+                boolean lunch = data.getExtras().getBoolean("Lunch");
+                boolean dinner = data.getExtras().getBoolean("Dinner");
+                boolean price1 = data.getExtras().getBoolean("OneEuro");
+                boolean price2 = data.getExtras().getBoolean("TwoEuro");
+                boolean price3 = data.getExtras().getBoolean("ThreeEuro");
+                boolean price4 = data.getExtras().getBoolean("FourEuro");
+                double range = data.getExtras().getDouble("range", DEFAULT_RANGE);
+
+                /*if(data.getExtras().get("range")!=null) {
+                    range = data.getExtras().getDouble("range");
+                }
+                else{
+                    range = DEFAULT_RANGE;
+                }*/
+                mClusterManager.clearItems();
+                restaurants_previews_list = mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range);
+                for(RestaurantPreview r_p : restaurants_previews_list){
+                    mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
+                    mClusterManager.cluster();
+                }
+            }
+        }
+        if(requestCode == ACTION_SEARCH){
+            if(resultCode == RESULT_OK){
+                final ArrayList<String> restaurantIDs = data.getExtras().getStringArrayList("restaurant_list");
+                if(restaurantIDs.size() > 0) {
+                    restaurants_previews_list = new ArrayList<>();
+                    mAdapter.clear();
+                }
+
+                //TODO
+                //mLastUserMarker.setPosition(new LatLng());
+
+                FirebaseUtil.showProgressDialog(mProgressDialog);
+                for(int i = 0; i < restaurantIDs.size(); i++) {
+                    Log.d("prova", restaurantIDs.get(i));
+                    final int index = i;
+                    DatabaseReference restaurantRef = firebase.getReference("restaurants_previews/" + restaurantIDs.get(i));
+                    restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            RestaurantPreview restaurantPreview = dataSnapshot.getValue(RestaurantPreview.class);
+                            if(restaurantPreview != null) {
+                                mAdapter.addItem(restaurantPreview);
+                                restaurants_previews_list.add(restaurantPreview);
+                            }
+
+                            if(index == restaurantIDs.size() - 1)
+                                FirebaseUtil.hideProgressDialog(mProgressDialog);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            FirebaseUtil.hideProgressDialog(mProgressDialog);
+                        }
+                    });
+                }
             }
         }
     }
@@ -998,20 +1046,6 @@ public class UserRestaurantList extends AppCompatActivity
         }
     */
 
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(true);
-        }
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
-    }
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 
         private int spanCount;
@@ -1100,9 +1134,6 @@ public class UserRestaurantList extends AppCompatActivity
     @Override
     protected void onPause() {
         super.onPause();
-        if (!haveNetworkConnection()) {
-            create_dialog(this);
-        }
         // Stop location updates to save battery, but don't disconnect the GoogleApiClient object.
         if (mGoogleApiClient.isConnected()) {
             stopLocationUpdates();

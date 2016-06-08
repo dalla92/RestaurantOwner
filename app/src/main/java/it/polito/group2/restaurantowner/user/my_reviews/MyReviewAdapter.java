@@ -19,6 +19,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +34,7 @@ import it.polito.group2.restaurantowner.owner.ItemTouchHelperAdapter;
 public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHelperAdapter {
     private final int VIEW_ITEM = 1;
     private final int VIEW_PROG = 0;
+    private final FirebaseDatabase firebase;
 
     private ArrayList<Review> reviews;
     private Context context;
@@ -45,6 +49,7 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
         this.reviews = reviews;
         this.context = context;
         this.recyclerView = recyclerView;
+        firebase = FirebaseDatabase.getInstance();
     }
 
     public void updateScrollListener(boolean moreReviews){
@@ -106,7 +111,16 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
         alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                //TODO remove logic both in userID and restaurantID child on firebase
+                Review  reviewToRemove = reviews.get(position);
+                String userID = reviewToRemove.getUser_id();
+                String restaurantID = reviewToRemove.getRestaurant_id();
+                String reviewID = reviewToRemove.getReview_id();
+                DatabaseReference userReviewRef = firebase.getReference("reviews/" + userID + "/" + reviewID);
+                DatabaseReference restaurantReviewRef = firebase.getReference("reviews/" + restaurantID + "/" + reviewID);
+
+                userReviewRef.setValue(null);
+                restaurantReviewRef.setValue(null);
+
                 removeItem(position);
                 dialog.dismiss();
 
@@ -126,15 +140,12 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
     public void removeItem(int position){
         reviews.remove(position);
         notifyItemRemoved(position);
-        //notifyItemRangeChanged(position, reviews.size());
     }
 
 
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        /*View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.user_review, parent, false);
-        return new ReviewViewHolder(itemView);*/
 
         RecyclerView.ViewHolder vh;
         if (viewType == VIEW_ITEM) {
@@ -153,7 +164,7 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
         if (holder instanceof ReviewViewHolder) {
 
             ReviewViewHolder reviewHolder = (ReviewViewHolder) holder;
-            reviewHolder.username.setText(reviews.get(position).getUser_id());
+            reviewHolder.username.setText(reviews.get(position).getUser_full_name());
             reviewHolder.stars.setRating(reviews.get(position).getReview_rating());
 
             SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");

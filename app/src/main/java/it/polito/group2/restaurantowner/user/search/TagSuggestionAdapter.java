@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 /**
@@ -44,17 +45,19 @@ public class TagSuggestionAdapter extends RecyclerView.Adapter<TagSuggestionAdap
         @Override
         public void onClick(View v) {
             String key = names.get(this.getLayoutPosition());
+            Log.d("prova", key);
             ArrayList<String> restaurantIDs = new ArrayList<>();
             HashMap<String, Boolean> mapIds = namesAndId.get(key);
             restaurantIDs.addAll(mapIds.keySet());
 
-            for(String s: restaurantIDs)
-                Log.d("prova", s);
+            Intent intent = new Intent();
+            intent.putExtra("restaurant_list", restaurantIDs);
+            activity.setResult(Activity.RESULT_OK, intent);
+            activity.finish();
 
-            //TODO update the list of restaurant in UserRestaurantList
-            /*Intent intent = new Intent(activity, UserRestaurantActivity.class);
+            /*Intent intent = new Intent(activity, UserRestaurantList.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra("restaurant_id", restaurantId);
+            intent.putExtra("restaurant_list", restaurantIDs);
             activity.startActivity(intent);*/
         }
     }

@@ -6,9 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.DataSnapshot;
@@ -41,7 +45,7 @@ import it.polito.group2.restaurantowner.firebasedata.TableReservation;
  * Created by Daniele on 05/04/2016.
  */
 public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder> {
-    private List<RestaurantPreview> mDataset;
+    private ArrayList<RestaurantPreview> mDataset;
     public static Context mContext;
     private static float PRICE_BOUNDARY_1 = 5;
     private static float PRICE_BOUNDARY_2 = 10;
@@ -54,7 +58,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
     public static int total_tables_number;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public UserRestaurantPreviewAdapter(List<RestaurantPreview> myDataset, Context myContext, Marker mLastUserMarker) {
+    public UserRestaurantPreviewAdapter(ArrayList<RestaurantPreview> myDataset, Context myContext, Marker mLastUserMarker) {
         this.mLastUserMarker = mLastUserMarker;
         mDataset = myDataset;
         mContext = myContext;
@@ -91,15 +95,19 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         return mDataset.size();
     }
 
-    public void addItem(int position, RestaurantPreview res) {
-        mDataset.add(position, res);
-        notifyItemInserted(position);
-        notifyItemRangeChanged(position, mDataset.size());
+    public void addItem(RestaurantPreview res) {
+        mDataset.add(res);
+        notifyItemInserted(mDataset.size() - 1);
     }
 
-    protected List<RestaurantPreview> filter(String category, boolean lunch, boolean dinner, boolean price1, boolean price2, boolean price3, boolean price4, Marker marker, double range) {
+    public void clear() {
+        mDataset = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
+    protected ArrayList<RestaurantPreview> filter(String category, boolean lunch, boolean dinner, boolean price1, boolean price2, boolean price3, boolean price4, Marker marker, double range) {
         //filter by category
-        List<RestaurantPreview> nResList = new ArrayList<RestaurantPreview>();
+        ArrayList<RestaurantPreview> nResList = new ArrayList<RestaurantPreview>();
         if (category.equals("0"))
             nResList = mDataset;
         else {
@@ -109,7 +117,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             }
         }
         //filter by time
-        List<RestaurantPreview> n2ResList = new ArrayList<RestaurantPreview>();
+        ArrayList<RestaurantPreview> n2ResList = new ArrayList<RestaurantPreview>();
         Calendar today = Calendar.getInstance();
         RestaurantTimeSlot timeSlot = null;
         for (RestaurantPreview res : nResList) {
@@ -128,7 +136,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                     n2ResList.add(res);
             }
         }
-        List<RestaurantPreview> n3ResList = new ArrayList<RestaurantPreview>();
+        ArrayList<RestaurantPreview> n3ResList = new ArrayList<RestaurantPreview>();
         for (RestaurantPreview r : n2ResList) {
             if (price1 && r.getRestaurant_price_range() == 1) {
                 n3ResList.add(r);
@@ -155,10 +163,8 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             }
         }
 
-        int size = mDataset.size();
         mDataset = n3ResList;
         notifyDataSetChanged();
-        notifyItemRangeChanged(0, size);
         return mDataset;
     }
 
@@ -188,6 +194,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         public TextView distance;
         public TextView price_range;
         public RestaurantPreview current;
+        public ProgressBar mProgressBar;
         public int position;
 
         public ViewHolder(View v) {
@@ -198,14 +205,48 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             reservationNumber = (TextView) v.findViewById(R.id.textViewReservationNumber);
             distance = (TextView) v.findViewById(R.id.textViewDistance);
             price_range = (TextView) v.findViewById(R.id.textViewPriceRange);
+            mProgressBar = (ProgressBar) v.findViewById(R.id.progress_bar);
         }
 
         public void setData(RestaurantPreview restaurant, int position) {
 
+            mProgressBar.setVisibility(View.VISIBLE);
             if (restaurant.getRestaurant_cover_firebase_URL() == null || restaurant.getRestaurant_cover_firebase_URL().equals(""))
-                Glide.with(mContext).load(R.drawable.no_image).into(this.image);
+                Glide
+                        .with(mContext)
+                        .load(R.drawable.no_image)
+                        .listener(new RequestListener<Integer, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, Integer model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                mProgressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, Integer model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                mProgressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .into(this.image);
             else
-                Glide.with(mContext).load(restaurant.getRestaurant_cover_firebase_URL()).into(this.image);
+                Glide
+                        .with(mContext)
+                        .load(restaurant.getRestaurant_cover_firebase_URL())
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                mProgressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                mProgressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .into(this.image);
 
             /*
             SharedPreferences userDetails = mContext.getSharedPreferences("userdetails", mContext.MODE_PRIVATE);

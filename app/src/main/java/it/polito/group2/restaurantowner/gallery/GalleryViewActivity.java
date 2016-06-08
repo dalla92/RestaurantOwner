@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.ImageUtils;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantGallery;
 
@@ -66,7 +67,9 @@ public class GalleryViewActivity extends AppCompatActivity {
     private FirebaseDatabase firebase;
     private String mCurrentPhotoPath;
     private ProgressDialog mProgressDialog;
-    private boolean isOwner;
+    private Boolean isOwner;
+    private String userID;
+    private DatabaseReference userRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,18 +79,130 @@ public class GalleryViewActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        Bundle bundle = getIntent().getExtras();
-        restaurantID = "-KIMqPtRSEdm0Cvfc3Za";
-        isOwner = true;
-        //restaurantID = bundle.getString("restaurantID");
-
         firebase = FirebaseDatabase.getInstance();
-
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
         mGridView = (GridView) findViewById(R.id.gridView);
+
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id") != null)
+            restaurantID = getIntent().getExtras().getString("restaurant_id");
+
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+
+        userID = FirebaseUtil.getCurrentUserId();
+        if(userID != null){
+            userRef = firebase.getReference("users/" + userID + "/ownerUser");
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    isOwner = dataSnapshot.getValue(Boolean.class);
+
+                    if(isOwner){
+                        mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
+                        mGridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+
+                            @Override
+                            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                                final int checkedCount = mGridView.getCheckedItemCount();
+                                // Set the CAB title according to total checked items
+                                mode.setTitle(checkedCount + " Selected");
+                                // Calls toggleSelection method from ListViewAdapter Class
+                                mGridAdapter.toggleSelection(position);
+                            }
+
+                            @Override
+                            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                                getSupportActionBar().hide();
+                                mode.getMenuInflater().inflate(R.menu.menu_gallery_selected, menu);
+                                return true;
+                            }
+
+                            @Override
+                            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
+                                switch (item.getItemId()) {
+                                    case R.id.action_delete:
+                                        AlertDialog.Builder alert = new AlertDialog.Builder(GalleryViewActivity.this);
+                                        alert.setTitle("Confirmation!");
+                                        alert.setMessage("Are you sure you want to delete the selected images?\nThis operation cannot be undone!");
+                                        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // Calls getSelectedIds method from ListViewAdapter Class
+                                                dialog.dismiss();
+                                                SparseBooleanArray selected = mGridAdapter.getSelectedIds();
+                                                // Captures all selected ids with a loop
+                                                for (int i = (selected.size() - 1); i >= 0; i--) {
+                                                    showProgressDialog();
+                                                    if (selected.valueAt(i)) {
+                                                        final String selectedItemKey = (String) mGridAdapter.getItem(selected.keyAt(i));
+                                                        String url = mGridData.get(selectedItemKey);
+
+                                                        //remove item from storage, database and adapter
+                                                        int index = url.indexOf("?");
+                                                        final String fileName = url.substring(index - 17, index);
+
+                                                        StorageReference imageRef = storageRef.child("restaurants/" + restaurantID + "/" + fileName);
+                                                        imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                                            @Override
+                                                            public void onSuccess(Void aVoid) {
+                                                                DatabaseReference galleryRef = firebase.getReference("restaurants_galleries/" + restaurantID + "/urls");
+                                                                galleryRef.child(selectedItemKey).removeValue(new DatabaseReference.CompletionListener() {
+                                                                    @Override
+                                                                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                                                                        mGridAdapter.remove(selectedItemKey);
+                                                                        hideProgressDialog();
+                                                                    }
+                                                                });
+                                                            }
+                                                        }).addOnFailureListener(new OnFailureListener() {
+                                                            @Override
+                                                            public void onFailure(@NonNull Exception e) {
+                                                                Toast.makeText(GalleryViewActivity.this, "Error during removal of the pictures, try again!", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
+
+                                                    }
+                                                }
+                                                // Close CAB
+                                                mode.finish();
+                                            }
+                                        });
+                                        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                mode.finish();
+                                                dialog.dismiss();
+                                            }
+                                        });
+                                        alert.show();
+                                    default:
+                                        return false;
+                                }
+                            }
+
+                            @Override
+                            public void onDestroyActionMode(ActionMode mode) {
+                                mGridAdapter.removeSelection();
+                                getSupportActionBar().show();
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
 
         storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com");
 
-        showProgressDialog();
+
         DatabaseReference galleryRef =  firebase.getReference("restaurants_galleries/" + restaurantID);
         galleryRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -146,109 +261,29 @@ public class GalleryViewActivity extends AppCompatActivity {
             }
         });
 
-        if(isOwner){
-            mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
-            mGridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-
-                @Override
-                public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                    final int checkedCount = mGridView.getCheckedItemCount();
-                    // Set the CAB title according to total checked items
-                    mode.setTitle(checkedCount + " Selected");
-                    // Calls toggleSelection method from ListViewAdapter Class
-                    mGridAdapter.toggleSelection(position);
-                }
-
-                @Override
-                public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                    mode.getMenuInflater().inflate(R.menu.menu_gallery_selected, menu);
-                    return true;
-                }
-
-                @Override
-                public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                    return false;
-                }
-
-                @Override
-                public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
-                    switch (item.getItemId()) {
-                        case R.id.action_delete:
-                            AlertDialog.Builder alert = new AlertDialog.Builder(GalleryViewActivity.this);
-                            alert.setTitle("Confirmation!");
-                            alert.setMessage("Are you sure you want to delete the selected images?\nThis operation cannot be undone!");
-                            alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    // Calls getSelectedIds method from ListViewAdapter Class
-                                    dialog.dismiss();
-                                    SparseBooleanArray selected = mGridAdapter.getSelectedIds();
-                                    // Captures all selected ids with a loop
-                                    for (int i = (selected.size() - 1); i >= 0; i--) {
-                                        showProgressDialog();
-                                        if (selected.valueAt(i)) {
-                                            final String selectedItemKey = (String) mGridAdapter.getItem(selected.keyAt(i));
-                                            String url = mGridData.get(selectedItemKey);
-
-                                            //remove item from storage, database and adapter
-                                            int index = url.indexOf("?");
-                                            final String fileName = url.substring(index - 17, index);
-
-                                            StorageReference imageRef = storageRef.child("restaurants/" + restaurantID + "/" + fileName);
-                                            imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    DatabaseReference galleryRef = firebase.getReference("restaurants_galleries/" + restaurantID + "/urls");
-                                                    galleryRef.child(selectedItemKey).removeValue(new DatabaseReference.CompletionListener() {
-                                                        @Override
-                                                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                                                            mGridAdapter.remove(selectedItemKey);
-                                                            hideProgressDialog();
-                                                        }
-                                                    });
-                                                }
-                                            }).addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception e) {
-                                                    Toast.makeText(GalleryViewActivity.this, "Error during removal of the pictures, try again!", Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-
-                                        }
-                                    }
-                                    // Close CAB
-                                    mode.finish();
-                                }
-                            });
-                            alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    mode.finish();
-                                    dialog.dismiss();
-                                }
-                            });
-                            alert.show();
-                        default:
-                            return false;
-                    }
-                }
-
-                @Override
-                public void onDestroyActionMode(ActionMode mode) {
-                    mGridAdapter.removeSelection();
-                }
-            });
-        }
-
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        if(isOwner)
-            getMenuInflater().inflate(R.menu.menu_gallery_owner, menu);
-        else
-            getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data: dataSnapshot.getChildren())
+                    isOwner = data.getValue(Boolean.class);
+
+                if(isOwner)
+                    getMenuInflater().inflate(R.menu.menu_gallery_owner, menu);
+                else
+                    getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
+            }
+        });
+
         return true;
     }
 

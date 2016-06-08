@@ -285,10 +285,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent intent = new Intent(this, UserRestaurantList.class);
+            super.onBackPressed();
+            /*Intent intent = new Intent(this, UserRestaurantList.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            finish();
+            finish();*/
         }
     }
 
@@ -791,7 +792,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
     public void openGallery(View v){
         Intent intent = new Intent(this, GalleryViewActivity.class);
-        intent.putExtra("restaurantID", restaurantID);
+        intent.putExtra("restaurant_id", restaurantID);
         startActivity(intent);
     }
 

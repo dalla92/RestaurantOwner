@@ -109,24 +109,6 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         tagsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         tagsRecyclerView.setAdapter(tagAdapter);
 
-        /*firebase.getReference("restaurant_names").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                restaurantNamesIDMap = (HashMap<String, String>) dataSnapshot.getValue();
-                if(restaurantNamesIDMap != null)
-                    names.addAll(restaurantNamesIDMap.keySet());
-
-                for(String name: restaurantNamesIDMap.keySet())
-                    Log.d("prova", name);
-                hideProgressDialog();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
-
         EditText textView = (EditText) findViewById(R.id.search_text);
         assert textView != null;
         textView.addTextChangedListener(new TextWatcher() {
@@ -147,7 +129,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                     progressBar.setVisibility(View.VISIBLE);
                     tagCard.setVisibility(View.GONE);
 
-                    Query restaurantQuery = firebase.getReference("/restaurant_names").orderByKey().startAt(s.toString()).endAt(s.toString()+"\uf8ff");
+                    Query restaurantQuery = firebase.getReference("/restaurant_names").orderByKey().startAt(s.toString().toLowerCase()).endAt(s.toString().toLowerCase()+"\uf8ff");
                     restaurantQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -207,52 +189,6 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             public void afterTextChanged(Editable s) {
             }
         });
-
-        /*ImageView icon_location = (ImageView) findViewById(R.id.icon_location);
-        assert icon_location != null;
-        icon_location.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showProgressDialog();
-                PendingResult<LocationSettingsResult> result =
-                        LocationServices.SettingsApi.checkLocationSettings(mGoogleApiClient, builder.build());
-
-                result.setResultCallback(new ResultCallback<LocationSettingsResult>() {
-                    @Override
-                    public void onResult(@NotNull LocationSettingsResult locationSettingsResult) {
-
-                        final Status status = locationSettingsResult.getStatus();
-                        final LocationSettingsStates LS_state = locationSettingsResult.getLocationSettingsStates();
-                        switch (status.getStatusCode()) {
-                            case LocationSettingsStatusCodes.SUCCESS:
-                                Log.d("prova", "success");
-                               getLocation();
-
-                                break;
-                            case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
-                                // Location settings are not satisfied. But could be fixed by showing the user
-                                // a dialog.
-                                try {
-                                    // Show the dialog by calling startResolutionForResult(),
-                                    // and check the result in onActivityResult().
-                                    status.startResolutionForResult(SearchActivity.this, REQUEST_CHECK_SETTINGS);
-
-                                } catch (IntentSender.SendIntentException e) {
-                                    // Ignore the error.
-                                }
-                                break;
-                            case LocationSettingsStatusCodes.SETTINGS_CHANGE_UNAVAILABLE:
-                                // Location settings are not satisfied. However, we have no way to fix the
-                                // settings so we won't show the dialog.
-                                hideProgressDialog();
-                                Log.d("prova", "error with location");
-                                break;
-                        }
-                    }
-                });
-
-            }
-        });*/
 
         ImageView iconBack = (ImageView) findViewById(R.id.icon_back);
         assert iconBack != null;
