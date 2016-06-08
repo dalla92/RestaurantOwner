@@ -97,23 +97,38 @@ public class FirebaseUtil {
         return null;
     }
 
+    public static DatabaseReference getRestaurantRef(String restaurantID) {
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        return firebase.getReference("restaurants/" + restaurantID);
+    }
+
+    public static DatabaseReference getOfferRef(String offerID) {
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        return firebase.getReference("offers/" + offerID);
+    }
+
+    public static Query getMealsByRestaurantRef(String restaurantID) {
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        return firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
+    }
+
+
+
+
+
+
+
+
+
+
+    //TODO deprecata
+    @Deprecated
     public static User getCurrentUser() {
-        DatabaseReference ref = getCurrentUserRef();
-        final User[] user = new User[1];
-        if(ref != null) {
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    user[0] = dataSnapshot.getValue(User.class);
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {}
-            });
-            return user[0];
-        }
         return null;
     }
 
+    //TODO deprecata
+    @Deprecated
     public static Restaurant getRestaurant(String restaurantID) {
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         DatabaseReference ref = firebase.getReference("restaurants/" + restaurantID);
@@ -132,24 +147,14 @@ public class FirebaseUtil {
         return null;
     }
 
+    //TODO deprecata
+    @Deprecated
     public static Offer getOffer(String offerID) {
-        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
-        DatabaseReference ref = firebase.getReference("offers/" + offerID);
-        final Offer[] offer = new Offer[1];
-        if(ref != null) {
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    offer[0] = dataSnapshot.getValue(Offer.class);
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {}
-            });
-            return offer[0];
-        }
         return null;
     }
 
+    //TODO deprecata
+    @Deprecated
     public static ArrayList<Meal> getMealsByRestaurant(String restaurantID) {
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         Query ref = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
@@ -172,6 +177,8 @@ public class FirebaseUtil {
         return null;
     }
 
+    //TODO deprecata
+    @Deprecated
     public static ArrayList<Order> getOrdersByRestaurant(String restaurantID) {
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         Query ref = firebase.getReference("orders").orderByChild("restaurant_id").equalTo(restaurantID);
@@ -194,6 +201,8 @@ public class FirebaseUtil {
         return null;
     }
 
+    //TODO deprecata
+    @Deprecated
     public static ArrayList<Order> getOrdersByUser(String userID) {
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         Query ref = firebase.getReference("orders").orderByChild("user_id").equalTo(userID);
@@ -214,6 +223,8 @@ public class FirebaseUtil {
         return null;
     }
 
+    //TODO deprecata
+    @Deprecated
     public static ArrayList<Offer> getOffersByRestaurant(String restaurantID) {
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         Query ref = firebase.getReference("offers").orderByChild("restaurant_id").equalTo(restaurantID);

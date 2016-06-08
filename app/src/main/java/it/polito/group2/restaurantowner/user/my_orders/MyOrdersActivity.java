@@ -168,6 +168,7 @@ public class MyOrdersActivity extends AppCompatActivity
     public void onResume(){
         super.onResume();
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
         if (drawer.isDrawerOpen(GravityCompat.START))
             drawer.closeDrawer(GravityCompat.START);
     }

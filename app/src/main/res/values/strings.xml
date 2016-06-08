@@ -279,6 +279,8 @@
     <string name="owner_offer_fragment_offer_lable_listempty">nothing is selected</string>
     <string name="owner_offer_fragment_offer_title_alert">Useless offer</string>
     <string name="owner_offer_fragment_offer_message_alert">The offer is enabled but it is applied on anything. Do you want to save it anyway?</string>
+    <string name="owner_offer_activity_onbackalert_title">Be careful!</string>
+    <string name="owner_offer_activity_onbackalert_message">If you press back you will lose the current offer.</string>
 
     <!-- Strings related to owner.my_offers -->
     <string name="owner_myoffers_lable_disable">(disabled)</string>
