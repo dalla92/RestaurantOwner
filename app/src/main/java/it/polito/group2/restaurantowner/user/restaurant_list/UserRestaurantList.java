@@ -841,7 +841,7 @@ public class UserRestaurantList extends AppCompatActivity
                 }
                 restaurants_previews_list = new ArrayList<RestaurantPreview>();
                 mClusterManager.clearItems();
-                restaurants_previews_list.addAll(mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range));
+                //restaurants_previews_list.addAll(mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range));
                 for(RestaurantPreview r_p : restaurants_previews_list){
                     mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
                     mClusterManager.cluster();

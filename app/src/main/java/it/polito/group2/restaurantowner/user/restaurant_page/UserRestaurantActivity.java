@@ -590,15 +590,25 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             FirebaseUtil.showLoginDialog(this);
         }
         else {
+            FirebaseUtil.showProgressDialog(mProgressDialog);
             Query reviewQuery = firebase.getReference("reviews").orderByChild("user_id").equalTo(userID);
             reviewQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(final DataSnapshot dataSnapshot) {
-                    if(!dataSnapshot.hasChildren()){
+                    String reviewId = null;
+                    for(DataSnapshot data: dataSnapshot.getChildren()){
+                        if(data.getValue(Review.class).getRestaurant_id().equals(restaurantID)) {
+                            reviewId = data.getValue(Review.class).getReview_id();
+                            break;
+                        }
+                    }
+
+                    if(reviewId == null){
                         Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
                         startActivityForResult(intent, ADD_REQUEST);
                     }
                     else{
+                        final String targetReviewID = reviewId;
                         AlertDialog.Builder alert = new AlertDialog.Builder(UserRestaurantActivity.this);
                         alert.setTitle("Warning");
                         alert.setMessage("You already added a review to this restaurant," +
@@ -607,12 +617,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                Review review = null;
-                                for(DataSnapshot data: dataSnapshot.getChildren())
-                                    review = data.getValue(Review.class);
                                 Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
-                                intent.putExtra("restaurant_id", restaurantID);
-                                intent.putExtra("review", review.getReview_id());
+                                intent.putExtra("review", targetReviewID);
                                 startActivityForResult(intent, ADD_REQUEST);
                             }
                         });
@@ -653,46 +659,55 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         User user = dataSnapshot.getValue(User.class);
                         String comment = data.getStringExtra("comment");
                         float starNumber = data.getFloatExtra("starsNumber", 0.0f);
-
+                        String reviewID = data.getStringExtra("review");
                         Calendar date = Calendar.getInstance();
 
-                        DatabaseReference reviewsRef = firebase.getReference("reviews/" + restaurantID).push();
-                        Review review =new Review();
+                        Review review = new Review();
                         review.setRestaurant_id(restaurantID);
                         review.setReview_comment(comment);
                         review.setReview_timestamp(date.getTimeInMillis());
-                        review.setReview_id(reviewsRef.getKey());
                         review.setReview_rating(starNumber);
                         review.setUser_id(user.getUser_id());
                         review.setUser_full_name(user.getUser_full_name());
                         review.setUser_thumbnail(user.getUser_thumbnail());
+
+                        DatabaseReference reviewsRef;
+                        if(reviewID == null) {
+                            reviewsRef = firebase.getReference("reviews").push();
+                            review.setReview_id(reviewsRef.getKey());
+                        }
+                        else{
+                            reviewsRef = firebase.getReference("reviews/" + reviewID);
+                            review.setReview_id(reviewID);
+                        }
+
                         reviewsRef.setValue(review)
                                 .addOnCompleteListener(UserRestaurantActivity.this, new OnCompleteListener<Void>() {
 
-                            @Override
-                            public void onComplete(@NotNull Task<Void> task) {
-                                //update restaurant rating
-                                DatabaseReference ref = firebase.getReference("reviews/" + restaurantID);
-                                ref.addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
-                                    public void onDataChange(DataSnapshot snapshot) {
-                                        double total_reviews_rating = 0;
-                                        for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                                            Review r = dataSnapshot.getValue(Review.class);
-                                            total_reviews_rating += r.getReview_rating();
-                                        }
-                                        DatabaseReference ref2 = firebase.getReference("restaurants/" + restaurantID + "/restaurant_rating");
-                                        ref2.setValue(total_reviews_rating);
-                                        DatabaseReference ref3 = firebase.getReference("restaurants_previews/" + restaurantID + "/restaurant_rating");
-                                        ref3.setValue(total_reviews_rating);
-                                    }
+                                    public void onComplete(@NotNull Task<Void> task) {
+                                        //update restaurant rating
+                                        Query reviewsRef = firebase.getReference("reviews").orderByChild("restaurant_id").equalTo(restaurantID);
+                                        reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot snapshot) {
+                                                double total_reviews_rating = 0;
+                                                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                                    Review r = dataSnapshot.getValue(Review.class);
+                                                    total_reviews_rating += r.getReview_rating();
+                                                }
+                                                DatabaseReference ref2 = firebase.getReference("restaurants/" + restaurantID + "/restaurant_rating");
+                                                ref2.setValue(total_reviews_rating);
+                                                DatabaseReference ref3 = firebase.getReference("restaurants_previews/" + restaurantID + "/restaurant_rating");
+                                                ref3.setValue(total_reviews_rating);
+                                            }
 
-                                    @Override
-                                    public void onCancelled(DatabaseError firebaseError) {
+                                            @Override
+                                            public void onCancelled(DatabaseError firebaseError) {
+                                            }
+                                        });
                                     }
                                 });
-                            }
-                        });
                     }
 
                     @Override
@@ -700,9 +715,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
                     }
                 });
-
-
-
             }
         }
     }

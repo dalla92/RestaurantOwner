@@ -39,7 +39,6 @@ public class AddReviewActivity extends AppCompatActivity {
     private RatingBar stars;
     private ProgressDialog mProgressDialog;
     private FirebaseDatabase firebase;
-    private String restaurantID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,17 +50,16 @@ public class AddReviewActivity extends AppCompatActivity {
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("review")!=null)
             reviewID = getIntent().getExtras().getString("review");
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null)
-            restaurantID = getIntent().getExtras().getString("restaurant_id");
 
         comment = (EditText) findViewById(R.id.edit_review_comment);
         stars = (RatingBar) findViewById(R.id.user_review_rating_bar);
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
 
         firebase = FirebaseDatabase.getInstance();
         FirebaseUtil.showProgressDialog(mProgressDialog);
         
-        if(reviewID != null && restaurantID != null){
-            Query reviewQuery = firebase.getReference("reviews/" + restaurantID).orderByChild("review_id").equalTo(reviewID);
+        if(reviewID != null){
+            Query reviewQuery = firebase.getReference("reviews").orderByChild("review_id").equalTo(reviewID);
             reviewQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -117,6 +115,8 @@ public class AddReviewActivity extends AppCompatActivity {
             }
 
             Intent intent = new Intent();
+            if(reviewID != null)
+                intent.putExtra("review", reviewID);
             intent.putExtra("comment", comment.getText().toString());
             intent.putExtra("starsNumber", stars.getRating());
             setResult(RESULT_OK, intent);
