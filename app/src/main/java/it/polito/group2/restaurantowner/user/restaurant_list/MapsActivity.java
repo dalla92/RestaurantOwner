@@ -530,8 +530,27 @@ public class MapsActivity extends AppCompatActivity implements
 
         mMap = map;
         mMap.getUiSettings().setZoomControlsEnabled(true);
-        mMap.getUiSettings().setMapToolbarEnabled(false);
+        mMap.getUiSettings().setMapToolbarEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
+        try {
+            mMap.setMyLocationEnabled(true);
+            mMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                @Override
+                public boolean onMyLocationButtonClick() {
+                    if (mMap.getUiSettings().isMyLocationButtonEnabled()) {
+                        stopLocationUpdates();
+                        Toast.makeText(MapsActivity.this, "Location updates stopped", Toast.LENGTH_SHORT).show();
+                    } else {
+                        startLocationUpdates();
+                        Toast.makeText(MapsActivity.this, "Location updates started", Toast.LENGTH_SHORT).show();
+                    }
+                    return false;
+                }
+            });
+        }
+        catch(SecurityException e){
+            Log.d("aaa", "Exception in onMapReady");
+        }
         //focus camera on Turin
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(45.063911, 7.658844), DEFAULT_ZOOM2));
         //mMap.getUiSettings().setZoomControlsEnabled(false); hide controls

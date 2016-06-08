@@ -102,5 +102,4 @@
 
     <include layout="@layout/content_user_restaurant_list" />
 
-
 </android.support.design.widget.CoordinatorLayout>

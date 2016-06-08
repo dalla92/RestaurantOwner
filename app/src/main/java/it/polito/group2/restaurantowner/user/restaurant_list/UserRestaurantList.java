@@ -26,7 +26,9 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -157,7 +159,7 @@ public class UserRestaurantList extends AppCompatActivity
     private ProgressDialog mProgressDialog;
     private Toolbar toolbar;
     private TextView search;
-
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,6 +167,24 @@ public class UserRestaurantList extends AppCompatActivity
         setContentView(R.layout.activity_user_restaurant_list);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        fab = (FloatingActionButton) findViewById(R.id.gps_fab);
+        //fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mRequestingLocationUpdates == false){
+                    //enable gps
+                    mRequestingLocationUpdates = true;
+                    fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
+                }
+                else{
+                    //disable gps
+                    mRequestingLocationUpdates = false;
+                    fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
+                }
+            }
+        });
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -182,7 +202,7 @@ public class UserRestaurantList extends AppCompatActivity
             // Create an instance of GoogleAPIClient.
             createLocationRequest();
 
-            grantPermissions();
+            //grantPermissions(); only in onResume
 
             ImageView filter_icon = (ImageView) findViewById(R.id.icon_filter);
             assert filter_icon != null;
@@ -292,6 +312,7 @@ public class UserRestaurantList extends AppCompatActivity
     public void onConnected(Bundle connectionHint) { //Runs when a GoogleApiClient object successfully connects.
         Log.i(TAG, "Connected to GoogleApiClient");
         mRequestingLocationUpdates = true;
+        fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
         // If the initial location was never previously requested, we use
         // FusedLocationApi.getLastLocation() to get it. If it was previously requested, we store
         // its value in the Bundle and check for it in onCreate(). We
@@ -404,6 +425,13 @@ public class UserRestaurantList extends AppCompatActivity
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(false);
         mMap.getUiSettings().setCompassEnabled(false);
+        try {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(false);
+        }
+        catch(SecurityException e){
+            Log.d("aaa", "Exception in onMapReady");
+        }
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -1105,14 +1133,18 @@ public class UserRestaurantList extends AppCompatActivity
             //mMap.clear();
             if (mCurrentLocation != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), DEFAULT_ZOOM1));
-                mLastUserMarker = mMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
-                                .title("Your position")
-                                //.snippet("Population: 2,074,200")
-                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
-                                .visible(false)
-                );
-                mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+                if(mLastUserMarker == null) {
+                    mLastUserMarker = mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
+                                    .title("Your position")
+                                            //.snippet("Population: 2,074,200")
+                                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
+                                    .visible(false)
+                    );
+                }
+                else {
+                    //mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+                }
             }
         }
     }

@@ -160,7 +160,11 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
     }
 
     public boolean validateTelephoneNumber(){
-        if(inputPhoneNumber.getText()==null && inputPhoneNumber.getText().toString().trim().equals(""))
+        if(inputPhoneNumber.getText()==null)
+            Log.d("aaa", "aaa");
+        if(inputPhoneNumber.getText().toString().trim().equals(""))
+            Log.d("aaa", "bbb");
+        if(inputPhoneNumber.getText()==null || inputPhoneNumber.getText().toString().trim().equals(""))
             return false;
         else return true;
     }
@@ -203,7 +207,7 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                                             // Staring UserRestaurantList Activity
-                                            Log.d("aaaaaaa", "ahajhsjsh");
+                                            Log.d("aaa", "ahajhsjsh");
                                             startActivity(i);
                                             finish();
                                         }
