@@ -166,6 +166,10 @@ public class RestaurantPreviewAdapter extends RecyclerView.Adapter<RestaurantPre
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         DatabaseReference resReference = firebase.getReference("restaurants/" + r.getRestaurant_id());
         resReference.removeValue();
+        //delete also its preview
+        FirebaseDatabase firebase2 = FirebaseDatabase.getInstance();
+        DatabaseReference resReference2 = firebase.getReference("restaurants_previews/" + r.getRestaurant_id());
+        resReference2.removeValue();
         mDataset.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position,mDataset.size());

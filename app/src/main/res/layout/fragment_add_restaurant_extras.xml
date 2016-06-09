@@ -27,31 +27,11 @@
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Vegans"
-                android:id="@+id/cbVegan"
-                android:layout_column="1"
-                android:checked="false" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vegetarian"
-                android:id="@+id/cbVegetarian"
-                android:layout_column="0"
-                android:checked="false" />
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="Gluten free"
                 android:id="@+id/cbGlutenFree"
                 android:layout_column="1"
                 android:checked="false" />
+
         </TableRow>
 
         <TableRow
@@ -69,15 +49,17 @@
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Patio"
-                android:id="@+id/cbPatio"
+                android:text="A/C"
+                android:id="@+id/cbAC"
                 android:layout_column="1"
                 android:checked="false" />
+
         </TableRow>
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp">
 
             <CheckBox
                 android:layout_width="wrap_content"
@@ -96,28 +78,12 @@
                 android:checked="false" />
         </TableRow>
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Baby space"
-                android:id="@+id/cbBabySpace"
-                android:layout_column="0"
-                android:checked="false" />
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="A/C"
-                android:id="@+id/cbAC"
-                android:layout_column="1"
-                android:checked="false" />
-        </TableRow>
-
     </TableLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"/>
 
     <EditText
         android:layout_width="match_parent"

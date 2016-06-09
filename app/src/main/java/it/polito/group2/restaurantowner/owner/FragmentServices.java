@@ -58,6 +58,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
 
     OnServicesPass dataPasser;
 
+    boolean times_changed;
 
     public FragmentServices() {
     }
@@ -104,6 +105,15 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
             takeAway.setChecked(true);
         else
             takeAway.setChecked(false);
+
+        if(!times_changed){
+            lunchOpenTime = new ArrayList<>();
+            lunchCloseTime = new ArrayList<>();
+            dinnerOpenTime = new ArrayList<>();
+            dinnerCloseTime = new ArrayList<>();
+            listLunchClose = new boolean[]{true,true,true,true,true,true,true,true};
+            listDinnerClose = new boolean[]{true,true,true,true,true,true,true,true};
+        }
 
         dataPasser.onServicesPass(fidelity.isChecked(), tableRes.isChecked(), tableResEdit.getText().toString(), takeAway.isChecked(), takeAwayEdit.getText().toString(),
                 lunchOpenTime, lunchCloseTime, dinnerOpenTime, dinnerCloseTime, listLunchClose, listDinnerClose);
@@ -177,6 +187,20 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
 
                 DialogFragment newFragment = new TimePickerFragment() {
                     @Override
+                    public Dialog onCreateDialog(Bundle savedInstanceState){
+                        /*
+                        //Use the current time as the default values for the time picker
+                        final Calendar c = Calendar.getInstance();
+                        int hour = c.get(Calendar.HOUR_OF_DAY);
+                        int minute = c.get(Calendar.MINUTE);
+                        */
+
+                        //Create and return a new instance of TimePickerDialog
+                        return new TimePickerDialog(getActivity(),this, 10, 00,
+                                DateFormat.is24HourFormat(getActivity()));
+                    }
+
+                    @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
@@ -185,6 +209,8 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                         else
                             lunchOpenTime.set(selectedDay,time);
                         buttonLunchOpen.setText(time);
+
+                        times_changed = true;
                     }
                 };
                 newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
@@ -198,6 +224,19 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
 
                 DialogFragment newFragment = new TimePickerFragment() {
                     @Override
+                    public Dialog onCreateDialog(Bundle savedInstanceState){
+                        /*
+                        //Use the current time as the default values for the time picker
+                        final Calendar c = Calendar.getInstance();
+                        int hour = c.get(Calendar.HOUR_OF_DAY);
+                        int minute = c.get(Calendar.MINUTE);
+                        */
+
+                        //Create and return a new instance of TimePickerDialog
+                        return new TimePickerDialog(getActivity(),this, 13, 00,
+                                DateFormat.is24HourFormat(getActivity()));
+                    }
+                    @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
@@ -206,6 +245,8 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                         else
                             lunchCloseTime.set(selectedDay,time);
                         buttonLunchClose.setText(time);
+
+                        times_changed = true;
                     }
                 };
                 newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
@@ -219,6 +260,19 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
 
                 DialogFragment newFragment = new TimePickerFragment() {
                     @Override
+                    public Dialog onCreateDialog(Bundle savedInstanceState){
+                        /*
+                        //Use the current time as the default values for the time picker
+                        final Calendar c = Calendar.getInstance();
+                        int hour = c.get(Calendar.HOUR_OF_DAY);
+                        int minute = c.get(Calendar.MINUTE);
+                        */
+
+                        //Create and return a new instance of TimePickerDialog
+                        return new TimePickerDialog(getActivity(),this, 19, 00,
+                                DateFormat.is24HourFormat(getActivity()));
+                    }
+                    @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
                         String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
@@ -229,6 +283,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                             dinnerOpenTime.set(selectedDay,time);
                         buttonDinnerOpen.setText(time);
 
+                        times_changed = true;
                     }
                 };
                 newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
@@ -242,6 +297,19 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
 
                 DialogFragment newFragment = new TimePickerFragment() {
                     @Override
+                    public Dialog onCreateDialog(Bundle savedInstanceState){
+                        /*
+                        //Use the current time as the default values for the time picker
+                        final Calendar c = Calendar.getInstance();
+                        int hour = c.get(Calendar.HOUR_OF_DAY);
+                        int minute = c.get(Calendar.MINUTE);
+                        */
+
+                        //Create and return a new instance of TimePickerDialog
+                        return new TimePickerDialog(getActivity(),this, 23, 00,
+                                DateFormat.is24HourFormat(getActivity()));
+                    }
+                    @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
@@ -250,6 +318,8 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                         else
                             dinnerCloseTime.set(selectedDay,time);
                         buttonDinnerClose.setText(time);
+
+                        times_changed = true;
                     }
                 };
                 newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
