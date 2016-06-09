@@ -64,8 +64,8 @@ public class FragmentExtras extends Fragment {
                 args.putBoolean("TV", true);
             if(res.getCreditCardAccepted())
                 args.putBoolean("Credit Card", true);
-//            if(res.getCeliacFriendly())
-//                args.putBoolean("Celiac", true);
+            if(res.getCeliacFriendly())
+                args.putBoolean("Celiac", true);
             if(res.getWifiPresent())
                 args.putBoolean("Wi-Fi", true);
             if(res.getRestaurant_squared_meters()!=0)
@@ -133,12 +133,13 @@ public class FragmentExtras extends Fragment {
                 rs.setName("Vegetarian");
                 list.add(rs);
             }
+*/
             if (glutenFree.isChecked()) {
                 RestaurantService rs = new RestaurantService();
                 rs.setName("Gluten Free");
                 list.add(rs);
             }
-*/        if (tv.isChecked())
+        if (tv.isChecked())
             myRes.setTvPresent(true);
         else
             myRes.setTvPresent(false);

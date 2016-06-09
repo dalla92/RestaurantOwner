@@ -22,6 +22,8 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
+import it.polito.group2.restaurantowner.firebasedata.MealAddition;
+import it.polito.group2.restaurantowner.firebasedata.MealCategory;
 
 /**
  * Created by Alessio on 12/04/2016.
@@ -74,8 +76,13 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
 
     @Override
     public void onBindViewHolder(MealViewHolder MealViewHolder, int i) {
-
         index = i;
+
+        //boolean initializations
+        meals.get(i).setMealVegan(false);
+        meals.get(i).setMealGlutenFree(false);
+        meals.get(i).setMealAvailable(false);
+        meals.get(i).setMealTakeAway(false);
 
         if (meals.get(i).getMeal_thumbnail() != null && !meals.get(i).getMeal_thumbnail().equals(""))
             MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_thumbnail()));

@@ -20,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -72,9 +73,41 @@ public class MenuRestaurant_page extends AppCompatActivity {
 
         context = this;
 
-        //get the right restaurant
-        if(restaurant_id==null)
-            restaurant_id = "-KI8xQ4PDVSKKjnRGmdG";
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id") != null)
+            restaurant_id = getIntent().getExtras().getString("restaurant_id");
+
+        //recycler view
+        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        mRecyclerView.setHasFixedSize(true);
+        adapter = new Adapter_Meals((Activity)context, 0, meals, restaurant_id);
+        mRecyclerView.setAdapter(adapter);
+
+        ImageView add_button = (ImageView) findViewById(R.id.imageButton);
+        add_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + restaurant_id);
+                Meal m = new Meal();
+                m.setMeal_name("");
+                m.setMeal_price(0.0);
+                m.setMealAvailable(false);
+                m.setMeal_cooking_time(0);
+                m.setMeal_id("");
+                m.setRestaurant_id(restaurant_id);
+                m.setMeal_description("");
+                m.setMealVegetarian(false);
+
+                m.setMealVegan(false);
+                m.setMealGlutenFree(false);
+                m.setMealTakeAway(false);
+                m.setMeal_photo_firebase_URL("");
+                m.setMeal_thumbnail("");
+                DatabaseReference ref_pushed = ref.push();
+                m.setMeal_id(ref_pushed.getKey());
+                ref_pushed.setValue(m);
+                adapter.notifyDataSetChanged();
+            }
+        });
 
         //get and fill related data
         get_data_from_firebase();
@@ -115,24 +148,23 @@ public class MenuRestaurant_page extends AppCompatActivity {
     private void get_data_from_firebase(){
         progress_dialog();
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+restaurant_id);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                int index = -1;
+                int final_index = -1;
                 for (DataSnapshot meSnapshot : snapshot.getChildren()) {
+                    if(index == -1)
+                        final_index = (int) snapshot.getChildrenCount();
+                    index++;
                     Meal snap_meal = meSnapshot.getValue(Meal.class);
-                    String snap_restaurant_id = snap_meal.getRestaurant_id();
-                    if (snap_restaurant_id.equals(restaurant_id)) {
-                        for (Meal m_temp : meals) {
-                            if (m_temp.getMeal_id().equals(snap_meal.getMeal_id())) {
-                                meals.remove(m_temp);
-                                break;
-                            }
-                        }
-                        meals.add(0, snap_meal);
-                        adapter.notifyDataSetChanged();
-                    }
+                    meals.add(0, snap_meal);
+                    adapter.notifyDataSetChanged();
+                    if(index==final_index)
+                        progressDialog.hide();
                 }
+
 
                 //toolbar
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -152,13 +184,13 @@ public class MenuRestaurant_page extends AppCompatActivity {
                         // Handle navigation view item clicks here.
                         int id = item.getItemId();
                         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if(id==R.id.action_my_restaurants){
+                        if (id == R.id.action_my_restaurants) {
                             Intent intent1 = new Intent(
                                     getApplicationContext(),
                                     MainActivity.class);
                             startActivity(intent1);
                             return true;
-                        } else if(id==R.id.action_show_as) {
+                        } else if (id == R.id.action_show_as) {
                             Intent intent1 = new Intent(
                                     getApplicationContext(),
                                     UserRestaurantActivity.class);
@@ -167,7 +199,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                             intent1.putExtras(b);
                             startActivity(intent1);
                             return true;
-                        } else if(id==R.id.action_gallery) {
+                        } else if (id == R.id.action_gallery) {
                             Intent intent1 = new Intent(
                                     getApplicationContext(),
                                     GalleryViewActivity.class);
@@ -176,7 +208,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                             intent1.putExtras(b);
                             startActivity(intent1);
                             return true;
-                        } else if(id==R.id.action_menu) {
+                        } else if (id == R.id.action_menu) {
                             Intent intent1 = new Intent(
                                     getApplicationContext(),
                                     MenuRestaurant_page.class);
@@ -185,7 +217,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                             intent1.putExtras(b);
                             startActivity(intent1);
                             return true;
-                        } else if(id==R.id.action_offers) {
+                        } else if (id == R.id.action_offers) {
                             Intent intent2 = new Intent(
                                     getApplicationContext(),
                                     MyOffersActivity.class);
@@ -194,7 +226,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                             intent2.putExtras(b2);
                             startActivity(intent2);
                             return true;
-                        } else if(id==R.id.action_reservations){
+                        } else if (id == R.id.action_reservations) {
                             Intent intent3 = new Intent(
                                     getApplicationContext(),
                                     ReservationActivity.class);
@@ -203,7 +235,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                             intent3.putExtras(b3);
                             startActivity(intent3);
                             return true;
-                        } else if(id==R.id.action_reviews){
+                        } else if (id == R.id.action_reviews) {
                             Intent intent4 = new Intent(
                                     getApplicationContext(),
                                     ReviewsActivity.class); //here Filippo must insert his class name
@@ -212,7 +244,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                             intent4.putExtras(b4);
                             startActivity(intent4);
                             return true;
-                        } else if(id==R.id.action_statistics){
+                        } else if (id == R.id.action_statistics) {
                             Intent intent5 = new Intent(
                                     getApplicationContext(),
                                     StatisticsActivity.class); //here Filippo must insert his class name
@@ -221,7 +253,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                             intent5.putExtras(b5);
                             startActivity(intent5);
                             return true;
-                        } else if(id==R.id.action_edit){
+                        } else if (id == R.id.action_edit) {
                             Intent intent6 = new Intent(
                                     getApplicationContext(),
                                     AddRestaurantActivity.class);
@@ -237,9 +269,6 @@ public class MenuRestaurant_page extends AppCompatActivity {
                     }
                 });
 
-                //recycler view
-                mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-                mRecyclerView.setHasFixedSize(true);
                 /*
                 if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                     mLayoutManager = new GridLayoutManager(this, 1);
@@ -257,7 +286,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                             @Override
                             public void onItemClick(View view, int position) {
                                 final String meal_key = meals.get(position).getMeal_id();
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+meal_key);
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
                                 ref.addValueEventListener(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot snapshot) {
@@ -277,7 +306,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                                                 getApplicationContext(),
                                                 MenuRestaurant_edit.class);
                                         if (meal_to_edit != null) {
-                                            intent1.putExtra("meal", (Serializable) meal_to_edit);
+                                            intent1.putExtra("meal",  meal_to_edit);
                                             startActivityForResult(intent1, MODIFY_MEAL);
                                         }
                                     }
@@ -289,14 +318,10 @@ public class MenuRestaurant_page extends AppCompatActivity {
                                 });
                             }
                         }));
-                adapter = new Adapter_Meals((Activity)context, 0, meals, restaurant_id);
-                mRecyclerView.setAdapter(adapter);
                 //delete with swipe
                 ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
                 ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
                 mItemTouchHelper.attachToRecyclerView(mRecyclerView);
-
-                progressDialog.dismiss();
             }
 
             @Override
@@ -327,27 +352,6 @@ public class MenuRestaurant_page extends AppCompatActivity {
         } else {
             super.onBackPressed();
         }
-    }
-
-    public void myClickHandler_add(View v) {
-        Meal m = new Meal();
-        m.setMeal_name("");
-        m.setMeal_price(0.0);
-        m.setMealAvailable(false);
-        m.setMeal_cooking_time(0);
-        m.setMeal_id("");
-        m.setRestaurant_id(restaurant_id);
-        m.setMeal_description("");
-        m.setMealVegetarian(false);
-        m.setMealVegan(false);
-        m.setMealGlutenFree(false);
-        m.setMealTakeAway(false);
-        m.setMeal_photo_firebase_URL("");
-        m.setMeal_thumbnail("");
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
-        DatabaseReference ref_pushed = ref.push();
-        m.setMeal_id(ref_pushed.getKey());
-        ref_pushed.setValue(m);
     }
 
     public void myClickHandler_enlarge(View v) {

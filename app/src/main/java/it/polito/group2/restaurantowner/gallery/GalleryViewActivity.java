@@ -67,7 +67,7 @@ public class GalleryViewActivity extends AppCompatActivity {
     private FirebaseDatabase firebase;
     private String mCurrentPhotoPath;
     private ProgressDialog mProgressDialog;
-    private Boolean isOwner;
+    private Boolean isOwner = false;
     private String userID;
     private DatabaseReference userRef;
 
@@ -208,10 +208,12 @@ public class GalleryViewActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 RestaurantGallery gallery = dataSnapshot.getValue(RestaurantGallery.class);
-                mGridData = new HashMap<>(gallery.getUrls());
-                //mGridData.addAll(gallery.getUrls().values());
-                mGridAdapter = new GalleryViewAdapter(GalleryViewActivity.this, R.layout.gallery_item, mGridData);
-                mGridView.setAdapter(mGridAdapter);
+                if(gallery!=null) {
+                    mGridData = new HashMap<>(gallery.getUrls());
+                    //mGridData.addAll(gallery.getUrls().values());
+                    mGridAdapter = new GalleryViewAdapter(GalleryViewActivity.this, R.layout.gallery_item, mGridData);
+                    mGridView.setAdapter(mGridAdapter);
+                }
                 hideProgressDialog();
             }
 

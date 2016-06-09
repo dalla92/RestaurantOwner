@@ -11,7 +11,7 @@ import java.util.ArrayList;
  * Created by Alessio on 16/05/2016.
  */
 
-public class Meal implements Serializable, Parcelable {
+public class Meal implements Parcelable {
 
     private String meal_id;
     private String restaurant_id;

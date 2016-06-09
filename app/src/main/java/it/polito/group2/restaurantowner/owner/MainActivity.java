@@ -211,29 +211,30 @@ public class MainActivity extends AppCompatActivity
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 Restaurant res = (Restaurant) data.getExtras().get("Restaurant");
-                if(userID!=null)
+                if(userID!=null) {
                     res.setUser_id(userID);
-                //resList.add(0,res);
-                //mAdapter.addItem(0, res);
-                DatabaseReference restaurantReference = firebase.getReference("restaurants");
-                DatabaseReference item = restaurantReference.push();
-                res.setRestaurant_id(item.getKey());
-                item.setValue(res);
-				
-				//save also the restaurant preview
-				DatabaseReference restaurantReference2 = firebase.getReference("restaurants_previews"+res.getRestaurant_id());
-				RestaurantPreview r_p = new RestaurantPreview();
-				if(res.getRestaurant_latitude_position()!=0)
-					r_p.setLat(res.getRestaurant_latitude_position());
-				if(res.getRestaurant_latitude_position()!=0)
-					r_p.setLon(res.getRestaurant_latitude_position());
-				r_p.setRestaurant_id(res.getRestaurant_id());
-				r_p.setRestaurant_name(res.getRestaurant_name());
-				r_p.setRestaurant_price_range(1);
-				r_p.setRestaurant_rating(1);
-				r_p.setTables_number(res.getRestaurant_total_tables_number());
-				r_p.setRestaurant_category(res.getRestaurant_category());
-				restaurantReference2.setValue(r_p);
+                    //resList.add(0,res);
+                    //mAdapter.addItem(0, res);
+                    DatabaseReference restaurantReference = firebase.getReference("restaurants");
+                    DatabaseReference item = restaurantReference.push();
+                    res.setRestaurant_id(item.getKey());
+                    item.setValue(res);
+
+                    //save also the restaurant preview
+                    DatabaseReference restaurantReference2 = firebase.getReference("restaurants_previews/" + res.getRestaurant_id());
+                    RestaurantPreview r_p = new RestaurantPreview();
+                    if (res.getRestaurant_latitude_position() != 0)
+                        r_p.setLat(res.getRestaurant_latitude_position());
+                    if (res.getRestaurant_latitude_position() != 0)
+                        r_p.setLon(res.getRestaurant_latitude_position());
+                    r_p.setRestaurant_id(res.getRestaurant_id());
+                    r_p.setRestaurant_name(res.getRestaurant_name());
+                    r_p.setRestaurant_price_range(1);
+                    r_p.setRestaurant_rating(1);
+                    r_p.setTables_number(res.getRestaurant_total_tables_number());
+                    r_p.setRestaurant_category(res.getRestaurant_category());
+                    restaurantReference2.setValue(r_p);
+                }
             }
         }
     }

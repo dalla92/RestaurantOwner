@@ -205,16 +205,6 @@ public class Restaurant_page extends AppCompatActivity
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                /*
-                for (DataSnapshot restSnapshot: snapshot.getChildren()) {
-                    Restaurant snap_restaurant = restSnapshot.getValue(Restaurant.class);
-                    String snap_restaurant_id = snap_restaurant.getRestaurant_id();
-                    if(snap_restaurant_id.equals(restaurant_id)){
-                        my_restaurant = snap_restaurant;
-                        break;
-                    }
-                }
-                */
                 my_restaurant = snapshot.getValue(Restaurant.class);
                 if(my_restaurant!=null)
                     fill_data();

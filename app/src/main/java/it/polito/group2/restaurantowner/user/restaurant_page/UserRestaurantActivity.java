@@ -95,6 +95,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private ImageView coverPicture;
     private FloatingActionButton fab;
     private boolean theUserIsTheOwner = false;
+    private TextView timesText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -207,6 +208,12 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_on_24dp));
                 else
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
+
+                if(targetRestaurant.isOpenNow())
+                    timesText.setText("Open now");
+                else{
+                    timesText.setText("Closed now");
+                }
 
                 setButtons();
                 setRestaurantInfo();
@@ -451,6 +458,17 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         assert category != null;
         assert extras != null;
         assert services != null;
+
+        //boolean initalizations (then corrected)
+        targetRestaurant.setAirConditionedPresent(false);
+        targetRestaurant.setAnimalAllowed(false);
+        targetRestaurant.setCeliacFriendly(false);
+        targetRestaurant.setCreditCardAccepted(false);
+        targetRestaurant.setTvPresent(false);
+        targetRestaurant.setWifiPresent(false);
+        targetRestaurant.setRestaurant_closest_bus("");
+        targetRestaurant.setRestaurant_closest_metro("");
+        targetRestaurant.setRestaurant_squared_meters(0);
 
         StringBuilder servicesBuilder = new StringBuilder();
         if(targetRestaurant.getCreditCardAccepted()) {
@@ -824,13 +842,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
 
     private void addTimesExpandAnimation() {
-        final TextView timesText = (TextView) findViewById(R.id.restaurant_today_time);
+        timesText = (TextView) findViewById(R.id.restaurant_today_time);
         assert timesText != null;
-        if(targetRestaurant.isOpenNow())
-            timesText.setText("Open now");
-        else{
-            timesText.setText("Closed now");
-        }
         timesText.setOnClickListener(new View.OnClickListener() {
             boolean clicked = false;
 

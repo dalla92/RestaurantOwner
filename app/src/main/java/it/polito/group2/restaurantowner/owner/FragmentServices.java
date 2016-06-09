@@ -75,21 +75,21 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
             args.putString("Table Number", String.valueOf(res.getRestaurant_total_tables_number()));
             args.putBoolean("Take Away", res.getTakeAwayAllowed());
             args.putString("Orders Hour", String.valueOf(res.getRestaurant_orders_per_hour()));
-                for(RestaurantTimeSlot ot : res.getRestaurant_time_slot()){
+            if (res.getRestaurant_time_slot() != null) {
+                for (RestaurantTimeSlot ot : res.getRestaurant_time_slot()) {
                     int day = ot.getDay_of_week();
-                    if (ot.getLunch()){
-                        args.putString("lunchOpenTime"+day,ot.getOpen_lunch_time());
+                    if (ot.getLunch()) {
+                        args.putString("lunchOpenTime" + day, ot.getOpen_lunch_time());
                         args.putString("lunchCloseTime" + day, ot.getClose_lunch_time());
-                    }
-                    else
-                        args.putBoolean("ClosedLunch"+day,true);
-                    if (ot.getDinner()){
-                        args.putString("dinnerOpenTime"+day,ot.getOpen_dinner_time());
+                    } else
+                        args.putBoolean("ClosedLunch" + day, true);
+                    if (ot.getDinner()) {
+                        args.putString("dinnerOpenTime" + day, ot.getOpen_dinner_time());
                         args.putString("dinnerCloseTime" + day, ot.getClose_dinner_time());
-                    }
-                    else
-                        args.putBoolean("ClosedDinner"+day,true);
+                    } else
+                        args.putBoolean("ClosedDinner" + day, true);
                 }
+            }
         }
         fragment.setArguments(args);
         return fragment;

@@ -35,7 +35,7 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
     private int reservations_number;
     private int tables_number;
     private String restaurant_category;
-    private ArrayList<RestaurantTimeSlot> restaurant_time_slot;
+    private ArrayList<RestaurantTimeSlot> restaurant_time_slot = new ArrayList<RestaurantTimeSlot>();
 
     public RestaurantPreview(){
 
@@ -43,7 +43,9 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
 
     @Override
     public LatLng getPosition() {
+        if(getLat()!=null && getLon()!=null)
         return new LatLng(getLat(), getLon());
+        else return null;
     }
 
     public String getRestaurant_id() {
@@ -135,40 +137,45 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
     }
 
     public boolean isOpenNow() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
-        Calendar openTime = Calendar.getInstance();
-        Calendar closeTime = Calendar.getInstance();
+        restaurant_time_slot = this.getRestaurant_time_slot();
+        if(!restaurant_time_slot.isEmpty()) {
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
+            Calendar openTime = Calendar.getInstance();
+            Calendar closeTime = Calendar.getInstance();
 
-        Calendar now = Calendar.getInstance();
-        RestaurantTimeSlot tSlot = null;
-        for(RestaurantTimeSlot s : restaurant_time_slot) {
-            if(s.getDay_of_week() == now.get(Calendar.DAY_OF_WEEK)) {
-                tSlot = s;
-                break;
+            Calendar now = Calendar.getInstance();
+            RestaurantTimeSlot tSlot = null;
+            for (RestaurantTimeSlot s : restaurant_time_slot) {
+                if (s.getDay_of_week() == now.get(Calendar.DAY_OF_WEEK)) {
+                    tSlot = s;
+                    break;
+                }
             }
-        }
-        assert tSlot != null;
-        if(tSlot.getLunch()) {
-            try {
-                openTime.setTime(sdf.parse(tSlot.getOpen_lunch_time()));
-                closeTime.setTime(sdf.parse(tSlot.getClose_lunch_time()));
-            } catch (ParseException e) {
-                e.printStackTrace();
+            assert tSlot != null;
+            if (tSlot.getLunch()) {
+                try {
+                    openTime.setTime(sdf.parse(tSlot.getOpen_lunch_time()));
+                    closeTime.setTime(sdf.parse(tSlot.getClose_lunch_time()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (openTime.before(now.getTime()) && closeTime.after(now.getTime()))
+                    return true;
             }
-            if(openTime.before(now.getTime()) && closeTime.after(now.getTime()))
-                return true;
-        }
-        if(tSlot.getDinner()) {
-            try {
-                openTime.setTime(sdf.parse(tSlot.getOpen_dinner_time()));
-                closeTime.setTime(sdf.parse(tSlot.getClose_dinner_time()));
-            } catch (ParseException e) {
-                e.printStackTrace();
+            if (tSlot.getDinner()) {
+                try {
+                    openTime.setTime(sdf.parse(tSlot.getOpen_dinner_time()));
+                    closeTime.setTime(sdf.parse(tSlot.getClose_dinner_time()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (openTime.before(now.getTime()) && closeTime.after(now.getTime()))
+                    return true;
             }
-            if(openTime.before(now.getTime()) && closeTime.after(now.getTime()))
-                return true;
+            return false;
         }
-        return false;
+        else
+            return false;
     }
 
     //Parcelable part

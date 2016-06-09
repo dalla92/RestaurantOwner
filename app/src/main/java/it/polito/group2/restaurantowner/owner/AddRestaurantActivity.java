@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 
@@ -61,12 +59,14 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             res = (Restaurant) intent.getExtras().get("Restaurant");
         if(res==null){
             res = new Restaurant();
+            /*
             //res.setRestaurant_id(UUID.randomUUID().toString());
             res.setRestaurant_photo_firebase_URL("");
             //TODO take off this hardcoded values and get the real values
             res.setRestaurant_rating(4);
             res.setRestaurant_total_tables_number(200);
             res.setRestaurant_orders_per_hour(50);
+            */
         }
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -197,7 +197,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             res.setAnimalAllowed(myRes.getAnimalAllowed());
             res.setWifiPresent(myRes.getWifiPresent());
             res.setCreditCardAccepted(myRes.getCreditCardAccepted());
-            //res.setCeliacFriendly(myRes.getCeliacFriendly());
+            res.setCeliacFriendly(myRes.getCeliacFriendly());
             res.setAirConditionedPresent(myRes.getAirConditionedPresent());
             res.setTvPresent(myRes.getTvPresent());
             res.setRestaurant_squared_meters(myRes.getRestaurant_squared_meters());

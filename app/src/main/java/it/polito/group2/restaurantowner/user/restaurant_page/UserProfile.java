@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -21,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -31,6 +33,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
@@ -96,12 +99,11 @@ public class UserProfile extends AppCompatActivity{
         context = this;
 
         //get the right user
-        Bundle b = getIntent().getExtras();
-        if(b!=null)
-            user_id = b.getString("user_id");
-        if(user_id==null)
-            user_id = "-KITT2QZqVN7VK2Smof9";
-
+        user_id = FirebaseUtil.getCurrentUserId();
+        if(user_id == null){
+            Toast.makeText(UserProfile.this, "You need to be logged in.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         //get and fill related data
         get_user_from_firebase();
 		
@@ -119,22 +121,10 @@ public class UserProfile extends AppCompatActivity{
     public void get_user_from_firebase(){
 		progress_dialog();
 
-		//DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/");
         DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/"+user_id);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                /*
-				for (DataSnapshot usSnapshot: snapshot.getChildren()) {
-					User snap_user = usSnapshot.getValue(User.class);
-					String snap_user_id = snap_user.getUser_id();
-					if(snap_user_id.equals(user_id)){
-						current_user = snap_user;
-						break;
-					}
-				}
-				*/
-
                 current_user = snapshot.getValue(User.class);
 
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -239,6 +229,14 @@ public class UserProfile extends AppCompatActivity{
                         nav_email.setText(current_user.getUser_email());
                     load_user_photo(nav_photo);
                 }
+
+                if (!current_user.getOwnerUser()) {
+                    TextView tvx = (TextView) findViewById(R.id.textView24);
+                    EditText tvy = (EditText) findViewById(R.id.vat_number);
+                    tvx.setVisibility(View.GONE);
+                    tvy.setVisibility(View.GONE);
+                }
+
                 /*
                 SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
                 Uri photouri = null;
@@ -267,17 +265,6 @@ public class UserProfile extends AppCompatActivity{
             }
         });
 	}
-	
-    private String getRealPathFromURI(Uri contentURI) {
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            return contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
-        }
-    }
 
     @Override
     protected void onDestroy() {
