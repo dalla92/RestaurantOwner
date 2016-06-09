@@ -885,6 +885,8 @@ public class UserRestaurantList extends AppCompatActivity
         }
         if(requestCode == ACTION_SEARCH){
             if(resultCode == RESULT_OK){
+                String searchedText = data.getExtras().getString("searchedText");
+                search.setText(searchedText);
                 final ArrayList<String> restaurantIDs = data.getExtras().getStringArrayList("restaurant_list");
                 if(restaurantIDs.size() > 0) {
                     restaurants_previews_list = new ArrayList<>();
