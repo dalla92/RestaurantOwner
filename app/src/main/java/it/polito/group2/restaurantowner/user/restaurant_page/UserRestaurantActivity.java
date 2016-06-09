@@ -119,8 +119,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null)
             restaurantID = getIntent().getExtras().getString("restaurant_id");
-        else
-            restaurantID = "-KIMqPtRSEdm0Cvfc3Za";
 
         FirebaseUtil.showProgressDialog(mProgressDialog);
         Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);

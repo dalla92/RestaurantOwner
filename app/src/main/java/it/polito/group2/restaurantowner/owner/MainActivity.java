@@ -39,13 +39,16 @@ import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
+import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantPreviewAdapter;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private final static int ACTION_ADD = 1;
-    private RestaurantPreviewAdapter mAdapter;
-    private ArrayList<Restaurant> resList = new ArrayList<>();
+    final static int ACTION_ADD = 1;
+    private OwnerRestaurantPreviewAdapter mAdapter;
+    private  RecyclerView  mRecyclerView;
+    ArrayList<RestaurantPreview> resList = new ArrayList<>();
+    private static final int VERTICAL_ITEM_SPACE = 5;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
 
@@ -61,15 +64,11 @@ public class MainActivity extends AppCompatActivity
 
         showProgressDialog();
         firebase = FirebaseDatabase.getInstance();
-        Query restaurantReference = firebase.getReference("restaurants").orderByChild("user_id").equalTo(userID);
-        DatabaseReference userReference = firebase.getReference("users/" + userID);
-        hideProgressDialog();
-
+        Query restaurantReference = firebase.getReference("restaurants_previews").orderByChild("user_id").equalTo(userID);
         restaurantReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mAdapter.addItem(0, dataSnapshot.getValue(Restaurant.class));
-                //resList.add(dataSnapshot.getValue(Restaurant.class));
+                mAdapter.addItem(0, dataSnapshot.getValue(RestaurantPreview.class));
             }
 
             @Override
@@ -86,8 +85,8 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Restaurant removedRes = dataSnapshot.getValue(Restaurant.class);
-                for (Restaurant r : resList) {
+                RestaurantPreview removedRes = dataSnapshot.getValue(RestaurantPreview.class);
+                for (RestaurantPreview r : resList) {
                     if (r.getRestaurant_id().equals(removedRes.getRestaurant_id())) {
                         mAdapter.removeItem(resList.indexOf(r));
                         resList.remove(r);
@@ -133,7 +132,7 @@ public class MainActivity extends AppCompatActivity
                 })
         );
 
-        mAdapter = new RestaurantPreviewAdapter(resList,this);
+        mAdapter = new OwnerRestaurantPreviewAdapter(resList,this);
         mRecyclerView.setAdapter(mAdapter);
 
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(mAdapter);
@@ -198,7 +197,7 @@ public class MainActivity extends AppCompatActivity
 
         try {
             resList = JSONUtil.readJSONResList(this);
-            mAdapter = new RestaurantPreviewAdapter(resList,this);
+            mAdapter = new OwnerRestaurantPreviewAdapter(resList,this);
             mRecyclerView.setAdapter(mAdapter);
         } catch (JSONException e) {
             e.printStackTrace();

@@ -40,10 +40,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnPausedListener;
@@ -69,6 +71,7 @@ import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
+import it.polito.group2.restaurantowner.user.restaurant_page.ReviewAdapter;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class Restaurant_page extends AppCompatActivity
@@ -88,7 +91,7 @@ public class Restaurant_page extends AppCompatActivity
     public Restaurant my_restaurant = null;
     public Context context;
     private ProgressDialog progressDialog;
-    private Adapter_Reviews adapter;
+    private ReviewAdapter adapter;
     private StorageReference photo_reference;
     private StorageReference user_storage_reference;
 
@@ -208,8 +211,6 @@ public class Restaurant_page extends AppCompatActivity
                 my_restaurant = snapshot.getValue(Restaurant.class);
                 if(my_restaurant!=null)
                     fill_data();
-
-                progressDialog.dismiss();
             }
             @Override
             public void onCancelled(DatabaseError firebaseError) {
@@ -218,30 +219,34 @@ public class Restaurant_page extends AppCompatActivity
         });
 
         //reviews
-        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/reviews/");
-        ref2.addValueEventListener(new ValueEventListener() {
+        Query reviewsQuery = FirebaseDatabase.getInstance().getReference("reviews/" + restaurant_id).orderByPriority();
+        reviewsQuery.addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot revSnapshot: snapshot.getChildren()) {
-                    Review snap_review = revSnapshot.getValue(Review.class);
-                    String snap_restaurant_id = snap_review.getRestaurant_id();
-                    if(snap_restaurant_id.equals(restaurant_id)){
-                        for(Review r_temp : reviews){
-                            if(r_temp.getReview_id().equals(snap_review.getReview_id())){
-                                reviews.remove(r_temp);
-                                break;
-                            }
-                        }
-                        reviews.add(snap_review);
-                        adapter.notifyDataSetChanged();
-                    }
-                }
-
-                progressDialog.dismiss();
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Log.d("prova", "review added");
+                adapter.addReview(dataSnapshot.getValue(Review.class));
             }
+
             @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                Log.d("prova", "child changed");
+                adapter.modifyReview(dataSnapshot.getValue(Review.class));
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                Log.d("prova", "review removed");
+                adapter.removeReview(dataSnapshot.getValue(Review.class));
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+                Log.d("prova", "child moved");
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("prova", "child cancelled");
             }
         });
 
@@ -591,9 +596,9 @@ public class Restaurant_page extends AppCompatActivity
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                 Uri downloadUrl = taskSnapshot.getDownloadUrl();
                 my_restaurant.setRestaurant_photo_firebase_URL(downloadUrl.toString());
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id+"/restaurant_photo_firebase_URL");
+                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_photo_firebase_URL");
                 ref.setValue(downloadUrl.toString());
-				DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/"+restaurant_id+"/restaurant_cover_firebase_URL");
+                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "/restaurant_cover_firebase_URL");
                 ref2.setValue(downloadUrl.toString());
             }
         });
@@ -621,7 +626,7 @@ public class Restaurant_page extends AppCompatActivity
     }
 
     private void initializeAdapterReviews(){
-        adapter = new Adapter_Reviews(reviews, this.getApplicationContext());
+        adapter = new ReviewAdapter(reviews, this.getApplicationContext());
         rv.setAdapter(adapter);
     }
 
