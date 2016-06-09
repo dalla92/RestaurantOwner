@@ -44,10 +44,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.timessquare.CalendarCellDecorator;
 import com.squareup.timessquare.CalendarPickerView;
+
 /**
  * Created by Alessio on 25/04/2016.
  */
-public class UserTableReservationActivity extends AppCompatActivity{
+public class UserTableReservationActivity extends AppCompatActivity {
 
     private String restaurant_id;
     private Restaurant current_restaurant = null;
@@ -90,7 +91,7 @@ public class UserTableReservationActivity extends AppCompatActivity{
         Intent intent = getIntent();
         current_restaurant = (Restaurant) intent.getExtras().get("Restaurant");
         user_id = (String) intent.getExtras().get("user_id");
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+user_id);
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + user_id);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -201,7 +202,7 @@ public class UserTableReservationActivity extends AppCompatActivity{
 
     }
 
-    public void getDate(){
+    public void getDate() {
         // Launch Calendar Picker Dialog
         final Dialog dialog = new Dialog(this, R.style.PauseDialog);
         dialog.setContentView(R.layout.calendar_picker_view);
@@ -262,12 +263,11 @@ public class UserTableReservationActivity extends AppCompatActivity{
         dialog.show();
     }
 
-    public void getTime(){
-        if(chosen_weekday == null) { //date calendar is not set
+    public void getTime() {
+        if (chosen_weekday == null) { //date calendar is not set
             Toast.makeText(context, R.string.set_date_first, Toast.LENGTH_SHORT).show();
             Log.d("what", "what");
-        }
-        else {
+        } else {
             // Launch Time Picker Dialog with current hour and minute
             CustomTimePickerDialog timePickerDialog = new CustomTimePickerDialog(this, chosen_weekday, current_restaurant.getRestaurant_time_slot(), current_table_reservation.getRestaurant_id(),
                     new TimePickerDialog.OnTimeSetListener() {
@@ -278,8 +278,8 @@ public class UserTableReservationActivity extends AppCompatActivity{
                             List<String> displayed_hours_values = new ArrayList<String>();
                             //find hours of lunch
                             for (RestaurantTimeSlot o : current_restaurant.getRestaurant_time_slot()) {
-                                if (o.getDay_of_week()+1 == Integer.parseInt(chosen_weekday)) {
-                                    if (o.getLunch()==true) {
+                                if (o.getDay_of_week() + 1 == Integer.parseInt(chosen_weekday)) {
+                                    if (o.getLunch() == true) {
                                         int open_time = Integer.parseInt(o.getOpen_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                         int close_time = Integer.parseInt(o.getClose_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                         for (int i = open_time; i < close_time; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50
@@ -290,8 +290,8 @@ public class UserTableReservationActivity extends AppCompatActivity{
                             }
                             //find hours of dinner
                             for (RestaurantTimeSlot o : current_restaurant.getRestaurant_time_slot()) {
-                                if (o.getDay_of_week()+1 == Integer.parseInt(chosen_weekday)) {
-                                    if (o.getDinner()==true) {
+                                if (o.getDay_of_week() + 1 == Integer.parseInt(chosen_weekday)) {
+                                    if (o.getDinner() == true) {
                                         int open_time = Integer.parseInt(o.getOpen_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                         int close_time = Integer.parseInt(o.getClose_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                         for (int i = open_time; i < close_time; i++) { //-1 because at that hous it closes, and minutes of previous hour arrive to 50
@@ -317,26 +317,25 @@ public class UserTableReservationActivity extends AppCompatActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    public void find_max_guests(){
+    public void find_max_guests() {
         DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot tsSnapshot: snapshot.getChildren()) {
+                for (DataSnapshot tsSnapshot : snapshot.getChildren()) {
                     TableReservation snap_table_reservations = tsSnapshot.getValue(TableReservation.class);
                     String snap_restaurant_id = snap_table_reservations.getRestaurant_id();
-                    if(snap_restaurant_id.equals(restaurant_id)){
-                        if(snap_table_reservations.getTable_reservation_date().YEAR == target_day.get(Calendar.YEAR) &&
+                    if (snap_restaurant_id.equals(restaurant_id)) {
+                        if (snap_table_reservations.getTable_reservation_date().YEAR == target_day.get(Calendar.YEAR) &&
                                 snap_table_reservations.getTable_reservation_date().MONTH == target_day.get(Calendar.MONTH) &&
-                                snap_table_reservations.getTable_reservation_date().DAY_OF_MONTH == target_day.get(Calendar.DAY_OF_MONTH))
-                        {
+                                snap_table_reservations.getTable_reservation_date().DAY_OF_MONTH == target_day.get(Calendar.DAY_OF_MONTH)) {
                             reservations_that_day.add(snap_table_reservations);
                         }
                     }
                 }
 
                 int orders_per_hour = current_restaurant.getRestaurant_orders_per_hour();
-                int max_guests = current_restaurant.getRestaurant_total_tables_number()*2; //I do not have the information about the number of max_guests, so I suppose that each table is composed by 4 chairs
+                int max_guests = current_restaurant.getRestaurant_total_tables_number() * 2; //I do not have the information about the number of max_guests, so I suppose that each table is composed by 4 chairs
                 //I do not have either the information about the number of tables/hour, so I suppose that at each clock hour I wil have full capacity
                 //compose chosen_date_reservation
                 target_day = Calendar.getInstance();
@@ -351,22 +350,22 @@ public class UserTableReservationActivity extends AppCompatActivity{
                             + " does not precede cal: " + date.getTime() + " IN onOptionsItemSelected");
                 }
                 //counter of reservations with that hour (that day)
-                int already_booked_guests=0;
-                for(TableReservation tr : reservations_that_day){
+                int already_booked_guests = 0;
+                for (TableReservation tr : reservations_that_day) {
                     int hour = tr.getTable_reservation_date().HOUR;
-                    if(hour == Integer.parseInt(chosen_hour)){
-                        already_booked_guests+= tr.getTable_reservation_guests_number();
+                    if (hour == Integer.parseInt(chosen_hour)) {
+                        already_booked_guests += tr.getTable_reservation_guests_number();
                     }
                 }
-                if(already_booked_guests >= max_guests){
+                if (already_booked_guests >= max_guests) {
                     guests_number.setMaxValue(0);
                     guests_number.setValue(0);
-                }
-                else{
+                } else {
                     guests_number.setMaxValue(max_guests - already_booked_guests);
                     guests_number.setValue(1);
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
@@ -389,7 +388,7 @@ public class UserTableReservationActivity extends AppCompatActivity{
                             @Override
                             public void onClick(DialogInterface dialog,
                                                 int which) {
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/"+restaurant_id);
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/" + restaurant_id);
                                 DatabaseReference ref2 = ref.push();
                                 current_table_reservation.setTable_reservation_id(ref2.getKey());
                                 ref2.setValue(current_table_reservation);
@@ -422,63 +421,60 @@ public class UserTableReservationActivity extends AppCompatActivity{
                                 //Do Something Here
                             }
                         }).show();
-                            }
+    }
 
-                            @Override
-                            public boolean onCreateOptionsMenu(Menu menu) {
-                                getMenuInflater().inflate(R.menu.menu_user_table_reservation, menu);
-                                return true;
-                            }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_user_table_reservation, menu);
+        return true;
+    }
 
-                            @Override
-                            public boolean onOptionsItemSelected(MenuItem item) {
-                                int id = item.getItemId();
-                                switch (item.getItemId()) {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (item.getItemId()) {
 
-                                    case R.id.table_reservation:
-                                        try {
-                                            last_chosen_date = Calendar.getInstance();
-                                            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                                            try {
-                                                last_chosen_date.setTime(sdf.parse(chosen_day + "/" + chosen_month + "/" + chosen_year + " " + chosen_hour + ":" + chosen_minute));
-                                            } catch (java.text.ParseException e) {
-                                                Log.e("EXCEPTION", "SDF.PARSE RAISED AN EXCEPTION IN onOptionsItemSelected");
-                                            }
-                                            if (last_chosen_date.before(mMinDate)) {
-                                                Log.e("EXCEPTION", "mMinDate: " + mMinDate.getTime()
-                                                        + " does not precede last_chosen_date: " + date.getTime() + " IN onOptionsItemSelected");
-                                            }
-                                            else
-                                                current_table_reservation.setTable_reservation_date((GregorianCalendar)last_chosen_date);
-                                            current_table_reservation.setTable_reservation_guests_number(guests_number.getValue());
-                                            if(notes.getText()!=null)
-                                                current_table_reservation.setTable_reservation_notes(notes.getText().toString());
-                                        }
-                                        catch(NullPointerException e){
-                                            Log.e("EXCEPTION", "NULL POINTER EXCEPTION IN onOptionsItemSelected");
-                                        }
-                                        current_table_reservation.setRestaurant_id(restaurant_id);
-                                        current_table_reservation.setUser_id(user_id);
-                                        if(current_table_reservation.getTable_reservation_date() != null
-                                                && current_table_reservation.getTable_reservation_guests_number() !=0
-                                                && current_table_reservation.getRestaurant_id() != null
-                                                && current_table_reservation.getUser_id() != null
-                                                && chosen_hour != null
-                                                && chosen_minute !=null) {
+            case R.id.table_reservation:
+                try {
+                    last_chosen_date = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                    try {
+                        last_chosen_date.setTime(sdf.parse(chosen_day + "/" + chosen_month + "/" + chosen_year + " " + chosen_hour + ":" + chosen_minute));
+                    } catch (java.text.ParseException e) {
+                        Log.e("EXCEPTION", "SDF.PARSE RAISED AN EXCEPTION IN onOptionsItemSelected");
+                    }
+                    if (last_chosen_date.before(mMinDate)) {
+                        Log.e("EXCEPTION", "mMinDate: " + mMinDate.getTime()
+                                + " does not precede last_chosen_date: " + date.getTime() + " IN onOptionsItemSelected");
+                    } else
+                        current_table_reservation.setTable_reservation_date((GregorianCalendar) last_chosen_date);
+                    current_table_reservation.setTable_reservation_guests_number(guests_number.getValue());
+                    if (notes.getText() != null)
+                        current_table_reservation.setTable_reservation_notes(notes.getText().toString());
+                } catch (NullPointerException e) {
+                    Log.e("EXCEPTION", "NULL POINTER EXCEPTION IN onOptionsItemSelected");
+                }
+                current_table_reservation.setRestaurant_id(restaurant_id);
+                current_table_reservation.setUser_id(user_id);
+                if (current_table_reservation.getTable_reservation_date() != null
+                        && current_table_reservation.getTable_reservation_guests_number() != 0
+                        && current_table_reservation.getRestaurant_id() != null
+                        && current_table_reservation.getUser_id() != null
+                        && chosen_hour != null
+                        && chosen_minute != null) {
 
-                                            showConfirmationDialog();
-                                        }
-                                        else
-                                            Toast.makeText(this, R.string.invalid_or_incomplete_data, Toast.LENGTH_SHORT).show();
-                                        return true;
+                    showConfirmationDialog();
+                } else
+                    Toast.makeText(this, R.string.invalid_or_incomplete_data, Toast.LENGTH_SHORT).show();
+                return true;
 
-                                    default:
-                                        // If we got here, the user's action was not recognized.
-                                        // Invoke the superclass to handle it.
-                                        return super.onOptionsItemSelected(item);
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
 
-                                }
-                            }
+        }
+    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -506,11 +502,11 @@ public class UserTableReservationActivity extends AppCompatActivity{
         notes.setText(savedInstanceState.getString("notes"));
 
         date_reserved_text = (TextView) findViewById(R.id.date_reserved);
-        if(chosen_day!=null && chosen_month != null && chosen_year!=null)
+        if (chosen_day != null && chosen_month != null && chosen_year != null)
             date_reserved_text.setText(chosen_day + "/" + chosen_month + "/" + chosen_year);
 
         time_reserved_text = (TextView) findViewById(R.id.time_reserved);
-        if(chosen_hour!=null && chosen_minute != null)
+        if (chosen_hour != null && chosen_minute != null)
             time_reserved_text.setText(chosen_hour + ":" + chosen_minute);
 
     }

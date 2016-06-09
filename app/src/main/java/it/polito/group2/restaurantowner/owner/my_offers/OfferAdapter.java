@@ -1,29 +1,31 @@
 package it.polito.group2.restaurantowner.owner.my_offers;
 
 import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import com.google.firebase.database.DatabaseReference;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Locale;
-import java.util.Map;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
+import it.polito.group2.restaurantowner.owner.offer.OfferActivity;
 
-/**
- * Created by Filippo on 05/06/2016.
- */
 public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHolder> {
 
     private final ArrayList<Offer> offerList;
@@ -38,7 +40,6 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
     }
 
     public class OfferViewHolder extends RecyclerView.ViewHolder {
-        public TextView id;
         public TextView name;
         public TextView enabled;
         public TextView description;
@@ -50,10 +51,12 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
         public TextView applied;
         public RecyclerView categoriesList;
         public RecyclerView mealsList;
+        public LinearLayout details;
+        public ImageView edit;
+        public ImageView del;
 
         public OfferViewHolder(View view) {
             super(view);
-            id = (TextView) itemView.findViewById(R.id.offer_id);
             name = (TextView) itemView.findViewById(R.id.offer_name);
             enabled = (TextView) itemView.findViewById(R.id.offer_enabled);
             description = (TextView) itemView.findViewById(R.id.offer_description);
@@ -65,6 +68,9 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
             applied = (TextView) itemView.findViewById(R.id.offer_on_what);
             categoriesList = (RecyclerView) itemView.findViewById(R.id.category_list);
             mealsList = (RecyclerView) itemView.findViewById(R.id.meal_list);
+            details = (LinearLayout) itemView.findViewById(R.id.offer_details);
+            edit = (ImageView) itemView.findViewById(R.id.edit_offer);
+            del = (ImageView) itemView.findViewById(R.id.del_offer);
         }
     }
 
@@ -75,10 +81,46 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
     }
 
     @Override
-    public void onBindViewHolder(final OfferAdapter.OfferViewHolder holder, int position) {
-        holder.id.setText(offerList.get(position).getOfferID());
+    public void onBindViewHolder(final OfferAdapter.OfferViewHolder holder, final int position) {
         holder.name.setText(offerList.get(position).getOfferName());
-        if(offerList.get(position).getOfferEnabled())
+        holder.name.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (holder.details.getVisibility() == View.GONE)
+                    holder.details.setVisibility(View.VISIBLE);
+                else
+                    holder.details.setVisibility(View.GONE);
+            }
+        });
+        holder.details.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                holder.details.setVisibility(View.GONE);
+            }
+        });
+        holder.edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, OfferActivity.class);
+                Bundle b = new Bundle();
+                b.putString("restaurant_id", offerList.get(position).getRestaurantID());
+                b.putString("offer_id", offerList.get(position).getOfferID());
+                intent.putExtras(b);
+                context.startActivity(intent);
+            }
+        });
+        holder.del.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO mettere un alert di avviso
+                DatabaseReference offersReference = FirebaseUtil.getOfferRef(offerList.get(position).getRestaurantID(),
+                        offerList.get(position).getOfferID());
+                offersReference.setValue(null);
+            }
+        });
+
+
+        if(!offerList.get(position).getOfferEnabled())
             holder.enabled.setVisibility(View.VISIBLE);
         else
             holder.enabled.setVisibility(View.GONE);
@@ -93,19 +135,19 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
         else
             holder.target.setText(context.getString(R.string.owner_myoffers_lable_never));
 
-        holder.from.setText(dateFormat.format(offerList.get(position).getOfferStartDate().getTime()));
-        holder.to.setText(dateFormat.format(offerList.get(position).getOfferStopDate().getTime()));
+        holder.from.setText(dateFormat.format(offerList.get(position).startToCalendar().getTime()));
+        holder.to.setText(dateFormat.format(offerList.get(position).stopToCalendar().getTime()));
 
         String[] weekdays = context.getResources().getStringArray(R.array.owner_myoffers_lable_weekdaysnames);
-        ArrayList<String> weekvalues = new ArrayList<String>();
-        for(Integer wDay : offerList.get(position).getOfferOnWeekDays().keySet()) {
-            if(offerList.get(position).getOfferOnWeekDays().get(wDay)) {
-                weekvalues.add(weekdays[wDay]);
+        ArrayList<String> weekvalues = new ArrayList<>();
+        for(int i=0;i<7;i++) {
+            if(offerList.get(position).isWeekDayInOffer(i)){
+                weekvalues.add(weekdays[i]);
             }
         }
         holder.weekdays.setText(TextUtils.join(", ", weekvalues));
 
-        holder.discount.setText(offerList.get(position).getOfferPercentage().toString());
+        holder.discount.setText(Integer.toString(offerList.get(position).getOfferPercentage()));
 
         if(offerList.get(position).getOfferForTotal()) {
             holder.applied.setText(context.getString(R.string.owner_myoffers_lable_everything));
@@ -136,7 +178,7 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
     }
 
     private ArrayList<String> getMealNameList(int position) {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         for(Meal m : mealRestaurantList) {
             if(offerList.get(position).getOfferOnMeals().get(m.getMeal_id()))
                 list.add(m.getMeal_name());

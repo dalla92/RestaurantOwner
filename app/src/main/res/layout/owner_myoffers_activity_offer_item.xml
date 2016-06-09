@@ -22,7 +22,6 @@
                 android:layout_height="wrap_content">
                 <TextView
                     android:clickable="true"
-                    android:onClick="openOfferDatails"
                     android:id="@+id/offer_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -38,25 +37,26 @@
                     android:textSize="15sp"
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="5dp"/>
-                <TextView
-                    android:visibility="invisible"
-                    android:id="@+id/offer_id"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
             </LinearLayout>
             <ImageView
                 android:src="@android:drawable/ic_menu_edit"
                 android:id="@+id/edit_offer"
                 android:clickable="true"
-                android:onClick="editOffer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/del_offer" />
+            <ImageView
+                android:src="@android:drawable/ic_menu_delete"
+                android:id="@+id/del_offer"
+                android:clickable="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
                 android:layout_alignParentEnd="true" />
         </RelativeLayout>
 
         <LinearLayout
             android:clickable="true"
-            android:onClick="closeOfferDatails"
             android:id="@+id/offer_details"
             android:orientation="vertical"
             android:layout_width="match_parent"
