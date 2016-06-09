@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.user.my_reviews;
+package it.polito.group2.restaurantowner.Utils;
 
 /**
  * Created by TheChuck on 29/05/2016.

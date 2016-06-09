@@ -43,6 +43,7 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -64,14 +65,12 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
-public class LoginManagerActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
+public class LoginManagerActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final int RC_SIGN_IN_GOOGLE = 9001;
 
     private CallbackManager callbackManager;
-    private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private TextInputLayout inputLayoutPassword, inputLayoutEmail;
@@ -82,17 +81,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Configure Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("51105168084-mt7a75l4aep1v8chjvkdo7i9rldbsiak.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActiStringvity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
 
         boolean logIn = getIntent().getBooleanExtra("login", false);
         if(!logIn){
@@ -125,9 +113,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         fbButton.setReadPermissions(Arrays.asList("public_profile", "email"));
         fbButton.setOnClickListener(this);
 
-        SignInButton googleBtn = (SignInButton) findViewById(R.id.google_login_button);
-        googleBtn.setOnClickListener(this);
-
         inputLayoutEmail = (TextInputLayout) findViewById(R.id.input_layout_email);
         inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
         inputEmail = (EditText) findViewById(R.id.input_email);
@@ -148,9 +133,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
     private void handleAuthToken(String provider, String accessToken) {
         if (provider.equals("facebook")) {
             firebaseAuthWithFacebook(accessToken);
-        }
-        if (provider.equals("google")) {
-            firebaseAuthWithGoogle(accessToken);
         }
         if(provider.equals("password")){
             firebaseAuthWithPassword();
@@ -191,8 +173,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
             }
             if(providerId == null)
                 providerId = "password";
-            if(providerId.equals("google.com"))
-                providerId = "google";
             if(providerId.equals("facebook.com"))
                 providerId = "facebook";
 
@@ -263,23 +243,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         }
     }
 
-    private void firebaseAuthWithGoogle(String accessToken) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(accessToken, null);
-        mAuth.signInWithCredential(credential)
-                .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(AuthResult result) {
-                        handleFirebaseAuthResult(result);
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("prova", "auth:onFailure:" + e.getMessage());
-                        handleFirebaseAuthResult(null);
-                    }
-                });
-    }
 
     private void firebaseAuthWithFacebook(final String token) {
         AuthCredential credential = FacebookAuthProvider.getCredential(token);
@@ -293,13 +256,13 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 .addOnFailureListener(this, new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        /*if (e instanceof FirebaseAuthUserCollisionException) {
+                        if (e instanceof FirebaseAuthUserCollisionException) {
                             checkAndMerge(token);
-                        } else {*/
+                        } else {
                             e.printStackTrace();
                             Log.d("prova", "auth:onFailureFacebook:" + e.getMessage());
                             handleFirebaseAuthResult(null);
-                        //}
+                        }
                     }
                 });
 
@@ -319,10 +282,10 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 assert target != null;
                 final HashMap<String, Boolean> providers = target.getProviders();
 
-                final AlertDialog.Builder alert = new AlertDialog.Builder(LoginManagerActivity.this);
+                AlertDialog.Builder alert = new AlertDialog.Builder(LoginManagerActivity.this);
                 alert.setTitle("Confirmation!");
                 alert.setMessage("You have already an account with email: " + fbEmail +
-                        "\nClick yes to use link your account and access your data or no to log in with another method.");
+                        "\nClick Yes to link your account and access your data or No to log in with another method.");
 
                 alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
                     @Override
@@ -446,11 +409,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
         handleAuthToken("password", null);
     }
 
-    private void signInWithGoogle() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
-    }
-
     private void signInWithFacebook() {
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
@@ -472,25 +430,27 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
     }
 
     public void requestFacebookUserProfile(LoginResult loginResult){
-        GraphRequest.newMeRequest(
+        GraphRequest request = GraphRequest.newMeRequest(
                 loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
-                    public void onCompleted(JSONObject me, GraphResponse response) {
+                    public void onCompleted(JSONObject object, GraphResponse response) {
                         if (response.getError() != null) {
-                           Log.e("prova", response.getError().toString());
+                            Log.e("prova", response.getError().toString());
                         } else {
                             try {
-                                fbEmail = response.getJSONObject().get("email").toString();
-                                Log.e("prova", fbEmail);
+                                fbEmail = object.getString("email");
+                                Log.d("prova", fbEmail);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            // send email and id to your web server
-                            Log.e("prova", response.getRawResponse());
-                            Log.e("prova", me.toString());
                         }
                     }
-                }).executeAsync();
+                });
+
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id, email");
+        request.setParameters(parameters);
+        request.executeAsync();
     }
 
     private boolean validateEmail() {
@@ -530,9 +490,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
     }
 
     private void signOut() {
-        if(mGoogleApiClient.isConnected())
-            Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-
         LoginManager.getInstance().logOut();
         FirebaseAuth.getInstance().signOut();
     }
@@ -541,28 +498,7 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN_GOOGLE) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
-                handleAuthToken("google", account.getIdToken());
-            } else {
-                // Google Sign In failed
-
-                hideProgressDialog();
-                Toast.makeText(LoginManagerActivity.this, "LogIn Failed result, Try again!", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else
-            callbackManager.onActivityResult( requestCode, resultCode, data );
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        hideProgressDialog();
-        Toast.makeText(LoginManagerActivity.this, "LogIn Failed, Try again!", Toast.LENGTH_SHORT).show();
+        callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
@@ -574,11 +510,6 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 signInWithFacebook();
                 break;
 
-            case R.id.google_login_button:
-                showProgressDialog();
-                signInWithGoogle();
-                break;
-
             case R.id.login_btn:
                 showProgressDialog();
                 signInWithPassword();
@@ -588,7 +519,51 @@ public class LoginManagerActivity extends AppCompatActivity implements GoogleApi
                 Intent i = new Intent(LoginManagerActivity.this, RegisterActivity.class);
                 startActivity(i);
                 break;
+
+            case R.id.forgot_password_link:
+                sendPasswordResetEmail();
+                break;
         }
+    }
+
+    private void sendPasswordResetEmail() {
+        AlertDialog.Builder alert = new AlertDialog.Builder(LoginManagerActivity.this);
+        alert.setTitle("Insert email");
+
+        final EditText input = new EditText(LoginManagerActivity.this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_SUBJECT);
+        alert.setView(input);
+
+        alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String emailAddress = input.getText().toString();
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+
+                auth.sendPasswordResetEmail(emailAddress)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(LoginManagerActivity.this, "Email sent", Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                if(e instanceof FirebaseAuthInvalidUserException)
+                                    Toast.makeText(LoginManagerActivity.this, "No account exists with this email", Toast.LENGTH_SHORT).show();
+                                e.printStackTrace();
+                            }
+                        });
+            }
+        });
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        alert.show();
     }
 
 

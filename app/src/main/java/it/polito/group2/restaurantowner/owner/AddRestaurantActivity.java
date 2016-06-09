@@ -153,6 +153,22 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                             //save also the restaurant preview if the restaurant was succefully written
                             DatabaseReference restaurantReference2 = firebase.getReference("restaurants_previews/" + finalRes.getRestaurant_id());
                             RestaurantPreview r_p = new RestaurantPreview();
+                            if(finalRes.getRestaurant_address() != null && !finalRes.getRestaurant_address().trim().equals("")) {
+                                String address = finalRes.getRestaurant_address();
+                                Geocoder geocoder = new Geocoder(AddRestaurantActivity.this, Locale.ITALY);
+                                try {
+                                    List<Address> addressList = geocoder.getFromLocationName(address, 1);
+                                    if (addressList != null && addressList.size() > 0) {
+                                        if (addressList.get(0).hasLatitude())
+                                            r_p.setLat(addressList.get(0).getLatitude());
+                                        if (addressList.get(0).hasLongitude())
+                                            r_p.setLon(addressList.get(0).getLongitude());
+                                    }
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             r_p.setRestaurant_id(finalRes.getRestaurant_id());
                             r_p.setRestaurant_name(finalRes.getRestaurant_name());
                             r_p.setRestaurant_price_range(1);

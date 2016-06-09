@@ -67,7 +67,7 @@
             android:parentActivityName=".owner.Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".owner.ReviewsActivity"
+            android:name=".owner.reviews.ReviewsActivity"
             android:label="@string/reviews_activity"
             android:parentActivityName=".owner.Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />

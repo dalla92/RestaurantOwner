@@ -71,6 +71,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -459,15 +460,13 @@ public class UserProfile extends AppCompatActivity{
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
             save_user();
+            Intent intent = new Intent(getApplicationContext(), UserRestaurantList.class);
+            startActivity(intent);
+            return true;
         }
         if (id == R.id.action_cancel) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantList.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
+            Intent intent = new Intent(getApplicationContext(), UserRestaurantList.class);
+            startActivity(intent);
             return true;
         }
 
@@ -574,13 +573,13 @@ public class UserProfile extends AppCompatActivity{
         Uri imageUri = Uri.fromFile(f);
         // Create a child reference
         // imagesRef now points to "images"
-        user_photo_reference = user_storage_reference.child("users/" + user_id);
+        Calendar c = Calendar.getInstance();
+        user_photo_reference = user_storage_reference.child("users/" + user_id + "/" + c.getTimeInMillis() + ".jpg");
         //upload
         UploadTask uploadTask = user_storage_reference.putFile(imageUri);
         uploadTask
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
-                    //public void onFailure(@NonNull Throwable throwable) {
                     public void onFailure(Exception e) {
                         e.printStackTrace();
                         Log.d("my_ex", e.getMessage());

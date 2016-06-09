@@ -1,11 +1,8 @@
-package it.polito.group2.restaurantowner.user.my_reviews;
+package it.polito.group2.restaurantowner.owner.reviews;
 
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,10 +15,8 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,7 +27,7 @@ import it.polito.group2.restaurantowner.Utils.OnLoadMoreListener;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.owner.ItemTouchHelperAdapter;
 
-public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHelperAdapter {
+public class ReviewAdapter extends RecyclerView.Adapter implements ItemTouchHelperAdapter {
     private final int VIEW_ITEM = 1;
     private final int VIEW_PROG = 0;
     private final FirebaseDatabase firebase;
@@ -46,7 +41,7 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
     private boolean loading;
     private OnLoadMoreListener onLoadMoreListener;
 
-    public MyReviewAdapter(ArrayList<Review> reviews, Context context, RecyclerView recyclerView) {
+    public ReviewAdapter(ArrayList<Review> reviews, Context context, RecyclerView recyclerView) {
         this.reviews = reviews;
         this.context = context;
         this.recyclerView = recyclerView;

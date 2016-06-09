@@ -246,6 +246,7 @@
     <string name="title_activity_register">RegisterActivity</string>
     <string name="profile_full_name">Full name</string>
     <string name="title_activity_search">SearchActivity</string>
+    <string name="fb_login_info">*If you are already registered with a different email from the facebook one you will create a new account.</string>
 
     <!-- Strings related to owner.offer -->
     <string name="owner_offer_fragment_offer_title">Offer initialization</string>

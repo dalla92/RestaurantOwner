@@ -20,7 +20,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -33,7 +32,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
@@ -43,6 +41,7 @@ import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
+import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class MenuRestaurant_page extends AppCompatActivity {

@@ -48,8 +48,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnPausedListener;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -71,6 +69,7 @@ import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
+import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.ReviewAdapter;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
@@ -581,27 +580,29 @@ public class Restaurant_page extends AppCompatActivity
         photo_reference = user_storage_reference.child("restaurants/" + restaurant_id + "/" + c.getTimeInMillis() + ".jpg");
         //upload
         UploadTask uploadTask = photo_reference.putFile(imageUri);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            //public void onFailure(@NonNull Throwable throwable) {
-            public void onFailure(Exception e) {
-                e.printStackTrace();
-                Log.d("my_ex", e.getMessage());
-                Toast failure_message = Toast.makeText(context, "The upload is failed", Toast.LENGTH_LONG);
-                failure_message.show();
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                my_restaurant.setRestaurant_photo_firebase_URL(downloadUrl.toString());
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_photo_firebase_URL");
-                ref.setValue(downloadUrl.toString());
-                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "/restaurant_cover_firebase_URL");
-                ref2.setValue(downloadUrl.toString());
-            }
-        });
+        uploadTask
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    //public void onFailure(@NonNull Throwable throwable) {
+                    public void onFailure(Exception e) {
+                        e.printStackTrace();
+                        Log.d("my_ex", e.getMessage());
+                        Toast failure_message = Toast.makeText(context, "The upload is failed", Toast.LENGTH_LONG);
+                        failure_message.show();
+                    }
+                })
+                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                        my_restaurant.setRestaurant_photo_firebase_URL(downloadUrl.toString());
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_photo_firebase_URL");
+                        ref.setValue(downloadUrl.toString());
+                        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "/restaurant_cover_firebase_URL");
+                        ref2.setValue(downloadUrl.toString());
+                    }
+                });
 
     }
 

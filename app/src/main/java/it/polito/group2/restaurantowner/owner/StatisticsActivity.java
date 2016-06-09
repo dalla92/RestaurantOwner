@@ -38,6 +38,7 @@ import it.polito.group2.restaurantowner.data.Order;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
+import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class StatisticsActivity extends AppCompatActivity

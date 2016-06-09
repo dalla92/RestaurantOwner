@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            tools:context=".owner.ReviewsActivity">
+            tools:context=".owner.reviews.ReviewsActivity">
 
             <android.support.design.widget.AppBarLayout
                 android:id="@+id/appbar"
@@ -37,18 +37,15 @@
 
         </android.support.design.widget.CoordinatorLayout>
 
-
-
-        <android.support.design.widget.NavigationView
+    <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:itemIconTint="@color/colorAccent"
+        app:headerLayout="@layout/nav_header_login"
+        app:menu="@menu/restaurant_page_drawer"
         app:itemTextColor="@color/gray"
-        android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_main"
-        app:menu="@menu/restaurant_page_drawer" />
-
+        app:theme="@style/AppTheme"/>
 
 </android.support.v4.widget.DrawerLayout>

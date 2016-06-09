@@ -59,7 +59,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
-public class RegisterActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+public class RegisterActivity extends AppCompatActivity{
 
     private static final int RC_SIGN_IN_GOOGLE = 9001;
 
@@ -69,7 +69,6 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
     private FirebaseAuth mAuth;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
-    private GoogleApiClient mGoogleApiClient;
     private DatabaseReference userRef;
     private String userID;
     private CallbackManager callbackManager;
@@ -85,17 +84,6 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
         firebase = FirebaseDatabase.getInstance();
         callbackManager = CallbackManager.Factory.create();
         userRef = firebase.getReference("users");
-
-        // Configure Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("51105168084-mt7a75l4aep1v8chjvkdo7i9rldbsiak.apps.googleusercontent.com")
-                .requestEmail()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
 
 
         inputLayoutFirstName = (TextInputLayout) findViewById(R.id.input_layout_first_name);
@@ -160,13 +148,9 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
     }
 
     public boolean validateTelephoneNumber(){
-        if(inputPhoneNumber.getText()==null)
-            Log.d("aaa", "aaa");
-        if(inputPhoneNumber.getText().toString().trim().equals(""))
-            Log.d("aaa", "bbb");
         if(inputPhoneNumber.getText()==null || inputPhoneNumber.getText().toString().trim().equals(""))
             return false;
-        else return true;
+        return true;
     }
 
     public void continue_registration(){
@@ -207,7 +191,6 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                                             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
                                             // Staring UserRestaurantList Activity
-                                            Log.d("aaa", "ahajhsjsh");
                                             startActivity(i);
                                             finish();
                                         }
@@ -236,9 +219,6 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
 
                         providers.put("password", true);
                         userRef.child(target.getUser_id()).setValue(target);
-                        if(providers.containsKey("google")){
-                            signInWithGoogle();
-                        }
                         if (providers.containsKey("facebook")){
                             signInWithFacebook();
                         }
@@ -332,6 +312,7 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
     public static boolean isValidEmail(CharSequence target) {
         return target != null && android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
     }
+
     private void showProgressDialog() {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
@@ -369,40 +350,11 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
     }
 
-    private void signInWithGoogle() {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Confirmation!");
-        alert.setMessage("You have already logged in with Google using this email," +
-                "It's not possible to have more then one account with the same email." +
-                "\nClick yes to use your google account and merge the two account to access the same data.");
-        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-                startActivityForResult(signInIntent, RC_SIGN_IN_GOOGLE);
-                dialog.dismiss();
-            }
-        });
-        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                userRef.child(userID + "/providers/password").setValue(null);
-                dialog.dismiss();
-            }
-        });
-
-        alert.show();
-    }
 
     private void handleAuthToken(String provider, String accessToken) {
         if (provider.equals("facebook")) {
             Log.d("prova", "handleAuthTokenFacebook");
             firebaseAuthWithFacebook(accessToken);
-        }
-        if (provider.equals("google")) {
-            firebaseAuthWithGoogle(accessToken);
         }
     }
 
@@ -427,24 +379,6 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
 
     }
 
-    private void firebaseAuthWithGoogle(String accessToken) {
-        AuthCredential credential = GoogleAuthProvider.getCredential(accessToken, null);
-        mAuth.signInWithCredential(credential)
-                .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
-                    @Override
-                    public void onSuccess(AuthResult result) {
-                        handleFirebaseAuthResult(result);
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d("prova", "auth:onFailure:" + e.getMessage());
-                        handleFirebaseAuthResult(null);
-                    }
-                });
-    }
-
     private void handleFirebaseAuthResult(AuthResult result) {
         if (result != null) {
             final FirebaseUser user = result.getUser();
@@ -453,8 +387,8 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
                     Log.d("prova", "different name");
                     signOut();
                     userRef.child(user.getUid() + "/providers/password").setValue(null);
-                    Toast.makeText(RegisterActivity.this, "This email is already register with Google or Facebook with a different name," +
-                            "\ntry again with the correct First name and Last name to merge the account data!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, "This email is already register with Facebook with a different name," +
+                            "\nTry again with the correct First name and Last name to merge the account data!", Toast.LENGTH_LONG).show();
                     return;
                 }
             }
@@ -497,39 +431,15 @@ public class RegisterActivity extends AppCompatActivity implements GoogleApiClie
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN_GOOGLE) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            if (result.isSuccess()) {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = result.getSignInAccount();
-                handleAuthToken("google", account.getIdToken());
-            } else {
-                // Google Sign In failed
-                userRef.child(userID + "/providers/password").setValue(null);
-                hideProgressDialog();
-                Toast.makeText(RegisterActivity.this, "Error during registration, Try again!", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else
-            callbackManager.onActivityResult( requestCode, resultCode, data );
+        callbackManager.onActivityResult( requestCode, resultCode, data );
     }
 
     private void signOut() {
-        if(mGoogleApiClient.isConnected())
-            Auth.GoogleSignInApi.signOut(mGoogleApiClient);
-
         LoginManager.getInstance().logOut();
         FirebaseAuth.getInstance().signOut();
         hideProgressDialog();
     }
 
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        hideProgressDialog();
-        Toast.makeText(RegisterActivity.this, "Fatal error,try again!", Toast.LENGTH_SHORT).show();
-        finish();
-    }
 
     private class MyTextWatcher implements TextWatcher {
 

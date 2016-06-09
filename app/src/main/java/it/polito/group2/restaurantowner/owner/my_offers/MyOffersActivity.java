@@ -35,7 +35,7 @@ import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
-import it.polito.group2.restaurantowner.owner.ReviewsActivity;
+import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
 import it.polito.group2.restaurantowner.owner.StatisticsActivity;
 import it.polito.group2.restaurantowner.owner.offer.OfferActivity;
 
