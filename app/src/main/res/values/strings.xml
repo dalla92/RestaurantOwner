@@ -82,7 +82,7 @@
     <string name="addres_section2">Services</string>
     <string name="addres_section3">Extras</string>
     <string name="name">Name</string>
-    <string name="address">Address</string>
+    <string name="address">Address: Street Number, City, Country</string>
     <string name="phone">Phone</string>
     <string name="category">Category</string>
     <string name="title_activity_restaurant_page">Restaurant_page</string>

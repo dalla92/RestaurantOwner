@@ -53,16 +53,6 @@ public class MealAddition implements Serializable, Parcelable {
     }
 
     @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        //TODO implementare
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -89,4 +79,34 @@ public class MealAddition implements Serializable, Parcelable {
         result = 31 * result + (additionSelected != null ? additionSelected.hashCode() : 0);
         return result;
     }
+
+    public MealAddition(Parcel parcel){
+        this.meal_addition_id = parcel.readString();
+        this.meal_addition_name = parcel.readString();
+        this.meal_addition_price =parcel.readDouble();
+        this.additionSelected =parcel.readInt() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.meal_addition_id);
+        dest.writeString(this.meal_addition_name);
+        dest.writeDouble(this.meal_addition_price);
+        dest.writeInt(this.additionSelected ? 1 : 0);
+    }
+
+    @Override
+    public int describeContents(){
+        return 0;
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public MealAddition createFromParcel(Parcel in) {
+            return new MealAddition(in);
+        }
+
+        public MealAddition[] newArray(int size) {
+            return new MealAddition[size];
+        }
+    };
 }

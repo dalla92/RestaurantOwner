@@ -172,16 +172,6 @@ public class Meal implements Serializable, Parcelable {
     }
 
     @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        //TODO vedere se necessario scrivere qualcosa
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -245,4 +235,62 @@ public class Meal implements Serializable, Parcelable {
         result = 31 * result + (meal_quantity != null ? meal_quantity.hashCode() : 0);
         return result;
     }
+
+    //Parcelable part
+    public Meal(Parcel parcel){
+        this.meal_id = parcel.readString();
+        this.restaurant_id = parcel.readString();
+        this.meal_name = parcel.readString();
+        this.meal_price = parcel.readDouble();
+        this.meal_cooking_time = parcel.readInt();
+        this.meal_description = parcel.readString();
+        this.meal_category = parcel.readString();
+        this.mealVegan = parcel.readInt() != 0;
+        this.mealVegetarian = parcel.readInt() != 0;
+        this.mealGlutenFree = parcel.readInt() != 0;
+        this.mealAvailable = parcel.readInt() != 0;
+        this.meal_additions = parcel.readArrayList(null);
+        this.meal_tags = parcel.readArrayList(null);
+        this.mealTakeAway = parcel.readInt() != 0;
+        this.meal_thumbnail = parcel.readString();
+        this.meal_photo_firebase_URL = parcel.readString();
+        this.meal_quantity = parcel.readInt();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.meal_id);
+        dest.writeString(this.restaurant_id);
+        dest.writeString(this.meal_name);
+        dest.writeDouble(this.meal_price);
+        dest.writeInt(this.meal_cooking_time);
+        dest.writeString(this.meal_description);
+        dest.writeString(this.meal_category);
+        dest.writeInt(this.mealVegan ? 1 : 0);
+        dest.writeInt(this.mealVegetarian ? 1 : 0);
+        dest.writeInt(this.mealGlutenFree? 1 : 0);
+        dest.writeInt(this.mealAvailable? 1 : 0);
+        dest.writeList(this.meal_additions);
+        dest.writeList(this.meal_tags);
+        dest.writeInt(this.mealTakeAway? 1 : 0);
+        dest.writeString(this.meal_thumbnail);
+        dest.writeString(this.meal_photo_firebase_URL);
+        dest.writeInt(this.meal_quantity);
+    }
+
+    @Override
+    public int describeContents(){
+        return 0;
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public Meal createFromParcel(Parcel in) {
+            return new Meal(in);
+        }
+
+        public Meal[] newArray(int size) {
+            return new Meal[size];
+        }
+    };
+
 }

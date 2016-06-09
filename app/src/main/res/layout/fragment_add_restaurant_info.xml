@@ -25,15 +25,19 @@
 
             />
 
-        <EditText
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textPostalAddress"
-            android:ems="10"
-            android:hint="@string/address"
-            android:id="@+id/resadd_info_address"
-            android:layout_marginTop="10dp"
-            />
+            android:layout_marginTop="10dp">
+
+            <AutoCompleteTextView
+                android:id="@+id/resadd_info_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/address" />
+
+        </android.support.design.widget.TextInputLayout>
 
         <EditText
             android:layout_width="match_parent"

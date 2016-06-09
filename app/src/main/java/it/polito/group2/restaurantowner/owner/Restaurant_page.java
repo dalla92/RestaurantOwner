@@ -606,18 +606,6 @@ public class Restaurant_page extends AppCompatActivity
 				DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/"+restaurant_id+"/restaurant_cover_firebase_URL");
                 ref2.setValue(downloadUrl.toString());
             }
-        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                double progress = 100.0 * (taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                Toast progress_message = Toast.makeText(context, "Upload is " + progress + "% done", Toast.LENGTH_LONG);
-                progress_message.show();
-            }
-        }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast pause_message = Toast.makeText(context, "Upload is has been paused", Toast.LENGTH_LONG);
-                pause_message.show();            }
         });
 
     }

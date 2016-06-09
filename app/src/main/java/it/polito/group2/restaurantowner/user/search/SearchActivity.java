@@ -59,9 +59,11 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
     private ProgressDialog mProgressDialog;
     private HashMap<String, String> restaurantNamesIDMap;
     private HashMap<String, HashMap<String, Boolean>> tagNamesIDMap;
-    private RecyclerView restaurantRecyclerView, placesRecyclerView, tagsRecyclerView;
+    private List<AutocompletePrediction> predictionList;
+    private RecyclerView restaurantRecyclerView, tagRecyclerView, placeRecyclerView;
     private RestaurantSuggestionAdapter restaurantAdapter;
     private TagSuggestionAdapter tagAdapter;
+    private PlaceSuggestionAdapter placeAdapter;
     private ProgressBar progressBar;
     private LatLngBounds bounds;
     private boolean empty = true;
@@ -114,12 +116,14 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
 
         restaurantNamesIDMap = new HashMap<>();
         tagNamesIDMap = new HashMap<>();
+        predictionList = new ArrayList<>();
+
         placesCard = (CardView) findViewById(R.id.places_card);
         restaurantsCard = (CardView) findViewById(R.id.restaurant_card);
         tagCard = (CardView) findViewById(R.id.tag_card);
         restaurantRecyclerView = (RecyclerView) findViewById(R.id.search_restaurant_list);
-        placesRecyclerView = (RecyclerView) findViewById(R.id.search_place_list);
-        tagsRecyclerView = (RecyclerView) findViewById(R.id.search_tag_list);
+        placeRecyclerView = (RecyclerView) findViewById(R.id.search_place_list);
+        tagRecyclerView = (RecyclerView) findViewById(R.id.search_tag_list);
 
 
         restaurantAdapter = new RestaurantSuggestionAdapter(restaurantNamesIDMap, this);
@@ -128,9 +132,14 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         restaurantRecyclerView.setAdapter(restaurantAdapter);
 
         tagAdapter = new TagSuggestionAdapter(tagNamesIDMap, this);
-        tagsRecyclerView.setHasFixedSize(true);
-        tagsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        tagsRecyclerView.setAdapter(tagAdapter);
+        tagRecyclerView.setHasFixedSize(true);
+        tagRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        tagRecyclerView.setAdapter(tagAdapter);
+
+        placeAdapter = new PlaceSuggestionAdapter(predictionList, this);
+        placeRecyclerView.setHasFixedSize(true);
+        placeRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        placeRecyclerView.setAdapter(placeAdapter);
 
         EditText textView = (EditText) findViewById(R.id.search_text);
         assert textView != null;
@@ -232,12 +241,6 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
 
         @Override
         protected List<AutocompletePrediction> doInBackground(String... params) {
-            /*Geocoder geocoder = new Geocoder(SearchActivity.this, Locale.getDefault());
-            try {
-                return geocoder.getFromLocationName(Locale.ITALY.getCountry(), 1);
-            } catch (IOException e) {
-                return null;
-            }*/
             AutocompleteFilter autocompleteFilter = new AutocompleteFilter.Builder().setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS).build();
             return getAutocomplete(params[0], bounds, autocompleteFilter);
         }
@@ -245,9 +248,12 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
         @Override
         protected void onPostExecute(List<AutocompletePrediction> prediction_list){
             progressBar.setVisibility(View.INVISIBLE);
-            for(AutocompletePrediction prediction: prediction_list)
-                Log.d("prova", prediction.getFullText(null).toString());
-            Log.d("prova", "-----------------------------------------------");
+            if(prediction_list.size() > 0){
+                placeAdapter.setData(prediction_list);
+                placesCard.setVisibility(View.VISIBLE);
+            }
+            else
+                placesCard.setVisibility(View.GONE);
 
         }
     }

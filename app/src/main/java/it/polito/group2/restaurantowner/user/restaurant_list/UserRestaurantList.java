@@ -6,13 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 
 import com.google.android.gms.common.api.PendingResult;
@@ -23,18 +18,14 @@ import com.google.android.gms.location.LocationServices;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -45,7 +36,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import it.polito.group2.restaurantowner.R;
 
@@ -54,29 +44,22 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStates;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Circle;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.Cluster;
@@ -86,24 +69,11 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.DialogOnDeniedPermissionListener;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-import org.json.JSONException;
-
-import java.io.File;
-import java.io.InputStream;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.User;
-import it.polito.group2.restaurantowner.firebasedata.Order;
-import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
@@ -142,6 +112,7 @@ public class UserRestaurantList extends AppCompatActivity
     private final float DEFAULT_ZOOM1 = 11.0f;
     private ClusterManager<MyItem> mClusterManager;
     private Marker mLastUserMarker;
+    private LatLng searchedPosition;
     protected static final String TAG = "location-updates-sample";
     protected boolean mRequestingLocationUpdates = false; //Tracks the status of the location updates request if started or not
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000; //The desired interval for location updates. Inexact. Updates may be more or less frequent.
@@ -173,12 +144,11 @@ public class UserRestaurantList extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mRequestingLocationUpdates == false){
+                if (mRequestingLocationUpdates == false) {
                     //enable gps
                     mRequestingLocationUpdates = true;
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
-                }
-                else{
+                } else {
                     //disable gps
                     mRequestingLocationUpdates = false;
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
@@ -456,10 +426,10 @@ public class UserRestaurantList extends AppCompatActivity
 
         maps_stuff();
         if(mRequestingLocationUpdates)
-            read_restaurants_from_firebase();
+            read_restaurants_from_firebase(mRequestingLocationUpdates);
     }
 
-    public void read_restaurants_from_firebase(){
+    public void read_restaurants_from_firebase(final boolean isPositionUp){
         FirebaseUtil.showProgressDialog(mProgressDialog);
         current_index = 0;
         //I want to get all restaurants within 2Km: I get all the ids of the restaurants, for each id I get its latitude and longitude, and if distance<2km I add it to restaurant_preview_list and cluster_manager
@@ -467,8 +437,11 @@ public class UserRestaurantList extends AppCompatActivity
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                if(!snapshot.hasChildren())
+                    FirebaseUtil.hideProgressDialog(mProgressDialog);
+
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        total_index = (int) snapshot.getChildrenCount();
+                    total_index = (int) snapshot.getChildrenCount();
                     final String restaurant_id = (String) dataSnapshot.getValue();
                     DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_latitude_position");
                     ref.addValueEventListener(new ValueEventListener() {
@@ -483,27 +456,52 @@ public class UserRestaurantList extends AppCompatActivity
                                 public void onDataChange(DataSnapshot snapshot) {
                                     Double snap_long = (Double) snapshot.getValue();
                                     final Double lon = snap_long;
-                                    if (is_restaurant_near(new LatLng(lat, lon), range)) {
-                                        DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
-                                        ref2.addValueEventListener(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot snapshot) {
-                                                RestaurantPreview snap_r_p = (RestaurantPreview) snapshot.getValue();
-                                                restaurants_previews_list.add(snap_r_p);
-                                                mAdapter.addItem(snap_r_p);
-                                                mClusterManager.addItem(new MyItem(lat, lon));
-                                                mClusterManager.cluster();
-                                                                current_index++;
-                                                                if(total_index==current_index)
-                                                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                            }
+                                    if (isPositionUp) {
+                                        if (is_restaurant_near_with_position(new LatLng(lat, lon), range)) {
+                                            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
+                                            ref2.addValueEventListener(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot snapshot) {
+                                                    RestaurantPreview snap_r_p = (RestaurantPreview) snapshot.getValue();
+                                                    restaurants_previews_list.add(snap_r_p);
+                                                    mAdapter.addItem(snap_r_p);
+                                                    mClusterManager.addItem(new MyItem(lat, lon));
+                                                    mClusterManager.cluster();
+                                                    current_index++;
+                                                    if (total_index == current_index)
+                                                        FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                                }
 
-                                            @Override
-                                            public void onCancelled(DatabaseError firebaseError) {
-                                                System.out.println("The read failed: " + firebaseError.getMessage());
-                                            }
-                                        });
+                                                @Override
+                                                public void onCancelled(DatabaseError firebaseError) {
+                                                    System.out.println("The read failed: " + firebaseError.getMessage());
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        if (is_restaurant_near_without_position(new LatLng(lat, lon), range)) {
+                                            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
+                                            ref2.addValueEventListener(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot snapshot) {
+                                                    RestaurantPreview snap_r_p = (RestaurantPreview) snapshot.getValue();
+                                                    restaurants_previews_list.add(snap_r_p);
+                                                    mAdapter.addItem(snap_r_p);
+                                                    mClusterManager.addItem(new MyItem(lat, lon));
+                                                    mClusterManager.cluster();
+                                                    current_index++;
+                                                    if (total_index == current_index)
+                                                        FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                                }
+
+                                                @Override
+                                                public void onCancelled(DatabaseError firebaseError) {
+                                                    System.out.println("The read failed: " + firebaseError.getMessage());
+                                                }
+                                            });
+                                        }
                                     }
+
                                 }
 
                                 @Override
@@ -528,8 +526,8 @@ public class UserRestaurantList extends AppCompatActivity
         });
     }
 
-    public boolean is_restaurant_near(LatLng res_position, double range){
-        double distance = calculate_distance2(res_position, mLastUserMarker);
+    public boolean is_restaurant_near_with_position(LatLng res_position, double range){
+        double distance = calculate_distance2(res_position, mLastUserMarker.getPosition());
         if(distance<range){
             return true;
         }
@@ -537,8 +535,17 @@ public class UserRestaurantList extends AppCompatActivity
         return false;
     }
 
-    public double calculate_distance2(LatLng a, Marker b) {
-        double distance = SphericalUtil.computeDistanceBetween(a, b.getPosition());
+    public boolean is_restaurant_near_without_position(LatLng res_position, double range){
+        double distance = calculate_distance2(res_position, searchedPosition);
+        if(distance<range){
+            return true;
+        }
+        else
+            return false;
+    }
+
+    public double calculate_distance2(LatLng a, LatLng b) {
+        double distance = SphericalUtil.computeDistanceBetween(a, b);
         return distance;
     }
 
@@ -887,39 +894,45 @@ public class UserRestaurantList extends AppCompatActivity
             if(resultCode == RESULT_OK){
                 String searchedText = data.getExtras().getString("searchedText");
                 search.setText(searchedText);
+                Log.d("prova", searchedText);
                 final ArrayList<String> restaurantIDs = data.getExtras().getStringArrayList("restaurant_list");
-                if(restaurantIDs.size() > 0) {
+                LatLng coordinates = (LatLng) data.getExtras().get("coordinates");
+
+                if(restaurantIDs != null && restaurantIDs.size() > 0) {
                     restaurants_previews_list = new ArrayList<>();
                     mAdapter.clear();
-                }
 
-                //TODO
-                //mLastUserMarker.setPosition(new LatLng());
+                    FirebaseUtil.showProgressDialog(mProgressDialog);
+                    for(int i = 0; i < restaurantIDs.size(); i++) {
+                        Log.d("prova", restaurantIDs.get(i));
+                        final int index = i;
+                        DatabaseReference restaurantRef = firebase.getReference("restaurants_previews/" + restaurantIDs.get(i));
+                        restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                RestaurantPreview restaurantPreview = dataSnapshot.getValue(RestaurantPreview.class);
+                                if(restaurantPreview != null) {
+                                    mAdapter.addItem(restaurantPreview);
+                                    restaurants_previews_list.add(restaurantPreview);
+                                }
 
-                FirebaseUtil.showProgressDialog(mProgressDialog);
-                for(int i = 0; i < restaurantIDs.size(); i++) {
-                    Log.d("prova", restaurantIDs.get(i));
-                    final int index = i;
-                    DatabaseReference restaurantRef = firebase.getReference("restaurants_previews/" + restaurantIDs.get(i));
-                    restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            RestaurantPreview restaurantPreview = dataSnapshot.getValue(RestaurantPreview.class);
-                            if(restaurantPreview != null) {
-                                mAdapter.addItem(restaurantPreview);
-                                restaurants_previews_list.add(restaurantPreview);
+                                if(index == restaurantIDs.size() - 1)
+                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                             }
 
-                            if(index == restaurantIDs.size() - 1)
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
                                 FirebaseUtil.hideProgressDialog(mProgressDialog);
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            FirebaseUtil.hideProgressDialog(mProgressDialog);
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
+
+                if(coordinates != null){
+                    searchedPosition = coordinates;
+                    read_restaurants_from_firebase(false);
+                }
+
             }
         }
     }

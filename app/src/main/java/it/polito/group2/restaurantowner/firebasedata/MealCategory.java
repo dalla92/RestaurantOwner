@@ -10,7 +10,7 @@ import java.io.Serializable;
  */
 
 
-public class MealCategory implements Serializable, Parcelable {
+public class MealCategory implements Parcelable {
 
     private String meal_category_id;
     private String meal_category_name;
@@ -35,13 +35,29 @@ public class MealCategory implements Serializable, Parcelable {
         this.meal_category_name = meal_category_name;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public MealCategory(Parcel parcel){
+        this.meal_category_id = parcel.readString();
+        this.meal_category_name = parcel.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        //TODO implementare
+        dest.writeString(this.meal_category_id);
+        dest.writeString(this.meal_category_name);
     }
+
+    @Override
+    public int describeContents(){
+        return 0;
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public MealCategory createFromParcel(Parcel in) {
+            return new MealCategory(in);
+        }
+
+        public MealCategory[] newArray(int size) {
+            return new MealCategory[size];
+        }
+    };
 }

@@ -172,33 +172,29 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
     }
 
     //Parcelable part
-    public RestaurantPreview(Parcel in){
-        String[] data = new String[9];
-
-        in.readStringArray(data);
-        this.lat = Double.valueOf(data[1]);
-        this.lon = Double.valueOf(data[2]);
-        this.restaurant_id = data[3];
-        this.restaurant_cover_firebase_URL = data[4];
-        this.restaurant_name = data[5];
-        this.restaurant_rating = Float.valueOf(data[6]);
-        this.reservations_number = Integer.valueOf(data[7]);
-        this.tables_number = Integer.valueOf(data[8]);
-
+    public RestaurantPreview(Parcel parcel){
+        this.lat = parcel.readDouble();
+        this.lon = parcel.readDouble();
+        this.restaurant_id = parcel.readString();
+        this.restaurant_cover_firebase_URL = parcel.readString();
+        this.restaurant_name = parcel.readString();
+        this.restaurant_rating = parcel.readFloat();
+        this.reservations_number = parcel.readInt();
+        this.tables_number = parcel.readInt();
+        this.restaurant_time_slot = parcel.readArrayList(null);
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeStringArray(new String[] {
-                String.valueOf(this.lat),
-                String.valueOf(this.lon),
-                this.restaurant_id,
-                this.restaurant_cover_firebase_URL,
-                this.restaurant_name,
-                String.valueOf(this.restaurant_rating),
-                String.valueOf(this.reservations_number),
-                String.valueOf(this.tables_number)
-                });
+        dest.writeDouble(this.lat);
+        dest.writeDouble(this.lon);
+        dest.writeString(this.restaurant_id);
+        dest.writeString(this.restaurant_cover_firebase_URL);
+        dest.writeString(this.restaurant_name);
+        dest.writeFloat(this.restaurant_rating);
+        dest.writeInt(this.reservations_number);
+        dest.writeInt(this.tables_number);
+        dest.writeList(this.restaurant_time_slot);
     }
 
     @Override

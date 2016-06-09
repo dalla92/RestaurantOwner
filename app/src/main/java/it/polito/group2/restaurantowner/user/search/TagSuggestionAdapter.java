@@ -51,7 +51,7 @@ public class TagSuggestionAdapter extends RecyclerView.Adapter<TagSuggestionAdap
 
             Intent intent = new Intent();
             intent.putExtra("restaurant_list", restaurantIDs);
-            intent.putExtra("searched_text", key);
+            intent.putExtra("searchedText", key);
             activity.setResult(Activity.RESULT_OK, intent);
             activity.finish();
 

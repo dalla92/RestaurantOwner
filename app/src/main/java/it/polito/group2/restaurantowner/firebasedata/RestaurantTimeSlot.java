@@ -1,11 +1,14 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 
 /**
  * Created by Alessio on 16/05/2016.
  */
-public class RestaurantTimeSlot implements Serializable{
+public class RestaurantTimeSlot implements Parcelable{
 
     private Boolean lunch;
     private Boolean dinner; //is_open is not needed anymore because lunch and dinner are both false when close
@@ -107,4 +110,41 @@ public class RestaurantTimeSlot implements Serializable{
         result = 31 * result + (close_dinner_time != null ? close_dinner_time.hashCode() : 0);
         return result;
     }
+
+    //Parcelable part
+    public RestaurantTimeSlot(Parcel parcel){
+        this.lunch = parcel.readInt() != 0;
+        this.dinner = parcel.readInt() != 0;
+        this.day_of_week = parcel.readInt();
+        this.open_lunch_time = parcel.readString();
+        this.close_lunch_time = parcel.readString();
+        this.open_dinner_time = parcel.readString();
+        this.close_dinner_time = parcel.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(this.lunch ? 1 : 0);
+        dest.writeInt(this.dinner ? 1 : 0);
+        dest.writeInt(this.day_of_week);
+        dest.writeString(this.open_lunch_time);
+        dest.writeString(this.close_lunch_time);
+        dest.writeString(this.open_dinner_time);
+        dest.writeString(this.close_dinner_time);
+    }
+
+    @Override
+    public int describeContents(){
+        return 0;
+    }
+
+    public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+        public RestaurantTimeSlot createFromParcel(Parcel in) {
+            return new RestaurantTimeSlot(in);
+        }
+
+        public RestaurantTimeSlot[] newArray(int size) {
+            return new RestaurantTimeSlot[size];
+        }
+    };
 }

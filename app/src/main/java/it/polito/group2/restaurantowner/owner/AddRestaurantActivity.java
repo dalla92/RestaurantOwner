@@ -16,6 +16,11 @@ import android.view.ViewGroup;
 
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Places;
+
 import org.json.JSONException;
 
 import java.util.ArrayList;
@@ -28,7 +33,7 @@ import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 
-public class AddRestaurantActivity extends AppCompatActivity implements FragmentInfo.OnInfoPass, FragmentServices.OnServicesPass, FragmentExtras.OnExtrasPass {
+public class AddRestaurantActivity extends AppCompatActivity implements FragmentInfo.OnInfoPass, FragmentServices.OnServicesPass, FragmentExtras.OnExtrasPass, GoogleApiClient.OnConnectionFailedListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -45,6 +50,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
      */
     private ViewPager mViewPager;
     private Restaurant res = null;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,12 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             res.setRestaurant_total_tables_number(200);
             res.setRestaurant_orders_per_hour(50);
         }
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, this)
+                .addApi(Places.GEO_DATA_API)
+                .addApi(LocationServices.API)
+                .build();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -123,6 +135,28 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         res.setRestaurant_category(category);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if( mGoogleApiClient != null )
+            mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if( mGoogleApiClient != null )
+            mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        if( mGoogleApiClient != null && mGoogleApiClient.isConnected() ) {
+            mGoogleApiClient.disconnect();
+        }
+        super.onStop();
+    }
+
 
     @Override
     public void onServicesPass(Boolean fidelity, Boolean tableRes, String numTables, Boolean takeAway, String orderPerHour, List<String> lunchOpenTime,
@@ -172,6 +206,10 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         }
     }
 
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
 
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
@@ -189,7 +227,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             if(position==0) {
-                    fi = FragmentInfo.newInstance(res);
+                    fi = FragmentInfo.newInstance(res, mGoogleApiClient, AddRestaurantActivity.this);
                 return fi;
             }
             if(position==1) {
