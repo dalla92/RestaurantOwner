@@ -46,7 +46,7 @@ public class Restaurant implements Serializable {
 
     }
 
-    public boolean isOpenNow() {
+    /*public boolean isOpenNow() {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
         Calendar openTime = Calendar.getInstance();
         Calendar closeTime = Calendar.getInstance();
@@ -81,7 +81,7 @@ public class Restaurant implements Serializable {
                 return true;
         }
         return false;
-    }
+    }*/
 
     public HashMap<String, Boolean> getFavourite_users() {
         return favourite_users;

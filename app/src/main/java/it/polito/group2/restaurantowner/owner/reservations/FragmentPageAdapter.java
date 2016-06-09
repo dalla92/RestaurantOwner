@@ -1,4 +1,4 @@
-package it.polito.group2.restaurantowner.owner;
+package it.polito.group2.restaurantowner.owner.reservations;
 
 
 import android.os.Bundle;
@@ -27,7 +27,7 @@ public class FragmentPageAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         Bundle bundle = new Bundle();
         bundle.putLong("date", date);
-        bundle.putString("id", restaurantId);
+        bundle.putString("restaurant_id", restaurantId);
 
         switch (position) {
             case 0:

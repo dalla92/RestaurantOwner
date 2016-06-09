@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -25,7 +28,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
@@ -37,16 +43,11 @@ import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    final static int ACTION_ADD = 1;
+    private final static int ACTION_ADD = 1;
     private RestaurantPreviewAdapter mAdapter;
-    private  RecyclerView  mRecyclerView;
-    ArrayList<Restaurant> resList = new ArrayList<>();
-    private static final int VERTICAL_ITEM_SPACE = 5;
+    private ArrayList<Restaurant> resList = new ArrayList<>();
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
-
-    private String userID;
-    private User user;
 
 
     @Override
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        userID = FirebaseUtil.getCurrentUserId();
+        String userID = FirebaseUtil.getCurrentUserId();
 
         showProgressDialog();
         firebase = FirebaseDatabase.getInstance();
@@ -73,14 +74,14 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
+                /*Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
                 for (Restaurant r : resList) {
                     if (r.getRestaurant_id().equals(changedRes.getRestaurant_id())) {
                         resList.remove(r);
                         resList.add(changedRes);
                         break;
                     }
-                }
+                }*/
             }
 
             @Override
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         mRecyclerView.setHasFixedSize(true);
@@ -112,11 +113,11 @@ public class MainActivity extends AppCompatActivity
         GridLayoutManager mLayoutManager = null;
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             mLayoutManager = new GridLayoutManager(this, 1);
-            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1,5,true));
+            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1, 5, true));
         }
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mLayoutManager = new GridLayoutManager(this, 2);
-            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
+            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, 5, true));
         }
 
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -124,7 +125,7 @@ public class MainActivity extends AppCompatActivity
                 new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        Intent mIntent = new Intent(MainActivity.this,Restaurant_page.class);
+                        Intent mIntent = new Intent(MainActivity.this, Restaurant_page.class);
                         String id = resList.get(position).getRestaurant_id();
                         mIntent.putExtra("RestaurantId", id);
                         startActivity(mIntent);
@@ -178,13 +179,13 @@ public class MainActivity extends AppCompatActivity
 
             case R.id.action_add:
                 Intent intent = new Intent(this,AddRestaurantActivity.class);
-                startActivityForResult(intent, ACTION_ADD);
+                startActivity(intent);
                 return true;
 
 
 
             default:
-                // If we got here, the user's action was not recognized.
+                // uf we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
 
@@ -211,30 +212,8 @@ public class MainActivity extends AppCompatActivity
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 Restaurant res = (Restaurant) data.getExtras().get("Restaurant");
-                if(userID!=null) {
-                    res.setUser_id(userID);
-                    //resList.add(0,res);
-                    //mAdapter.addItem(0, res);
-                    DatabaseReference restaurantReference = firebase.getReference("restaurants");
-                    DatabaseReference item = restaurantReference.push();
-                    res.setRestaurant_id(item.getKey());
-                    item.setValue(res);
 
-                    //save also the restaurant preview
-                    DatabaseReference restaurantReference2 = firebase.getReference("restaurants_previews/" + res.getRestaurant_id());
-                    RestaurantPreview r_p = new RestaurantPreview();
-                    if (res.getRestaurant_latitude_position() != 0)
-                        r_p.setLat(res.getRestaurant_latitude_position());
-                    if (res.getRestaurant_latitude_position() != 0)
-                        r_p.setLon(res.getRestaurant_latitude_position());
-                    r_p.setRestaurant_id(res.getRestaurant_id());
-                    r_p.setRestaurant_name(res.getRestaurant_name());
-                    r_p.setRestaurant_price_range(1);
-                    r_p.setRestaurant_rating(1);
-                    r_p.setTables_number(res.getRestaurant_total_tables_number());
-                    r_p.setRestaurant_category(res.getRestaurant_category());
-                    restaurantReference2.setValue(r_p);
-                }
+
             }
         }
     }

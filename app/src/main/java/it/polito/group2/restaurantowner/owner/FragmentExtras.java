@@ -29,14 +29,10 @@ public class FragmentExtras extends Fragment {
 
     OnExtrasPass dataPasser;
     CheckBox animals;
-    CheckBox vegan;
-    CheckBox vegetarian;
     CheckBox glutenFree;
     CheckBox tv;
-    CheckBox patio;
     CheckBox wifi;
     CheckBox creditcard;
-    CheckBox babyspace;
     CheckBox ac;
     EditText squaredMeters;
     EditText closestMetro;
@@ -70,9 +66,9 @@ public class FragmentExtras extends Fragment {
                 args.putBoolean("Wi-Fi", true);
             if(res.getRestaurant_squared_meters()!=0)
                 args.putInt("Squared Meters", 0);
-            if(res.getRestaurant_closest_metro()!="")
+            if(!res.getRestaurant_closest_metro().equals(""))
                 args.putString("Closest Metro", "");
-            if(res.getRestaurant_closest_bus()!="")
+            if(!res.getRestaurant_closest_bus().equals(""))
                 args.putString("Closest Bus", "");
         }
         fragment.setArguments(args);
@@ -84,14 +80,10 @@ public class FragmentExtras extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_add_restaurant_extras, container, false);
         animals = (CheckBox) rootView.findViewById(R.id.cbAnimals);
-        vegan = (CheckBox) rootView.findViewById(R.id.cbVegan);
-        vegetarian = (CheckBox) rootView.findViewById(R.id.cbVegetarian);
         glutenFree = (CheckBox) rootView.findViewById(R.id.cbGlutenFree);
         tv = (CheckBox) rootView.findViewById(R.id.cbTV);
-        patio = (CheckBox) rootView.findViewById(R.id.cbPatio);
         wifi = (CheckBox) rootView.findViewById(R.id.cbWifi);
         creditcard = (CheckBox) rootView.findViewById(R.id.cbCreditCard);
-        babyspace = (CheckBox) rootView.findViewById(R.id.cbBabySpace);
         ac = (CheckBox) rootView.findViewById(R.id.cbAC);
         squaredMeters = (EditText) rootView.findViewById(R.id.etSquaredMeters);
         closestMetro = (EditText) rootView.findViewById(R.id.etClosestMetro);
@@ -99,14 +91,10 @@ public class FragmentExtras extends Fragment {
 
         if(!getArguments().isEmpty()){
             animals.setChecked(getArguments().getBoolean("Animals",false));
-            vegan.setChecked(getArguments().getBoolean("Vegan",false));
-            vegetarian.setChecked(getArguments().getBoolean("Vegetarian",false));
             glutenFree.setChecked(getArguments().getBoolean("GlutenFree",false));
             tv.setChecked(getArguments().getBoolean("TV",false));
-            patio.setChecked(getArguments().getBoolean("Patio",false));
             wifi.setChecked(getArguments().getBoolean("Wi-Fi",false));
             creditcard.setChecked(getArguments().getBoolean("Credit Card",false));
-            babyspace.setChecked(getArguments().getBoolean("Baby Space",false));
             ac.setChecked(getArguments().getBoolean("AC",false));
             squaredMeters.setText(getArguments().getString("Squared Meters", ""));
             closestMetro.setText(getArguments().getString("Closest Metro", ""));
@@ -117,64 +105,54 @@ public class FragmentExtras extends Fragment {
     }
 
     public void passData() {
+        myRes.setAirConditionedPresent(false);
+        myRes.setAnimalAllowed(false);
+        myRes.setCeliacFriendly(false);
+        myRes.setCreditCardAccepted(false);
+        myRes.setTvPresent(false);
+        myRes.setWifiPresent(false);
+        myRes.setRestaurant_closest_bus("");
+        myRes.setRestaurant_closest_metro("");
         if(dataPasser!=null) {
-            ArrayList<RestaurantService> list = new ArrayList<RestaurantService>();
             if (animals.isChecked())
                 myRes.setAnimalAllowed(true);
             else
                 myRes.setAnimalAllowed(false);
-/*            if (vegan.isChecked()) {
-                RestaurantService rs = new RestaurantService();
-                rs.setName("Vegan");
-                list.add(rs);
-            }
-            if (vegetarian.isChecked()) {
-                RestaurantService rs = new RestaurantService();
-                rs.setName("Vegetarian");
-                list.add(rs);
-            }
-*/
-            if (glutenFree.isChecked()) {
-                RestaurantService rs = new RestaurantService();
-                rs.setName("Gluten Free");
-                list.add(rs);
-            }
-        if (tv.isChecked())
-            myRes.setTvPresent(true);
-        else
-            myRes.setTvPresent(false);
-/*            if (patio.isChecked()) {
-                RestaurantService rs = new RestaurantService();
-                rs.setName("Patio");
-                list.add(rs);
-            }
-*/          if (wifi.isChecked())
-            myRes.setWifiPresent(true);
+
+            if (glutenFree.isChecked())
+                myRes.setCeliacFriendly(true);
             else
-            myRes.setWifiPresent(false);
+                myRes.setCeliacFriendly(false);
+
+            if (tv.isChecked())
+                myRes.setTvPresent(true);
+            else
+                myRes.setTvPresent(false);
+
+            if (wifi.isChecked())
+                myRes.setWifiPresent(true);
+            else
+                myRes.setWifiPresent(false);
+
             if (creditcard.isChecked())
                 myRes.setCreditCardAccepted(true);
             else
                 myRes.setCreditCardAccepted(false);
-/*            if (babyspace.isChecked()) {
-                RestaurantService rs = new RestaurantService();
-                rs.setName("Baby Space");
-                list.add(rs);
-            }
-*/          if (ac.isChecked())
+
+            if (ac.isChecked())
                 myRes.setAirConditionedPresent(true);
             else
                 myRes.setAirConditionedPresent(false);
-            if(!squaredMeters.getText().toString().equals("")) {
+
+            if(!squaredMeters.getText().toString().equals(""))
                 myRes.setRestaurant_squared_meters(Integer.parseInt(squaredMeters.getText().toString()));
-            }
-            if(!closestMetro.getText().toString().equals("")) {
+
+            if(!closestMetro.getText().toString().equals(""))
                 myRes.setRestaurant_closest_metro(closestMetro.getText().toString());
-            }
-            if(!closestBus.getText().toString().equals("")) {
+
+            if(!closestBus.getText().toString().equals(""))
                 myRes.setRestaurant_closest_bus(closestBus.getText().toString());
 
-            }
             dataPasser.onExtrasPass(myRes);
         }
     }

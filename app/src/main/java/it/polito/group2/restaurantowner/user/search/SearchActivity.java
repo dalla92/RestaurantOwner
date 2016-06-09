@@ -161,7 +161,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                     progressBar.setVisibility(View.VISIBLE);
                     tagCard.setVisibility(View.GONE);
 
-                    Query restaurantQuery = firebase.getReference("/restaurant_names").orderByKey().startAt(s.toString().toLowerCase()).endAt(s.toString().toLowerCase()+"\uf8ff");
+                    Query restaurantQuery = firebase.getReference("restaurant_names").orderByKey().startAt(s.toString().toLowerCase()).endAt(s.toString().toLowerCase()+"\uf8ff");
                     restaurantQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {

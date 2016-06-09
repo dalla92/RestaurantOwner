@@ -17,18 +17,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.DatePicker;
 
-import org.json.JSONException;
-
 import java.text.DateFormatSymbols;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.AddRestaurantActivity;
-import it.polito.group2.restaurantowner.owner.FragmentPageAdapter;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
 import it.polito.group2.restaurantowner.owner.ReviewsActivity;
@@ -40,7 +35,6 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
 
     private FragmentPageAdapter adapter;
     private String restaurant_id;
-    public ArrayList<Restaurant> all_restaurants = new ArrayList<Restaurant>();
     public Restaurant current_restaurant;
     public Context context;
     public int MODIFY_INFO = 4;
@@ -52,20 +46,6 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         restaurant_id = getIntent().getExtras().getString("restaurant_id");
-
-        context = this;
-        try {
-            all_restaurants = JSONUtil.readJSONResList(context);
-        }
-        catch(JSONException e){
-            e.printStackTrace();
-        }
-        for(Restaurant r : all_restaurants){
-            if(r.getRestaurantId().equals(restaurant_id)){
-                current_restaurant = r;
-                break;
-            }
-        }
 
         //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -240,7 +220,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
                     adapter.getTakeaway_fragment().changeData(c, restaurant_id);
-                    adapter.getTable_fragment().changeData(c, restaurant_id);
+                    adapter.getTable_fragment().changeData(c);
 
                     c = Calendar.getInstance();
                     if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
@@ -256,7 +236,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     }
                 }
             }, year, month, day);
-            //dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+
             dialog.show();
         }
 

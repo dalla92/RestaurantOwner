@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * Created by Alessio on 16/05/2016.
  */
-public class MealAddition implements Serializable, Parcelable {
+public class MealAddition implements Parcelable {
 
     private String meal_addition_id;
     private String meal_addition_name;

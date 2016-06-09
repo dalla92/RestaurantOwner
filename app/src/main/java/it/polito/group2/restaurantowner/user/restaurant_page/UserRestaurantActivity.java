@@ -209,15 +209,16 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 else
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
 
-                if(targetRestaurant.isOpenNow())
+                /*if(targetRestaurant.isOpenNow())
                     timesText.setText("Open now");
                 else{
                     timesText.setText("Closed now");
-                }
+                }*/
 
                 setButtons();
                 setRestaurantInfo();
-                setTimesList(targetRestaurant.getRestaurant_time_slot());
+
+                //setTimesList(targetRestaurant.getRestaurant_time_slot());
                 setRestaurantExtraInfo();
             }
 
@@ -292,11 +293,15 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
-            /*Intent intent = new Intent(this, UserRestaurantList.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();*/
+            if(isTaskRoot()){
+                Intent intent = new Intent(this, UserRestaurantList.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            }
+            else
+                super.onBackPressed();
+
         }
     }
 
@@ -458,17 +463,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         assert category != null;
         assert extras != null;
         assert services != null;
-
-        //boolean initalizations (then corrected)
-        targetRestaurant.setAirConditionedPresent(false);
-        targetRestaurant.setAnimalAllowed(false);
-        targetRestaurant.setCeliacFriendly(false);
-        targetRestaurant.setCreditCardAccepted(false);
-        targetRestaurant.setTvPresent(false);
-        targetRestaurant.setWifiPresent(false);
-        targetRestaurant.setRestaurant_closest_bus("");
-        targetRestaurant.setRestaurant_closest_metro("");
-        targetRestaurant.setRestaurant_squared_meters(0);
 
         StringBuilder servicesBuilder = new StringBuilder();
         if(targetRestaurant.getCreditCardAccepted()) {

@@ -1,6 +1,8 @@
 package it.polito.group2.restaurantowner.owner;
 
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,15 +22,22 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 
 public class AddRestaurantActivity extends AppCompatActivity implements FragmentInfo.OnInfoPass, FragmentServices.OnServicesPass, FragmentExtras.OnExtrasPass, GoogleApiClient.OnConnectionFailedListener {
@@ -43,18 +52,17 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
     private Restaurant res = null;
     private GoogleApiClient mGoogleApiClient;
+    private FirebaseDatabase firebase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_restaurant);
         Intent intent = getIntent();
+
+        firebase = FirebaseDatabase.getInstance();
         if(intent.hasExtra("Restaurant"))
             res = (Restaurant) intent.getExtras().get("Restaurant");
         if(res==null){
@@ -83,7 +91,10 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        /*
+      The {@link ViewPager} that will host the section contents.
+     */
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -108,14 +119,64 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
         if (id == R.id.action_save) {
             saveData();
-            if(res.getRestaurant_name().equals(""))
-                Toast.makeText(this,"Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
+            if (res.getRestaurant_name().equals(""))
+                Toast.makeText(this, "Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
             else {
-                Intent intent = new Intent();
+                String userID = FirebaseUtil.getCurrentUserId();
+                if (userID != null) {
+                    res.setUser_id(userID);
+
+                    //resList.add(0,res);
+                    //mAdapter.addItem(0, res);
+                    DatabaseReference restaurantsReference = firebase.getReference("restaurants");
+                    DatabaseReference restaurantRef = restaurantsReference.push();
+                    res.setRestaurant_id(restaurantRef.getKey());
+                    final Restaurant finalRes = res;
+                    restaurantRef.setValue(res).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            //save also the restaurant preview if the restaurant was succefully written
+                            DatabaseReference restaurantReference2 = firebase.getReference("restaurants_previews/" + finalRes.getRestaurant_id());
+                            RestaurantPreview r_p = new RestaurantPreview();
+                            if (finalRes.getRestaurant_address() != null && !finalRes.getRestaurant_address().trim().equals("")) {
+                                String address = finalRes.getRestaurant_address();
+                                Geocoder geocoder = new Geocoder(AddRestaurantActivity.this, Locale.ITALY);
+                                try {
+                                    List<Address> addressList = geocoder.getFromLocationName(address, 1);
+                                    if (addressList != null && addressList.size() > 0) {
+                                        if (addressList.get(0).hasLatitude())
+                                            r_p.setLat(addressList.get(0).getLatitude());
+                                        if (addressList.get(0).hasLongitude())
+                                            r_p.setLon(addressList.get(0).getLongitude());
+                                    }
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            r_p.setRestaurant_id(finalRes.getRestaurant_id());
+                            r_p.setRestaurant_name(finalRes.getRestaurant_name());
+                            r_p.setRestaurant_price_range(1);
+                            r_p.setRestaurant_rating(1);
+                            r_p.setTables_number(finalRes.getRestaurant_total_tables_number());
+                            r_p.setRestaurant_category(finalRes.getRestaurant_category());
+                            restaurantReference2.setValue(r_p);
+
+                            //saving the names of the restaurant with the id in restaurant_names for search purpose
+                            firebase.getReference("restaurant_names/" + finalRes.getRestaurant_name().toLowerCase()).setValue(finalRes.getRestaurant_id());
+                            Toast.makeText(AddRestaurantActivity.this, "Restaurant added successfully", Toast.LENGTH_SHORT).show();
+                            finish();
+                        }
+                    });
+
+                /*Intent intent = new Intent();
                 intent.putExtra("Restaurant", res);
                 setResult(RESULT_OK, intent);
                 finish();//finishing activity
-                return true;
+                return true;*/
+                }
+                else
+                    Toast.makeText(this,"You are not logged in!", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -161,6 +222,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
     @Override
     public void onServicesPass(Boolean fidelity, Boolean tableRes, String numTables, Boolean takeAway, String orderPerHour, List<String> lunchOpenTime,
                                List<String> lunchCloseTime, List<String> dinnerOpenTime, List<String> dinnerCloseTime, boolean[] lunchClosure, boolean[] dinnerClosure) {
+
         res.setFidelityProgramAccepted(fidelity);
         res.setTableReservationAllowed(tableRes);
         if(tableRes)
