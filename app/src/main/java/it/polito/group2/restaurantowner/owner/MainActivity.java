@@ -61,49 +61,6 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         String userID = FirebaseUtil.getCurrentUserId();
-
-        showProgressDialog();
-        firebase = FirebaseDatabase.getInstance();
-        Query restaurantReference = firebase.getReference("restaurants_previews").orderByChild("user_id").equalTo(userID);
-        restaurantReference.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mAdapter.addItem(0, dataSnapshot.getValue(RestaurantPreview.class));
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                /*Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
-                for (Restaurant r : resList) {
-                    if (r.getRestaurant_id().equals(changedRes.getRestaurant_id())) {
-                        resList.remove(r);
-                        resList.add(changedRes);
-                        break;
-                    }
-                }*/
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                RestaurantPreview removedRes = dataSnapshot.getValue(RestaurantPreview.class);
-                for (RestaurantPreview r : resList) {
-                    if (r.getRestaurant_id().equals(removedRes.getRestaurant_id())) {
-                        mAdapter.removeItem(resList.indexOf(r));
-                        resList.remove(r);
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
-
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -148,6 +105,49 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        showProgressDialog();
+        firebase = FirebaseDatabase.getInstance();
+        Query restaurantReference = firebase.getReference("restaurants_previews").orderByChild("user_id").equalTo(userID);
+        restaurantReference.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                mAdapter.addItem(0, dataSnapshot.getValue(RestaurantPreview.class));
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                /*Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
+                for (Restaurant r : resList) {
+                    if (r.getRestaurant_id().equals(changedRes.getRestaurant_id())) {
+                        resList.remove(r);
+                        resList.add(changedRes);
+                        break;
+                    }
+                }*/
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                RestaurantPreview removedRes = dataSnapshot.getValue(RestaurantPreview.class);
+                for (RestaurantPreview r : resList) {
+                    if (r.getRestaurant_id().equals(removedRes.getRestaurant_id())) {
+                        mAdapter.removeItem(resList.indexOf(r));
+                        resList.remove(r);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
     }
 
     @Override

@@ -65,10 +65,7 @@ public class ReviewsActivity extends AppCompatActivity
         Bundle b = getIntent().getExtras();
         if(b != null) {
             restaurant_id = b.getString("restaurant_id");
-        } else {
-            //error on restaurant id
         }
-
         context = this;
         try {
             all_restaurants = JSONUtil.readJSONResList(context);

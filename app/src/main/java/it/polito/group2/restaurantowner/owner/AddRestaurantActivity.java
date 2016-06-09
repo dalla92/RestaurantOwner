@@ -131,35 +131,36 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                     DatabaseReference restaurantsReference = firebase.getReference("restaurants");
                     DatabaseReference restaurantRef = restaurantsReference.push();
                     res.setRestaurant_id(restaurantRef.getKey());
+                    if (res.getRestaurant_address() != null && !res.getRestaurant_address().trim().equals("")) {
+                        String address = res.getRestaurant_address();
+                        try {
+                            Geocoder geocoder = new Geocoder(AddRestaurantActivity.this);
+                            List<Address> addresses;
+                            addresses = geocoder.getFromLocationName(address, 1);
+                            if(addresses.size() > 0) {
+                                res.setRestaurant_latitude_position(addresses.get(0).getLatitude());
+                                res.setRestaurant_longitude_position(addresses.get(0).getLongitude());
+                           }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     final Restaurant finalRes = res;
+
                     restaurantRef.setValue(res).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             //save also the restaurant preview if the restaurant was succefully written
                             DatabaseReference restaurantReference2 = firebase.getReference("restaurants_previews/" + finalRes.getRestaurant_id());
                             RestaurantPreview r_p = new RestaurantPreview();
-                            if (finalRes.getRestaurant_address() != null && !finalRes.getRestaurant_address().trim().equals("")) {
-                                String address = finalRes.getRestaurant_address();
-                                Geocoder geocoder = new Geocoder(AddRestaurantActivity.this, Locale.ITALY);
-                                try {
-                                    List<Address> addressList = geocoder.getFromLocationName(address, 1);
-                                    if (addressList != null && addressList.size() > 0) {
-                                        if (addressList.get(0).hasLatitude())
-                                            r_p.setLat(addressList.get(0).getLatitude());
-                                        if (addressList.get(0).hasLongitude())
-                                            r_p.setLon(addressList.get(0).getLongitude());
-                                    }
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                            }
                             r_p.setRestaurant_id(finalRes.getRestaurant_id());
                             r_p.setRestaurant_name(finalRes.getRestaurant_name());
                             r_p.setRestaurant_price_range(1);
                             r_p.setRestaurant_rating(1);
                             r_p.setTables_number(finalRes.getRestaurant_total_tables_number());
                             r_p.setRestaurant_category(finalRes.getRestaurant_category());
+                            r_p.setLat(finalRes.getRestaurant_latitude_position());
+                            r_p.setLon(finalRes.getRestaurant_longitude_position());
                             restaurantReference2.setValue(r_p);
 
                             //saving the names of the restaurant with the id in restaurant_names for search purpose

@@ -193,8 +193,8 @@ public class MapsActivity extends AppCompatActivity implements
         if(b!=null && b.getDouble("range")!=0){
             DEFAULT_RADIUS = b.getDouble("range");
         }
-        if(b!=null && b.getParcelable("restaurants_previews_list")!=null){ //it must be always this way, because otherwise this activity is not started
-            near_restaurants_previews_list = b.getParcelable("restaurant_preview_list");
+        if(b!=null && b.getParcelableArrayList("restaurants_previews_list")!=null){ //it must be always this way, because otherwise this activity is not started
+            near_restaurants_previews_list = b.getParcelableArrayList("restaurants_previews_list");
         }
         /*
         //just for debugging purpose

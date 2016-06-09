@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -37,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -65,6 +67,8 @@ public class UserMyReservations extends AppCompatActivity{
     private ProgressDialog progressDialog;
     private HashMap<String, String> restaurant_names_and_phone = new HashMap<String, String>();
     private int j=0;
+    private ProgressDialog mProgressDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,12 +78,9 @@ public class UserMyReservations extends AppCompatActivity{
         initToolBar();
         context = this;
 
-        //get the right restaurant
-        Bundle b = getIntent().getExtras();
-        if(b!=null)
-            user_id = b.getString("user_id");
-        if(user_id==null)
-            user_id = "fake_user_id";
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+        user_id = FirebaseUtil.getCurrentUserId();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -127,23 +128,26 @@ public class UserMyReservations extends AppCompatActivity{
                     }
                 }
 
-                //ordering from last done
-                Collections.reverse(all_table_reservations);
+                if(all_table_reservations.isEmpty())
+                    Toast.makeText(getApplicationContext(), "No reservations", Toast.LENGTH_SHORT).show();
+                else {
+                    //ordering from last done
+                    Collections.reverse(all_table_reservations);
 
-                //Searching the names of the restaurants
-                //DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
-                for(TableReservation tr : all_table_reservations) {
-                    DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + tr.getRestaurant_id());
-                    ref.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            Restaurant snap_restaurant = snapshot.getValue(Restaurant.class);
-                            restaurant_names_and_phone.put(snap_restaurant.getRestaurant_name(), snap_restaurant.getRestaurant_telephone_number());
+                    //Searching the names of the restaurants
+                    //DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
+                    for (TableReservation tr : all_table_reservations) {
+                        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + tr.getRestaurant_id());
+                        ref.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot snapshot) {
+                                Restaurant snap_restaurant = snapshot.getValue(Restaurant.class);
+                                restaurant_names_and_phone.put(snap_restaurant.getRestaurant_name(), snap_restaurant.getRestaurant_telephone_number());
 
-                            if (j == all_table_reservations.size() - 1) {
-                                //recycler view
-                                mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-                                mRecyclerView.setHasFixedSize(true);
+                                if (j == all_table_reservations.size() - 1) {
+                                    //recycler view
+                                    mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+                                    mRecyclerView.setHasFixedSize(true);
                                 /*
                                 if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                                     mLayoutManager = new GridLayoutManager(this, 1);
@@ -155,30 +159,30 @@ public class UserMyReservations extends AppCompatActivity{
                                 }
                                 */
 
-                                // use a linear layout manager
-                                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
-                                mRecyclerView.setLayoutManager(mLayoutManager);
-                                adapter = new My_Reservations_Adapter(context, all_table_reservations, progressDialog, restaurant_names_and_phone);
-                                mRecyclerView.setAdapter(adapter);
-                                //delete with swipe
-                                ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-                                ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
-                                mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+                                    // use a linear layout manager
+                                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
+                                    mRecyclerView.setLayoutManager(mLayoutManager);
+                                    adapter = new My_Reservations_Adapter(context, all_table_reservations, progressDialog, restaurant_names_and_phone);
+                                    mRecyclerView.setAdapter(adapter);
+                                    //delete with swipe
+                                    ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+                                    ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
+                                    mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
-                                //progressDialog.dismiss(); done inside the adapter
+                                    //progressDialog.dismiss(); done inside the adapter
+
+                                }
+
+                                j++;
 
                             }
 
-                            j++;
-
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError firebaseError) {
-                            System.out.println("The read failed: " + firebaseError.getMessage());
-                        }
-                    });
-                }
+                            @Override
+                            public void onCancelled(DatabaseError firebaseError) {
+                                System.out.println("The read failed: " + firebaseError.getMessage());
+                            }
+                        });
+                    }
 
                 /*
                 ref.addValueEventListener(new ValueEventListener() {
@@ -195,7 +199,7 @@ public class UserMyReservations extends AppCompatActivity{
                             }
                         }
                 */
-
+                }
             }
 
             @Override
@@ -206,18 +210,11 @@ public class UserMyReservations extends AppCompatActivity{
     }
 
     private void get_user_from_firebase(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/");
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/"+ user_id);
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot usSnapshot: snapshot.getChildren()) {
-                    User snap_user = usSnapshot.getValue(User.class);
-                    String snap_user_id = snap_user.getUser_id();
-                    if(user_id.equals(snap_user_id)){
-                        current_user = snap_user;
-                        break;
-                    }
-                }
+                User current_user = snapshot.getValue(User.class);
 
                 //navigation drawer
                 NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);

@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.owner.reservations;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -25,6 +28,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 
 public class TableFragment extends Fragment {
@@ -33,6 +37,7 @@ public class TableFragment extends Fragment {
     private BaseAdapter adapter;
     private FirebaseDatabase firebase;
     private View rootView;
+    private ProgressDialog mProgressDialog;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -44,6 +49,10 @@ public class TableFragment extends Fragment {
         firebase = FirebaseDatabase.getInstance();
 
         Query reservationsQuery = firebase.getReference("table_reservations").orderByChild("restaurant_id").equalTo(restaurantId);
+
+        mProgressDialog = FirebaseUtil.initProgressDialog(getActivity());
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+
         reservationsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -57,11 +66,14 @@ public class TableFragment extends Fragment {
 
                 TextView reservation_title = (TextView) rootView.findViewById(R.id.reservation_list_title);
                 if(reservation_list.isEmpty()) {
-                    reservation_title.setVisibility(View.VISIBLE);
-                    reservation_title.setText(getString(R.string.no_reservation));
+                    reservation_title.setText("");
+                    Toast.makeText(getActivity(), "No reservations", Toast.LENGTH_SHORT).show();
                 }
                 else
                     reservation_title.setVisibility(View.GONE);
+
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
+
             }
 
             @Override
