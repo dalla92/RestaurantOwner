@@ -1,6 +1,7 @@
 package it.polito.group2.restaurantowner.owner.offer;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +16,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -22,11 +25,12 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
@@ -47,7 +51,8 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActiv
 public class OfferActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
         OfferFragment.OnActionListener,
-        CategoryFragment.OnActionListener {
+        CategoryFragment.OnActionListener,
+        MealFragment.OnActionListener {
 
     private Offer offer = null;
     private ArrayList<Meal> mealList = null;
@@ -55,9 +60,9 @@ public class OfferActivity extends AppCompatActivity
     private String restaurantID = null;
 
     private ProgressDialog mProgressDialog;
-    private int progressDialogCounter = 0;
     private final int MODIFY_INFO = 0;
     private Toolbar toolbar;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,15 +74,17 @@ public class OfferActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+
         //User object
         DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
         if (userRef != null) {
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            userRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    showProgressDialog();
                     User user = dataSnapshot.getValue(User.class);
-                    hideProgressDialog();
+                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                     setDrawer(user);
                 }
 
@@ -92,7 +99,7 @@ public class OfferActivity extends AppCompatActivity
         //MealList object
         if (getIntent().getExtras() != null && getIntent().getExtras().getString("restaurant_id") != null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
-            Query mealsRef = FirebaseUtil.getMealsByRestaurantRef(restaurantID);
+            DatabaseReference mealsRef = FirebaseUtil.getMealsRef(restaurantID);
             if (mealsRef == null)
                 goAway();
             assert mealsRef != null;
@@ -100,11 +107,10 @@ public class OfferActivity extends AppCompatActivity
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     ArrayList<Meal> meals = new ArrayList<>();
-                    showProgressDialog();
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
                         meals.add(d.getValue(Meal.class));
                     }
-                    hideProgressDialog();
+                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                     openOfferFragment(meals);
                 }
 
@@ -119,14 +125,13 @@ public class OfferActivity extends AppCompatActivity
         //Offer object (for editing purpose)
         if (getIntent().getExtras() != null && getIntent().getExtras().getString("offer_id") != null) {
             String offerID = getIntent().getExtras().getString("offer_id");
-            DatabaseReference offerRef = FirebaseUtil.getOfferRef(offerID);
+            DatabaseReference offerRef = FirebaseUtil.getOfferRef(restaurantID, offerID);
             if (offerRef != null) {
                 offerRef.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        showProgressDialog();
                         Offer editOffer = dataSnapshot.getValue(Offer.class);
-                        hideProgressDialog();
+                        FirebaseUtil.hideProgressDialog(mProgressDialog);
                         openOfferFragment(editOffer);
                     }
 
@@ -264,20 +269,27 @@ public class OfferActivity extends AppCompatActivity
     @Override
     public void onSaveClicked(Offer offer) {
         this.offer = offer;
-        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
-        DatabaseReference offersReference = firebase.getReference("offers/");
-        DatabaseReference keyReference = offersReference.push();
-        this.offer.setOfferID(keyReference.getKey());
-        keyReference.setValue(this.offer);
-        this.offer = setNewOffer();
+        if(this.offer.getOfferID() != null && !this.offer.getOfferID().equals("")) {
+            DatabaseReference offersReference = FirebaseUtil.getOfferRef(restaurantID, this.offer.getOfferID());
+            offersReference.setValue(this.offer);
+        } else {
+            DatabaseReference offersReference = FirebaseUtil.getOffersRef(restaurantID);
+            DatabaseReference keyReference = offersReference.push();
+            this.offer.setOfferID(keyReference.getKey());
+            keyReference.setValue(this.offer);
+        }
+        this.offer = null;
         Intent intent = new Intent(this, MyOffersActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("restaurant_id", restaurantID);
         startActivity(intent);
+        finish();
     }
 
     @Override
     public void onSaveListClicked(Offer offer) {
         this.offer = offer;
-        OfferFragment offerFragment = OfferFragment.newInstance(offer, this.mealList);
+        OfferFragment offerFragment = OfferFragment.newInstance(this.offer, this.mealList);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, offerFragment, "OFFER");
         transaction.addToBackStack(null);
@@ -287,7 +299,7 @@ public class OfferActivity extends AppCompatActivity
     @Override
     public void onCategoryListRq(Offer offer) {
         this.offer = offer;
-        CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(), offer);
+        CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(),  this.offer);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
         transaction.addToBackStack(null);
@@ -297,7 +309,7 @@ public class OfferActivity extends AppCompatActivity
     @Override
     public void onMealListRq(Offer offer) {
         this.offer = offer;
-        MealFragment mealFragment = MealFragment.newInstance(mealList, offer);
+        MealFragment mealFragment = MealFragment.newInstance(this.mealList, this.offer);
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, mealFragment, "MEAL");
         transaction.addToBackStack(null);
@@ -316,12 +328,66 @@ public class OfferActivity extends AppCompatActivity
 
     private ArrayList<String> getCategoryList() {
         ArrayList<String> categoryList = new ArrayList<>();
-        for (Meal m : mealList) {
-            if (categoryList.indexOf(m.getMeal_category()) == -1)
-                categoryList.add(m.getMeal_category());
+        if(mealList.size() > 0) {
+            for (Meal m : mealList) {
+                if (categoryList.indexOf(m.getMeal_category()) == -1)
+                    categoryList.add(m.getMeal_category());
+            }
         }
-
         return categoryList;
+    }
+
+    public void showFromDatePickerDialog(final View v) {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        // Create a new instance of DatePickerDialog and return it
+        DatePickerDialog dialog =  new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                TextView date = (TextView) v.findViewById(R.id.text_from_date);
+                Calendar c = Calendar.getInstance();
+                if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
+                    date.setText(getString(R.string.owner_offer_fragment_offer_label_today));
+                else {
+                    c.set(Calendar.YEAR, year);
+                    c.set(Calendar.MONTH, monthOfYear);
+                    c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    date.setText(dateFormat.format(c.getTime()));
+                }
+            }
+        }, year, month, day);
+        dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+        dialog.show();
+    }
+
+    public void showToDatePickerDialog(final View v) {
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        // Create a new instance of DatePickerDialog and return it
+        DatePickerDialog dialog =  new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                TextView date = (TextView) v.findViewById(R.id.text_to_date);
+                Calendar c = Calendar.getInstance();
+                if(c.get(Calendar.YEAR) == year &&  c.get(Calendar.MONTH) == monthOfYear &&  c.get(Calendar.DAY_OF_MONTH) == dayOfMonth)
+                    date.setText(getString(R.string.owner_offer_fragment_offer_label_today));
+                else {
+                    c.set(Calendar.YEAR, year);
+                    c.set(Calendar.MONTH, monthOfYear);
+                    c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                    date.setText(dateFormat.format(c.getTime()));
+                }
+            }
+        }, year, month, day);
+
+        dialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+        dialog.show();
     }
 
     //ACTIVITY FUNCTIONS ===========================================================================
@@ -340,6 +406,9 @@ public class OfferActivity extends AppCompatActivity
 
     private synchronized void openOfferFragment(ArrayList<Meal> mealList) {
         this.mealList = mealList;
+        if(this.mealList == null) {
+            this.mealList = new ArrayList<>();
+        }
         if (this.offer != null) {
             if (findViewById(R.id.fragment_container) != null) {
                 OfferFragment offerFragment = OfferFragment.newInstance(this.offer, this.mealList);
@@ -406,26 +475,6 @@ public class OfferActivity extends AppCompatActivity
                     .into(nav_picture);
         }
 
-    }
-
-    private synchronized void showProgressDialog() {
-        progressDialogCounter++;
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(true);
-        }
-        mProgressDialog.show();
-    }
-
-    private synchronized void hideProgressDialog() {
-        progressDialogCounter--;
-        if (progressDialogCounter <= 0) {
-            progressDialogCounter = 0;
-            if (mProgressDialog != null && mProgressDialog.isShowing()) {
-                mProgressDialog.hide();
-            }
-        }
     }
 
     private void goAway() {

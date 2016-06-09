@@ -1,80 +1,97 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
-/**
- * Created by Alessio on 16/05/2016.
- */
-
 public class Offer implements Serializable {
 
-    private String offerID;
-    private String restaurantID;
-    private String userID;
-    private String offerName;
-    private String offerDescription;
+    private String offerID = "";
+    private String restaurantID = "";
+    private String userID = "";
+    private String offerName = "";
+    private String offerDescription = "";
 
     private Boolean offerAtLunch = false;
     private Boolean offerAtDinner = false;
-    private Calendar offerStartDate;
-    private Calendar offerStopDate;
-    private HashMap<Integer, Boolean> offerOnWeekDays = new HashMap<Integer, Boolean>();
+    private Long offerStart = 0L;
+    private Long offerStop = 0L;
+    private ArrayList<Boolean> offerOnWeekDays = new ArrayList<>();
 
     private Boolean offerForTotal = true;
     private Boolean offerForMeal = false;
     private Boolean offerForCategory = false;
 
-    private HashMap<String, Boolean> offerOnCategories = new HashMap<String, Boolean>();
-    private HashMap<String, Boolean> offerOnMeals = new HashMap<String, Boolean>();
+    private HashMap<String, Boolean> offerOnCategories = new HashMap<>();
+    private HashMap<String, Boolean> offerOnMeals = new HashMap<>();
 
     private Boolean offerEnabled = true;
-    private Integer offerPercentage;
+    private Integer offerPercentage = 0;
 
     public Offer() {
-        offerOnWeekDays.put(Calendar.MONDAY, true);
-        offerOnWeekDays.put(Calendar.TUESDAY, true);
-        offerOnWeekDays.put(Calendar.WEDNESDAY, true);
-        offerOnWeekDays.put(Calendar.THURSDAY, true);
-        offerOnWeekDays.put(Calendar.FRIDAY, true);
-        offerOnWeekDays.put(Calendar.SATURDAY, true);
-        offerOnWeekDays.put(Calendar.SUNDAY, true);
+        offerOnWeekDays.add(false);
+        offerOnWeekDays.add(Calendar.SUNDAY, true);
+        offerOnWeekDays.add(Calendar.MONDAY, true);
+        offerOnWeekDays.add(Calendar.TUESDAY, true);
+        offerOnWeekDays.add(Calendar.WEDNESDAY, true);
+        offerOnWeekDays.add(Calendar.THURSDAY, true);
+        offerOnWeekDays.add(Calendar.FRIDAY, true);
+        offerOnWeekDays.add(Calendar.SATURDAY, true);
+        offerStart = Calendar.getInstance().getTimeInMillis();
+        offerStop = Calendar.getInstance().getTimeInMillis();
     }
 
     public Boolean isWeekDayInOffer(Integer weekDay) {
-        return offerOnWeekDays.containsKey(weekDay);
+        if(isCorrectWeekday(weekDay))
+            return offerOnWeekDays.get(weekDay);
+
+        return false;
+    }
+
+    public Boolean isCorrectWeekday(Integer v) {
+        switch (v) {
+            case Calendar.SUNDAY:
+            case Calendar.MONDAY:
+            case Calendar.TUESDAY:
+            case Calendar.WEDNESDAY:
+            case Calendar.THURSDAY:
+            case Calendar.FRIDAY:
+            case Calendar.SATURDAY:
+                return true;
+            default:
+                return false;
+        }
     }
 
     public void addWeekDayInOffer(Integer weekDay) {
-        if(isWeekDayInOffer(weekDay))
-            offerOnWeekDays.put(weekDay, true);
+        if(isCorrectWeekday(weekDay))
+        offerOnWeekDays.set(weekDay, true);
     }
 
     public void delWeekDayInOffer(Integer weekDay) {
-        if(isWeekDayInOffer(weekDay)) {
-            offerOnWeekDays.put(weekDay, false);
-        }
+        if(isCorrectWeekday(weekDay))
+        offerOnWeekDays.set(weekDay, false);
     }
 
     public Double getNewMealPrice(Meal meal, Calendar day) {
         Double price = meal.getMeal_price();
         if(isNowInOffer(day)) {
             if(isMealInOffer(meal)) {
-                price = (Double)(meal.getMeal_price()*offerPercentage)/100;
+                price = (meal.getMeal_price()*offerPercentage)/100;
             }
         }
         return price;
     }
 
     public Boolean isDayInOffer(Calendar day) {
-        int timeOfDay = day.get(Calendar.HOUR_OF_DAY);
         if(offerEnabled) {
             Calendar start = Calendar.getInstance();
-            start.setTimeInMillis(offerStartDate.getTimeInMillis() - 60000);
+            start.setTimeInMillis(offerStart - 60000);
             Calendar stop = Calendar.getInstance();
-            stop.setTimeInMillis(offerStopDate.getTimeInMillis() + 60000);
+            stop.setTimeInMillis(offerStop + 60000);
             if(day.after(start) && day.before(stop)) {
                 return isWeekDayInOffer(day.get(Calendar.DAY_OF_WEEK));
             }
@@ -137,7 +154,7 @@ public class Offer implements Serializable {
     }
 
     public ArrayList<String> getCategoryList() {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         for(String key : offerOnCategories.keySet()) {
             if(offerOnCategories.get(key)) {
                 list.add(key);
@@ -147,13 +164,29 @@ public class Offer implements Serializable {
     }
 
     public ArrayList<String> getMealList() {
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         for(String key : offerOnMeals.keySet()) {
             if(offerOnMeals.get(key)) {
                 list.add(key);
             }
         }
         return list;
+    }
+
+    public Long getOfferStart() {
+        return offerStart;
+    }
+
+    public void setOfferStart(Long offerStart) {
+        this.offerStart = offerStart;
+    }
+
+    public Long getOfferStop() {
+        return offerStop;
+    }
+
+    public void setOfferStop(Long offerStop) {
+        this.offerStop = offerStop;
     }
 
     public String getOfferID() {
@@ -212,20 +245,24 @@ public class Offer implements Serializable {
         this.offerAtDinner = offerAtDinner;
     }
 
-    public Calendar getOfferStartDate() {
-        return offerStartDate;
+    public Calendar startToCalendar() {
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(getOfferStart());
+        return date;
     }
 
-    public void setOfferStartDate(Calendar offerStartDate) {
-        this.offerStartDate = offerStartDate;
+    public void calendarToStart(Calendar offerStartDate) {
+        setOfferStart(offerStartDate.getTimeInMillis());
     }
 
-    public Calendar getOfferStopDate() {
-        return offerStopDate;
+    public Calendar stopToCalendar() {
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(getOfferStop());
+        return date;
     }
 
-    public void setOfferStopDate(Calendar offerStopDate) {
-        this.offerStopDate = offerStopDate;
+    public void calendarToStop(Calendar offerStopDate) {
+        setOfferStop(offerStopDate.getTimeInMillis());
     }
 
     public Boolean getOfferForTotal() {
@@ -268,11 +305,11 @@ public class Offer implements Serializable {
         this.offerPercentage = offerPercentage;
     }
 
-    public HashMap<Integer, Boolean> getOfferOnWeekDays() {
+    public ArrayList<Boolean> getOfferOnWeekDays() {
         return offerOnWeekDays;
     }
 
-    public void setOfferOnWeekDays(HashMap<Integer, Boolean> offerOnWeekDays) {
+    public void setOfferOnWeekDays(ArrayList<Boolean> offerOnWeekDays) {
         this.offerOnWeekDays = offerOnWeekDays;
     }
 
@@ -311,9 +348,9 @@ public class Offer implements Serializable {
             return false;
         if (offerAtDinner != null ? !offerAtDinner.equals(offer.offerAtDinner) : offer.offerAtDinner != null)
             return false;
-        if (offerStartDate != null ? !offerStartDate.equals(offer.offerStartDate) : offer.offerStartDate != null)
+        if (offerStart != null ? !offerStart.equals(offer.offerStart) : offer.offerStart != null)
             return false;
-        if (offerStopDate != null ? !offerStopDate.equals(offer.offerStopDate) : offer.offerStopDate != null)
+        if (offerStop != null ? !offerStop.equals(offer.offerStop) : offer.offerStop != null)
             return false;
         if (offerOnWeekDays != null ? !offerOnWeekDays.equals(offer.offerOnWeekDays) : offer.offerOnWeekDays != null)
             return false;
@@ -342,8 +379,8 @@ public class Offer implements Serializable {
         result = 31 * result + (offerDescription != null ? offerDescription.hashCode() : 0);
         result = 31 * result + (offerAtLunch != null ? offerAtLunch.hashCode() : 0);
         result = 31 * result + (offerAtDinner != null ? offerAtDinner.hashCode() : 0);
-        result = 31 * result + (offerStartDate != null ? offerStartDate.hashCode() : 0);
-        result = 31 * result + (offerStopDate != null ? offerStopDate.hashCode() : 0);
+        result = 31 * result + (offerStart != null ? offerStart.hashCode() : 0);
+        result = 31 * result + (offerStop != null ? offerStop.hashCode() : 0);
         result = 31 * result + (offerOnWeekDays != null ? offerOnWeekDays.hashCode() : 0);
         result = 31 * result + (offerForTotal != null ? offerForTotal.hashCode() : 0);
         result = 31 * result + (offerForMeal != null ? offerForMeal.hashCode() : 0);
@@ -365,8 +402,8 @@ public class Offer implements Serializable {
                 ", offerDescription='" + offerDescription + '\'' +
                 ", offerAtLunch=" + offerAtLunch +
                 ", offerAtDinner=" + offerAtDinner +
-                ", offerStartDate=" + offerStartDate +
-                ", offerStopDate=" + offerStopDate +
+                ", offerStartDate=" + offerStart +
+                ", offerStopDate=" + offerStop +
                 ", offerOnWeekDays=" + offerOnWeekDays +
                 ", offerForTotal=" + offerForTotal +
                 ", offerForMeal=" + offerForMeal +

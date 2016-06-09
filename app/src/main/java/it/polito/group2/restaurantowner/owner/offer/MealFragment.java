@@ -48,6 +48,7 @@ public class MealFragment extends Fragment {
             offer = (Offer) getArguments().getSerializable(OFFER);
         }
         setHasOptionsMenu(true);
+        Log.d("FILIPPO", "P4");
         try {
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
                     getResources().getString(R.string.owner_offer_fragment_meal_title));
@@ -60,18 +61,23 @@ public class MealFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.owner_offer_fragment_meal, container, false);
+        Log.d("FILIPPO", "P5");
+        setMealList(view);
+        Log.d("FILIPPO", "P6");
         return view;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
+        Log.d("FILIPPO", "P7");
         super.onActivityCreated(savedInstanceState);
-        setMealList();
+        Log.d("FILIPPO", "P8");
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        Log.d("FILIPPO", "P2");
         if (context instanceof OnActionListener) {
             mCallback = (OnActionListener) context;
         } else {
@@ -101,6 +107,7 @@ public class MealFragment extends Fragment {
         int id = item.getItemId();
 
         if(id == R.id.action_save){
+            Log.d("FILIPPO", "P1");
             mCallback.onSaveListClicked(offer);
             return true;
         }
@@ -108,8 +115,8 @@ public class MealFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setMealList() {
-        final RecyclerView list = (RecyclerView) getView().findViewById(R.id.meal_list);
+    private void setMealList(View view) {
+        final RecyclerView list = (RecyclerView) view.findViewById(R.id.meal_list);
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         list.setNestedScrollingEnabled(false);
