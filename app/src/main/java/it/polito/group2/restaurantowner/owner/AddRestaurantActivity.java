@@ -169,23 +169,23 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         if(takeAway)
             res.setRestaurant_orders_per_hour(Integer.parseInt(orderPerHour));
         ArrayList<RestaurantTimeSlot> openTimeList = new ArrayList<>();
-        for(int i=0;i<7;i++){
-
-            RestaurantTimeSlot daySlot = new RestaurantTimeSlot();
-            //daySlot.setRestaurant_id(res.getRestaurant_id());
-            daySlot.setDay_of_week(i);
-            if(!lunchClosure[i]){
-                daySlot.setLunch(true);
-                daySlot.setOpen_lunch_time(lunchOpenTime.get(i));
-                daySlot.setClose_lunch_time(lunchCloseTime.get(i));
+        if(!lunchOpenTime.isEmpty()) {
+            for (int i = 0; i < 7; i++) {
+                RestaurantTimeSlot daySlot = new RestaurantTimeSlot();
+                //daySlot.setRestaurant_id(res.getRestaurant_id());
+                daySlot.setDay_of_week(i);
+                if (!lunchClosure[i]) {
+                    daySlot.setLunch(true);
+                    daySlot.setOpen_lunch_time(lunchOpenTime.get(i));
+                    daySlot.setClose_lunch_time(lunchCloseTime.get(i));
+                }
+                if (!dinnerClosure[i]) {
+                    daySlot.setDinner(true);
+                    daySlot.setOpen_dinner_time(dinnerOpenTime.get(i));
+                    daySlot.setClose_dinner_time(dinnerCloseTime.get(i));
+                }
+                openTimeList.add(daySlot);
             }
-            if(!dinnerClosure[i]){
-                daySlot.setDinner(true);
-                daySlot.setOpen_dinner_time(dinnerOpenTime.get(i));
-                daySlot.setClose_dinner_time(dinnerCloseTime.get(i));
-            }
-            openTimeList.add(daySlot);
-
         }
         res.setRestaurant_time_slot(openTimeList);
 
