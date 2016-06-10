@@ -14,6 +14,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,6 +29,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
+import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
@@ -43,7 +46,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class UserMyFavourites extends AppCompatActivity{
+public class UserMyFavourites extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private String user_id;
     private ListView listView;
@@ -53,29 +56,33 @@ public class UserMyFavourites extends AppCompatActivity{
     public User current_user;
     public Drawable d;
     private ProgressDialog mProgressDialog;
+    private Toolbar toolbar;
+    private FirebaseDatabase firebase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_my_favourites);
 
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        firebase = FirebaseDatabase.getInstance();
         context = this;
 
         mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
         user_id = FirebaseUtil.getCurrentUserId();
 
+        setDrawer();
+
         get_favourites_from_firebase();
-
-        get_user_from_firebase();
-
-
     }
 
     public void get_favourites_from_firebase(){
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/");
+        DatabaseReference ref = firebase.getReference("users");
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -148,137 +155,155 @@ public class UserMyFavourites extends AppCompatActivity{
         });
     }
 
-    private void get_user_from_firebase(){
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/"+ user_id);
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                User current_user = snapshot.getValue(User.class);
+    private void setDrawer() {
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-                //navigation drawer
-                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                    @SuppressWarnings("StatementWithEmptyBody")
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem item) {
-                        // Handle navigation view item clicks here.
-                        int id = item.getItemId();
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (id == R.id.nav_owner) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    MainActivity.class);
-                            Bundle b1 = new Bundle();
-                            b1.putString("user_id", user_id);
-                            intent1.putExtras(b1);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_home) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    UserRestaurantList.class);
-                            Bundle b1 = new Bundle();
-                            b1.putString("user_id", user_id);
-                            intent1.putExtras(b1);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_login) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    UserRestaurantList.class);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_my_profile) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    UserProfile.class);
-                            Bundle b1 = new Bundle();
-                            b1.putString("user_id", user_id);
-                            intent1.putExtras(b1);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_my_orders) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    MyOrdersActivity.class);
-                            Bundle b1 = new Bundle();
-                            b1.putString("user_id", user_id);
-                            intent1.putExtras(b1);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_my_reservations) {
-                            Intent intent3 = new Intent(
-                                    getApplicationContext(),
-                                    UserMyReservations.class);
-                            Bundle b3 = new Bundle();
-                            b3.putString("user_id", user_id);
-                            intent3.putExtras(b3);
-                            startActivity(intent3);
-                            return true;
-                        } else if (id == R.id.nav_my_reviews) {
-                            Intent intent3 = new Intent(
-                                    getApplicationContext(),
-                                    MyReviewsActivity.class);
-                            Bundle b3 = new Bundle();
-                            b3.putString("user_id", user_id);
-                            intent3.putExtras(b3);
-                            startActivity(intent3);
-                            return true;
-                        } else if (id == R.id.nav_my_favourites) {
-                            Intent intent3 = new Intent(
-                                    getApplicationContext(),
-                                    UserMyFavourites.class);
-                            Bundle b3 = new Bundle();
-                            b3.putString("user_id", user_id);
-                            intent3.putExtras(b3);
-                            startActivity(intent3);
-                            return true;
-                        }
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        final MenuItem ownerItem = menu.findItem(R.id.nav_owner);
+        MenuItem loginItem = menu.findItem(R.id.nav_login);
+        MenuItem logoutItem = menu.findItem(R.id.nav_logout);
+        MenuItem myProfileItem = menu.findItem(R.id.nav_my_profile);
+        MenuItem myOrdersItem = menu.findItem(R.id.nav_my_orders);
+        MenuItem mrResItem =  menu.findItem(R.id.nav_my_reservations);
+        MenuItem myReviewsItem = menu.findItem(R.id.nav_my_reviews);
+        MenuItem myFavItem = menu.findItem(R.id.nav_my_favourites);
 
-                        drawer.closeDrawer(GravityCompat.START);
-                        return true;
+        ownerItem.setVisible(false);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
+            loginItem.setVisible(false);
+            logoutItem.setVisible(true);
+            myProfileItem.setVisible(true);
+            myOrdersItem.setVisible(true);
+            mrResItem.setVisible(true);
+            myReviewsItem.setVisible(true);
+            myFavItem.setVisible(true);
+            //navigationView.inflateHeaderView(R.layout.nav_header_login);
+
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    User target = dataSnapshot.getValue(User.class);
+
+                    if (target.getOwnerUser())
+                        ownerItem.setVisible(true);
+
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
+
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(UserMyFavourites.this)
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
                     }
-                });
-                TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-                TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-                ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-                if (current_user != null) {
-                    if (current_user.getUser_full_name() != null && current_user.getUser_full_name() == null)
-                        nav_username.setText(current_user.getUser_full_name());
-                    if (current_user.getUser_email() != null)
-                        nav_email.setText(current_user.getUser_email());
-                    if (current_user.getUser_photo_firebase_URL() != null)
-                        Glide.with(context)
-                                .load(current_user.getUser_photo_firebase_URL()) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
-                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                .placeholder(R.drawable.blank_profile)
-                                .into(nav_photo);
+                    else{
+                        Glide
+                                .with(UserMyFavourites.this)
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
+
+        }
+        else{
+            loginItem.setVisible(true);
+            logoutItem.setVisible(false);
+            myProfileItem.setVisible(false);
+            myOrdersItem.setVisible(false);
+            mrResItem.setVisible(false);
+            myReviewsItem.setVisible(false);
+            myFavItem.setVisible(false);
+
+        }
+
+        navigationView.setNavigationItemSelectedListener(this);
     }
+
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        d = null;
-        System.gc();
+    public void onResume(){
+        super.onResume();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START))
+            drawer.closeDrawer(GravityCompat.START);
     }
 
-    private String getRealPathFromURI(Uri contentURI) {
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            return contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
+
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(id==R.id.nav_owner){
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            return true;
         }
+        else if(id==R.id.nav_home){
+            Intent intent = new Intent(this, UserRestaurantList.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return true;
+        }
+        else if(id==R.id.nav_login){
+            Intent intent = new Intent(this, LoginManagerActivity.class);
+            intent.putExtra("login", true);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_logout){
+            Intent intent = new Intent(this, LoginManagerActivity.class);
+            intent.putExtra("login", false);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        } else if(id==R.id.nav_my_profile) {
+            Intent intent = new Intent(this, UserProfile.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_orders) {
+            Intent intent = new Intent(this, MyOrdersActivity.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_reservations){
+            Intent intent = new Intent(this, UserMyReservations.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_reviews){
+            Intent intent = new Intent(this, MyReviewsActivity.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_favourites){
+            Intent intent = new Intent(this, UserMyFavourites.class);
+            startActivity(intent);
+            return true;
+        }
+
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override

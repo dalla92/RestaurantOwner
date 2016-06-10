@@ -35,6 +35,7 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
     private int reservations_number;
     private int tables_number;
     private String restaurant_category;
+    private String user_id;
     private ArrayList<RestaurantTimeSlot> restaurant_time_slot = new ArrayList<RestaurantTimeSlot>();
 
     public RestaurantPreview(){
@@ -46,6 +47,14 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
         if(getLat()!=null && getLon()!=null)
         return new LatLng(getLat(), getLon());
         else return null;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 
     public String getRestaurant_id() {
@@ -188,6 +197,7 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
         this.restaurant_rating = parcel.readFloat();
         this.reservations_number = parcel.readInt();
         this.tables_number = parcel.readInt();
+        this.user_id = parcel.readString();
         this.restaurant_time_slot = parcel.readArrayList(null);
     }
 
@@ -201,6 +211,7 @@ public class RestaurantPreview implements ClusterItem, Parcelable {
         dest.writeFloat(this.restaurant_rating);
         dest.writeInt(this.reservations_number);
         dest.writeInt(this.tables_number);
+        dest.writeString(this.user_id);
         dest.writeList(this.restaurant_time_slot);
     }
 

@@ -122,7 +122,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             if (res.getRestaurant_name().equals(""))
                 Toast.makeText(this, "Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
             else {
-                String userID = FirebaseUtil.getCurrentUserId();
+                final String userID = FirebaseUtil.getCurrentUserId();
                 if (userID != null) {
                     res.setUser_id(userID);
 
@@ -173,6 +173,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                             r_p.setRestaurant_name(finalRes.getRestaurant_name());
                             r_p.setRestaurant_price_range(1);
                             r_p.setRestaurant_rating(1);
+                            r_p.setUser_id(userID);
                             r_p.setTables_number(finalRes.getRestaurant_total_tables_number());
                             r_p.setRestaurant_category(finalRes.getRestaurant_category());
                             r_p.setLat(finalRes.getRestaurant_latitude_position());
@@ -186,11 +187,6 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                         }
                     });
 
-                /*Intent intent = new Intent();
-                intent.putExtra("Restaurant", res);
-                setResult(RESULT_OK, intent);
-                finish();//finishing activity
-                return true;*/
                 }
                 else
                     Toast.makeText(this,"You are not logged in!", Toast.LENGTH_SHORT).show();

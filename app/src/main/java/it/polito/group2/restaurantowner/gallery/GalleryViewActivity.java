@@ -341,7 +341,7 @@ public class GalleryViewActivity extends AppCompatActivity {
             try {
                 photoFile = createImageFile();
             } catch (IOException ex) {
-                Log.d("aaa", "BREAK1");
+                ex.printStackTrace();
             }
             if (photoFile != null) {
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,

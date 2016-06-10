@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.User;
+import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
@@ -75,20 +76,19 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class UserProfile extends AppCompatActivity{
+public class UserProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private String user_id;
     static final int PICK_IMAGE = 2;
     static final int REQUEST_TAKE_PHOTO = 3;
-    boolean isImageFitToScreen=false;
     public String photouri=null;
-    public User current_user;
-    private Context context;
-    private Drawable d;
     private ProgressDialog progressDialog;
     private StorageReference user_storage_reference;
     private StorageReference user_photo_reference;
     private StorageReference user_photo_reference_thumbnail;  //mStorageRef was previously used to transfer data
+    private Toolbar toolbar;
+    private FirebaseDatabase firebase;
+    private User current_user;
 
 
     @Override
@@ -96,192 +96,178 @@ public class UserProfile extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
-        context = this;
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
+       firebase = FirebaseDatabase.getInstance();
         //get the right user
         user_id = FirebaseUtil.getCurrentUserId();
         if(user_id == null){
             Toast.makeText(UserProfile.this, "You need to be logged in.", Toast.LENGTH_SHORT).show();
             finish();
         }
-        //get and fill related data
-        get_user_from_firebase();
+
+        setDrawerAndGetUser();
 		
     }
 
-    private void progress_dialog(){
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMax(100);
-        progressDialog.setMessage("Its loading....");
-        progressDialog.setTitle("");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
+    private void setDrawerAndGetUser() {
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        final MenuItem ownerItem = menu.findItem(R.id.nav_owner);
+        MenuItem loginItem = menu.findItem(R.id.nav_login);
+        MenuItem logoutItem = menu.findItem(R.id.nav_logout);
+        MenuItem myProfileItem = menu.findItem(R.id.nav_my_profile);
+        MenuItem myOrdersItem = menu.findItem(R.id.nav_my_orders);
+        MenuItem mrResItem =  menu.findItem(R.id.nav_my_reservations);
+        MenuItem myReviewsItem = menu.findItem(R.id.nav_my_reviews);
+        MenuItem myFavItem = menu.findItem(R.id.nav_my_favourites);
+
+        ownerItem.setVisible(false);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
+            loginItem.setVisible(false);
+            logoutItem.setVisible(true);
+            myProfileItem.setVisible(true);
+            myOrdersItem.setVisible(true);
+            mrResItem.setVisible(true);
+            myReviewsItem.setVisible(true);
+            myFavItem.setVisible(true);
+            //navigationView.inflateHeaderView(R.layout.nav_header_login);
+
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    User target = dataSnapshot.getValue(User.class);
+
+                    current_user = target;
+
+                    load_saved_data();
+
+                    activate_buttons();
+
+                    if (target.getOwnerUser())
+                        ownerItem.setVisible(true);
+
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
+
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(UserProfile.this)
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                    else{
+                        Glide
+                                .with(UserProfile.this)
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
+
+        }
+        else{
+            loginItem.setVisible(true);
+            logoutItem.setVisible(false);
+            myProfileItem.setVisible(false);
+            myOrdersItem.setVisible(false);
+            mrResItem.setVisible(false);
+            myReviewsItem.setVisible(false);
+            myFavItem.setVisible(false);
+
+        }
+
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
-    public void get_user_from_firebase(){
-		progress_dialog();
-
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/"+user_id);
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                current_user = snapshot.getValue(User.class);
-
-                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                setSupportActionBar(toolbar);
-                //navigation drawer
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                        (Activity) context, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-                drawer.setDrawerListener(toggle);
-                toggle.syncState();
-                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                    @SuppressWarnings("StatementWithEmptyBody")
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem item) {
-                        // Handle navigation view item clicks here.
-                        int id = item.getItemId();
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (id == R.id.nav_owner) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    MainActivity.class);
-                            Bundle b1 = new Bundle();
-                            b1.putString("user_id", user_id);
-                            intent1.putExtras(b1);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_home) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    UserRestaurantList.class);
-                            Bundle b1 = new Bundle();
-                            b1.putString("user_id", user_id);
-                            intent1.putExtras(b1);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_login) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    UserRestaurantList.class);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_my_profile) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    UserProfile.class);
-                            Bundle b1 = new Bundle();
-                            b1.putString("user_id", user_id);
-                            intent1.putExtras(b1);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_my_orders) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    MyOrdersActivity.class);
-                            Bundle b1 = new Bundle();
-                            b1.putString("user_id", user_id);
-                            intent1.putExtras(b1);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.nav_my_reservations) {
-                            Intent intent3 = new Intent(
-                                    getApplicationContext(),
-                                    UserMyReservations.class);
-                            Bundle b3 = new Bundle();
-                            b3.putString("user_id", user_id);
-                            intent3.putExtras(b3);
-                            startActivity(intent3);
-                            return true;
-                        } else if (id == R.id.nav_my_reviews) {
-                            Intent intent3 = new Intent(
-                                    getApplicationContext(),
-                                    MyReviewsActivity.class);
-                            Bundle b3 = new Bundle();
-                            b3.putString("user_id", user_id);
-                            intent3.putExtras(b3);
-                            startActivity(intent3);
-                            return true;
-                        } else if (id == R.id.nav_my_favourites) {
-                            Intent intent3 = new Intent(
-                                    getApplicationContext(),
-                                    UserMyFavourites.class);
-                            Bundle b3 = new Bundle();
-                            b3.putString("user_id", user_id);
-                            intent3.putExtras(b3);
-                            startActivity(intent3);
-                            return true;
-                        }
-
-                        drawer.closeDrawer(GravityCompat.START);
-                        return true;
-                    }
-                });
-
-                TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-                TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-                ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-                if (current_user != null) {
-                    if (current_user.getUser_full_name() != null && current_user.getUser_full_name() == null)
-                        nav_username.setText(current_user.getUser_full_name());
-                    if (current_user.getUser_email() != null)
-                        nav_email.setText(current_user.getUser_email());
-                    load_user_photo(nav_photo);
-                }
-
-                if (!current_user.getOwnerUser()) {
-                    TextView tvx = (TextView) findViewById(R.id.textView24);
-                    EditText tvy = (EditText) findViewById(R.id.vat_number);
-                    tvx.setVisibility(View.GONE);
-                    tvy.setVisibility(View.GONE);
-                }
-
-                /*
-                SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-                Uri photouri = null;
-                if(userDetails.getString("photouri", null)!=null) {
-                    photouri = Uri.parse(userDetails.getString("photouri", null));
-                    File f = new File(getRealPathFromURI(photouri));
-                    Drawable d = Drawable.createFromPath(f.getAbsolutePath());
-                    navigationView.getHeaderView(0).setBackground(d);
-                }
-                else
-                    nav_photo.setImageResource();
-                        }
-                */
-
-                load_saved_data();
-
-                activate_buttons();
-
-                progressDialog.dismiss();
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        });
-	}
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        d = null;
-        System.gc();
+    public void onResume(){
+        super.onResume();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START))
+            drawer.closeDrawer(GravityCompat.START);
     }
 
-    private void load_user_photo(ImageView nav_photo){
-        if (current_user!=null && current_user.getUser_photo_firebase_URL() != null) {
-            Glide.with(context)
-                    .load(current_user.getUser_photo_firebase_URL()) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.blank_profile)
-                    .into(nav_photo);
+
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if(id==R.id.nav_owner){
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            return true;
         }
+        else if(id==R.id.nav_home){
+            Intent intent = new Intent(this, UserRestaurantList.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+            return true;
+        }
+        else if(id==R.id.nav_login){
+            Intent intent = new Intent(this, LoginManagerActivity.class);
+            intent.putExtra("login", true);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_logout){
+            Intent intent = new Intent(this, LoginManagerActivity.class);
+            intent.putExtra("login", false);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        } else if(id==R.id.nav_my_profile) {
+            Intent intent = new Intent(this, UserProfile.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_orders) {
+            Intent intent = new Intent(this, MyOrdersActivity.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_reservations){
+            Intent intent = new Intent(this, UserMyReservations.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_reviews){
+            Intent intent = new Intent(this, MyReviewsActivity.class);
+            startActivity(intent);
+            return true;
+        } else if(id==R.id.nav_my_favourites){
+            Intent intent = new Intent(this, UserMyFavourites.class);
+            startActivity(intent);
+            return true;
+        }
+
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
+
 
     /*
     public void show(){
@@ -306,7 +292,23 @@ public class UserProfile extends AppCompatActivity{
     public void load_saved_data(){
         //load photo
         ImageView image = (ImageView) findViewById(R.id.imageView);
-        load_user_photo(image);
+
+        String photoUri = current_user.getUser_photo_firebase_URL();
+        if(photoUri == null || photoUri.equals("")) {
+            Glide
+                    .with(UserProfile.this)
+                    .load(R.drawable.blank_profile)
+                    .centerCrop()
+                    .into(image);
+        }
+        else{
+            Glide
+                    .with(UserProfile.this)
+                    .load(photoUri)
+                    .centerCrop()
+                    .into(image);
+        }
+
         //load other fields
         TextView tv = (TextView) findViewById(R.id.email);
         if (current_user.getUser_email() != null)
@@ -344,6 +346,7 @@ public class UserProfile extends AppCompatActivity{
             }
         });
     }
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) { //not called in case of finish()
         Log.d("tag1", "saveinstancestate");
@@ -391,7 +394,7 @@ public class UserProfile extends AppCompatActivity{
                 Uri photouri2 = Uri.parse(savedInstanceState.getString("photouri", null));
                 if(photouri2!=null) {
                     ImageView image = (ImageView) findViewById(R.id.imageView);
-                    Glide.with(context)
+                    Glide.with(this)
                             .load(photouri2) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
                             .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .placeholder(R.drawable.blank_profile)
@@ -480,7 +483,7 @@ public class UserProfile extends AppCompatActivity{
             //view photo
             Log.d("aaa", "BREAK2");
             ImageView image = (ImageView) findViewById(R.id.imageView);
-            setPic();
+            //setPic();
             //add photo to gallery
             Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             if(photouri!=null) {
@@ -491,7 +494,7 @@ public class UserProfile extends AppCompatActivity{
                 //photouri = contentUri.toString();
                 Log.d("aaa", "BREAK3"+contentUri.toString());
                 Log.d("aaa", "BREAK4" + Uri.parse(photouri));
-                Glide.with(context)
+                Glide.with(this)
                         .load(photouri) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.blank_profile)
@@ -507,8 +510,8 @@ public class UserProfile extends AppCompatActivity{
                 imageStream = getContentResolver().openInputStream(imageUri);
                 ImageView image_to_enlarge = (ImageView) findViewById(R.id.imageView);
                 Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
-                Glide.with(context)
-                        .load(getImageUri(context, bitmap)) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                Glide.with(this)
+                        .load(imageUri) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.blank_profile)
                         .into(image_to_enlarge);
@@ -583,7 +586,7 @@ public class UserProfile extends AppCompatActivity{
                     public void onFailure(Exception e) {
                         e.printStackTrace();
                         Log.d("my_ex", e.getMessage());
-                        Toast failure_message = Toast.makeText(context, "The upload is failed", Toast.LENGTH_LONG);
+                        Toast failure_message = Toast.makeText(UserProfile.this, "The upload is failed", Toast.LENGTH_LONG);
                         failure_message.show();
                     }
                 })
@@ -598,7 +601,7 @@ public class UserProfile extends AppCompatActivity{
                         final int THUMBSIZE = 64;
                         Bitmap ThumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(photouri),
                                 THUMBSIZE, THUMBSIZE);
-                        File f = new File((getImageUri(context, ThumbImage).toString()));
+                        File f = new File((getImageUri(UserProfile.this, ThumbImage).toString()));
                         Uri imageUri = Uri.fromFile(f);
                         user_photo_reference_thumbnail = user_storage_reference.child("users/" + user_id + "_thumbnail");
                         UploadTask uploadTask = user_photo_reference_thumbnail.putFile(imageUri);
@@ -608,7 +611,7 @@ public class UserProfile extends AppCompatActivity{
                             public void onFailure(Exception e) {
                                 e.printStackTrace();
                                 Log.d("my_ex", e.getMessage());
-                                Toast failure_message = Toast.makeText(context, "The upload is failed", Toast.LENGTH_LONG);
+                                Toast failure_message = Toast.makeText(UserProfile.this, "The upload is failed", Toast.LENGTH_LONG);
                                 failure_message.show();
                             }
                         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -678,42 +681,6 @@ public class UserProfile extends AppCompatActivity{
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
-    }
-
-    private void setPic() {
-        ImageView mImageView = (ImageView) findViewById(R.id.imageView);
-        // Get the dimensions of the View
-        int targetW = mImageView.getWidth();
-        int targetH = mImageView.getHeight();
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(photouri, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-        // Determine how much to scale down the image
-        int scaleFactor = 1;
-        if (targetW != 0 && targetH != 0) {
-            scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-        }
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-        Bitmap bitmap = BitmapFactory.decodeFile(photouri, bmOptions);
-        if (bitmap != null)
-            Glide.with(context)
-                    .load(getImageUri(context, bitmap)) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .placeholder(R.drawable.blank_profile)
-                    .into(mImageView);
-        /*
-        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-        SharedPreferences.Editor edit = userDetails.edit();
-        edit.putString("photouri", photouri);
-        //I can not save the photo, but i could save its URI
-        edit.commit();
-        */
     }
 
 }

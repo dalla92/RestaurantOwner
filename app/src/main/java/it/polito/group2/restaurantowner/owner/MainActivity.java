@@ -19,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.ChildEventListener;
@@ -46,9 +47,7 @@ public class MainActivity extends AppCompatActivity
 
     final static int ACTION_ADD = 1;
     private OwnerRestaurantPreviewAdapter mAdapter;
-    private  RecyclerView  mRecyclerView;
     ArrayList<RestaurantPreview> resList = new ArrayList<>();
-    private static final int VERTICAL_ITEM_SPACE = 5;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
 
@@ -61,6 +60,10 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         String userID = FirebaseUtil.getCurrentUserId();
+        if(userID == null){
+            Toast.makeText(MainActivity.this, "You need to be logged in.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -113,6 +116,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 mAdapter.addItem(0, dataSnapshot.getValue(RestaurantPreview.class));
+                hideProgressDialog();
             }
 
             @Override
