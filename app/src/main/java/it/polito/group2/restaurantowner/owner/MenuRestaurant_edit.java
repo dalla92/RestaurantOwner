@@ -63,14 +63,13 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
     private Meal current_meal;
-    private StorageReference photo_reference;
-    private StorageReference user_storage_reference;
     private Context context;
     private String photouri;
     private FirebaseDatabase firebase;
     private static final int PRICE_BOUNDARY_1 = 5;
     private static final int PRICE_BOUNDARY_2 = 10;
     private static final int PRICE_BOUNDARY_3 = 15;
+    private StorageReference storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -206,18 +205,16 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
 
         //save photo
         ImageView image = (ImageView) findViewById(R.id.imageView);
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        user_storage_reference = storage.getReferenceFromUrl("gs://have-break-9713d.appspot.com");
+        storage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com");
         // Create a child reference
         // imagesRef now points to "images"
-        photo_reference = user_storage_reference.child("images/meals/" + current_meal.getMeal_id());
+        StorageReference photo_reference = storage.child("images/meals/" + current_meal.getMeal_id());
         File f = new File(photouri);
         Uri imageUri = Uri.fromFile(f);
         //upload
-        UploadTask uploadTask = user_storage_reference.putFile(imageUri);
+        UploadTask uploadTask = photo_reference.putFile(imageUri);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
-            //public void onFailure(@NonNull Throwable throwable) {
             public void onFailure(Exception e) {
                 e.printStackTrace();
                 Log.d("my_ex", e.getMessage());
@@ -232,31 +229,18 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                 current_meal.setMeal_photo_firebase_URL(downloadUrl.toString());
                 String meal_key = current_meal.getMeal_id();
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
-                ref.setValue(null);
-                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
+                ref.setValue(current_meal);
+                /*DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
                 DatabaseReference ref3 = ref2.push();
                 current_meal.setMeal_id(ref3.getKey());
-                ref3.setValue(current_meal);
+                ref3.setValue(current_meal);*/
 
                 //TODO save also thumbnail
-            }
-        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                double progress = 100.0 * (taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                Toast progress_message = Toast.makeText(context, "Upload is " + progress + "% done", Toast.LENGTH_LONG);
-                progress_message.show();
-            }
-        }).addOnPausedListener(new OnPausedListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onPaused(UploadTask.TaskSnapshot taskSnapshot) {
-                Toast pause_message = Toast.makeText(context, "Upload is has been paused", Toast.LENGTH_LONG);
-                pause_message.show();
             }
         });
     }
 
-    @Override
+    /*@Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
@@ -291,7 +275,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                 }
             });
         }
-    }
+    }*/
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
         private FragmentMainInfo fm;
