@@ -85,26 +85,24 @@ public class MenuRestaurant_page extends AppCompatActivity {
         add_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + restaurant_id);
+                DatabaseReference mealRef = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + restaurant_id).push();
                 Meal m = new Meal();
                 m.setMeal_name("");
                 m.setMeal_price(0.0);
                 m.setMealAvailable(false);
                 m.setMeal_cooking_time(0);
-                m.setMeal_id("");
+                m.setMeal_id(mealRef.getKey());
                 m.setRestaurant_id(restaurant_id);
                 m.setMeal_description("");
                 m.setMealVegetarian(false);
-
                 m.setMealVegan(false);
                 m.setMealGlutenFree(false);
                 m.setMealTakeAway(false);
                 m.setMeal_photo_firebase_URL("");
                 m.setMeal_thumbnail("");
-                DatabaseReference ref_pushed = ref.push();
-                m.setMeal_id(ref_pushed.getKey());
-                ref_pushed.setValue(m);
-                adapter.notifyDataSetChanged();
+                m.setMeal_quantity(0);
+                mealRef.setValue(m);
+                adapter.addItem(0, m);
             }
         });
 
@@ -113,27 +111,6 @@ public class MenuRestaurant_page extends AppCompatActivity {
 
     }
 
-    /*
-    @Override
-    public void onPause() {
-        super.onPause();  // Always call the superclass method first
-        try {
-            saveJSONMeList();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();  // Always call the superclass method first
-        try {
-            readJSONMeList();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-    */
 
     private void progress_dialog(){
         progressDialog = new ProgressDialog(this);
@@ -148,22 +125,15 @@ public class MenuRestaurant_page extends AppCompatActivity {
         progress_dialog();
 
         DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+restaurant_id);
-        ref.addValueEventListener(new ValueEventListener() {
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                int index = -1;
-                int final_index = -1;
                 for (DataSnapshot meSnapshot : snapshot.getChildren()) {
-                    if(index == -1)
-                        final_index = (int) snapshot.getChildrenCount();
-                    index++;
                     Meal snap_meal = meSnapshot.getValue(Meal.class);
-                    meals.add(0, snap_meal);
-                    adapter.notifyDataSetChanged();
-                    if(index==final_index)
-                        progressDialog.hide();
+                    adapter.addItem(0, snap_meal);
                 }
 
+                progressDialog.hide();
 
                 //toolbar
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -172,7 +142,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                 //navigation drawer
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
                 ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                        (Activity)context, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+                        (Activity) context, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
                 drawer.setDrawerListener(toggle);
                 toggle.syncState();
                 NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -284,37 +254,10 @@ public class MenuRestaurant_page extends AppCompatActivity {
                         new RecyclerItemClickListener(context, new RecyclerItemClickListener.OnItemClickListener() {
                             @Override
                             public void onItemClick(View view, int position) {
-                                final String meal_key = meals.get(position).getMeal_id();
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
-                                ref.addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot snapshot) {
-                                        /*
-                                        for (DataSnapshot meSnapshot : snapshot.getChildren()) {
-                                            Meal snap_meal = meSnapshot.getValue(Meal.class);
-                                            String snap_restaurant_id = snap_meal.getRestaurant_id();
-                                            if (snap_restaurant_id.equals(restaurant_id)) {
-                                                if (meal_key.equals(snap_meal.getMeal_id())) {
-                                                    meal_to_edit = snap_meal;
-                                                }
-                                            }
-                                        }
-                                        */
-                                        meal_to_edit = snapshot.getValue(Meal.class);
-                                        Intent intent1 = new Intent(
-                                                getApplicationContext(),
-                                                MenuRestaurant_edit.class);
-                                        if (meal_to_edit != null) {
-                                            intent1.putExtra("meal",  meal_to_edit);
-                                            startActivityForResult(intent1, MODIFY_MEAL);
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError firebaseError) {
-                                        System.out.println("The read failed: " + firebaseError.getMessage());
-                                    }
-                                });
+                                meal_to_edit = meals.get(position);
+                                Intent intent = new Intent(getApplicationContext(), MenuRestaurant_edit.class);
+                                intent.putExtra("meal", meal_to_edit);
+                                startActivityForResult(intent, MODIFY_MEAL);
                             }
                         }));
                 //delete with swipe
@@ -358,8 +301,8 @@ public class MenuRestaurant_page extends AppCompatActivity {
         LinearLayout ll = (LinearLayout) v.getParent();
         TextView child = (TextView) ll.findViewById(R.id.meal_name);
         String meal_name = child.getText().toString();
-        int i = 0;
-        for (; i < meals.size(); i++) {
+
+        for (int i = 0; i < meals.size(); i++) {
             if (meals.get(i).getMeal_name().equals(meal_name)) {
                 if (meals.get(i).getMeal_photo_firebase_URL() != null && !meals.get(i).getMeal_photo_firebase_URL().equals((""))) {
                     Intent intent = new Intent(

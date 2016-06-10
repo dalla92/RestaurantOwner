@@ -30,7 +30,7 @@ import it.polito.group2.restaurantowner.firebasedata.MealCategory;
  */
 public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHolder> implements ItemTouchHelperAdapter {
     private Activity activity;
-    private static ArrayList<Meal> meals;
+    private ArrayList<Meal> meals;
     private static LayoutInflater inflater = null;
     public String meal_name;
     public int index;
@@ -57,14 +57,10 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     }
 
     public Adapter_Meals(Activity activity, int textViewResourceId, ArrayList<Meal> meals, String restaurant_id) {
-        try {
-            this.activity = activity;
-            this.meals = meals;
-            inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            this.restaurant_id = restaurant_id;
-        } catch (Exception e) {
-        }
-        Log.d("ccc", "CALLED WITH SUCCESS1");
+        this.activity = activity;
+        this.meals = meals;
+        inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.restaurant_id = restaurant_id;
     }
 
     @Override

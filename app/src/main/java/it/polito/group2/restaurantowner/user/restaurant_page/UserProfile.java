@@ -10,6 +10,7 @@ import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.opengl.Visibility;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -26,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.ImageUtils;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
@@ -83,12 +86,12 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
     static final int REQUEST_TAKE_PHOTO = 3;
     public String photouri=null;
     private ProgressDialog progressDialog;
-    private StorageReference user_storage_reference;
-    private StorageReference user_photo_reference;
-    private StorageReference user_photo_reference_thumbnail;  //mStorageRef was previously used to transfer data
     private Toolbar toolbar;
     private FirebaseDatabase firebase;
     private User current_user;
+    private Uri imageUri;
+    private StorageReference storageRef;
+    private ProgressDialog mProgressDialog;
 
 
     @Override
@@ -99,13 +102,16 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       firebase = FirebaseDatabase.getInstance();
         //get the right user
         user_id = FirebaseUtil.getCurrentUserId();
         if(user_id == null){
             Toast.makeText(UserProfile.this, "You need to be logged in.", Toast.LENGTH_SHORT).show();
             finish();
         }
+
+        storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com");
+        firebase = FirebaseDatabase.getInstance();
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
 
         setDrawerAndGetUser();
 		
@@ -268,27 +274,6 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         return true;
     }
 
-
-    /*
-    public void show(){
-        //button present yes/not
-        Button button_take_photo1 = (Button) findViewById(R.id.button_take_photo);
-        button_take_photo1.setVisibility(View.VISIBLE);
-        button_take_photo1.requestFocus();
-        Button button_choose_photo1 = (Button) findViewById(R.id.button_choose_photo);
-        button_choose_photo1.setVisibility(View.VISIBLE);
-        button_choose_photo1.requestFocus();
-    }
-
-    public void hide(){
-        //button present yes/not
-        Button button_take_photo2 = (Button) findViewById(R.id.button_take_photo);
-        button_take_photo2.setVisibility(View.GONE);
-        Button button_choose_photo2 = (Button) findViewById(R.id.button_choose_photo);
-        button_choose_photo2.setVisibility(View.GONE);
-    }
-    */
-
     public void load_saved_data(){
         //load photo
         ImageView image = (ImageView) findViewById(R.id.imageView);
@@ -325,17 +310,20 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
     }
 
     public void activate_buttons() {
-        //buttons listeners implementation
+
         //take a photo
         Button button1 = (Button) findViewById(R.id.button_take_photo);
+        assert button1 != null;
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dispatchTakePictureIntent();
             }
         });
+
         //choose a photo
         Button button2 = (Button) findViewById(R.id.button_choose_photo);
+        assert button2 != null;
         button2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -347,94 +335,6 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         });
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) { //not called in case of finish()
-        Log.d("tag1", "saveinstancestate");
-        //save the state here
-        saveinstancestate(savedInstanceState);
-    }
-
-    public void saveinstancestate(Bundle savedInstanceState){
-        // If there's an upload in progress, save the reference so you can query it later
-        if (user_photo_reference != null) {
-            savedInstanceState.putString("reference", user_photo_reference.toString());
-        }
-        if (user_photo_reference_thumbnail != null) {
-            savedInstanceState.putString("reference", user_photo_reference_thumbnail.toString());
-        }
-
-        TextView tv = (TextView) findViewById(R.id.email);
-        TextView tv3 = (TextView) findViewById(R.id.profile_full_name);
-        TextView tv5 = (TextView) findViewById(R.id.phone_number);
-        TextView tv6 = (TextView) findViewById(R.id.vat_number);
-
-        String email = tv.getText().toString();
-        String full_name = tv3.getText().toString();
-        String phone_number = tv5.getText().toString();
-        String vat_number = tv6.getText().toString();
-
-        savedInstanceState.putString("email", email);
-        savedInstanceState.putString("full_name", full_name);
-        savedInstanceState.putString("phone_number", phone_number);
-        savedInstanceState.putString("vat_number", vat_number);
-        //I can not save the photo, but i could save its URI
-        savedInstanceState.putString("photouri", photouri);
-    }
-
-
-    @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
-        Log.d("tag1", "restoreinstancestate");
-        restoreinstancestate(savedInstanceState);
-    }
-
-    public void restoreinstancestate(Bundle savedInstanceState){
-        if (savedInstanceState != null) {
-            if(savedInstanceState.getString("photouri", null)!=null) {
-                Uri photouri2 = Uri.parse(savedInstanceState.getString("photouri", null));
-                if(photouri2!=null) {
-                    ImageView image = (ImageView) findViewById(R.id.imageView);
-                    Glide.with(this)
-                            .load(photouri2) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(R.drawable.blank_profile)
-                            .into(image);
-                }
-            }
-            TextView tv = (TextView) findViewById(R.id.email);
-            TextView tv3 = (TextView) findViewById(R.id.profile_full_name);
-            TextView tv5 = (TextView) findViewById(R.id.phone_number);
-            TextView tv6 = (TextView) findViewById(R.id.vat_number);
-            if (savedInstanceState.getString("email") != null)
-                tv.setText(savedInstanceState.getString("email", null));
-            if (savedInstanceState.getString("full_name") != null)
-                tv3.setText(savedInstanceState.getString("full_name", null));
-            if (savedInstanceState.getString("phone_number") != null)
-                tv5.setText(savedInstanceState.getString("phone_number", null));
-            if (savedInstanceState.getString("vat_number") != null)
-                tv6.setText(savedInstanceState.getString("vat_number", null));
-        }
-
-        // If there was an upload in progress, get its reference and create a new StorageReference
-        final String stringRef = savedInstanceState.getString("reference");
-        if (stringRef == null) {
-            return;
-        }
-        user_storage_reference = FirebaseStorage.getInstance().getReferenceFromUrl(stringRef);
-        // Find all UploadTasks under this StorageReference (in this example, there should be one)
-        List<UploadTask> tasks = user_storage_reference.getActiveUploadTasks();
-        if (tasks.size() > 0) {
-            // Get the task monitoring the upload
-            UploadTask task = tasks.get(0);
-            // Add new listeners to the task using an Activity scope
-            task.addOnSuccessListener(this, new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                }
-            });
-        }
-    }
 
     @Override
     public void onBackPressed() {
@@ -463,8 +363,6 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
             save_user();
-            Intent intent = new Intent(getApplicationContext(), UserRestaurantList.class);
-            startActivity(intent);
             return true;
         }
         if (id == R.id.action_cancel) {
@@ -479,61 +377,28 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //take a photo result
+        ImageView image = (ImageView) findViewById(R.id.imageView);
+
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            //view photo
-            Log.d("aaa", "BREAK2");
-            ImageView image = (ImageView) findViewById(R.id.imageView);
-            //setPic();
-            //add photo to gallery
-            Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
             if(photouri!=null) {
-                File f = new File(photouri); //here is passed the mCurrentPhotoPath
-                Uri contentUri = Uri.fromFile(f);
-                mediaScanIntent.setData(contentUri);
-                this.sendBroadcast(mediaScanIntent);
-                //photouri = contentUri.toString();
-                Log.d("aaa", "BREAK3"+contentUri.toString());
-                Log.d("aaa", "BREAK4" + Uri.parse(photouri));
                 Glide.with(this)
-                        .load(photouri) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .load(photouri)
                         .placeholder(R.drawable.blank_profile)
                         .into(image);
             }
         }
         //choose a photo result
         if (requestCode == PICK_IMAGE && resultCode == RESULT_OK) {
-            Uri imageUri = data.getData();
-            //photouri = imageUri.toString();
-            InputStream imageStream = null;
-            try {
-                imageStream = getContentResolver().openInputStream(imageUri);
-                ImageView image_to_enlarge = (ImageView) findViewById(R.id.imageView);
-                Bitmap bitmap = BitmapFactory.decodeStream(imageStream);
+            imageUri = data.getData();
                 Glide.with(this)
-                        .load(imageUri) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .load(imageUri)
                         .placeholder(R.drawable.blank_profile)
-                        .into(image_to_enlarge);
-                photouri = saveToInternalStorage(bitmap);
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }finally {
-                if (imageStream != null) {
-                    try {
-                        imageStream.close();
-                    } catch (IOException e) {
-                        // Ignore the exception
-                    }
-                }
-            }
+                        .into(image);
         }
-        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
+        /*SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
         SharedPreferences.Editor edit = userDetails.edit();
         edit.putString("photouri", photouri);
-        edit.commit();
+        edit.commit();*/
         //I can not save the photo, but i could save its URI
         //hide();
     }
@@ -547,6 +412,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
 
     public void save_user(){
         //new user
+        FirebaseUtil.showProgressDialog(mProgressDialog);
         TextView tv = (TextView) findViewById(R.id.email);
         TextView tv3 = (TextView) findViewById(R.id.profile_full_name);
         TextView tv5 = (TextView) findViewById(R.id.phone_number);
@@ -561,92 +427,156 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         current_user.setUser_telephone_number(phone_number);
         current_user.setOwner_vat_number(vat_number);
 
-        //save photo
-        ImageView image = (ImageView) findViewById(R.id.imageView);
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        user_storage_reference = storage.getReferenceFromUrl("gs://have-break-9713d.appspot.com");
-
-        if(photouri == null){
+        if(photouri == null && imageUri == null){
             DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/" + user_id);
             ref2.setValue(current_user);
-            return;
+            FirebaseUtil.hideProgressDialog(mProgressDialog);
+            Toast.makeText(UserProfile.this, "Information saved", Toast.LENGTH_SHORT).show();
+            end();
         }
 
-        File f = new File(photouri);
-        Uri imageUri = Uri.fromFile(f);
-        // Create a child reference
-        // imagesRef now points to "images"
-        Calendar c = Calendar.getInstance();
-        user_photo_reference = user_storage_reference.child("users/" + user_id + "/" + c.getTimeInMillis() + ".jpg");
-        //upload
-        UploadTask uploadTask = user_storage_reference.putFile(imageUri);
-        uploadTask
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(Exception e) {
-                        e.printStackTrace();
-                        Log.d("my_ex", e.getMessage());
-                        Toast failure_message = Toast.makeText(UserProfile.this, "The upload is failed", Toast.LENGTH_LONG);
-                        failure_message.show();
-                    }
-                })
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                        current_user.setUser_photo_firebase_URL(downloadUrl.toString());
+        if(photouri != null){
+            ImageCompressionAsyncTask imageCompression = new ImageCompressionAsyncTask() {
+                @Override
+                protected void onPostExecute(Uri uri) {
+                    // image here is compressed & ready to be saved
+                    galleryAddPic();
 
-                        //onSuccess try to save also its thumbnail
-                        final int THUMBSIZE = 64;
-                        Bitmap ThumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(photouri),
-                                THUMBSIZE, THUMBSIZE);
-                        File f = new File((getImageUri(UserProfile.this, ThumbImage).toString()));
-                        Uri imageUri = Uri.fromFile(f);
-                        user_photo_reference_thumbnail = user_storage_reference.child("users/" + user_id + "_thumbnail");
-                        UploadTask uploadTask = user_photo_reference_thumbnail.putFile(imageUri);
-                        uploadTask.addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            //public void onFailure(@NonNull Throwable throwable) {
-                            public void onFailure(Exception e) {
+                    final StorageReference userPictureRef = storageRef.child("users/" + user_id + "/profile.jpg");
+                    final StorageReference userThumbnailRef = storageRef.child("users/" + user_id + "/profile_thumbnail.jpg");
+
+                    //upload
+                    UploadTask uploadTask = userPictureRef.putFile(uri);
+                    uploadTask
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NotNull Exception e) {
+                                    e.printStackTrace();
+                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                    Toast.makeText(UserProfile.this, "The upload is failed", Toast.LENGTH_LONG).show();
+                                    end();
+                                }
+                            })
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                    current_user.setUser_photo_firebase_URL(downloadUrl.toString());
+
+                                    //onSuccess try to save also its thumbnail
+                                    final int THUMBSIZE = 64;
+                                    Bitmap ThumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(photouri), THUMBSIZE, THUMBSIZE);
+
+                                    UploadTask uploadTask = userThumbnailRef.putFile(getImageUri(UserProfile.this, ThumbImage));
+                                    uploadTask.addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        //public void onFailure(@NonNull Throwable throwable) {
+                                        public void onFailure(@NotNull Exception e) {
+                                            e.printStackTrace();
+                                            FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                            Toast.makeText(UserProfile.this, "The thumbnail upload is failed", Toast.LENGTH_LONG).show();
+                                            end();
+                                        }
+                                    }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                        @Override
+                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                            current_user.setUser_thumbnail(downloadUrl.toString());
+
+                                            DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/" + user_id);
+                                            ref2.setValue(current_user);
+                                            FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                            Toast.makeText(UserProfile.this, "Information saved", Toast.LENGTH_SHORT).show();
+                                            end();
+                                        }
+                                    });
+                                }
+                            });
+                }
+            };
+            imageCompression.execute(photouri);// imagePath as a string
+        }
+
+        if(imageUri != null){
+            final StorageReference userPictureRef = storageRef.child("users/" + user_id + "/profile.jpg");
+            final StorageReference userThumbnailRef = storageRef.child("users/" + user_id + "/profile_thumbnail.jpg");
+
+            //upload
+            UploadTask uploadTask = userPictureRef.putFile(imageUri);
+            uploadTask
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NotNull Exception e) {
+                            e.printStackTrace();
+                            FirebaseUtil.hideProgressDialog(mProgressDialog);
+                            Toast.makeText(UserProfile.this, "The upload is failed", Toast.LENGTH_LONG).show();
+                            end();
+                        }
+                    })
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                            current_user.setUser_photo_firebase_URL(downloadUrl.toString());
+
+                            //onSuccess try to save also its thumbnail
+                            try {
+                                final int THUMBSIZE = 64;
+                                Bitmap bitmap = MediaStore.Images.Media.getBitmap(UserProfile.this.getContentResolver(),imageUri);
+                                Bitmap ThumbImage = ThumbnailUtils.extractThumbnail(bitmap, THUMBSIZE, THUMBSIZE);
+                                UploadTask uploadTask = userThumbnailRef.putFile(getImageUri(UserProfile.this, ThumbImage));
+                                uploadTask.addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    //public void onFailure(@NonNull Throwable throwable) {
+                                    public void onFailure(@NotNull Exception e) {
+                                        e.printStackTrace();
+                                        FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                        Toast.makeText(UserProfile.this, "The thumbnail upload is failed", Toast.LENGTH_LONG).show();
+                                        end();
+                                    }
+                                }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                        current_user.setUser_thumbnail(downloadUrl.toString());
+                                        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/" + user_id);
+                                        ref2.setValue(current_user);
+
+                                        FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                        Toast.makeText(UserProfile.this, "Information saved", Toast.LENGTH_SHORT).show();
+                                        end();
+                                    }
+                                });
+                            } catch (IOException e) {
+                                FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                Toast.makeText(UserProfile.this, "The thumbnail creation failed", Toast.LENGTH_LONG).show();
                                 e.printStackTrace();
-                                Log.d("my_ex", e.getMessage());
-                                Toast failure_message = Toast.makeText(UserProfile.this, "The upload is failed", Toast.LENGTH_LONG);
-                                failure_message.show();
+                                end();
                             }
-                        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                current_user.setUser_thumbnail(downloadUrl.toString());
 
-                                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/" + user_id);
-                                ref2.setValue(current_user);
-                            }
-                        });
-                    }
-                });
-
-            }
-
-
-    private String saveToInternalStorage(Bitmap bitmapImage) throws IOException {
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        // path to /data/data/yourapp/app_data/imageDir
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        // Create imageDir
-        File myPath = new File(directory, "profile.png");
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(myPath);
-            // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 50, fos);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            fos.close();
+                        }
+                    });
         }
-        return myPath.getAbsolutePath();
+
+    }
+
+    private void end(){
+        Intent intent = new Intent(getApplicationContext(), UserRestaurantList.class);
+        startActivity(intent);
+    }
+
+    public abstract class ImageCompressionAsyncTask extends AsyncTask<String, Void, Uri> {
+
+        @Override
+        protected Uri doInBackground(String... strings) {
+            if(strings.length == 0 || strings[0] == null)
+                return null;
+            return ImageUtils.compressImage(strings[0]);
+        }
+
+        protected abstract void onPostExecute(Uri imageUri) ;
     }
 
     private File createImageFile() throws IOException {
@@ -681,6 +611,14 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(photouri);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
     }
 
 }
