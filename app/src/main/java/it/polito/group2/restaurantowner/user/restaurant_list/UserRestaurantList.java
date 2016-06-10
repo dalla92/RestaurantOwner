@@ -225,8 +225,9 @@ public class UserRestaurantList extends AppCompatActivity
                         @Override
                         public void onItemClick(View view, int position) {
                             Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
-                            String id = restaurants_previews_list.get(position).getRestaurant_id();
-                            mIntent.putExtra("restaurant_id", id);
+                            RestaurantPreview resPrev = mAdapter.getItem(position);
+                            if(resPrev != null)
+                            mIntent.putExtra("restaurant_id", resPrev.getRestaurant_id());
                             startActivity(mIntent);
                         }
                     })
@@ -250,8 +251,8 @@ public class UserRestaurantList extends AppCompatActivity
         alertDialogBuilder
                 .setMessage("You need to provide internet access")
                 .setCancelable(false)
-                .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
                         // if this button is clicked, close
                         // current activity
                         UserRestaurantList.this.finish();
@@ -283,7 +284,6 @@ public class UserRestaurantList extends AppCompatActivity
     @Override
     public void onConnected(Bundle connectionHint) { //Runs when a GoogleApiClient object successfully connects.
         Log.i(TAG, "Connected to GoogleApiClient");
-        mRequestingLocationUpdates = true;
         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
         // If the initial location was never previously requested, we use
         // FusedLocationApi.getLastLocation() to get it. If it was previously requested, we store
@@ -307,16 +307,18 @@ public class UserRestaurantList extends AppCompatActivity
         // If the user presses the Start Updates button before GoogleApiClient connects, we set
         // mRequestingLocationUpdates to true (see startUpdatesButtonHandler()). Here, we check
         // the value of mRequestingLocationUpdates and if it is true, we start location updates.
-        if (mRequestingLocationUpdates) {
+        /*if (mRequestingLocationUpdates) {
             startLocationUpdates();
             read_restaurants_from_firebase(mRequestingLocationUpdates);
-        }
+        }*/
 
         updateUI();
     }
 
     @Override
     public void onLocationChanged(Location location) {
+        mRequestingLocationUpdates = true;
+
         mCurrentLocation = location;
         updateUI();
         /*
@@ -394,6 +396,8 @@ public class UserRestaurantList extends AppCompatActivity
             return;
         }
 
+        grantPermissions();
+
         mMap = map;
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(false);
@@ -428,8 +432,10 @@ public class UserRestaurantList extends AppCompatActivity
         });
 
         maps_stuff();
-        if(mRequestingLocationUpdates)
+        /*if(mRequestingLocationUpdates) {
+            Log.d("prova", "ciao");
             read_restaurants_from_firebase(mRequestingLocationUpdates);
+        }*/
     }
 
     public void read_restaurants_from_firebase(final boolean isPositionUp){
@@ -465,6 +471,7 @@ public class UserRestaurantList extends AppCompatActivity
                                                     public void onDataChange(DataSnapshot snapshot) {
                                                         RestaurantPreview snap_r_p = snapshot.getValue(RestaurantPreview.class);
                                                         //restaurants_previews_list.add(snap_r_p);
+                                                        Log.d("prova", "added");
                                                         mAdapter.addItem(snap_r_p);
                                                         mClusterManager.addItem(new MyItem(lat, lon));
                                                         mClusterManager.cluster();
@@ -475,28 +482,29 @@ public class UserRestaurantList extends AppCompatActivity
                                                         System.out.println("The read failed: " + firebaseError.getMessage());
                                                     }
                                                 });
-                                            } else {
-                                                if (is_restaurant_near_without_position(new LatLng(lat, lon), range)) {
-                                                    DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
-                                                    ref2.addValueEventListener(new ValueEventListener() {
-                                                        @Override
-                                                        public void onDataChange(DataSnapshot snapshot) {
-                                                            RestaurantPreview snap_r_p = snapshot.getValue(RestaurantPreview.class);
-                                                            //restaurants_previews_list.add(snap_r_p);
-                                                            mAdapter.addItem(snap_r_p);
-                                                            mClusterManager.addItem(new MyItem(lat, lon));
-                                                            mClusterManager.cluster();
-                                                            current_index++;
-                                                            if (total_index == current_index)
-                                                                FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                                        }
+                                            }
+                                        }
+                                    }
+                                    else {
+                                        if (lat != null && lon != null) {
+                                            if (is_restaurant_near_without_position(new LatLng(lat, lon), range)) {
+                                                DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
+                                                ref2.addValueEventListener(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot snapshot) {
+                                                        RestaurantPreview snap_r_p = snapshot.getValue(RestaurantPreview.class);
+                                                        //restaurants_previews_list.add(snap_r_p);
+                                                        Log.d("prova", "added no search");
+                                                        mAdapter.addItem(snap_r_p);
+                                                        mClusterManager.addItem(new MyItem(lat, lon));
+                                                        mClusterManager.cluster();
+                                                    }
 
-                                                        @Override
-                                                        public void onCancelled(DatabaseError firebaseError) {
-                                                            System.out.println("The read failed: " + firebaseError.getMessage());
-                                                        }
-                                                    });
-                                                }
+                                                    @Override
+                                                    public void onCancelled(DatabaseError firebaseError) {
+                                                        System.out.println("The read failed: " + firebaseError.getMessage());
+                                                    }
+                                                });
                                             }
                                         }
                                     }
@@ -777,6 +785,8 @@ public class UserRestaurantList extends AppCompatActivity
                     case LocationSettingsStatusCodes.SUCCESS:
                         // All location settings are satisfied. The client can initialize location
                         // requests here.
+                        startLocationUpdates();
+                        read_restaurants_from_firebase(true);
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         // Location settings are not satisfied. But could be fixed by showing the user
@@ -930,10 +940,18 @@ public class UserRestaurantList extends AppCompatActivity
                 }
 
                 if(coordinates != null){
+                    Log.d("prova", "coordinates");
                     searchedPosition = coordinates;
                     read_restaurants_from_firebase(false);
                 }
 
+            }
+        }
+
+        if(requestCode == REQUEST_CHECK_SETTINGS){
+            if(resultCode == RESULT_OK){
+                mRequestingLocationUpdates = true;
+                startLocationUpdates();
             }
         }
     }

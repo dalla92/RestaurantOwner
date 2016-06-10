@@ -212,11 +212,11 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
                         for (DataSnapshot data : dataSnapshot.getChildren()) {
                             target = data.getValue(User.class);
                         }
-                        HashMap<String, Boolean> providers = target.getProviders();
+                        /*HashMap<String, Boolean> providers = target.getProviders();
                         if(!providers.containsKey(targetProvider)){
                             providers.put(targetProvider, true);
-                        }
-                        userRef.child(target.getUser_id()).child("providers").setValue(providers);
+                        }*/
+                        userRef.child(target.getUser_id()).child("providers/" + targetProvider).setValue(true);
 
                         hideProgressDialog();
                         Intent i = new Intent(LoginManagerActivity.this, UserRestaurantList.class);
@@ -302,10 +302,7 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     String password = input.getText().toString();
-                                    if (providers.containsKey("google"))
-                                        mergeWithPassword(password, true, token);
-                                    else
-                                        mergeWithPassword(password, false, token);
+                                    mergeWithPassword(password, token);
                                 }
                             });
                             alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -345,7 +342,7 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
         });
     }
 
-    private void mergeWithPassword(String password, final boolean mergeWithGoogle, final String token) {
+    private void mergeWithPassword(String password, final String token) {
         AuthCredential credential = EmailAuthProvider.getCredential(fbEmail, password);
         mAuth.signInWithCredential(credential)
                 .addOnSuccessListener(this, new OnSuccessListener<AuthResult>() {
@@ -357,9 +354,8 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
                                 .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                                     @Override
                                     public void onSuccess(AuthResult authResult) {
-                                        if (!mergeWithGoogle) {
-                                            handleFirebaseAuthResult(authResult);
-                                        }
+                                        handleFirebaseAuthResult(authResult);
+
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

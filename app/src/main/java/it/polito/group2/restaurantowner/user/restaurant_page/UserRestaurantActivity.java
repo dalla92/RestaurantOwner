@@ -780,7 +780,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserRestaurantActivity.this, UserTableReservationActivity.class);
-                //intent.putExtra("Restaurant", targetRestaurant);
+                intent.putExtra("restaurant", targetRestaurant);
                 startActivity(intent);
             }
         });

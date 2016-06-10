@@ -105,6 +105,10 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         notifyDataSetChanged();
     }
 
+    public RestaurantPreview getItem(int position){
+        return mDataset.get(position);
+    }
+
     protected ArrayList<RestaurantPreview> filter(String category, boolean lunch, boolean dinner, boolean price1, boolean price2, boolean price3, boolean price4, Marker marker, double range) {
         //filter by category
         ArrayList<RestaurantPreview> nResList = new ArrayList<RestaurantPreview>();
