@@ -77,11 +77,14 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
 import it.polito.group2.restaurantowner.user.restaurant_page.Filter;
@@ -125,6 +128,7 @@ public class UserRestaurantList extends AppCompatActivity
     private Toolbar toolbar;
     private TextView search;
     private FloatingActionButton fab;
+    public static int index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -434,7 +438,7 @@ public class UserRestaurantList extends AppCompatActivity
         resPreviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot data: dataSnapshot.getChildren()){
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
                     RestaurantPreview resPreview = data.getValue(RestaurantPreview.class);
                     Double lat = resPreview.getLat();
                     Double lon = resPreview.getLon();
@@ -448,8 +452,7 @@ public class UserRestaurantList extends AppCompatActivity
                                 mClusterManager.cluster();
                             }
                         }
-                    }
-                    else {
+                    } else {
                         //if I have the location searched by the user
                         if (lat != null && lon != null) {
                             if (is_restaurant_near_without_position(new LatLng(lat, lon), range)) {
@@ -800,12 +803,9 @@ public class UserRestaurantList extends AppCompatActivity
                 boolean price3 = data.getExtras().getBoolean("ThreeEuro");
                 boolean price4 = data.getExtras().getBoolean("FourEuro");
                 double range = data.getExtras().getDouble("range", DEFAULT_RANGE);
+                this.range = range;
                 mClusterManager.clearItems();
-                restaurants_previews_list = mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range);
-                for(RestaurantPreview r_p : restaurants_previews_list){
-                    mClusterManager.addItem(new MyItem(r_p.getLat(), r_p.getLon()));
-                    mClusterManager.cluster();
-                }
+                filter(cat, lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range);
             }
         }
         if(requestCode == ACTION_SEARCH){
@@ -861,6 +861,73 @@ public class UserRestaurantList extends AppCompatActivity
                 startLocationUpdates();
             }
         }
+    }
+
+    protected void filter(final String category, final boolean lunch, final boolean dinner, final boolean price1, final boolean price2, final boolean price3, final boolean price4, final Marker marker, final double range) {
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        //filter by time
+        final Calendar today = Calendar.getInstance();
+        restaurants_previews_list = mAdapter.getPreviews();
+        for (index = 0; index < restaurants_previews_list.size()-1; index++) {
+            DatabaseReference resPreviewRef = firebase.getReference("restaurants/" + restaurants_previews_list.get(index).getRestaurant_id() + "/restaurant_time_slot");
+            resPreviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    ArrayList<RestaurantPreview> filtered_restaurants_previews_list = new ArrayList<RestaurantPreview>();
+                    for (DataSnapshot snap_slot : snapshot.getChildren()) {
+                        RestaurantTimeSlot timeSlot = snap_slot.getValue(RestaurantTimeSlot.class);
+                        if (timeSlot.getDay_of_week() == today.get(Calendar.DAY_OF_WEEK) - 2) {
+                            boolean addRes = true;
+                            if (lunch && !timeSlot.getLunch())
+                                addRes = false;
+                            if (dinner && !timeSlot.getDinner())
+                                addRes = false;
+                            if (addRes) {
+                                if (category.equals("0")){
+                                    if (price1 && restaurants_previews_list.get(index).getRestaurant_price_range() == 1 ||
+                                            price2 && restaurants_previews_list.get(index).getRestaurant_price_range() == 2 ||
+                                            price3 && restaurants_previews_list.get(index).getRestaurant_price_range() == 3 ||
+                                            price4 && restaurants_previews_list.get(index).getRestaurant_price_range() == 4 )
+                                        if (is_restaurant_near(new LatLng(restaurants_previews_list.get(index).getPosition().latitude, restaurants_previews_list.get(index).getPosition().longitude), mLastUserMarker, range)) {
+                                            filtered_restaurants_previews_list.add(restaurants_previews_list.get(index));
+                                            mClusterManager.addItem(new MyItem(restaurants_previews_list.get(index).getLat(), restaurants_previews_list.get(index).getLon()));
+                                            mClusterManager.cluster();
+                                            mAdapter.notifyDataSetChanged();
+                                        }
+                                }
+                                else{
+                                    if (restaurants_previews_list.get(index).getRestaurant_category().equals(category))
+                                        if (price1 && restaurants_previews_list.get(index).getRestaurant_price_range() == 1 ||
+                                                price2 && restaurants_previews_list.get(index).getRestaurant_price_range() == 2 ||
+                                                price3 && restaurants_previews_list.get(index).getRestaurant_price_range() == 3 ||
+                                                price4 && restaurants_previews_list.get(index).getRestaurant_price_range() == 4 )
+                                            if (is_restaurant_near(new LatLng(restaurants_previews_list.get(index).getPosition().latitude, restaurants_previews_list.get(index).getPosition().longitude), mLastUserMarker, range)) {
+                                                filtered_restaurants_previews_list.add(restaurants_previews_list.get(index));
+                                                mClusterManager.addItem(new MyItem(restaurants_previews_list.get(index).getLat(), restaurants_previews_list.get(index).getLon()));
+                                                mClusterManager.cluster();
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+
+                                }
+                                }
+
+                            }
+                        }
+                    }
+
+                @Override
+                public void onCancelled(DatabaseError firebaseError) {
+                }
+            });
+        }
+    }
+
+    public boolean is_restaurant_near(LatLng res_position, Marker mLastUserMarker, double range) {
+        double distance = calculate_distance2(res_position, mLastUserMarker.getPosition());
+        if (distance < range) {
+            return true;
+        } else
+            return false;
     }
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
@@ -941,6 +1008,7 @@ public class UserRestaurantList extends AppCompatActivity
                 Circle circle = mMap.addCircle(new CircleOptions()
                         .center(new LatLng(mLastUserMarker.getPosition().latitude, mLastUserMarker.getPosition().longitude))
                         .radius(range)
+                        .strokeWidth(5)
                         .strokeColor(Color.BLACK));
                 //.fillColor(Color.BLUE)
 

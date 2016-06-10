@@ -53,6 +53,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
     public static int today_month;
     public static int today_year;
     public static int total_tables_number;
+    public static int index;
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public UserRestaurantPreviewAdapter(ArrayList<RestaurantPreview> myDataset, Context myContext, Marker mLastUserMarker) {
@@ -63,6 +64,10 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         today_day = today.get(Calendar.DAY_OF_MONTH);
         today_month = today.get(Calendar.MONTH);
         today_year = today.get(Calendar.YEAR);
+    }
+
+    public ArrayList<RestaurantPreview> getPreviews(){
+        return this.mDataset;
     }
 
     // Create new views (invoked by the layout manager)
@@ -104,83 +109,6 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
 
     public RestaurantPreview getItem(int position){
         return mDataset.get(position);
-    }
-
-    protected ArrayList<RestaurantPreview> filter(String category, boolean lunch, boolean dinner, boolean price1, boolean price2, boolean price3, boolean price4, Marker marker, double range) {
-        /*
-        FirebaseDatabase firebase;
-        firebase.getInstance();
-        Firebase ref = new Firebase("https://dinosaur-facts.firebaseio.com/dinosaurs");
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                // do some stuff once
-            }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-            }
-        });
-        */
-        //filter by category
-        ArrayList<RestaurantPreview> nResList = new ArrayList<RestaurantPreview>();
-        if (category.equals("0"))
-            nResList = mDataset;
-        else {
-            for (RestaurantPreview res : mDataset) {
-                if (res.getRestaurant_category().equals(category))
-                    nResList.add(res);
-            }
-        }
-        //filter by time
-        ArrayList<RestaurantPreview> n2ResList = new ArrayList<RestaurantPreview>();
-        Calendar today = Calendar.getInstance();
-        RestaurantTimeSlot timeSlot = null;
-        for (RestaurantPreview res : nResList) {
-            for (RestaurantTimeSlot tSlot : res.getRestaurant_time_slot()) {
-                if (tSlot.getDay_of_week() == today.get(Calendar.DAY_OF_WEEK)) {
-                    timeSlot = tSlot;
-                    break;
-                }
-                boolean addRes = true;
-                if (lunch && !timeSlot.getLunch())
-                    addRes = false;
-                if (dinner && !timeSlot.getDinner())
-                    addRes = false;
-
-                if (addRes)
-                    n2ResList.add(res);
-            }
-        }
-        ArrayList<RestaurantPreview> n3ResList = new ArrayList<RestaurantPreview>();
-        for (RestaurantPreview r : n2ResList) {
-            if (price1 && r.getRestaurant_price_range() == 1) {
-                n3ResList.add(r);
-                continue;
-            }
-            if (price2 && r.getRestaurant_price_range() == 2) {
-                n3ResList.add(r);
-                continue;
-            }
-            if (price3 && r.getRestaurant_price_range() == 3) {
-                n3ResList.add(r);
-                continue;
-            }
-            if (price4 && r.getRestaurant_price_range() == 4) {
-                n3ResList.add(r);
-                continue;
-            }
-        }
-        //filter by range if range is not null
-        List<RestaurantPreview> n4ResList = new ArrayList<RestaurantPreview>();
-        for (RestaurantPreview r : n3ResList) {
-            if (is_restaurant_near(new LatLng(r.getPosition().latitude, r.getPosition().longitude), range)) {
-                n4ResList.add(r);
-            }
-        }
-
-        mDataset = n3ResList;
-        notifyDataSetChanged();
-        return mDataset;
     }
 
     public boolean is_restaurant_near(LatLng res_position, double range) {
@@ -310,7 +238,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        it.polito.group2.restaurantowner.firebasedata.TableReservation snap_t_b = (it.polito.group2.restaurantowner.firebasedata.TableReservation) dataSnapshot.getValue();
+                        TableReservation snap_t_b = (TableReservation) dataSnapshot.getValue(TableReservation.class);
                         Calendar that = snap_t_b.getTable_reservation_date();
                         int that_day = that.get(Calendar.DAY_OF_MONTH);
                         int that_month = that.get(Calendar.MONTH);

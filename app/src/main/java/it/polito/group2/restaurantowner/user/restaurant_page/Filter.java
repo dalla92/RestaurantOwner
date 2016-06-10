@@ -38,7 +38,8 @@ public class Filter extends AppCompatActivity {
     private Spinner category;
     private SeekBar seekBar;
     private TextView textView;
-    private double range = 5000;
+    private int DEFAULT_RANGE = 5000;
+    private double range = DEFAULT_RANGE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +60,12 @@ public class Filter extends AppCompatActivity {
         seekBar = (SeekBar) findViewById(R.id.seekBar1);
         textView = (TextView) findViewById(R.id.textView1);
 
+        CBlunch.setChecked(true);
+        CBdinner.setChecked(true);
+
         // seekbar and textview management
-        seekBar.setMax(5000); //5  km at maximum of range
+        seekBar.setMax(DEFAULT_RANGE); //5  km at maximum of range
+        seekBar.setProgress(DEFAULT_RANGE);
         textView.setText(seekBar.getProgress() + "/" + formatNumber(seekBar.getMax()));
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -74,7 +79,7 @@ public class Filter extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                textView.setText(range + "/" + seekBar.getMax());
+                textView.setText(range + "/" + formatNumber(seekBar.getMax()));
             }
         });
 
