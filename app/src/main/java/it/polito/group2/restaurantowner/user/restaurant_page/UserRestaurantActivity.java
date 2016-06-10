@@ -10,7 +10,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -31,13 +30,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
@@ -54,14 +51,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
-
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
-
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
@@ -75,12 +69,7 @@ import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
-import it.polito.group2.restaurantowner.login.LoginManagerActivity;
-import it.polito.group2.restaurantowner.owner.MainActivity;
-import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
-import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.order.OrderActivity;
-import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class UserRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -99,8 +88,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private FloatingActionButton fab;
     private boolean theUserIsTheOwner = false;
     private TextView timesText;
-    private Query q_meals;
-    private ValueEventListener l_meals;
     private Query q_reviews;
     private ChildEventListener l_reviews;
 
@@ -120,13 +107,13 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         coverPicture = (ImageView) findViewById(R.id.user_restaurant_image);
         fab = (FloatingActionButton) findViewById(R.id.bookmark_fab);
         firebase = FirebaseDatabase.getInstance();
-
-        //FirebaseAuth.getInstance().signOut();
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null)
             restaurantID = getIntent().getExtras().getString("restaurant_id");
 
-        q_meals = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
+        Query mealsQuery = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
         q_reviews = firebase.getReference("reviews/" + restaurantID).orderByPriority();
 
         DatabaseReference restaurantRef = firebase.getReference("restaurants/" + restaurantID);
@@ -170,38 +157,12 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                             .with(UserRestaurantActivity.this)
                             .load(R.drawable.no_image)
                             .fitCenter()
-                            .listener(new RequestListener<Integer, GlideDrawable>() {
-                                @Override
-                                public boolean onException(Exception e, Integer model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                    return false;
-                                }
-
-                                @Override
-                                public boolean onResourceReady(GlideDrawable resource, Integer model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                    return false;
-                                }
-                            })
                             .into(coverPicture);
                 } else {
                     Glide
                             .with(UserRestaurantActivity.this)
                             .load(photoURL)
                             .fitCenter()
-                            .listener(new RequestListener<String, GlideDrawable>() {
-                                @Override
-                                public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                    return false;
-                                }
-
-                                @Override
-                                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                    FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                    return false;
-                                }
-                            })
                             .into(coverPicture);
                 }
 
@@ -212,16 +173,16 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 else
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
 
-                /*if(targetRestaurant.isOpenNow())
+                if(targetRestaurant.isOpenNow())
                     timesText.setText("Open now");
                 else{
                     timesText.setText("Closed now");
-                }*/
+                }
 
                 setButtons();
                 setRestaurantInfo();
 
-                //setTimesList(targetRestaurant.getRestaurant_time_slot());
+                setTimesList(targetRestaurant.getRestaurant_time_slot());
                 setRestaurantExtraInfo();
             }
 
@@ -261,11 +222,12 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         };
 
-        l_meals = new ValueEventListener() {
+        mealsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot data : dataSnapshot.getChildren())
                     meals.add(data.getValue(Meal.class));
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
                 categories = getCategoryList();
                 setRestaurantMenu();
             }
@@ -273,7 +235,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("prova", "meals cancelled");
             }
-        };
+        });
 
         offers = getOffersJSON();
 
@@ -289,15 +251,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUtil.initProgressDialog(this);
-        FirebaseUtil.showProgressDialog(mProgressDialog);
-        q_meals.addValueEventListener(l_meals);
-        q_meals.addValueEventListener(l_meals);
+        q_reviews.addChildEventListener(l_reviews);
     }
     @Override
     protected void onStop() {
         super.onStop();
-        RemoveListenerUtil.remove_value_event_listener(q_meals, l_meals);
         RemoveListenerUtil.remove_child_event_listener(q_reviews, l_reviews);
     }
 

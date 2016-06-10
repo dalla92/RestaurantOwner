@@ -251,11 +251,17 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                     daySlot.setOpen_lunch_time(lunchOpenTime.get(i));
                     daySlot.setClose_lunch_time(lunchCloseTime.get(i));
                 }
+                else
+                    daySlot.setLunch(false);
+
                 if (!dinnerClosure[i]) {
                     daySlot.setDinner(true);
                     daySlot.setOpen_dinner_time(dinnerOpenTime.get(i));
                     daySlot.setClose_dinner_time(dinnerCloseTime.get(i));
                 }
+                else
+                    daySlot.setDinner(false);
+
                 openTimeList.add(daySlot);
             }
         }
