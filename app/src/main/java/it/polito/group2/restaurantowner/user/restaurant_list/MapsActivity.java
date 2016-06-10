@@ -197,33 +197,6 @@ public class MapsActivity extends AppCompatActivity implements
         if(b!=null && b.getParcelableArrayList("restaurants_previews_list")!=null){ //it must be always this way, because otherwise this activity is not started
             near_restaurants_previews_list = b.getParcelableArrayList("restaurants_previews_list");
         }
-        /*
-        //just for debugging purpose
-        else{
-            RestaurantPreview r_p = new RestaurantPreview();
-            r_p.setRestaurant_id("-KIMqPtRSEdm0Cvfc3Za");
-            r_p.setRestaurant_name("Bella Italia");
-            r_p.setRestaurant_rating((float) 3.7);
-            r_p.setReservations_number(16);
-            r_p.setRestaurant_cover_firebase_URL("https://firebasestorage.googleapis.com/v0/b/have-break-9713d.appspot.com/o/restaurants%2F-KIMqPtRSEdm0Cvfc3Za%2Fcover.jpg?alt=media&token=1977eb09-a51c-440c-b64c-e6d48fe7c316");
-            r_p.setTables_number(100);
-            r_p.setLat(45.0650655);
-            r_p.setLon(7.645966);
-            near_restaurants_previews_list.add(r_p);
-            RestaurantPreview r_p2 = new RestaurantPreview();
-            r_p2.setRestaurant_id("-KIMqPtRSEdm0Cvfc3Za");
-            r_p2.setRestaurant_name("Istanbul");
-            r_p2.setRestaurant_rating((float) 4.7);
-            r_p2.setReservations_number(40);
-            r_p2.setRestaurant_cover_firebase_URL("https://www.flickr.com/photos/142675931@N04/26796728940/in/dateposted-public/");
-            r_p2.setTables_number(50);
-            r_p2.setLat(45.0613068);
-            r_p2.setLon(7.6501717);
-            near_restaurants_previews_list.add(r_p2);
-
-            //add_restaurant_preview_if_near();
-        }
-        */
 
         if (savedInstanceState != null) {
             if (savedInstanceState.keySet().contains(REQUESTING_LOCATION_UPDATES_KEY)) {
@@ -295,18 +268,22 @@ public class MapsActivity extends AppCompatActivity implements
 
     private void updateUI() {
         if(mMap!=null) {
-            mMap.clear();
+            //mMap.clear();
             if (mCurrentLocation != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), DEFAULT_ZOOM2));
                 mLastUpdateTimeTextView.setText(String.format("%s: %s", mLastUpdateTimeLabel, mLastUpdateTime));
-                mLastUserMarker = mMap.addMarker(new MarkerOptions()
-                                .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
-                                .title("Your position")
-                                        //.snippet("Population: 2,074,200")
-                                .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
-                                .visible(false)
-                );
+                /*
+                if(mLastUserMarker==null) {
+                    mLastUserMarker = mMap.addMarker(new MarkerOptions()
+                                    .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
+                                    .title("Your position")
+                                            //.snippet("Population: 2,074,200")
+                                    .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
+                                    .visible(false)
+                    );
+                }
                 mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+                */
                 prepare_clustering();
                 if(DEFAULT_RADIUS!=0){
                     //add circle

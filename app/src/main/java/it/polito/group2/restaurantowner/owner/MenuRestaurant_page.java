@@ -30,7 +30,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
     public Restaurant current_restaurant;
     public Context context;
     private FirebaseDatabase firebase;
-    private Query q;
+    private DatabaseReference q;
     private ValueEventListener l;
     private ProgressDialog mProgressDialog;
     private Activity a;
@@ -82,6 +82,9 @@ public class MenuRestaurant_page extends AppCompatActivity {
         context = this;
         a = this;
         firebase = FirebaseDatabase.getInstance();
+
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id") != null)
             restaurant_id = getIntent().getExtras().getString("restaurant_id");
@@ -123,7 +126,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
     }
     
     private void get_data_from_firebase(){
-        Query q = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+restaurant_id);
+        DatabaseReference q = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+restaurant_id);
         l = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -195,8 +198,6 @@ public class MenuRestaurant_page extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUtil.initProgressDialog(this);
-        FirebaseUtil.showProgressDialog(mProgressDialog);
         q.addValueEventListener(l);
     }
     @Override

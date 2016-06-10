@@ -85,8 +85,6 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
     }
 
     public void get_favourites_from_firebase(){
-        FirebaseUtil.showProgressDialog(mProgressDialog);
-
         DatabaseReference ref = firebase.getReference("users");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -146,6 +144,7 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
                                 }
                             }
                         }
+
                 FirebaseUtil.hideProgressDialog(mProgressDialog);
 
             }

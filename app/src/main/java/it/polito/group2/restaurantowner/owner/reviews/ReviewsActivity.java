@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.owner.reviews;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.design.widget.NavigationView;
@@ -53,6 +54,7 @@ public class ReviewsActivity extends AppCompatActivity implements NavigationView
     private boolean moreReviews;
     private RecyclerView mRecyclerView;
     private String restaurantID;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +88,9 @@ public class ReviewsActivity extends AppCompatActivity implements NavigationView
 
         firebase = FirebaseDatabase.getInstance();
 
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+
         Query reviewsQuery = firebase.getReference("reviews/" + restaurantID).orderByPriority().limitToFirst(10);
         reviewsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -96,6 +101,8 @@ public class ReviewsActivity extends AppCompatActivity implements NavigationView
                     mAdapter.notifyItemInserted(reviews.size());
                     lastKnownKey = data.getKey();
                 }
+
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
 
                 moreReviews = reviews.size() == 10;
                 mAdapter.updateScrollListener(moreReviews);

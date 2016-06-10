@@ -48,6 +48,9 @@ public class TableFragment extends Fragment {
 
         Bundle bundle = getArguments();
         String restaurantId = bundle.getString("restaurant_id");
+        
+        FirebaseUtil.initProgressDialog(getActivity());
+        FirebaseUtil.showProgressDialog(mProgressDialog);
 
         firebase = FirebaseDatabase.getInstance();
 
@@ -171,8 +174,6 @@ public class TableFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        FirebaseUtil.initProgressDialog(getActivity());
-        FirebaseUtil.showProgressDialog(mProgressDialog);
         q.addValueEventListener(l);
     }
     @Override

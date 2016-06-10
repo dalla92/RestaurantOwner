@@ -113,7 +113,9 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
 
         storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com");
         firebase = FirebaseDatabase.getInstance();
-        mProgressDialog = FirebaseUtil.initProgressDialog(this);
+
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
 
         setDrawerAndGetUser();
 		

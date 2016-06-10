@@ -93,7 +93,7 @@ public class Restaurant_page extends AppCompatActivity
     public ArrayList<Review> reviews = new ArrayList<>();
     public Restaurant my_restaurant = null;
     public Context context;
-    private Query q;
+    private DatabaseReference q;
     private Query q2;
     private ValueEventListener l;
     private ChildEventListener l2;
@@ -119,10 +119,10 @@ public class Restaurant_page extends AppCompatActivity
 
         if(b!=null)
             restaurant_id = b.getString("RestaurantId");
-        /*
-        if(restaurant_id==null)
-            restaurant_id = "-KI8xQ4PDVSKKjnRGmdG";
-        */
+
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+
         //get and fill related data
         get_data_from_firebase();
 
@@ -207,6 +207,7 @@ public class Restaurant_page extends AppCompatActivity
                 my_restaurant = snapshot.getValue(Restaurant.class);
                 if(my_restaurant!=null)
                     fill_data();
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
             }
             @Override
             public void onCancelled(DatabaseError firebaseError) {
@@ -252,7 +253,7 @@ public class Restaurant_page extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         //FirebaseUtil.initProgressDialog(this);
-        q.addValueEventListener(l);
+        q.addListenerForSingleValueEvent(l);
         q2.addChildEventListener(l2);
     }
     @Override

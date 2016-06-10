@@ -45,7 +45,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.timessquare.CalendarCellDecorator;
 import com.squareup.timessquare.CalendarPickerView;
@@ -81,7 +81,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
     private ArrayList<TableReservation> reservations_that_day = new ArrayList<TableReservation>();
     private String user_id;
     private FirebaseDatabase firebase;
-    private Query q;
+    private DatabaseReference q;
     private ValueEventListener l;
     private ProgressDialog mProgressDialog;
 

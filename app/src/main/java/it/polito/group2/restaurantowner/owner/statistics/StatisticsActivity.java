@@ -39,6 +39,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -58,7 +59,10 @@ public class StatisticsActivity extends AppCompatActivity
     private Toolbar toolbar;
     private ProgressDialog mProgressDialog;
     public int MODIFY_INFO = 4;
-
+    private Query q_orders;
+    private ValueEventListener l_orders;
+    private Query q_reservations;
+    private ValueEventListener l_reservations;
     private String restaurantID;
     ArrayList<Order> orderList = null;
     ArrayList<TableReservation> reservationList = null;
@@ -82,19 +86,19 @@ public class StatisticsActivity extends AppCompatActivity
         if (getIntent().getExtras() == null || getIntent().getExtras().getString("restaurant_id") == null)
             abortActivity();
         restaurantID = getIntent().getExtras().getString("restaurant_id");
-        Query ordersRef = FirebaseUtil.getOrdersByRestaurantRef(restaurantID);
-        if (ordersRef == null)
+        q_orders = FirebaseUtil.getOrdersByRestaurantRef(restaurantID);
+        if (q_orders == null)
             abortActivity();
-        Query reservationsRef = FirebaseUtil.getOrdersByRestaurantRef(restaurantID);
-        if (reservationsRef == null)
+        q_reservations = FirebaseUtil.getOrdersByRestaurantRef(restaurantID);
+        if (q_reservations == null)
             abortActivity();
 
         assert userRef != null;
-        userRef.addValueEventListener(new ValueEventListener() {
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
-                FirebaseUtil.hideProgressDialog(mProgressDialog);
                 setDrawer(user);
             }
 
@@ -103,8 +107,8 @@ public class StatisticsActivity extends AppCompatActivity
             }
         });
 
-        if (ordersRef != null) {
-            ordersRef.addValueEventListener(new ValueEventListener() {
+        if (q_orders != null) {
+            l_orders = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     ArrayList<Order> orders = new ArrayList<>();
@@ -118,17 +122,18 @@ public class StatisticsActivity extends AppCompatActivity
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
-            });
+            };
         }
 
-        if (reservationsRef != null) {
-            reservationsRef.addValueEventListener(new ValueEventListener() {
+        if (q_reservations != null) {
+            l_reservations = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     ArrayList<TableReservation> reservations = new ArrayList<>();
                     for (DataSnapshot d : dataSnapshot.getChildren()) {
                         reservations.add(d.getValue(TableReservation.class));
                     }
+                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                     reservationList = reservations;
                     getStart(false);
                 }
@@ -136,9 +141,24 @@ public class StatisticsActivity extends AppCompatActivity
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
                 }
-            });
+            };
         }
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+        q_reservations.addValueEventListener(l_reservations);
+        q_orders.addValueEventListener(l_orders);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RemoveListenerUtil.remove_value_event_listener(q_orders, l_orders);
+        RemoveListenerUtil.remove_value_event_listener(q_reservations, l_reservations);
     }
 
     private synchronized void getStart(boolean orders) {

@@ -469,7 +469,7 @@ public class UserRestaurantList extends AppCompatActivity
                                         if (lat != null && lon != null) {
                                             if (is_restaurant_near_without_position(new LatLng(lat, lon), range)) {
                                                 DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
-                                                ref2.addValueEventListener(new ValueEventListener() {
+                                                ref2.addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(DataSnapshot snapshot) {
                                                         RestaurantPreview snap_r_p = snapshot.getValue(RestaurantPreview.class);

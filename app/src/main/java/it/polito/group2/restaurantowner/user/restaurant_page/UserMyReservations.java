@@ -76,7 +76,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
     private int j=0;
     private ProgressDialog mProgressDialog;
     private FirebaseDatabase firebase;
-    private Query q;
+    private DatabaseReference q;
     private ValueEventListener l;
 
     @Override
@@ -303,8 +303,6 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUtil.initProgressDialog(this);
-        FirebaseUtil.showProgressDialog(mProgressDialog);
         q.addValueEventListener(l);
     }
     @Override
