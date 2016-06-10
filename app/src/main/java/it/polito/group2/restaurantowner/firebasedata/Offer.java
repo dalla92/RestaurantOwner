@@ -76,6 +76,7 @@ public class Offer implements Serializable {
         offerOnWeekDays.set(weekDay, false);
     }
 
+    //TODO cambiare il nome
     public Double getNewMealPrice(Meal meal, Calendar day) {
         Double price = meal.getMeal_price();
         if(isNowInOffer(day)) {
@@ -153,6 +154,7 @@ public class Offer implements Serializable {
             offerOnMeals.remove(meal.getMeal_id());
     }
 
+    //TODO cambiare il nome
     public ArrayList<String> getCategoryList() {
         ArrayList<String> list = new ArrayList<>();
         for(String key : offerOnCategories.keySet()) {
@@ -163,6 +165,7 @@ public class Offer implements Serializable {
         return list;
     }
 
+    //TODO cambiare il nome
     public ArrayList<String> getMealList() {
         ArrayList<String> list = new ArrayList<>();
         for(String key : offerOnMeals.keySet()) {

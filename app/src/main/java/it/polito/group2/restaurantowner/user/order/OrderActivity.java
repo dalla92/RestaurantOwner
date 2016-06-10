@@ -522,11 +522,25 @@ public class OrderActivity extends AppCompatActivity
         return categoryList;
     }
 
+    private ArrayList<Meal> filterAvailableMeals(ArrayList<Meal> meals) {
+        ArrayList<Meal> list = new ArrayList<>();
+        for(Meal m : meals) {
+            if(m.getMealAvailable() && m.getMealTakeAway()) {
+                list.add(m);
+            }
+        }
+        return list;
+    }
+
     //ACTIVITY FUNCTIONS ===========================================================================
 
     private synchronized void startOrder(ArrayList<Meal> meals) {
-        mealList = meals;
-        checkForStart();
+        if(meals.size() <=0) {
+            tempCreateFakeMeals(restaurantID);
+        } else {
+            mealList = filterAvailableMeals(meals);
+            checkForStart();
+        }
     }
 
     private synchronized void startOrder(Restaurant r) {
@@ -641,5 +655,32 @@ public class OrderActivity extends AppCompatActivity
         intent.putExtra("restaurant_id", restaurantID);
         startActivity(intent);
         finish();
+    }
+
+    //TODO quando il sistema è a regime eliminare questo metodo
+    private void tempCreateFakeMeals(String restID) {
+        String[] cats = {"Primi", "Secondi", "Contorni", "Frutta", "Bevande", "Dolci", "Antipasti", "Specialità"};
+        DatabaseReference mealsReference = FirebaseUtil.getMealsRef(restID);
+        for(int i=0; i<100; i++) {
+            Meal meal = new Meal();
+            meal.setMeal_price(5.0);
+            meal.setMeal_category(cats[i%8]);
+            meal.setMeal_cooking_time(5);
+            meal.setMeal_description("Meal " + i + " description.");
+            meal.setMeal_name("Meal " + i + " name");
+            meal.setMealAvailable(true);
+            meal.setMealTakeAway(true);
+            meal.setRestaurant_id(restID);
+            ArrayList<MealAddition> additions = new ArrayList<>();
+            for(int j=0; j<10; j++) {
+                MealAddition add = new MealAddition();
+                add.setMeal_addition_name("Addition "+j+" name");
+                add.setMeal_addition_price(1.0);
+            }
+            meal.addManyAdditions(additions);
+            DatabaseReference keyReference = mealsReference.push();
+            meal.setMeal_id(keyReference.getKey());
+            keyReference.setValue(meal);
+        }
     }
 }
