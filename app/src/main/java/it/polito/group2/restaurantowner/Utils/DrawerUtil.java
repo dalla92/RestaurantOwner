@@ -161,7 +161,7 @@ public class DrawerUtil {
             }
             return true;
         } else if(id==R.id.action_statistics){
-            if (a instanceof StatisticsActivity) {
+            if (a instanceof StatisticsActivity ) {
                 drawer.closeDrawer(GravityCompat.START);
             }
             else {

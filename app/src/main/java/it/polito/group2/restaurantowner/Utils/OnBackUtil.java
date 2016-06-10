@@ -28,9 +28,6 @@ public class OnBackUtil {
     }
 
     public static void clean_stack_and_exit_application(Context c, Activity a) {
-        Intent intent = new Intent(c, UserRestaurantList.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        c.startActivity(intent);
         a.finish();
     }
 }

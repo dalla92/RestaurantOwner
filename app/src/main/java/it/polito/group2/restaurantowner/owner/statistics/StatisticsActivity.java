@@ -36,7 +36,9 @@ import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -356,103 +358,17 @@ public class StatisticsActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        assert drawer != null;
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            OnBackUtil.clean_stack_and_go_to_main_activity(this);
         }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-// Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (id == R.id.action_my_restaurants) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MainActivity.class);
-            startActivity(intent1);
-            return true;
-        } else if (id == R.id.action_show_as) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantActivity.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurantID);
-            intent1.putExtras(b);
-            startActivity(intent1);
-            return true;
-        } else if (id == R.id.action_gallery) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    GalleryViewActivity.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurantID);
-            intent1.putExtras(b);
-            startActivity(intent1);
-            return true;
-        } else if (id == R.id.action_menu) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MenuRestaurant_page.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurantID);
-            intent1.putExtras(b);
-            startActivity(intent1);
-            return true;
-        } else if (id == R.id.action_offers) {
-            Intent intent2 = new Intent(
-                    getApplicationContext(),
-                    MyOffersActivity.class);
-            Bundle b2 = new Bundle();
-            b2.putString("restaurant_id", restaurantID);
-            intent2.putExtras(b2);
-            startActivity(intent2);
-            return true;
-        } else if (id == R.id.action_reservations) {
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    ReservationActivity.class);
-            Bundle b3 = new Bundle();
-            b3.putString("restaurant_id", restaurantID);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        } else if (id == R.id.action_reviews) {
-            Intent intent4 = new Intent(
-                    getApplicationContext(),
-                    ReviewsActivity.class); //here Filippo must insert his class name
-            Bundle b4 = new Bundle();
-            b4.putString("restaurant_id", restaurantID);
-            intent4.putExtras(b4);
-            startActivity(intent4);
-            return true;
-        } else if (id == R.id.action_statistics) {
-            Intent intent5 = new Intent(
-                    getApplicationContext(),
-                    StatisticsActivity.class); //here Filippo must insert his class name
-            Bundle b5 = new Bundle();
-            b5.putString("restaurant_id", restaurantID);
-            intent5.putExtras(b5);
-            startActivity(intent5);
-            return true;
-        } else if (id == R.id.action_edit) {
-            Intent intent6 = new Intent(
-                    getApplicationContext(),
-                    AddRestaurantActivity.class);
-            intent6.putExtra("Restaurant", "");
-            final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
-            assert appbar != null;
-            appbar.setExpanded(false);
-            startActivityForResult(intent6, MODIFY_INFO);
-            return true;
-        }
-        assert drawer != null;
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        return DrawerUtil.drawer_owner_not_restaurant_page(this, item, restaurantID);
     }
 
     private void setDrawer(User user) {

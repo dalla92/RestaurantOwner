@@ -52,15 +52,13 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.Cluster;
@@ -79,15 +77,8 @@ import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.firebasedata.User;
-import it.polito.group2.restaurantowner.login.LoginManagerActivity;
-import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
-import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
-import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.Filter;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 import it.polito.group2.restaurantowner.user.search.SearchActivity;
 
@@ -123,7 +114,6 @@ public class UserRestaurantList extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     PermissionListener dialogPermissionListener_gps;
-    private int current_index, total_index;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private Toolbar toolbar;
@@ -192,14 +182,6 @@ public class UserRestaurantList extends AppCompatActivity
                     startActivityForResult(intent, ACTION_SEARCH);
                 }
             });
-
-/*        DatabaseReference.setAndroidContext(this);
-        geoFire = new GeoFire(new DatabaseReference("https://flickering-fire-455.firebaseio.com/"));
-*/
-            // GoogleMapOptions options = new GoogleMapOptions().liteMode(true);
-            //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-            ////SupportMapFragment mapFragment = SupportMapFragment.newInstance(options);
-            // mapFragment.getMapAsync(this);
 
             mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
             // use this setting to improve performance if you know that changes
@@ -438,10 +420,9 @@ public class UserRestaurantList extends AppCompatActivity
     public void read_restaurants_from_firebase(final boolean isPositionUp){
         mAdapter.clear();
         FirebaseUtil.showProgressDialog(mProgressDialog);
-        current_index = 0;
         //I want to get all restaurants within 2Km: I get all the ids of the restaurants, for each id I get its latitude and longitude, and if distance<2km I add it to restaurant_preview_list and cluster_manager
-        Query restaurantQuery = firebase.getReference("restaurant_names");
-        restaurantQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseReference restaurantDatabaseReference = firebase.getReference("restaurant_names");
+        restaurantDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
@@ -460,6 +441,7 @@ public class UserRestaurantList extends AppCompatActivity
                                     Double snap_long = snapshot.getValue(Double.class);
                                     final Double lon = snap_long;
                                     if (isPositionUp) {
+                                        //if i have the position of the user
                                         if (lat != null && lon != null) {
                                             if (is_restaurant_near_with_position(new LatLng(lat, lon), range)) {
                                                 DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "/");
@@ -481,7 +463,9 @@ public class UserRestaurantList extends AppCompatActivity
                                                 });
                                             }
                                         }
-                                    } else {
+                                    }
+                                    else {
+                                        //if I have the location searched by the user
                                         if (lat != null && lon != null) {
                                             if (is_restaurant_near_without_position(new LatLng(lat, lon), range)) {
                                                 DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
@@ -699,17 +683,13 @@ public class UserRestaurantList extends AppCompatActivity
     protected void onStop() {
         super.onStop();
         mGoogleApiClient.disconnect();
-/*        if(geoQuery!=null)
-            geoQuery.removeAllListeners();
-*/    }
+    }
 
     @Override
     protected void onStart() {
         super.onStart();
         if(!haveNetworkConnection())
             create_dialog(this);
-        else
-            grantPermissions();
     }
 
     public void settingsrequest(){
@@ -730,12 +710,14 @@ public class UserRestaurantList extends AppCompatActivity
                 final LocationSettingsStates state = result.getLocationSettingsStates();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
+                        //I have already the GPS activated
                         // All location settings are satisfied. The client can initialize location
                         // requests here.
                         startLocationUpdates();
                         read_restaurants_from_firebase(true);
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
+                        //GPS permission is requested
                         // Location settings are not satisfied. But could be fixed by showing the user
                         // a dialog.
                         try {
@@ -755,70 +737,6 @@ public class UserRestaurantList extends AppCompatActivity
         });
     }
 
-    /*@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.user_restaurant_list, menu);
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        switch (item.getItemId()) {
-
-            case R.id.action_filter:
-                Intent intent = new Intent(this, Filter.class);
-                startActivityForResult(intent, ACTION_FILTER);
-                return true;
-
-            default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
-                return super.onOptionsItemSelected(item);
-
-        }
-    }*/
-
-
-    /*    @Override
-        protected DatabaseReference getDatabaseReferenceRef() {
-            DatabaseReference rootRef = new DatabaseReference("https://flickering-fire-455.firebaseio.com/my/data");
-            // Return your DatabaseReference ref
-            return rootRef;
-        }
-
-        @Override
-        protected void onDatabaseReferenceLoginProviderError(DatabaseReferenceLoginError firebaseLoginError) {
-            // Handle an error from the authentication provider
-        }
-
-        @Override
-        protected void onDatabaseReferenceLoginUserError(DatabaseReferenceLoginError firebaseLoginError) {
-            // Handle an error from the user
-        }
-
-        @Override
-        public void onDatabaseReferenceLoggedIn(AuthData authData) {
-            // Handle successful login displaying user info in the drawer
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            TextView username = (TextView) drawer.findViewById(R.id.navHeaderUsername);
-            TextView email = (TextView) drawer.findViewById(R.id.navHeaderEmail);
-            username.setText(authData.getUid());
-
-        }
-
-        @Override
-        public void onDatabaseReferenceLoggedOut() {
-            // Handle logout
-        }
-
-    */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
@@ -833,13 +751,6 @@ public class UserRestaurantList extends AppCompatActivity
                 boolean price3 = data.getExtras().getBoolean("ThreeEuro");
                 boolean price4 = data.getExtras().getBoolean("FourEuro");
                 double range = data.getExtras().getDouble("range", DEFAULT_RANGE);
-
-                /*if(data.getExtras().get("range")!=null) {
-                    range = data.getExtras().getDouble("range");
-                }
-                else{
-                    range = DEFAULT_RANGE;
-                }*/
                 mClusterManager.clearItems();
                 restaurants_previews_list = mAdapter.filter(cat,lunch, dinner, price1, price2, price3, price4, mLastUserMarker, range);
                 for(RestaurantPreview r_p : restaurants_previews_list){
@@ -871,7 +782,7 @@ public class UserRestaurantList extends AppCompatActivity
                                 RestaurantPreview restaurantPreview = dataSnapshot.getValue(RestaurantPreview.class);
                                 if(restaurantPreview != null) {
                                     mAdapter.addItem(restaurantPreview);
-                                    restaurants_previews_list.add(restaurantPreview);
+                                    //restaurants_previews_list.add(restaurantPreview);
                                 }
 
                                 if(index == restaurantIDs.size() - 1)
@@ -902,158 +813,6 @@ public class UserRestaurantList extends AppCompatActivity
             }
         }
     }
-
-    /*@SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.nav_owner){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MainActivity.class);
-            Bundle b1 = new Bundle();
-            b1.putString("user_id", user_id);
-            intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        }
-        else if(id==R.id.nav_home){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantList.class);
-                Bundle b1 = new Bundle();
-                b1.putString("user_id", user_id);
-                intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        }
-        else if(id==R.id.nav_login){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantList.class);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.nav_my_profile) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserProfile.class);
-                Bundle b1 = new Bundle();
-                b1.putString("user_id", user_id);
-                intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.nav_my_orders) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MyOrdersActivity.class);
-                Bundle b1 = new Bundle();
-                b1.putString("user_id", user_id);
-                intent1.putExtras(b1);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.nav_my_reservations){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    UserMyReservations.class);
-            Bundle b3 = new Bundle();
-                b3.putString("user_id", user_id);
-                intent3.putExtras(b3);
-                startActivity(intent3);
-            return true;
-        } else if(id==R.id.nav_my_reviews){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    MyReviewsActivity.class);
-            Bundle b3 = new Bundle();
-                b3.putString("user_id", user_id);
-                intent3.putExtras(b3);
-                startActivity(intent3);
-            return true;
-        } else if(id==R.id.nav_my_favourites){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    UserMyFavourites.class);
-            Bundle b3 = new Bundle();
-                b3.putString("user_id", user_id);
-                intent3.putExtras(b3);
-                startActivity(intent3);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }*/
-
-    /*    @Override
-        public void onMapReady(GoogleMap googleMap) {
-            Set<String> keySet = resNearby.keySet();
-            for(String key : keySet){
-                map.addMarker(new MarkerOptions()
-                        .position(new LatLng(resNearby.get(key).latitude, resNearby.get(key).longitude))
-                        .title(key));
-            }
-        }
-    */
-
-    /*
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case LOCATION_REQUEST: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay!
-
-                } else {
-
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
-        }
-    }
-    */
-
-    /*    @Override
-        public void onKeyEntered(String key, GeoLocation location) {
-            //search for the restaurant
-            resNearby.put(key,location);
-
-        }
-
-        @Override
-        public void onKeyExited(String key) {
-            //remove restaurant from the adapter
-            resNearby.remove(key);
-        }
-
-        @Override
-        public void onKeyMoved(String key, GeoLocation location) {
-
-        }
-
-        @Override
-        public void onGeoQueryReady() {
-            //query the DatabaseReference database with resNearby
-        }
-
-        @Override
-        public void onGeoQueryError(DatabaseError error) {
-            new AlertDialog.Builder(this)
-                    .setTitle("Error")
-                    .setMessage("There was an unexpected error querying GeoFire: " + error.getMessage())
-                    .setPositiveButton(android.R.string.ok, null)
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .show();
-
-        }
-    */
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 
@@ -1114,6 +873,7 @@ public class UserRestaurantList extends AppCompatActivity
             //mMap.clear();
             if (mCurrentLocation != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), DEFAULT_ZOOM1));
+                /*
                 if(mLastUserMarker == null) {
                     mLastUserMarker = mMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
@@ -1124,8 +884,9 @@ public class UserRestaurantList extends AppCompatActivity
                     );
                 }
                 else {
-                    //mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+                    mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
                 }
+                */
             }
         }
     }
@@ -1159,26 +920,5 @@ public class UserRestaurantList extends AppCompatActivity
         // recommended in applications that request frequent location updates.
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
     }
-
-/*
-@Override
-public void onConnected(Bundle bundle) {
-if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-ActivityCompat.requestPermissions(this,
-        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},LOCATION_REQUEST);
-return;
-}
-else {
-Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-if (mLastLocation != null) {
-    //order list based on current position or make query to firebase
-   geoQuery = geoFire.queryAtLocation(new GeoLocation(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 0.6);
-    geoQuery.addGeoQueryEventListener(this);
-}
-}
-}
-*/
-
 
 }

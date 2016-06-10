@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 
 import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -12,11 +13,11 @@ import com.google.firebase.database.ValueEventListener;
  */
 public class RemoveListenerUtil {
 
-    public static void remove_value_event_listener(Query q, ValueEventListener l){
+    public static void remove_value_event_listener(DatabaseReference q, ValueEventListener l){
         q.removeEventListener(l);
     }
 
-    public static void remove_child_event_listener(Query q, ChildEventListener l){
+    public static void remove_child_event_listener(DatabaseReference q, ChildEventListener l){
         q.removeEventListener(l);
     }
 
