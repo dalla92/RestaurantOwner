@@ -62,7 +62,7 @@
             android:theme="@style/AppTheme.NoActionBar" >
             </activity>
         <activity
-            android:name=".owner.StatisticsActivity"
+            android:name=".owner.statistics.StatisticsActivity"
             android:label="@string/statistics_activity"
             android:parentActivityName=".owner.Restaurant_page"
             android:theme="@style/AppTheme.NoActionBar" />

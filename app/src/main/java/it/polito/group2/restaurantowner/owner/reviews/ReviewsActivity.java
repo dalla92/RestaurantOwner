@@ -2,7 +2,6 @@ package it.polito.group2.restaurantowner.owner.reviews;
 
 import android.content.Intent;
 import android.os.Handler;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -34,19 +32,13 @@ import it.polito.group2.restaurantowner.Utils.OnLoadMoreListener;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
-import it.polito.group2.restaurantowner.login.LoginManagerActivity;
-import it.polito.group2.restaurantowner.owner.AddRestaurantActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
 import it.polito.group2.restaurantowner.owner.SimpleItemTouchHelperCallback;
-import it.polito.group2.restaurantowner.owner.StatisticsActivity;
+import it.polito.group2.restaurantowner.owner.statistics.StatisticsActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
-import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class ReviewsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
