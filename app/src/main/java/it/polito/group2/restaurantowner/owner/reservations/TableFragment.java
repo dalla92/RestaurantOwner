@@ -29,14 +29,17 @@ import java.util.GregorianCalendar;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 
 public class TableFragment extends Fragment {
 
     private ArrayList<TableReservation> reservation_list;
     private BaseAdapter adapter;
-    private FirebaseDatabase firebase;
     private View rootView;
+    private FirebaseDatabase firebase;
+    private Query q;
+    private ValueEventListener l;
     private ProgressDialog mProgressDialog;
 
     @Override
@@ -48,12 +51,8 @@ public class TableFragment extends Fragment {
 
         firebase = FirebaseDatabase.getInstance();
 
-        Query reservationsQuery = firebase.getReference("table_reservations").orderByChild("restaurant_id").equalTo(restaurantId);
-
-        mProgressDialog = FirebaseUtil.initProgressDialog(getActivity());
-        FirebaseUtil.showProgressDialog(mProgressDialog);
-
-        reservationsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        q = firebase.getReference("table_reservations").orderByChild("restaurant_id").equalTo(restaurantId);
+        l = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 reservation_list = new ArrayList<>();
@@ -73,16 +72,13 @@ public class TableFragment extends Fragment {
                     reservation_title.setVisibility(View.GONE);
 
                 FirebaseUtil.hideProgressDialog(mProgressDialog);
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
-
-
+        };
 
         ListView lv = (ListView) rootView.findViewById(R.id.table_list_view);
         adapter = new BaseAdapter() {
@@ -170,6 +166,19 @@ public class TableFragment extends Fragment {
         lv.setAdapter(adapter);
 
         return rootView;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        FirebaseUtil.initProgressDialog(getActivity());
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+        q.addValueEventListener(l);
+    }
+    @Override
+    public void onStop() {
+        super.onStop();
+        RemoveListenerUtil.remove_value_event_listener(q, l);
     }
 
     public void changeData(Calendar date){

@@ -64,6 +64,10 @@ import java.util.Date;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.DrawerUtil;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
@@ -72,7 +76,6 @@ import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
 import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
 import it.polito.group2.restaurantowner.owner.statistics.StatisticsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.ReviewAdapter;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class Restaurant_page extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -90,10 +93,15 @@ public class Restaurant_page extends AppCompatActivity
     public ArrayList<Review> reviews = new ArrayList<>();
     public Restaurant my_restaurant = null;
     public Context context;
-    private ProgressDialog progressDialog;
+    private Query q;
+    private Query q2;
+    private ValueEventListener l;
+    private ChildEventListener l2;
+    private ProgressDialog mProgressDialog;
     private ReviewAdapter adapter;
     private StorageReference photo_reference;
     private StorageReference user_storage_reference;
+    private FirebaseDatabase firebase;
 
     /*private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int SELECT_PICTURE = 2;
@@ -190,22 +198,10 @@ public class Restaurant_page extends AppCompatActivity
         });
     }
 
-    private void progress_dialog(){
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMax(100);
-        progressDialog.setMessage("Its loading....");
-        progressDialog.setTitle("");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
-    }
-
     private void get_data_from_firebase(){
-        progress_dialog();
-
-        //my_restaurant
-        //DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/");
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id);
-        ref.addValueEventListener(new ValueEventListener() {
+        firebase = FirebaseDatabase.getInstance();
+        q = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id);
+        l = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 my_restaurant = snapshot.getValue(Restaurant.class);
@@ -216,11 +212,11 @@ public class Restaurant_page extends AppCompatActivity
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
-        });
+        };
 
         //reviews
-        Query reviewsQuery = FirebaseDatabase.getInstance().getReference("reviews/" + restaurant_id).orderByPriority();
-        reviewsQuery.addChildEventListener(new ChildEventListener() {
+        q2 = firebase.getReference("reviews/" + restaurant_id).orderByPriority();
+        l2 = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.d("prova", "review added");
@@ -248,8 +244,22 @@ public class Restaurant_page extends AppCompatActivity
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("prova", "child cancelled");
             }
-        });
+        };
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //FirebaseUtil.initProgressDialog(this);
+        q.addValueEventListener(l);
+        q2.addChildEventListener(l2);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RemoveListenerUtil.remove_value_event_listener(q, l);
+        RemoveListenerUtil.remove_child_event_listener(q2, l2);
     }
 
     private void fill_data(){
@@ -348,7 +358,7 @@ public class Restaurant_page extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            OnBackUtil.clean_stack_and_go_to_main_activity(this);
         }
     }
 
@@ -367,91 +377,8 @@ public class Restaurant_page extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-// Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.action_my_restaurants){
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MainActivity.class);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.action_show_as) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantActivity.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurant_id);
-            intent1.putExtras(b);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.action_gallery) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    GalleryViewActivity.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurant_id);
-            intent1.putExtras(b);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.action_menu) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    MenuRestaurant_page.class);
-            Bundle b = new Bundle();
-            b.putString("restaurant_id", restaurant_id);
-            intent1.putExtras(b);
-            startActivity(intent1);
-            return true;
-        } else if(id==R.id.action_offers) {
-            Intent intent2 = new Intent(
-                    getApplicationContext(),
-                    MyOffersActivity.class);
-            Bundle b2 = new Bundle();
-            b2.putString("restaurant_id", restaurant_id);
-            intent2.putExtras(b2);
-            startActivity(intent2);
-            return true;
-        } else if(id==R.id.action_reservations){
-            Intent intent3 = new Intent(
-                    getApplicationContext(),
-                    ReservationActivity.class);
-            Bundle b3 = new Bundle();
-            b3.putString("restaurant_id", restaurant_id);
-            intent3.putExtras(b3);
-            startActivity(intent3);
-            return true;
-        } else if(id==R.id.action_reviews){
-            Intent intent4 = new Intent(
-                    getApplicationContext(),
-                    ReviewsActivity.class); //here Filippo must insert his class name
-            Bundle b4 = new Bundle();
-            b4.putString("restaurant_id", restaurant_id);
-            intent4.putExtras(b4);
-            startActivity(intent4);
-            return true;
-        } else if(id==R.id.action_statistics){
-            Intent intent5 = new Intent(
-                    getApplicationContext(),
-                    StatisticsActivity.class); //here Filippo must insert his class name
-            Bundle b5 = new Bundle();
-            b5.putString("restaurant_id", restaurant_id);
-            intent5.putExtras(b5);
-            startActivity(intent5);
-            return true;
-        } else if(id==R.id.action_edit){
-            Intent intent6 = new Intent(
-                    getApplicationContext(),
-                    AddRestaurantActivity.class);
-            intent6.putExtra("Restaurant", my_restaurant);
-            final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
-            appbar.setExpanded(false);
-            startActivityForResult(intent6, MODIFY_INFO);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+    // Handle navigation view item clicks here.
+        return DrawerUtil.drawer_owner_restaurant_page(this, item, restaurant_id, my_restaurant);
     }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {

@@ -36,6 +36,7 @@ import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
@@ -67,14 +68,6 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             res = (Restaurant) intent.getExtras().get("Restaurant");
         if(res==null){
             res = new Restaurant();
-            /*
-            //res.setRestaurant_id(UUID.randomUUID().toString());
-            res.setRestaurant_photo_firebase_URL("");
-            //TODO take off this hardcoded values and get the real values
-            res.setRestaurant_rating(4);
-            res.setRestaurant_total_tables_number(200);
-            res.setRestaurant_orders_per_hour(50);
-            */
         }
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -90,10 +83,6 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        // Set up the ViewPager with the sections adapter.
-        /*
-      The {@link ViewPager} that will host the section contents.
-     */
         ViewPager mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
@@ -197,7 +186,6 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
     }
 
     public void saveData(){
-
         mSectionsPagerAdapter.saveDataFromFragments();
     }
 
@@ -231,6 +219,10 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         super.onStop();
     }
 
+    @Override
+    public void onBackPressed() {
+        OnBackUtil.clean_stack_and_go_to_main_activity(this);
+    }
 
     @Override
     public void onServicesPass(Boolean fidelity, Boolean tableRes, String numTables, Boolean takeAway, String orderPerHour, List<String> lunchOpenTime,

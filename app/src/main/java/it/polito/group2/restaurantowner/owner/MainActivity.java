@@ -4,8 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Rect;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,26 +19,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.DrawerUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
-import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
-import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantPreviewAdapter;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -50,6 +44,8 @@ public class MainActivity extends AppCompatActivity
     ArrayList<RestaurantPreview> resList = new ArrayList<>();
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
+    private Query q;
+    private ValueEventListener l;
 
 
     @Override
@@ -109,49 +105,36 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        showProgressDialog();
+
         firebase = FirebaseDatabase.getInstance();
-        Query restaurantReference = firebase.getReference("restaurants_previews").orderByChild("user_id").equalTo(userID);
-        restaurantReference.addChildEventListener(new ChildEventListener() {
+        q = firebase.getReference("restaurants_previews").orderByChild("user_id").equalTo(userID);
+        l = new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                mAdapter.addItem(0, dataSnapshot.getValue(RestaurantPreview.class));
-                hideProgressDialog();
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                /*Restaurant changedRes = dataSnapshot.getValue(Restaurant.class);
-                for (Restaurant r : resList) {
-                    if (r.getRestaurant_id().equals(changedRes.getRestaurant_id())) {
-                        resList.remove(r);
-                        resList.add(changedRes);
-                        break;
-                    }
-                }*/
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                RestaurantPreview removedRes = dataSnapshot.getValue(RestaurantPreview.class);
-                for (RestaurantPreview r : resList) {
-                    if (r.getRestaurant_id().equals(removedRes.getRestaurant_id())) {
-                        mAdapter.removeItem(resList.indexOf(r));
-                        resList.remove(r);
-                        break;
-                    }
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    mAdapter.addItem(0, postSnapshot.getValue(RestaurantPreview.class));
                 }
+                FirebaseUtil.showProgressDialog(mProgressDialog);
             }
-
             @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+            public void onCancelled(DatabaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
             }
+        };
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUtil.initProgressDialog(this);
+        q.addValueEventListener(l);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RemoveListenerUtil.remove_value_event_listener(q, l);
     }
 
     @Override
@@ -160,7 +143,7 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            finish();
+            OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
         }
     }
 
@@ -224,35 +207,7 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if(id==R.id.action_user_part) {
-            Intent intent1 = new Intent(
-                    getApplicationContext(),
-                    UserRestaurantList.class);
-            startActivity(intent1);
-            return true;
-        }
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(true);
-        }
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
+        return DrawerUtil.drawer_owner_main_activity(this, item);
     }
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {

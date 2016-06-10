@@ -262,8 +262,6 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                 }
             }*/
 
-            //TODO calculate price range
-            //restaurant.setPriceRange(String.valueOf(calculate_range(restaurant)));
             switch (restaurant.getRestaurant_price_range()) {
                 case 1:
                     this.price_range.setText("Average price: 5 euro");

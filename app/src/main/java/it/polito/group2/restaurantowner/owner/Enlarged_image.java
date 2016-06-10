@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import java.io.InputStream;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 
 public class Enlarged_image extends AppCompatActivity {
 
@@ -30,23 +31,23 @@ public class Enlarged_image extends AppCompatActivity {
         int currentapiVersion = android.os.Build.VERSION.SDK_INT;
         if (currentapiVersion <= Build.VERSION_CODES.KITKAT){
             myimage.setImageURI(image_uri);
-        } else{
+        } else {
             Bitmap bitmap = null;
             try {
                 bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), image_uri);
+            } catch (Exception e) {
+                Log.e("Exception", "Exception occurred in MediaStore.Images.Media.getBitmap");
             }
-            catch(Exception e){
-                Log.e("Exception" , "Exception occurred in MediaStore.Images.Media.getBitmap");
-            }
-            if(bitmap != null) {
+            if (bitmap != null) {
                 myimage.setImageBitmap(bitmap);
                 //myimage.setScaleType(ImageView.ScaleType.MATRIX);
             }
         }
+    }
 
-
-
-
+    @Override
+    public void onBackPressed() {
+        OnBackUtil.clean_stack_and_go_to_main_activity(this);
     }
 
 }

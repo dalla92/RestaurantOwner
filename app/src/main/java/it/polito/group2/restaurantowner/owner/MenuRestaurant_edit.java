@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -49,6 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
@@ -115,6 +117,11 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_add_restaurant, menu);
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+       OnBackUtil.clean_stack_and_go_to_main_activity(this);
     }
 
     @Override

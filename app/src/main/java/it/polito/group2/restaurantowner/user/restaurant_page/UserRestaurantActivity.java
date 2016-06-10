@@ -63,7 +63,10 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.data.Offer;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
@@ -96,6 +99,10 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private FloatingActionButton fab;
     private boolean theUserIsTheOwner = false;
     private TextView timesText;
+    private Query q_meals;
+    private ValueEventListener l_meals;
+    private Query q_reviews;
+    private ChildEventListener l_reviews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,18 +120,16 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         coverPicture = (ImageView) findViewById(R.id.user_restaurant_image);
         fab = (FloatingActionButton) findViewById(R.id.bookmark_fab);
         firebase = FirebaseDatabase.getInstance();
-        mProgressDialog = FirebaseUtil.initProgressDialog(this);
 
         //FirebaseAuth.getInstance().signOut();
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null)
             restaurantID = getIntent().getExtras().getString("restaurant_id");
 
-        FirebaseUtil.showProgressDialog(mProgressDialog);
-        Query mealsReference = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
-        Query reviewsQuery = firebase.getReference("reviews/" + restaurantID).orderByPriority();
-        DatabaseReference restaurantRef = firebase.getReference("restaurants/" + restaurantID);
+        q_meals = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
+        q_reviews = firebase.getReference("reviews/" + restaurantID).orderByPriority();
 
+        DatabaseReference restaurantRef = firebase.getReference("restaurants/" + restaurantID);
         restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -226,7 +231,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
-        reviewsQuery.addChildEventListener(new ChildEventListener() {
+        l_reviews = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.d("prova", "review added");
@@ -254,25 +259,21 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("prova", "child cancelled");
             }
-        });
+        };
 
-        mealsReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        l_meals = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot data : dataSnapshot.getChildren())
                     meals.add(data.getValue(Meal.class));
-
                 categories = getCategoryList();
                 setRestaurantMenu();
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.d("prova", "meals cancelled");
             }
-        });
-
-
+        };
 
         offers = getOffersJSON();
 
@@ -286,22 +287,31 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+        q_meals.addValueEventListener(l_meals);
+        q_meals.addValueEventListener(l_meals);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RemoveListenerUtil.remove_value_event_listener(q_meals, l_meals);
+        RemoveListenerUtil.remove_child_event_listener(q_reviews, l_reviews);
+    }
+
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if(isTaskRoot()){
-                Intent intent = new Intent(this, UserRestaurantList.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                finish();
-            }
-            else
-                super.onBackPressed();
-
+            OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
         }
     }
+
+
 
     private void setDrawer() {
         //navigation drawer
@@ -396,62 +406,10 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             drawer.closeDrawer(GravityCompat.START);
     }
 
-
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.nav_owner){
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            return true;
-        }
-        else if(id==R.id.nav_home){
-            Intent intent = new Intent(this, UserRestaurantList.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-            return true;
-        }
-        else if(id==R.id.nav_login){
-            Intent intent = new Intent(this, LoginManagerActivity.class);
-            intent.putExtra("login", true);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_logout){
-            Intent intent = new Intent(this, LoginManagerActivity.class);
-            intent.putExtra("login", false);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        } else if(id==R.id.nav_my_profile) {
-            Intent intent = new Intent(this, UserProfile.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_orders) {
-            Intent intent = new Intent(this, MyOrdersActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reservations){
-            Intent intent = new Intent(this, UserMyReservations.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reviews){
-            Intent intent = new Intent(this, MyReviewsActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_favourites){
-            Intent intent = new Intent(this, UserMyFavourites.class);
-            startActivity(intent);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        return DrawerUtil.drawer_user_not_restaurant_page(this, item);
     }
 
     private void setRestaurantExtraInfo() {

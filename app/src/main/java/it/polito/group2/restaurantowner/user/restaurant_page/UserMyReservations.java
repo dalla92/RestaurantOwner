@@ -32,6 +32,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -40,7 +41,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -72,7 +76,8 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
     private int j=0;
     private ProgressDialog mProgressDialog;
     private FirebaseDatabase firebase;
-
+    private Query q;
+    private ValueEventListener l;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -187,79 +192,15 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
             drawer.closeDrawer(GravityCompat.START);
     }
 
-
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.nav_owner){
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            return true;
-        }
-        else if(id==R.id.nav_home){
-            Intent intent = new Intent(this, UserRestaurantList.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-            return true;
-        }
-        else if(id==R.id.nav_login){
-            Intent intent = new Intent(this, LoginManagerActivity.class);
-            intent.putExtra("login", true);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_logout){
-            Intent intent = new Intent(this, LoginManagerActivity.class);
-            intent.putExtra("login", false);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        } else if(id==R.id.nav_my_profile) {
-            Intent intent = new Intent(this, UserProfile.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_orders) {
-            Intent intent = new Intent(this, MyOrdersActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reservations){
-            Intent intent = new Intent(this, UserMyReservations.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reviews){
-            Intent intent = new Intent(this, MyReviewsActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_favourites){
-            Intent intent = new Intent(this, UserMyFavourites.class);
-            startActivity(intent);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
-
-
-    private void progress_dialog(){
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMax(100);
-        progressDialog.setMessage("Its loading....");
-        progressDialog.setTitle("");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
+        return DrawerUtil.drawer_user_not_restaurant_page(this, item);
     }
 
     public void get_data_from_firebase(){
-        progress_dialog();
-
-        DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
-        ref.addValueEventListener(new ValueEventListener() {
+        q = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
+        l = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot revSnapshot : snapshot.getChildren()) {
@@ -356,9 +297,21 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
-        });
+        };
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+        q.addValueEventListener(l);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RemoveListenerUtil.remove_value_event_listener(q, l);
+    }
 
     public void initToolBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -373,11 +326,9 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
         }
     }
-
-
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
 

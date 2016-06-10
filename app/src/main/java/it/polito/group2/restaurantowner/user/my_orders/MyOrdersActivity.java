@@ -28,7 +28,9 @@ import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.HaveBreak;
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
@@ -114,29 +116,13 @@ public class MyOrdersActivity extends AppCompatActivity
         list.setAdapter(adapter);
     }
 
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(true);
-        }
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
-    }
-
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
         }
     }
 
@@ -211,51 +197,7 @@ public class MyOrdersActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.nav_owner){
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            return true;
-        }
-        else if(id==R.id.nav_home){
-            Intent intent = new Intent(this, UserRestaurantList.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-            return true;
-        } else if(id==R.id.nav_logout){
-            Intent intent = new Intent(this, LoginManagerActivity.class);
-            intent.putExtra("login", false);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        } else if(id==R.id.nav_my_profile) {
-            Intent intent = new Intent(this, UserProfile.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_orders) {
-            Intent intent = new Intent(this, MyOrdersActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reservations){
-            Intent intent = new Intent(this, UserMyReservations.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reviews){
-            Intent intent = new Intent(this, MyReviewsActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_favourites){
-            Intent intent = new Intent(this, UserMyFavourites.class);
-            startActivity(intent);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        return DrawerUtil.drawer_user_not_restaurant_page(this, item);
     }
 
     private void abortActivity() {

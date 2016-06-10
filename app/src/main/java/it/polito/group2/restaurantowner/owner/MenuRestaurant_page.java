@@ -30,11 +30,16 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.DrawerUtil;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
@@ -63,8 +68,11 @@ public class MenuRestaurant_page extends AppCompatActivity {
     private RecyclerView  mRecyclerView;
     public Restaurant current_restaurant;
     public Context context;
-    private ProgressDialog progressDialog;
-
+    private FirebaseDatabase firebase;
+    private Query q;
+    private ValueEventListener l;
+    private ProgressDialog mProgressDialog;
+    private Activity a;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +80,8 @@ public class MenuRestaurant_page extends AppCompatActivity {
         setContentView(R.layout.activity_menu_restaurant_page);
 
         context = this;
+        a = this;
+        firebase = FirebaseDatabase.getInstance();
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id") != null)
             restaurant_id = getIntent().getExtras().getString("restaurant_id");
@@ -111,30 +121,16 @@ public class MenuRestaurant_page extends AppCompatActivity {
         get_data_from_firebase();
 
     }
-
-
-    private void progress_dialog(){
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setMax(100);
-        progressDialog.setMessage("Its loading....");
-        progressDialog.setTitle("");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        progressDialog.show();
-    }
-
+    
     private void get_data_from_firebase(){
-        progress_dialog();
-
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+restaurant_id);
-        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query q = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+restaurant_id);
+        l = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot meSnapshot : snapshot.getChildren()) {
                     Meal snap_meal = meSnapshot.getValue(Meal.class);
                     adapter.addItem(0, snap_meal);
                 }
-
-                progressDialog.hide();
 
                 //toolbar
                 Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -152,90 +148,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem item) {
                         // Handle navigation view item clicks here.
-                        int id = item.getItemId();
-                        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                        if (id == R.id.action_my_restaurants) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    MainActivity.class);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.action_show_as) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    UserRestaurantActivity.class);
-                            Bundle b = new Bundle();
-                            b.putString("restaurant_id", restaurant_id);
-                            intent1.putExtras(b);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.action_gallery) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    GalleryViewActivity.class);
-                            Bundle b = new Bundle();
-                            b.putString("restaurant_id", restaurant_id);
-                            intent1.putExtras(b);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.action_menu) {
-                            Intent intent1 = new Intent(
-                                    getApplicationContext(),
-                                    MenuRestaurant_page.class);
-                            Bundle b = new Bundle();
-                            b.putString("restaurant_id", restaurant_id);
-                            intent1.putExtras(b);
-                            startActivity(intent1);
-                            return true;
-                        } else if (id == R.id.action_offers) {
-                            Intent intent2 = new Intent(
-                                    getApplicationContext(),
-                                    MyOffersActivity.class);
-                            Bundle b2 = new Bundle();
-                            b2.putString("restaurant_id", restaurant_id);
-                            intent2.putExtras(b2);
-                            startActivity(intent2);
-                            return true;
-                        } else if (id == R.id.action_reservations) {
-                            Intent intent3 = new Intent(
-                                    getApplicationContext(),
-                                    ReservationActivity.class);
-                            Bundle b3 = new Bundle();
-                            b3.putString("restaurant_id", restaurant_id);
-                            intent3.putExtras(b3);
-                            startActivity(intent3);
-                            return true;
-                        } else if (id == R.id.action_reviews) {
-                            Intent intent4 = new Intent(
-                                    getApplicationContext(),
-                                    ReviewsActivity.class); //here Filippo must insert his class name
-                            Bundle b4 = new Bundle();
-                            b4.putString("restaurant_id", restaurant_id);
-                            intent4.putExtras(b4);
-                            startActivity(intent4);
-                            return true;
-                        } else if (id == R.id.action_statistics) {
-                            Intent intent5 = new Intent(
-                                    getApplicationContext(),
-                                    StatisticsActivity.class); //here Filippo must insert his class name
-                            Bundle b5 = new Bundle();
-                            b5.putString("restaurant_id", restaurant_id);
-                            intent5.putExtras(b5);
-                            startActivity(intent5);
-                            return true;
-                        } else if (id == R.id.action_edit) {
-                            Intent intent6 = new Intent(
-                                    getApplicationContext(),
-                                    AddRestaurantActivity.class);
-                            intent6.putExtra("Restaurant", current_restaurant);
-                            final AppBarLayout appbar = (AppBarLayout) findViewById(R.id.appbar);
-                            appbar.setExpanded(false);
-                            startActivityForResult(intent6, MODIFY_INFO);
-                            return true;
-                        }
-
-                        drawer.closeDrawer(GravityCompat.START);
-                        return true;
+                        return DrawerUtil.drawer_owner_not_restaurant_page(a, item, restaurant_id);
                     }
                 });
 
@@ -265,14 +178,31 @@ public class MenuRestaurant_page extends AppCompatActivity {
                 ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
                 ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
                 mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+
+                Menu menu = navigationView.getMenu();
+                MenuItem i = menu.findItem(R.id.action_edit);
+                i.setVisible(false);
             }
 
             @Override
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
-        });
+        };
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+        q.addValueEventListener(l);
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RemoveListenerUtil.remove_value_event_listener(q, l);
     }
 
     @Override
@@ -293,7 +223,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            OnBackUtil.clean_stack_and_go_to_main_activity(this);
         }
     }
 
@@ -319,13 +249,13 @@ public class MenuRestaurant_page extends AppCompatActivity {
         }
     }
 
+    /*
     public void myClickHandler_remove(View v) {
         LinearLayout vwParentRow = (LinearLayout) v.getParent();
         TextView child = (TextView) vwParentRow.getChildAt(2);
         final String meal_name = child.getText().toString();
         meal_to_delete = null;
         //TODO find meal_to_delete into db
-
         //dialog box
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
@@ -347,6 +277,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
         builder.setMessage("Are you sure that you want to delete " + meal_name + "?").setPositiveButton("Yes, sure", dialogClickListener)
                 .setNegativeButton("No", dialogClickListener).show();
     }
+    */
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -354,6 +285,8 @@ public class MenuRestaurant_page extends AppCompatActivity {
         if (requestCode == MODIFY_MEAL) {
             if (resultCode == RESULT_OK) {
                 Meal m = (Meal) data.getExtras().get("meal");
+                DatabaseReference dr = firebase.getReference("meals/" + m.getRestaurant_id() + "/" + m.getMeal_id());
+                dr.setValue(m);
                 meals.set(index_position, m);
                 adapter.notifyDataSetChanged();
             }

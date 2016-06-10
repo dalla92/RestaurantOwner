@@ -74,7 +74,9 @@ import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.ArrayList;
 
+import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
@@ -99,9 +101,7 @@ public class UserRestaurantList extends AppCompatActivity
 
     private final static int ACTION_FILTER = 10;
     private final static int ACTION_SEARCH = 2;
-    private final static int VERTICAL_ITEM_SPACE = 5;
     private final static int REQUEST_CHECK_SETTINGS = 1;
-    private final static int LOCATION_REQUEST = 4;
 
     private UserRestaurantPreviewAdapter mAdapter;
     private RecyclerView mRecyclerView;
@@ -122,10 +122,6 @@ public class UserRestaurantList extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     PermissionListener dialogPermissionListener_gps;
-    PermissionListener dialogPermissionListener_wifi;
-    /*private GeoFire geoFire;
-    private GeoQuery geoQuery;
-    HashMap<String,GeoLocation> resNearby = new HashMap<>();*/
     private int current_index, total_index;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
@@ -141,7 +137,7 @@ public class UserRestaurantList extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         fab = (FloatingActionButton) findViewById(R.id.gps_fab);
-        //fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
+        fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -450,14 +446,14 @@ public class UserRestaurantList extends AppCompatActivity
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     final String restaurant_id = (String) dataSnapshot.getValue();
                     DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_latitude_position");
-                    ref.addValueEventListener(new ValueEventListener() {
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot snapshot) {
                             Double snap_lat = snapshot.getValue(Double.class);
                             final Double lat = snap_lat;
                             //get only longitude
                             DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_longitude_position");
-                            ref2.addValueEventListener(new ValueEventListener() {
+                            ref2.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot snapshot) {
                                     Double snap_long = snapshot.getValue(Double.class);
@@ -466,7 +462,7 @@ public class UserRestaurantList extends AppCompatActivity
                                         if (lat != null && lon != null) {
                                             if (is_restaurant_near_with_position(new LatLng(lat, lon), range)) {
                                                 DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "/");
-                                                ref2.addValueEventListener(new ValueEventListener() {
+                                                ref2.addListenerForSingleValueEvent(new ValueEventListener() {
                                                     @Override
                                                     public void onDataChange(DataSnapshot snapshot) {
                                                         RestaurantPreview snap_r_p = snapshot.getValue(RestaurantPreview.class);
@@ -683,59 +679,10 @@ public class UserRestaurantList extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.nav_owner){
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            return true;
-        }
-        else if(id==R.id.nav_home){
-            Intent intent = new Intent(this, UserRestaurantList.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-            return true;
-        }
-        else if(id==R.id.nav_login){
-            Intent intent = new Intent(this, LoginManagerActivity.class);
-            intent.putExtra("login", true);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_logout){
-            Intent intent = new Intent(this, LoginManagerActivity.class);
-            intent.putExtra("login", false);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        } else if(id==R.id.nav_my_profile) {
-            Intent intent = new Intent(this, UserProfile.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_orders) {
-            Intent intent = new Intent(this, MyOrdersActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reservations){
-            Intent intent = new Intent(this, UserMyReservations.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reviews){
-            Intent intent = new Intent(this, MyReviewsActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_favourites){
-            Intent intent = new Intent(this, UserMyFavourites.class);
-            startActivity(intent);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        return DrawerUtil.drawer_user_not_restaurant_page(this, item);
     }
 
     @Override
@@ -744,7 +691,7 @@ public class UserRestaurantList extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            finish();
+            OnBackUtil.clean_stack_and_exit_application(this, this);
         }
     }
 

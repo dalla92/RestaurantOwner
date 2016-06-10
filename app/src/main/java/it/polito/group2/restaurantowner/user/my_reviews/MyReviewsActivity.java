@@ -33,7 +33,9 @@ import java.util.Calendar;
 import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.Utils.OnLoadMoreListener;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -67,7 +69,6 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
         handler = new Handler();
 
         userID = FirebaseUtil.getCurrentUserId();
-        Log.d("prova", ""+userID);
         if(userID == null) {
             Toast.makeText(MyReviewsActivity.this, "Error!", Toast.LENGTH_LONG).show();
             Intent intent = new Intent(this, UserRestaurantList.class);
@@ -150,31 +151,6 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
                     }
                 });
 
-
-                /*handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-
-
-                        //add items one by one
-                        int start = reviews.size();
-                        int end = start + 20;
-
-                        //TODO download more data
-                        for (int i = start + 1; i <= end; i++) {
-                            String c1 = "Davvero un bel locale, personale accogliente e mangiare davvero sopra la media. I prezzi sono accessibile e data la qualità del cibo sono più che giusti.";
-                            Calendar date1 = Calendar.getInstance();
-                            date1.set(Calendar.HOUR_OF_DAY, 12);
-                            Review r1 = new Review("1", "Paola C.", date1, c1, UUID.randomUUID().toString(), 4.5f);
-                            reviews.add(r1);
-
-                        }
-
-
-                        //or you can add all at once but do not forget to call mAdapter.notifyDataSetChanged();
-                    }
-                }, 700);*/
-
             }
         });
 
@@ -187,7 +163,7 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
         }
     }
 
@@ -271,56 +247,10 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
             drawer.closeDrawer(GravityCompat.START);
     }
 
-
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if(id==R.id.nav_owner){
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            return true;
-        }
-        else if(id==R.id.nav_home){
-            Intent intent = new Intent(this, UserRestaurantList.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-            return true;
-        } else if(id==R.id.nav_logout){
-            Intent intent = new Intent(this, LoginManagerActivity.class);
-            intent.putExtra("login", false);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        } else if(id==R.id.nav_my_profile) {
-            Intent intent = new Intent(this, UserProfile.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_orders) {
-            Intent intent = new Intent(this, MyOrdersActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reservations){
-            Intent intent = new Intent(this, UserMyReservations.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_reviews){
-            Intent intent = new Intent(this, MyReviewsActivity.class);
-            startActivity(intent);
-            return true;
-        } else if(id==R.id.nav_my_favourites){
-            Intent intent = new Intent(this, UserMyFavourites.class);
-            startActivity(intent);
-            return true;
-        }
-
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+        return DrawerUtil.drawer_user_not_restaurant_page(this, item);
     }
 
 }

@@ -114,6 +114,7 @@ import java.util.Random;
 import java.util.Set;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.user.restaurant_list.StreetViewActivity;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
@@ -259,6 +260,7 @@ public class MapsActivity extends AppCompatActivity implements
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
+    /*
     public void startUpdatesButtonHandler() {
         if (!mRequestingLocationUpdates) {
             mRequestingLocationUpdates = true;
@@ -273,6 +275,12 @@ public class MapsActivity extends AppCompatActivity implements
             //setButtonsEnabledState();
             stopLocationUpdates();
         }
+    }
+    */
+
+    @Override
+    public void onBackPressed() {
+        OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
     }
 
     protected void startLocationUpdates() {
@@ -708,15 +716,13 @@ public class MapsActivity extends AppCompatActivity implements
             else{
                 open_now.setText("Closed now");
             }
-            //TODO decomment after integration
-            /*
             button_get_info.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             Intent intent = new Intent(
                                     getApplicationContext(),
-                                    UserRestaurantPage.class);
+                                    UserRestaurantActivity.class);
                             Bundle b = new Bundle();
                             b.putString("restaurant_id", restaurant_preview.getRestaurant_id());
                             intent.putExtras(b);
@@ -724,7 +730,6 @@ public class MapsActivity extends AppCompatActivity implements
                         }
                     }
             );
-            */
             button_get_street_view.setOnClickListener(
                     new View.OnClickListener() {
                         @Override
@@ -749,8 +754,6 @@ public class MapsActivity extends AppCompatActivity implements
                         }
                     }
             );
-
-            //TODO add price_range into DB: calculate it in the owner when a new meal is added with the function "calculate_range" in UserRestaurantPreviewAdapter
 
             d.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
