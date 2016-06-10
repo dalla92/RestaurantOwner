@@ -52,8 +52,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -421,12 +423,54 @@ public class UserRestaurantList extends AppCompatActivity
         mAdapter.clear();
         FirebaseUtil.showProgressDialog(mProgressDialog);
         //I want to get all restaurants within 2Km: I get all the ids of the restaurants, for each id I get its latitude and longitude, and if distance<2km I add it to restaurant_preview_list and cluster_manager
-        DatabaseReference restaurantDatabaseReference = firebase.getReference("restaurant_names");
+
+        DatabaseReference resPreviewRef = firebase.getReference("restaurants_previews");
+        resPreviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data: dataSnapshot.getChildren()){
+                    RestaurantPreview resPreview = data.getValue(RestaurantPreview.class);
+                    Double lat = resPreview.getLat();
+                    Double lon = resPreview.getLon();
+
+                    if (isPositionUp) {
+                        //if i have the position of the user
+                        if (lat != null && lon != null) {
+                            if (is_restaurant_near_with_position(new LatLng(lat, lon), range)) {
+                                mAdapter.addItem(resPreview);
+                                mClusterManager.addItem(new MyItem(lat, lon));
+                                mClusterManager.cluster();
+                            }
+                        }
+                    }
+                    else {
+                        //if I have the location searched by the user
+                        if (lat != null && lon != null) {
+                            if (is_restaurant_near_without_position(new LatLng(lat, lon), range)) {
+                                mAdapter.addItem(resPreview);
+                                mClusterManager.addItem(new MyItem(lat, lon));
+                                mClusterManager.cluster();
+                            }
+                        }
+                    }
+                }
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
+            }
+        });
+
+
+        /*DatabaseReference restaurantDatabaseReference = firebase.getReference("restaurant_names");
         restaurantDatabaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     final String restaurant_id = (String) dataSnapshot.getValue();
+
                     DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_latitude_position");
                     ref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -451,9 +495,7 @@ public class UserRestaurantList extends AppCompatActivity
                                                         RestaurantPreview snap_r_p = snapshot.getValue(RestaurantPreview.class);
                                                         //restaurants_previews_list.add(snap_r_p);
                                                         Log.d("prova", "added");
-                                                        mAdapter.addItem(snap_r_p);
-                                                        mClusterManager.addItem(new MyItem(lat, lon));
-                                                        mClusterManager.cluster();
+
                                                     }
 
                                                     @Override
@@ -512,7 +554,7 @@ public class UserRestaurantList extends AppCompatActivity
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
-        });
+        });*/
     }
 
     public boolean is_restaurant_near_with_position(LatLng res_position, double range){
@@ -873,7 +915,7 @@ public class UserRestaurantList extends AppCompatActivity
             //mMap.clear();
             if (mCurrentLocation != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), DEFAULT_ZOOM1));
-                /*
+
                 if(mLastUserMarker == null) {
                     mLastUserMarker = mMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
@@ -886,7 +928,7 @@ public class UserRestaurantList extends AppCompatActivity
                 else {
                     mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
                 }
-                */
+
             }
         }
     }

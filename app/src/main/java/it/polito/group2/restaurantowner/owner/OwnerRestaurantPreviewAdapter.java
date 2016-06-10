@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -81,15 +82,22 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
             notifyItemRangeChanged(position, mDataset.size());
         }
 
+        public void clear(){
+            mDataset = new ArrayList<>();
+            notifyDataSetChanged();
+        }
+
         public void removeItem(int position) {
             RestaurantPreview r = mDataset.get(position);
             FirebaseDatabase firebase = FirebaseDatabase.getInstance();
             DatabaseReference resReference = firebase.getReference("restaurants/" + r.getRestaurant_id());
-            resReference.removeValue();
+            DatabaseReference resPreviewReference = firebase.getReference("restaurants_previews/" + r.getRestaurant_id());
+            DatabaseReference resNameRef = firebase.getReference("restaurant_names/" + r.getRestaurant_name() + "/" + r.getRestaurant_id());
+
+            resNameRef.setValue(null);
+            resReference.setValue(null);
             //delete also its preview
-            FirebaseDatabase firebase2 = FirebaseDatabase.getInstance();
-            DatabaseReference resReference2 = firebase.getReference("restaurants_previews/" + r.getRestaurant_id());
-            resReference2.removeValue();
+            resPreviewReference.setValue(null);
             mDataset.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, mDataset.size());

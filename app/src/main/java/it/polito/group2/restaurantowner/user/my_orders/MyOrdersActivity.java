@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -26,19 +25,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-import it.polito.group2.restaurantowner.HaveBreak;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.User;
-import it.polito.group2.restaurantowner.login.LoginManagerActivity;
-import it.polito.group2.restaurantowner.owner.MainActivity;
-import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 

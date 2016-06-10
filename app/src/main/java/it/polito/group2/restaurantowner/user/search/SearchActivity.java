@@ -57,7 +57,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
     private CardView restaurantsCard, placesCard, tagCard;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
-    private HashMap<String, String> restaurantNamesIDMap;
+    private HashMap<String, HashMap<String, Boolean>> restaurantNamesIDMap;
     private HashMap<String, HashMap<String, Boolean>> tagNamesIDMap;
     private List<AutocompletePrediction> predictionList;
     private RecyclerView restaurantRecyclerView, tagRecyclerView, placeRecyclerView;
@@ -166,7 +166,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if(!empty) {
-                                HashMap<String, String> matches = (HashMap<String, String>) dataSnapshot.getValue();
+                                HashMap<String, HashMap<String, Boolean>> matches = (HashMap<String, HashMap<String, Boolean>>) dataSnapshot.getValue();
                                 if (matches != null && matches.size() > 0) {
                                     restaurantAdapter.setData(matches);
                                     restaurantsCard.setVisibility(View.VISIBLE);

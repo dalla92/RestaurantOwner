@@ -45,20 +45,16 @@ public class TagSuggestionAdapter extends RecyclerView.Adapter<TagSuggestionAdap
         @Override
         public void onClick(View v) {
             String key = names.get(this.getLayoutPosition());
-            ArrayList<String> restaurantIDs = new ArrayList<>();
             HashMap<String, Boolean> mapIds = namesAndId.get(key);
-            restaurantIDs.addAll(mapIds.keySet());
+            ArrayList<String> restaurantsIDs = new ArrayList<>();
+            restaurantsIDs.addAll(mapIds.keySet());
 
             Intent intent = new Intent();
-            intent.putExtra("restaurant_list", restaurantIDs);
+            intent.putExtra("restaurant_list", restaurantsIDs);
             intent.putExtra("searchedText", key);
             activity.setResult(Activity.RESULT_OK, intent);
             activity.finish();
 
-            /*Intent intent = new Intent(activity, UserRestaurantList.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra("restaurant_list", restaurantIDs);
-            activity.startActivity(intent);*/
         }
     }
 

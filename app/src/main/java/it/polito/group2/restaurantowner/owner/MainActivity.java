@@ -44,8 +44,8 @@ public class MainActivity extends AppCompatActivity
     ArrayList<RestaurantPreview> resList = new ArrayList<>();
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
-    private Query q;
-    private ValueEventListener l;
+    private Query resPreviewQuery;
+    private ValueEventListener resPreviewValueListener;
 
 
     @Override
@@ -60,6 +60,9 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(MainActivity.this, "You need to be logged in.", Toast.LENGTH_SHORT).show();
             finish();
         }
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -107,14 +110,15 @@ public class MainActivity extends AppCompatActivity
 
 
         firebase = FirebaseDatabase.getInstance();
-        q = firebase.getReference("restaurants_previews").orderByChild("user_id").equalTo(userID);
-        l = new ValueEventListener() {
+        resPreviewQuery = firebase.getReference("restaurants_previews").orderByChild("user_id").equalTo(userID);
+        resPreviewValueListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+                mAdapter.clear();
                 for (DataSnapshot postSnapshot: snapshot.getChildren()) {
                     mAdapter.addItem(0, postSnapshot.getValue(RestaurantPreview.class));
                 }
-                FirebaseUtil.showProgressDialog(mProgressDialog);
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
             }
             @Override
             public void onCancelled(DatabaseError firebaseError) {
@@ -127,14 +131,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUtil.initProgressDialog(this);
-        q.addValueEventListener(l);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+        resPreviewQuery.addValueEventListener(resPreviewValueListener);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        RemoveListenerUtil.remove_value_event_listener(q, l);
+        RemoveListenerUtil.remove_value_event_listener(resPreviewQuery, resPreviewValueListener);
     }
 
     @Override

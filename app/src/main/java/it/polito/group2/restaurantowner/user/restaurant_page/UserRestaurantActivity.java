@@ -36,9 +36,6 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -173,7 +170,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 else
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
 
-                if(targetRestaurant.isOpenNow())
+                if(targetRestaurant.openNow())
                     timesText.setText("Open now");
                 else{
                     timesText.setText("Closed now");
@@ -403,7 +400,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             extrasBuilder.append(getString(R.string.gluten_free));
             extrasBuilder.append(", ");
         }
-        if(targetRestaurant.getRestaurant_closest_bus() != null) {
+        if(targetRestaurant.getRestaurant_closest_bus() != null &&
+            !targetRestaurant.getRestaurant_closest_bus().trim().equals("")) {
             extrasBuilder.append(getString(R.string.near));
             extrasBuilder.append(" ");
             extrasBuilder.append(targetRestaurant.getRestaurant_closest_bus());
@@ -411,7 +409,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             extrasBuilder.append(getString(R.string.bus_stop));
             extrasBuilder.append(", ");
         }
-        if(targetRestaurant.getRestaurant_closest_metro() !=null){
+        if(targetRestaurant.getRestaurant_closest_metro() !=null &&
+            !targetRestaurant.getRestaurant_closest_metro().trim().equals("")){
             extrasBuilder.append(getString(R.string.near));
             extrasBuilder.append(" ");
             extrasBuilder.append(targetRestaurant.getRestaurant_closest_metro());
@@ -696,7 +695,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(UserRestaurantActivity.this, UserTableReservationActivity.class);
-                intent.putExtra("restaurant", targetRestaurant);
+                intent.putExtra("restaurant_id", targetRestaurant.getRestaurant_id());
                 startActivity(intent);
             }
         });

@@ -169,7 +169,7 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name=".user.restaurant_page.UserMyFavourites"
+            android:name=".user.my_favourites.UserMyFavourites"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.my_orders.MyOrdersActivity"

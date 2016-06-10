@@ -1,12 +1,9 @@
-package it.polito.group2.restaurantowner.user.restaurant_page;
+package it.polito.group2.restaurantowner.user.my_favourites;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -23,26 +20,22 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
-import it.polito.group2.restaurantowner.firebasedata.Favourite;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.firebasedata.User;
-import it.polito.group2.restaurantowner.login.LoginManagerActivity;
-import it.polito.group2.restaurantowner.owner.MainActivity;
-import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
-import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
-import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
+import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
-import android.provider.MediaStore;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,15 +47,13 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
 
     private String user_id;
     private ListView listView;
-    private ArrayList<String> favourites = new ArrayList<String>();
-    private ArrayList<Restaurant> favourite_restaurants = new ArrayList<Restaurant>();
+    private ArrayList<RestaurantPreview> favourite_restaurants;
     private Context context;
-    public Drawable d;
     private Toolbar toolbar;
     private FirebaseDatabase firebase;
-    private Query q;
     private ValueEventListener l;
     private ProgressDialog mProgressDialog;
+    private FavouriteAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,11 +64,31 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
         setSupportActionBar(toolbar);
 
         firebase = FirebaseDatabase.getInstance();
-        context = this;
+        favourite_restaurants = new ArrayList<>();
 
         mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
         user_id = FirebaseUtil.getCurrentUserId();
+
+        if(user_id == null){
+            Toast.makeText(UserMyFavourites.this, "You must be logged in", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+        //list view implementation
+        listView = (ListView) findViewById(R.id.list);
+        adapter = new FavouriteAdapter(this, R.layout.favourite_layout, favourite_restaurants);
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // ListView Clicked item value
+                RestaurantPreview itemValue = (RestaurantPreview) listView.getItemAtPosition(position);
+                Intent intent = new Intent(getApplicationContext(), UserRestaurantActivity.class);
+                intent.putExtra("restaurant_id", itemValue.getRestaurant_id());
+                startActivity(intent);
+            }
+        });
 
         setDrawer();
 
@@ -85,68 +96,48 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
     }
 
     public void get_favourites_from_firebase(){
-        DatabaseReference ref = firebase.getReference("users");
+        DatabaseReference ref = firebase.getReference("users/" + user_id + "/" + "favourites_restaurants");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                    User snap_user = snapshot.getValue(User.class);
-                        for (String s : snap_user.getFavourites_restaurants().keySet()) {
-                            favourites.add(s);
-                        }
+                HashMap<String, Boolean> favourites = (HashMap<String, Boolean>) snapshot.getValue();
+                final ArrayList<String> favouritesID = new ArrayList<>();
+                if(favourites == null) {
+                    Toast.makeText(getApplicationContext(), "No favourite restaurants", Toast.LENGTH_SHORT).show();
+                    FirebaseUtil.hideProgressDialog(mProgressDialog);
+                }
+                else {
+                    for (String key : favourites.keySet()) {
+                        favouritesID.add(key);
+                    }
 
-                        if (favourites.isEmpty()) {
-                            Toast.makeText(getApplicationContext(), "No favourite restaurants", Toast.LENGTH_SHORT).show();
-                        } else {
-
-                            if (favourites != null && !favourites.isEmpty()) {
-                                for (int i = 0; i < favourites.size(); i++) {
-                                    DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + favourites.get(i));
-                                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot snapshot) {
-                                            for (DataSnapshot resSnapshot : snapshot.getChildren()) {
-                                                Restaurant snap_restaurant = resSnapshot.getValue(Restaurant.class);
-                                                String snap_restaurant_id = snap_restaurant.getRestaurant_id();
-                                                if (favourites.contains(snap_restaurant_id)) {
-                                                    favourite_restaurants.add(snap_restaurant);
-                                                }
-                                            }
-
-                                            //list view implementation
-                                            listView = (ListView) findViewById(R.id.list);
-                                            FavouriteAdapter adapter = new FavouriteAdapter(context, R.layout.favourite_layout, favourite_restaurants);
-                                            listView.setAdapter(adapter);
-
-                                            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                                @Override
-                                                public void onItemClick(AdapterView<?> parent, View view,
-                                                                        int position, long id) {
-                                                    // ListView Clicked item value
-                                                    Restaurant itemValue = (Restaurant) listView.getItemAtPosition(position);
-                                                    Intent intent3 = new Intent(
-                                                            getApplicationContext(),
-                                                            UserRestaurantActivity.class);
-                                                    Bundle b3 = new Bundle();
-                                                    b3.putString("user_id", user_id);
-                                                    b3.putString("restaurant_id", itemValue.getRestaurant_id());
-                                                    intent3.putExtras(b3);
-                                                    startActivity(intent3);
-                                                }
-                                            });
-
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError firebaseError) {
-                                            System.out.println("The read failed: " + firebaseError.getMessage());
-                                        }
-                                    });
+                    if (favouritesID.isEmpty()) {
+                        Toast.makeText(getApplicationContext(), "No favourite restaurants", Toast.LENGTH_SHORT).show();
+                        FirebaseUtil.hideProgressDialog(mProgressDialog);
+                    }
+                    else {
+                        for (int i = 0; i < favouritesID.size(); i++) {
+                            final int index = i;
+                            DatabaseReference ref = firebase.getReference("restaurants_previews/" + favouritesID.get(i));
+                            Log.d("prova", favouritesID.get(i));
+                            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    RestaurantPreview restaurantPreview = snapshot.getValue(RestaurantPreview.class);
+                                    favourite_restaurants.add(restaurantPreview);
+                                    adapter.notifyDataSetChanged();
+                                    if(index == favouritesID.size() - 1)
+                                        FirebaseUtil.hideProgressDialog(mProgressDialog);
                                 }
-                            }
+
+                                @Override
+                                public void onCancelled(DatabaseError firebaseError) {
+                                    System.out.println("The read failed: " + firebaseError.getMessage());
+                                }
+                            });
                         }
-
-                FirebaseUtil.hideProgressDialog(mProgressDialog);
-
+                    }
+                }
             }
 
 

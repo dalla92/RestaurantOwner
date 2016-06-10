@@ -18,8 +18,7 @@
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
-            app:layout_collapseMode="parallax"
+            app:layout_collapseMode="pin"
             android:focusable="true"
             android:focusableInTouchMode="true">
 
@@ -78,6 +77,7 @@
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginStart="148dp"
             app:expandedTitleMarginEnd="164dp"
+            app:layout_collapseMode="parallax"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <LinearLayout

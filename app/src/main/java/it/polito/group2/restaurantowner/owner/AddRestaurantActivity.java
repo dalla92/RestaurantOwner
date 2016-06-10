@@ -174,7 +174,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                             restaurantReference2.setValue(r_p);
 
                             //saving the names of the restaurant with the id in restaurant_names for search purpose
-                            firebase.getReference("restaurant_names/" + finalRes.getRestaurant_name().toLowerCase()).setValue(finalRes.getRestaurant_id());
+                            firebase.getReference("restaurant_names/" + finalRes.getRestaurant_name().toLowerCase() + "/" + finalRes.getRestaurant_id()).setValue(true);
                             FirebaseUtil.hideProgressDialog(mProssesDialog);
                             Toast.makeText(AddRestaurantActivity.this, "Restaurant added successfully", Toast.LENGTH_SHORT).show();
                             finish();

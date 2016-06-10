@@ -29,8 +29,6 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
@@ -39,13 +37,7 @@ import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.Utils.OnLoadMoreListener;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.User;
-import it.polito.group2.restaurantowner.login.LoginManagerActivity;
-import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.SimpleItemTouchHelperCallback;
-import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class MyReviewsActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{

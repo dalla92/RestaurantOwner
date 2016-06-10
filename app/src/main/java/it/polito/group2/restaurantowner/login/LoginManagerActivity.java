@@ -385,6 +385,7 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
 
     private void signInWithPassword(){
         if (!validateEmail() || !validatePassword()) {
+            hideProgressDialog();
             return;
         }
 
@@ -401,11 +402,13 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
 
             @Override
             public void onCancel() {
+                hideProgressDialog();
                 Log.d("prova", "facebook login cancelled!");
             }
 
             @Override
             public void onError(FacebookException error) {
+                hideProgressDialog();
                 Log.d("prova", error.toString());
             }
         });

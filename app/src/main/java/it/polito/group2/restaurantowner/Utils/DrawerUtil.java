@@ -1,7 +1,6 @@
 package it.polito.group2.restaurantowner.Utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -23,7 +22,7 @@ import it.polito.group2.restaurantowner.owner.statistics.StatisticsActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserMyFavourites;
+import it.polito.group2.restaurantowner.user.my_favourites.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserMyReservations;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserProfile;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;

@@ -18,10 +18,10 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActiv
 public class RestaurantSuggestionAdapter extends RecyclerView.Adapter<RestaurantSuggestionAdapter.RestaurantSearchViewHolder> {
 
     private ArrayList<String> names;
-    private HashMap<String, String> namesAndId;
+    private HashMap<String, HashMap<String, Boolean>> namesAndId;
     private Activity activity;
 
-    public RestaurantSuggestionAdapter(HashMap<String, String> namesAndId, Activity activity) {
+    public RestaurantSuggestionAdapter(HashMap<String, HashMap<String, Boolean>> namesAndId, Activity activity) {
         this.names = new ArrayList<>();
         this.names.addAll(namesAndId.keySet());
         this.namesAndId = namesAndId;
@@ -41,11 +41,26 @@ public class RestaurantSuggestionAdapter extends RecyclerView.Adapter<Restaurant
         @Override
         public void onClick(View v) {
             String key = names.get(this.getLayoutPosition());
-            String restaurantId = namesAndId.get(key);
-            Intent intent = new Intent(activity, UserRestaurantActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            intent.putExtra("restaurant_id", restaurantId);
-            activity.startActivity(intent);
+            HashMap<String, Boolean> mapIds = namesAndId.get(key);
+
+            ArrayList<String> restaurantsIDs = new ArrayList<>();
+            restaurantsIDs.addAll(mapIds.keySet());
+
+            if(restaurantsIDs.size() == 1){
+                Intent intent = new Intent(activity, UserRestaurantActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                intent.putExtra("restaurant_id", restaurantsIDs.get(0));
+                activity.startActivity(intent);
+            }
+            else {
+                Intent intent = new Intent();
+                intent.putExtra("restaurant_list", restaurantsIDs);
+                intent.putExtra("searchedText", key);
+                activity.setResult(Activity.RESULT_OK, intent);
+                activity.finish();
+            }
+
+
         }
     }
 
@@ -65,7 +80,7 @@ public class RestaurantSuggestionAdapter extends RecyclerView.Adapter<Restaurant
         return names.size();
     }
 
-    public void setData(HashMap<String, String> namesAndId){
+    public void setData(HashMap<String, HashMap<String, Boolean>> namesAndId){
         this.namesAndId = namesAndId;
         this.names = new ArrayList<>();
         this.names.addAll(namesAndId.keySet());
