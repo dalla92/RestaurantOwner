@@ -914,15 +914,12 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
     private void addBookmarkButtonClick() {
         final String userID = FirebaseUtil.getCurrentUserId();
-        Log.d("prova", "" + userID);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (userID == null) {
-                    Log.d("prova", "null");
                     FirebaseUtil.showLoginDialog(UserRestaurantActivity.this);
                 } else {
-                    Log.d("prova", "not null");
                     FirebaseUtil.showProgressDialog(mProgressDialog);
                     final DatabaseReference restaurantBookmarksRef = firebase.getReference("restaurants/" + restaurantID + "/favourite_users/" + userID);
                     final DatabaseReference userBookmarksRef = firebase.getReference("users/" + userID + "/favourites_restaurants/" + restaurantID);
