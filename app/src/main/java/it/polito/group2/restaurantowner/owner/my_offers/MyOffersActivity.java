@@ -252,10 +252,6 @@ public class MyOffersActivity extends AppCompatActivity
         list.setAdapter(adapter);
     }
 
-    public void deleteOffer(Offer offer) {
-
-    }
-
     //ACTIVITY FUNCTIONS ===========================================================================
 
     private void setDrawer(User user) {
