@@ -285,7 +285,7 @@ public class MapsActivity extends AppCompatActivity implements
                 mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
                 */
                 prepare_clustering();
-                if(DEFAULT_RADIUS!=0){
+                if(DEFAULT_RADIUS!=0 && mLastUserMarker!=null){
                     //add circle
                     Circle circle = mMap.addCircle(new CircleOptions()
                             .center(new LatLng(mLastUserMarker.getPosition().latitude, mLastUserMarker.getPosition().longitude))
@@ -463,6 +463,7 @@ public class MapsActivity extends AppCompatActivity implements
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
                             status.startResolutionForResult(MapsActivity.this, REQUEST_CHECK_SETTINGS);
+                            status.startResolutionForResult(MapsActivity.this, REQUEST_CHECK_SETTINGS);
                         } catch (IntentSender.SendIntentException e) {
                             // Ignore the error.
                         }
@@ -486,7 +487,7 @@ public class MapsActivity extends AppCompatActivity implements
                         startLocationUpdates();
                         break;
                     case Activity.RESULT_CANCELED:
-                        settingsrequest();//keep asking if imp or do whatever
+                        //settingsrequest();//keep asking if imp or do whatever
                         break;
                 }
                 break;

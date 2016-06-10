@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.location.Location;
 
@@ -52,6 +53,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -137,10 +141,12 @@ public class UserRestaurantList extends AppCompatActivity
                 if (mRequestingLocationUpdates == false) {
                     //enable gps
                     mRequestingLocationUpdates = true;
+                    startLocationUpdates();
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
                 } else {
                     //disable gps
                     mRequestingLocationUpdates = false;
+                    stopLocationUpdates();
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
                 }
             }
@@ -766,6 +772,7 @@ public class UserRestaurantList extends AppCompatActivity
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
                             status.startResolutionForResult(UserRestaurantList.this, REQUEST_CHECK_SETTINGS);
+                            read_restaurants_from_firebase(true);
                         } catch (IntentSender.SendIntentException e) {
                             // Ignore the error.
                         }
@@ -928,6 +935,14 @@ public class UserRestaurantList extends AppCompatActivity
                 else {
                     mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
                 }
+            }
+            if(range!=0 && mLastUserMarker!=null){
+                //add circle
+                Circle circle = mMap.addCircle(new CircleOptions()
+                        .center(new LatLng(mLastUserMarker.getPosition().latitude, mLastUserMarker.getPosition().longitude))
+                        .radius(range)
+                        .strokeColor(Color.BLACK));
+                //.fillColor(Color.BLUE)
 
             }
         }

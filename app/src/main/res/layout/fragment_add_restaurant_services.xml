@@ -64,12 +64,16 @@
             android:hint="Max orders/hour"
             android:id="@+id/editTextTakeAway"
             android:layout_weight="1" />
+
     </LinearLayout>
 
      <View
          android:layout_width="match_parent"
          android:layout_height="1dp"
-         android:background="@color/divider"/>
+         android:padding="10dp"
+         android:id="@+id/lll"
+         android:background="@color/divider"
+         android:layout_below="@id/ll2"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -78,7 +82,7 @@
         android:text="Set open and close hours"
         android:id="@+id/textView5"
         android:paddingTop="10dp"
-        android:layout_below="@id/ll2"/>
+        android:layout_below="@id/lll"/>
 
     <Spinner
         android:layout_width="match_parent"

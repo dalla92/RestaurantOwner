@@ -110,6 +110,20 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
     }
 
     protected ArrayList<RestaurantPreview> filter(String category, boolean lunch, boolean dinner, boolean price1, boolean price2, boolean price3, boolean price4, Marker marker, double range) {
+        /*
+        FirebaseDatabase firebase;
+        firebase.getInstance();
+        Firebase ref = new Firebase("https://dinosaur-facts.firebaseio.com/dinosaurs");
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                // do some stuff once
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+            }
+        });
+        */
         //filter by category
         ArrayList<RestaurantPreview> nResList = new ArrayList<RestaurantPreview>();
         if (category.equals("0"))

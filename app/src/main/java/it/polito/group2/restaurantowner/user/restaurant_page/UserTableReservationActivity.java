@@ -97,97 +97,107 @@ public class UserTableReservationActivity extends AppCompatActivity {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         //get data
-        Intent intent = getIntent();
-        current_restaurant = (Restaurant) intent.getExtras().get("restaurant");
         mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
-        user_id = FirebaseUtil.getCurrentUserId();
-            if (current_restaurant.getRestaurant_total_tables_number() <= 0) {
-                new AlertDialog.Builder(context)
-                        .setMessage(R.string.no_table_reservation_service)
-                        .setPositiveButton(
-                                getResources().getString(R.string.ok),
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog,
-                                                        int which) {
-                                        Intent intent = new Intent(
-                                                getApplicationContext(),
-                                                UserRestaurantActivity.class);
-                                        startActivity(intent);
+
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/"+restaurant_id);
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                current_restaurant = snapshot.getValue(Restaurant.class);
+                user_id = FirebaseUtil.getCurrentUserId();
+                if (current_restaurant.getRestaurant_total_tables_number() <= 0) {
+                    new AlertDialog.Builder(context)
+                            .setMessage(R.string.no_table_reservation_service)
+                            .setPositiveButton(
+                                    getResources().getString(R.string.ok),
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog,
+                                                            int which) {
+                                            Intent intent = new Intent(
+                                                    getApplicationContext(),
+                                                    UserRestaurantActivity.class);
+                                            startActivity(intent);
+                                        }
                                     }
-                                }
-                        )
-                        .setMessage(
-                                getResources().getString(R.string.no_table_reservation_service))
-                        .show();
-            } else {
-                current_table_reservation = new TableReservation();
-                notes = (EditText) findViewById(R.id.table_reservation_notes);
+                            )
+                            .setMessage(
+                                    getResources().getString(R.string.no_table_reservation_service))
+                            .show();
+                } else {
+                    current_table_reservation = new TableReservation();
+                    notes = (EditText) findViewById(R.id.table_reservation_notes);
 
-                //numberpicker
-                guests_number = (NumberPicker) findViewById(R.id.guests_number_picker);
-                guests_number.setValue(0);
-                guests_number.setMaxValue(0);
-                guests_number.setMinValue(0);
-                guests_number.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
-                    @Override
-                    public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                        if (guests_number.getMaxValue() == 0)
-                            Toast.makeText(context, R.string.set_time_first, Toast.LENGTH_SHORT).show();
+                    //numberpicker
+                    guests_number = (NumberPicker) findViewById(R.id.guests_number_picker);
+                    guests_number.setValue(0);
+                    guests_number.setMaxValue(0);
+                    guests_number.setMinValue(0);
+                    guests_number.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+                        @Override
+                        public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                            if (guests_number.getMaxValue() == 0)
+                                Toast.makeText(context, R.string.set_time_first, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    guests_number.setOnScrollListener(new NumberPicker.OnScrollListener() {
+                        @Override
+                        public void onScrollStateChange(NumberPicker view, int scrollState) {
+                            if (guests_number.getMaxValue() == 0)
+                                Toast.makeText(context, R.string.set_time_first, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    //text fields
+                    date_reserved_text = (TextView) findViewById(R.id.date_reserved);
+                    time_reserved_text = (TextView) findViewById(R.id.time_reserved);
+
+                    //timepicker
+                    // Get Current Time
+                    final Calendar today = Calendar.getInstance();
+                    current_hour = Integer.toString(today.get(Calendar.HOUR_OF_DAY));
+                    current_minute = Integer.toString(today.get(Calendar.MINUTE));
+                    chosen_hour = null; //current_hour;
+                    chosen_minute = null; //current_minute;
+                    timepicker_button = (Button) findViewById(R.id.table_reservation_time);
+                    timepicker_button.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            getTime();
+                        }
+                    });
+
+                    //datepicker
+                    // Get Current Date
+                    final Calendar c = Calendar.getInstance();
+                    current_year = Integer.toString(c.get(Calendar.YEAR));
+                    current_month = Integer.toString(c.get(Calendar.MONTH));
+                    current_day = Integer.toString(c.get(Calendar.DAY_OF_MONTH));
+                    chosen_year = null; //current_year;
+                    chosen_month = null; //current_month;
+                    chosen_day = null; //current_day;
+                    chosen_weekday = null; //current_day;
+                    datepicker_button = (Button) findViewById(R.id.table_reservation_date);
+                    datepicker_button.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            getDate();
+                        }
+                    });
+
+                    //searching closing days
+                    closing_days = new ArrayList<>();
+                    for (RestaurantTimeSlot rts : current_restaurant.getRestaurant_time_slot()) {
+                        closing_days.add(rts.getDay_of_week());
                     }
-                });
-                guests_number.setOnScrollListener(new NumberPicker.OnScrollListener() {
-                    @Override
-                    public void onScrollStateChange(NumberPicker view, int scrollState) {
-                        if (guests_number.getMaxValue() == 0)
-                            Toast.makeText(context, R.string.set_time_first, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-                //text fields
-                date_reserved_text = (TextView) findViewById(R.id.date_reserved);
-                time_reserved_text = (TextView) findViewById(R.id.time_reserved);
-
-                //timepicker
-                // Get Current Time
-                final Calendar today = Calendar.getInstance();
-                current_hour = Integer.toString(today.get(Calendar.HOUR_OF_DAY));
-                current_minute = Integer.toString(today.get(Calendar.MINUTE));
-                chosen_hour = null; //current_hour;
-                chosen_minute = null; //current_minute;
-                timepicker_button = (Button) findViewById(R.id.table_reservation_time);
-                timepicker_button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        getTime();
-                    }
-                });
-
-                //datepicker
-                // Get Current Date
-                final Calendar c = Calendar.getInstance();
-                current_year = Integer.toString(c.get(Calendar.YEAR));
-                current_month = Integer.toString(c.get(Calendar.MONTH));
-                current_day = Integer.toString(c.get(Calendar.DAY_OF_MONTH));
-                chosen_year = null; //current_year;
-                chosen_month = null; //current_month;
-                chosen_day = null; //current_day;
-                chosen_weekday = null; //current_day;
-                datepicker_button = (Button) findViewById(R.id.table_reservation_date);
-                datepicker_button.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        getDate();
-                    }
-                });
-
-                //searching closing days
-                closing_days = new ArrayList<>();
-                for (RestaurantTimeSlot rts : current_restaurant.getRestaurant_time_slot()) {
-                    closing_days.add(rts.getDay_of_week());
                 }
             }
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+            }
+        });
+
     }
 
     public void getDate() {

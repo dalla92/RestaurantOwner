@@ -38,7 +38,7 @@ public class Filter extends AppCompatActivity {
     private Spinner category;
     private SeekBar seekBar;
     private TextView textView;
-    private double range = 0;
+    private double range = 5000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
