@@ -201,7 +201,10 @@
     <string name="profile_phone_number">Telephone number</string>
     <string name="profile_vat_number">VAT Number</string>
     <string name="action_cancel">Cancel</string>
-
+    <string name="start">Start:</string>
+    <string name="end">End:</string>
+    <string name="offers">Offers</string>
+    <string name="reviews">Reviews</string>
     <string name="title_activity_my_orders">My Orders</string>
     <string name="call_confirmation">Call confirmation</string>
     <string name="call_confirmation_message">Sure to call the restaurant?</string>

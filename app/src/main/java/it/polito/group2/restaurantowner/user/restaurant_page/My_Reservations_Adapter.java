@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Set;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.Review;

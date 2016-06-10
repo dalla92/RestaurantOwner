@@ -1,100 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="6dp">
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/offer_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:id="@+id/offer_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:paddingTop="4dp"
+            />
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1">
+            android:paddingTop="4dp">
 
             <TextView
-                android:id="@+id/offer_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
+                android:text="@string/start"
+                android:textSize="14sp"
+                android:paddingEnd="4dp"
                 />
 
             <TextView
-                android:id="@+id/offer_desc"
+                android:id="@+id/offer_from"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:paddingTop="4dp"
                 />
 
-            <LinearLayout
-                android:orientation="horizontal"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="4dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/from"
-                    android:textSize="14sp"
-                    android:paddingEnd="4dp"
-                    />
-
-                <TextView
-                    android:id="@+id/offer_from"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/to"
-                    android:textSize="14sp"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="4dp"
-                    />
-
-                <TextView
-                    android:id="@+id/offer_to"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    />
-
-            </LinearLayout>
+                android:text="@string/end"
+                android:textSize="14sp"
+                android:paddingStart="10dp"
+                android:paddingEnd="4dp"
+                />
 
             <TextView
-                android:id="@+id/offer_lunch_dinner"
+                android:id="@+id/offer_to"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:paddingTop="4dp"
-                android:textColor="@color/colorPrimaryDark"
                 />
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/offer_delete"
+        <TextView
+            android:id="@+id/offer_lunch_dinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_delete_primary_24dp"
-            android:padding="4dp"
-            android:clickable="true"
+            android:textSize="14sp"
+            android:paddingTop="4dp"
+            android:textColor="@color/colorPrimaryDark"
             />
 
     </LinearLayout>
 
-</RelativeLayout>
+    <ImageView
+        android:id="@+id/offer_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_delete_primary_24dp"
+        android:padding="4dp"
+        android:clickable="true"
+        />
+
+</LinearLayout>

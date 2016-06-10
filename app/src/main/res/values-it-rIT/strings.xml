@@ -239,4 +239,6 @@
     <string name="user_order_cart_deltitle">Cancella cibo</string>
     <string name="user_order_info_alert_message">Devi inserire la quantità da aggiungere al carrello.</string>
     <string name="user_order_info_alert_title">Attenzione!</string>
+    <string name="offers">Offerte</string>
+    <string name="reviews">Recensioni</string>
 </resources>

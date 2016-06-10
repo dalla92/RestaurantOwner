@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +71,21 @@ public class PlaceSuggestionAdapter extends RecyclerView.Adapter<PlaceSuggestion
     @Override
     public void onBindViewHolder(PlaceSearchViewHolder holder, int position) {
         holder.searchSuggestion.setText(prediction_list.get(position).getFullText(null));
+    }
+
+    private String getFormattedAddress(AutocompletePrediction prediction) {
+        String secondaryText = prediction.getSecondaryText(null).toString();
+        int firstComma = secondaryText.indexOf(',');
+        int lastComma =secondaryText.lastIndexOf(',');
+
+        String address = prediction.getPrimaryText(null).toString().trim();
+        String city = secondaryText.substring(0, firstComma);
+        String country = secondaryText.substring(lastComma + 1).trim();
+        Log.d("prova", address);
+        Log.d("prova", city);
+        Log.d("prova", country);
+        Log.d("prova", "--------------------------------------");
+        return address + ", " + city + ", " + country;
     }
 
     @Override

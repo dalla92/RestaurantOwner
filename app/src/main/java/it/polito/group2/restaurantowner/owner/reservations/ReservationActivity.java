@@ -23,7 +23,6 @@ import java.util.Calendar;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
-import it.polito.group2.restaurantowner.data.Restaurant;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.AddRestaurantActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
@@ -37,7 +36,6 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
 
     private FragmentPageAdapter adapter;
     private String restaurant_id;
-    public Restaurant current_restaurant;
     public Context context;
     public int MODIFY_INFO = 4;
 

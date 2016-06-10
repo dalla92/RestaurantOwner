@@ -33,9 +33,6 @@ import java.util.List;
 import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.Meal;
-import it.polito.group2.restaurantowner.data.OpenTime;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;

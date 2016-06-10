@@ -51,7 +51,6 @@ import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
-import it.polito.group2.restaurantowner.data.JSONUtil;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.MealCategory;

@@ -115,7 +115,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 mAdapter.clear();
+                resList = new ArrayList<>();
                 for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    resList.add(0, postSnapshot.getValue(RestaurantPreview.class));
                     mAdapter.addItem(0, postSnapshot.getValue(RestaurantPreview.class));
                 }
                 FirebaseUtil.hideProgressDialog(mProgressDialog);

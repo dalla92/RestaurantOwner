@@ -58,8 +58,7 @@ import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.Offer;
+import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
@@ -73,7 +72,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private static final int ADD_REQUEST = 1;
     private String restaurantID;
     private ArrayList<Review> reviews;
-    private ArrayList<Offer> offers;
+    private ArrayList<it.polito.group2.restaurantowner.firebasedata.Offer> offers;
     private ArrayList<Meal> meals;
     private ArrayList<String> categories;
     private Restaurant targetRestaurant;
@@ -85,8 +84,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private FloatingActionButton fab;
     private boolean theUserIsTheOwner = false;
     private TextView timesText;
-    private Query q_reviews;
-    private ChildEventListener l_reviews;
+    private Query reviewsQuery;
+    private ChildEventListener reviewsChildListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,20 +97,23 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
         meals = new ArrayList<>();
         reviews = new ArrayList<>();
+        offers = new ArrayList<>();
         initializeUserReviewList();
         final CollapsingToolbarLayout collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_user_restaurant);
         collapsing.setExpandedTitleColor(ContextCompat.getColor(this, android.R.color.transparent));
         coverPicture = (ImageView) findViewById(R.id.user_restaurant_image);
         fab = (FloatingActionButton) findViewById(R.id.bookmark_fab);
+
         firebase = FirebaseDatabase.getInstance();
-        FirebaseUtil.initProgressDialog(this);
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null)
             restaurantID = getIntent().getExtras().getString("restaurant_id");
 
         Query mealsQuery = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
-        q_reviews = firebase.getReference("reviews/" + restaurantID).orderByPriority();
+        Query offersQuery = firebase.getReference("offers/" + restaurantID).orderByChild("offerEnabled").equalTo(true);
+        reviewsQuery = firebase.getReference("reviews/" + restaurantID).orderByPriority();
 
         DatabaseReference restaurantRef = firebase.getReference("restaurants/" + restaurantID);
         restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -189,7 +191,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
-        l_reviews = new ChildEventListener() {
+        reviewsChildListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Log.d("prova", "review added");
@@ -224,6 +226,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot data : dataSnapshot.getChildren())
                     meals.add(data.getValue(Meal.class));
+
                 FirebaseUtil.hideProgressDialog(mProgressDialog);
                 categories = getCategoryList();
                 setRestaurantMenu();
@@ -234,26 +237,38 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             }
         });
 
-        offers = getOffersJSON();
+        offersQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot data : dataSnapshot.getChildren())
+                    offers.add(data.getValue(Offer.class));
+
+                Log.d("prova", ""+offers.size());
+                setRestaurantOffers();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("offer", "meals cancelled");
+            }
+        });
 
         addBookmarkButtonClick();
         addInfoExpandAnimation();
         addTimesExpandAnimation();
         setCallAction();
         setDrawer();
-
-        setRestaurantOffers();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        q_reviews.addChildEventListener(l_reviews);
+        reviewsQuery.addChildEventListener(reviewsChildListener);
     }
     @Override
     protected void onStop() {
         super.onStop();
-        RemoveListenerUtil.remove_child_event_listener(q_reviews, l_reviews);
+        RemoveListenerUtil.remove_child_event_listener(reviewsQuery, reviewsChildListener);
     }
 
     @Override
@@ -945,7 +960,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         else
                             fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
 
-                        userBookmarksRef.setValue(bookmark? true : null);
+                        userBookmarksRef.setValue(bookmark ? true : null);
                         FirebaseUtil.hideProgressDialog(mProgressDialog);
                     }
                 })
@@ -967,16 +982,6 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         ObjectAnimator animation = ObjectAnimator.ofInt(tv, "maxLines",
                 tv.getMaxLines() == collapsedMaxLines? tv.getLineCount() : collapsedMaxLines);
         animation.setDuration(200).start();
-    }
-
-
-    private ArrayList<Offer> getOffersJSON(){
-        try {
-            return JSONUtil.readJSONOfferList(this, restaurantID);
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
-        }
     }
 
 }

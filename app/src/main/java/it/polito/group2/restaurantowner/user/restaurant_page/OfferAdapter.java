@@ -2,16 +2,17 @@ package it.polito.group2.restaurantowner.user.restaurant_page;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.Offer;
+import it.polito.group2.restaurantowner.firebasedata.Offer;
 
 public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHolder> {
 
@@ -45,14 +46,20 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
 
     @Override
     public void onBindViewHolder(OfferViewHolder holder, int position) {
-        holder.name.setText(offers.get(position).getName());
-        holder.desc.setText(offers.get(position).getDescription());
+        holder.name.setText(offers.get(position).getOfferName());
+        holder.desc.setText(offers.get(position).getOfferDescription());
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        holder.from.setText(dateFormat.format(offers.get(position).getFrom()));
-        holder.to.setText(dateFormat.format(offers.get(position).getTo()));
-        if(offers.get(position).isLunch() && offers.get(position).isDinner())
+        Calendar start = Calendar.getInstance();
+        Calendar stop = Calendar.getInstance();
+        start.setTimeInMillis(offers.get(position).getOfferStart());
+        stop.setTimeInMillis(offers.get(position).getOfferStop());
+
+        holder.from.setText(dateFormat.format(start.getTime()));
+        holder.to.setText(dateFormat.format(stop.getTime()));
+        if(offers.get(position).getOfferAtLunch() && offers.get(position).getOfferAtDinner())
            holder.validity.setText(context.getString(R.string.valid_for) + context.getString(R.string.lunch) + "/" + context.getString(R.string.dinner));
-        else if(offers.get(position).isLunch())
+        else if(offers.get(position).getOfferAtLunch())
             holder.validity.setText(context.getString(R.string.lunch));
         else
             holder.validity.setText(context.getString(R.string.dinner));
