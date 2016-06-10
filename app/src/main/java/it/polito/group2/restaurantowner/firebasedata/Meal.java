@@ -50,7 +50,9 @@ public class Meal implements Parcelable {
     }
 
     public ArrayList<MealAddition> allAdditions() {
-        return (ArrayList<MealAddition>) meal_additions.values();
+        ArrayList<MealAddition> list = new ArrayList<>();
+        list.addAll(meal_additions.values());
+        return list;
     }
 
     public void addTag(MealCategory tag) {
@@ -68,7 +70,9 @@ public class Meal implements Parcelable {
     }
 
     public ArrayList<MealCategory> allTags() {
-        return (ArrayList<MealCategory>) meal_tags.values();
+        ArrayList<MealCategory> list = new ArrayList<>();
+        list.addAll(meal_tags.values());
+        return list;
     }
 
     public String getMeal_id() {

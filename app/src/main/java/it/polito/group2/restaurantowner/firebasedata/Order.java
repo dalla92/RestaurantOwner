@@ -42,7 +42,9 @@ public class Order implements Serializable {
     }
 
     public ArrayList<Meal> allMeals() {
-        return (ArrayList<Meal>) order_meals.values();
+        ArrayList<Meal> list = new ArrayList<>();
+        list.addAll(order_meals.values());
+        return list;
     }
 
     public String getOrder_id() {
