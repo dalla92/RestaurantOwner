@@ -195,14 +195,7 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
                             public void onComplete(@NonNull Task<Void> task) {
                                 hideProgressDialog();
                                 Intent i = new Intent(LoginManagerActivity.this, UserRestaurantList.class);
-
-                                // Closing all the Activities from stack
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                                // Add new Flag to start new Activity
-                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                                // Staring UserRestaurantList Activity
+                                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(i);
                             }
                         });
@@ -220,14 +213,7 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
 
                         hideProgressDialog();
                         Intent i = new Intent(LoginManagerActivity.this, UserRestaurantList.class);
-
-                        // Closing all the Activities from stack
-                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-                        // Add new Flag to start new Activity
-                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                        // Staring UserRestaurantList Activity
+                        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(i);
                     }
                 }

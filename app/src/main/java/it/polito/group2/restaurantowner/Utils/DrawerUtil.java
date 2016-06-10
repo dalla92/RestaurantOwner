@@ -16,10 +16,10 @@ import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.AddRestaurantActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
-import it.polito.group2.restaurantowner.owner.StatisticsActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
 import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
+import it.polito.group2.restaurantowner.owner.statistics.StatisticsActivity;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
@@ -161,7 +161,7 @@ public class DrawerUtil {
             }
             return true;
         } else if(id==R.id.action_statistics){
-            if (a instanceof StatisticsActivity ) {
+            if (a instanceof StatisticsActivity) {
                 drawer.closeDrawer(GravityCompat.START);
             }
             else {
