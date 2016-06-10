@@ -132,4 +132,9 @@ public class FirebaseUtil {
         return firebase.getReference("orders").orderByChild("user_id").equalTo(userID);
     }
 
+    public static DatabaseReference getOrdersRef() {
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        return firebase.getReference("orders");
+    }
+
 }

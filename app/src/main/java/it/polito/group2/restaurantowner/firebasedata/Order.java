@@ -18,6 +18,7 @@ public class Order implements Serializable {
     private String order_notes;
     private HashMap<String, Meal> order_meals = new HashMap<>();
     private Double order_price;
+    private Boolean fidelity_applied = false;
 
     public Order(){
 
@@ -103,6 +104,14 @@ public class Order implements Serializable {
         this.order_meals = order_meals;
     }
 
+    public Boolean getFidelity_applied() {
+        return fidelity_applied;
+    }
+
+    public void setFidelity_applied(Boolean fidelity_applied) {
+        this.fidelity_applied = fidelity_applied;
+    }
+
     public Double getOrder_price() {
         return order_price;
     }
@@ -131,7 +140,9 @@ public class Order implements Serializable {
             return false;
         if (order_meals != null ? !order_meals.equals(order.order_meals) : order.order_meals != null)
             return false;
-        return !(order_price != null ? !order_price.equals(order.order_price) : order.order_price != null);
+        if (order_price != null ? !order_price.equals(order.order_price) : order.order_price != null)
+            return false;
+        return !(fidelity_applied != null ? !fidelity_applied.equals(order.fidelity_applied) : order.fidelity_applied != null);
 
     }
 
@@ -145,6 +156,7 @@ public class Order implements Serializable {
         result = 31 * result + (order_notes != null ? order_notes.hashCode() : 0);
         result = 31 * result + (order_meals != null ? order_meals.hashCode() : 0);
         result = 31 * result + (order_price != null ? order_price.hashCode() : 0);
+        result = 31 * result + (fidelity_applied != null ? fidelity_applied.hashCode() : 0);
         return result;
     }
 
@@ -159,6 +171,7 @@ public class Order implements Serializable {
                 ", order_notes='" + order_notes + '\'' +
                 ", order_meals=" + order_meals +
                 ", order_price=" + order_price +
+                ", fidelity_applied=" + fidelity_applied +
                 '}';
     }
 }

@@ -340,6 +340,13 @@
     <string name="user_order_cancel_message">Do you want to delete the order?</string>
     <string name="user_order_cart_deltitle">Delete meal</string>
     <string name="user_order_cart_delmessage">Do you want to delete this meal?</string>
+    <string name="user_order_alert_back_title">Attention!</string>
+    <string name="user_order_alert_back_message">If you go back, you will lose your order if you don\'t confirm it.</string>
+    <string name="user_order_alert_limit_title">Restaurant order limit</string>
+    <string name="user_order_alert_limit_message">We are sorry, the limit of orders in this hour out. Try later.</string>
+    <string name="user_order_alert_fidelity_title">Fidelity program</string>
+    <string name="user_order_alert_fidelityuse_message">With your 1000 points you have 10% of discount extra.</string>
+    <string name="user_order_alert_fidelityup_message">You will have 1 point per each 10 euro of order</string>
 
     <!-- Google Maps strings -->
     <string name="last_update_time_label">Last location update time</string>
