@@ -17,13 +17,13 @@
             android:layout_marginTop="16dp"
             android:layout_marginStart="16dp">
 
-            <TextView
+            <!--TextView
                 android:id="@+id/user_restaurant_num_reviews"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="26sp"
-                android:layout_marginRight="6dp"/>
+                android:layout_marginRight="6dp"/-->
 
             <TextView
                 android:layout_width="wrap_content"

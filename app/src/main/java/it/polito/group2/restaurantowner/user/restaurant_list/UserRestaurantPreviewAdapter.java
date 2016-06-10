@@ -233,12 +233,12 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             final TextView res_num_text_view = reservationNumber;
             firebase = FirebaseDatabase.getInstance();
             total_tables_number = r.getTables_number();
-            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/" + restaurant_id + "");
+            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/" + restaurant_id);
             ref2.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        TableReservation snap_t_b = (TableReservation) dataSnapshot.getValue(TableReservation.class);
+                        TableReservation snap_t_b = dataSnapshot.getValue(TableReservation.class);
                         Calendar that = snap_t_b.getTable_reservation_date();
                         int that_day = that.get(Calendar.DAY_OF_MONTH);
                         int that_month = that.get(Calendar.MONTH);

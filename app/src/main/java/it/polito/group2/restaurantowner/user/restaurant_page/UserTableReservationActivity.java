@@ -96,6 +96,11 @@ public class UserTableReservationActivity extends AppCompatActivity {
         //remove focus from edittext
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        user_id = FirebaseUtil.getCurrentUserId();
+        if(user_id == null)
+            finish();
+
+        restaurant_id = getIntent().getExtras().getString("restaurant_id");
         //get data
         mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
@@ -369,14 +374,14 @@ public class UserTableReservationActivity extends AppCompatActivity {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
         };
+
+        q.addListenerForSingleValueEvent(l);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUtil.initProgressDialog(this);
-        FirebaseUtil.showProgressDialog(mProgressDialog);
-        q.addValueEventListener(l);
+        //q.addValueEventListener(l);
     }
     @Override
     protected void onStop() {

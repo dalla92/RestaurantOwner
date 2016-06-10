@@ -27,7 +27,7 @@ import it.polito.group2.restaurantowner.Utils.OnLoadMoreListener;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.owner.ItemTouchHelperAdapter;
 
-public class ReviewAdapter extends RecyclerView.Adapter implements ItemTouchHelperAdapter {
+public class ReviewAdapter extends RecyclerView.Adapter {
     private final int VIEW_ITEM = 1;
     private final int VIEW_PROG = 0;
     private final FirebaseDatabase firebase;
@@ -94,51 +94,6 @@ public class ReviewAdapter extends RecyclerView.Adapter implements ItemTouchHelp
     public int getItemViewType(int position) {
         return reviews.get(position) != null ? VIEW_ITEM : VIEW_PROG;
     }
-
-    @Override
-    public void onItemMove(int fromPosition, int toPosition) {
-    }
-
-    @Override
-    public void onItemDismiss(final int position) {
-        AlertDialog.Builder alert = new AlertDialog.Builder(context);
-        alert.setTitle("Confirmation!");
-        alert.setMessage("Are you sure you want to delete the review?\nThis operation cannot be undone!");
-        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Review  reviewToRemove = reviews.get(position);
-                String userID = reviewToRemove.getUser_id();
-                String restaurantID = reviewToRemove.getRestaurant_id();
-                String reviewID = reviewToRemove.getReview_id();
-                DatabaseReference userReviewRef = firebase.getReference("reviews/" + userID + "/" + reviewID);
-                DatabaseReference restaurantReviewRef = firebase.getReference("reviews/" + restaurantID + "/" + reviewID);
-
-                userReviewRef.setValue(null);
-                restaurantReviewRef.setValue(null);
-
-                removeItem(position);
-                dialog.dismiss();
-
-            }
-        });
-        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                notifyDataSetChanged();
-                dialog.dismiss();
-            }
-        });
-
-        alert.show();
-    }
-
-    public void removeItem(int position){
-        reviews.remove(position);
-        notifyItemRemoved(position);
-    }
-
-
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

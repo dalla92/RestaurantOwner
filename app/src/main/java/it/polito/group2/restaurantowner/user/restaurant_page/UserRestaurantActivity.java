@@ -111,7 +111,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null)
             restaurantID = getIntent().getExtras().getString("restaurant_id");
 
-        Query mealsQuery = firebase.getReference("meals").orderByChild("restaurant_id").equalTo(restaurantID);
+        Query mealsQuery = firebase.getReference("meals/" + restaurantID);
         Query offersQuery = firebase.getReference("offers/" + restaurantID).orderByChild("offerEnabled").equalTo(true);
         reviewsQuery = firebase.getReference("reviews/" + restaurantID).orderByPriority();
 
@@ -679,7 +679,9 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         assert ordersButton != null;
         assert reservationsButton != null;
 
-        if(theUserIsTheOwner) {
+        String userID = FirebaseUtil.getCurrentUserId();
+
+        if(theUserIsTheOwner || userID == null) {
             ordersButton.setVisibility(View.GONE);
             reservationsButton.setVisibility(View.GONE);
         } else {
@@ -699,9 +701,23 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         ordersButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(UserRestaurantActivity.this);
+                alert.setTitle("Warning");
+                alert.setMessage("Questa funzionalità è in fase sviluppo, stay tuned!");
+
+                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                alert.show();
+
+                /* TODO fix order
                 Intent intent = new Intent(UserRestaurantActivity.this, OrderActivity.class);
                 intent.putExtra("restaurant_id", targetRestaurant.getRestaurant_id());
-                startActivity(intent);
+                startActivity(intent);*/
             }
         });
 
@@ -709,9 +725,23 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         reservationsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(UserRestaurantActivity.this);
+                alert.setTitle("Warning");
+                alert.setMessage("Questa funzionalità è in fase sviluppo, stay tuned!");
+
+                alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                alert.show();
+
+                /* TODO fix reservation
                 Intent intent = new Intent(UserRestaurantActivity.this, UserTableReservationActivity.class);
                 intent.putExtra("restaurant_id", targetRestaurant.getRestaurant_id());
-                startActivity(intent);
+                startActivity(intent);*/
             }
         });
     }
@@ -752,8 +782,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     }
 
     private void initializeUserReviewList() {
-        TextView reviews_num = (TextView) findViewById(R.id.user_restaurant_num_reviews);
-        reviews_num.setText(""+reviews.size());
+        /*TextView reviews_num = (TextView) findViewById(R.id.user_restaurant_num_reviews);
+        reviews_num.setText(""+reviews.size());*/
         RecyclerView reviewList = (RecyclerView) findViewById(R.id.user_restaurant_review_list);
         assert reviewList != null;
         reviewList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));

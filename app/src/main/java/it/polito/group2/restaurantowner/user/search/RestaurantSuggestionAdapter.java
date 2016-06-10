@@ -59,8 +59,6 @@ public class RestaurantSuggestionAdapter extends RecyclerView.Adapter<Restaurant
                 activity.setResult(Activity.RESULT_OK, intent);
                 activity.finish();
             }
-
-
         }
     }
 
