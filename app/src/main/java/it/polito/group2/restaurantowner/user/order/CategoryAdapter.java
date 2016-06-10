@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         this.offer = offer;
     }
 
-    public class CategoryViewHolder extends RecyclerView.ViewHolder {
+    public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView categoryName;
         public ImageView offerActive;
 
@@ -36,6 +37,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
             super(view);
             categoryName = (TextView) itemView.findViewById(R.id.category_name);
             offerActive = (ImageView) itemView.findViewById(R.id.offer_active);
+        }
+
+        @Override
+        public void onClick(View v) {
+            //categoryList.get(this.getLayoutPosition())
         }
     }
 
@@ -46,7 +52,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     }
 
     @Override
-    public void onBindViewHolder(CategoryAdapter.CategoryViewHolder holder, int position) {
+    public void onBindViewHolder(CategoryAdapter.CategoryViewHolder holder, final int position) {
         holder.categoryName.setText(categoryList.get(position));
         if(inOffer(categoryList.get(position))) {
             holder.offerActive.setVisibility(View.VISIBLE);
@@ -66,4 +72,5 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
         }
         return false;
     }
+
 }

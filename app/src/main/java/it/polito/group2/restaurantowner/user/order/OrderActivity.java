@@ -99,7 +99,7 @@ public class OrderActivity extends AppCompatActivity
 
         //user firebase data getting
         assert userRef != null;
-        userRef.addValueEventListener(new ValueEventListener() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
@@ -116,7 +116,7 @@ public class OrderActivity extends AppCompatActivity
 
         //restaurant firebase data getting
         assert restaurantRef != null;
-        restaurantRef.addValueEventListener(new ValueEventListener() {
+        restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Restaurant rest = dataSnapshot.getValue(Restaurant.class);
@@ -131,7 +131,7 @@ public class OrderActivity extends AppCompatActivity
                 //orders reference
                 Query ordersRef = FirebaseUtil.getOrdersByRestaurantRef(restaurantID);
                 if (ordersRef != null) {
-                    ordersRef.addValueEventListener(new ValueEventListener() {
+                    ordersRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             ArrayList<Order> orders = new ArrayList<>();
@@ -162,7 +162,7 @@ public class OrderActivity extends AppCompatActivity
 
         //meals firebase data getting
         assert mealsRef != null;
-        mealsRef.addValueEventListener(new ValueEventListener() {
+        mealsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ArrayList<Meal> meals = new ArrayList<>();
@@ -179,7 +179,7 @@ public class OrderActivity extends AppCompatActivity
 
         //offers firebase data getting
         if (offersRef != null) {
-            offersRef.addValueEventListener(new ValueEventListener() {
+            offersRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     ArrayList<Offer> offers = new ArrayList<>();
@@ -193,6 +193,8 @@ public class OrderActivity extends AppCompatActivity
                 public void onCancelled(DatabaseError databaseError) {
                 }
             });
+        } else {
+            startOrder(restaurantID, new ArrayList<Offer>());
         }
 
     }
@@ -361,7 +363,7 @@ public class OrderActivity extends AppCompatActivity
             price += mealprice;
         }
         if(order.getFidelity_applied())
-            price -= price*0.1; //10% per 1000 punti
+            price -= price*0.2; //20% per 100 punti
         order.setOrder_price(price);
     }
 
@@ -370,10 +372,10 @@ public class OrderActivity extends AppCompatActivity
             this.order.allMeals().get(i).setMeal_price(getRightMealPrice(this.order.allMeals().get(i), now));
         }
 
-        //se ha 1000 punti li tolgo e applico il 10% di sconto
+        //se ha 100 punti li tolgo e applico il 20% di sconto
         //altrimenti aggiungo un punto per ogni 10 euro di spesa se il ristorante aderisce
         if(order.getFidelity_applied()) {
-            user.setUser_fidelity_points(user.getUser_fidelity_points() - 1000);
+            user.setUser_fidelity_points(user.getUser_fidelity_points() - 100);
         } else {
             if(restaurant.getFidelityProgramAccepted())
                 user.setUser_fidelity_points(user.getUser_fidelity_points()+((int)(this.order.getOrder_price()/10)));
@@ -494,7 +496,7 @@ public class OrderActivity extends AppCompatActivity
                 !orderStarted) {
             order = setNewOrder();
 
-            if(restaurant.getFidelityProgramAccepted() && user.getUser_fidelity_points() >= 1000)
+            if(restaurant.getFidelityProgramAccepted() && user.getUser_fidelity_points() >= 100)
                 order.setFidelity_applied(true);
 
             FirebaseUtil.hideProgressDialog(mProgressDialog);
@@ -588,7 +590,7 @@ public class OrderActivity extends AppCompatActivity
     private void tempCreateFakeMeals(String restID) {
         String[] cats = {"Primi", "Secondi", "Contorni", "Frutta", "Bevande", "Dolci", "Antipasti", "Specialità"};
         DatabaseReference mealsReference = FirebaseUtil.getMealsRef(restID);
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 20; i++) {
             Meal meal = new Meal();
             meal.setMeal_price(5.0);
             meal.setMeal_category(cats[i % 8]);

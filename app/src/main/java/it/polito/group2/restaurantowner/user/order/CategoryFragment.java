@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 
-public class CategoryFragment extends Fragment {
+public class CategoryFragment extends Fragment implements RecyclerView.OnClickListener {
 
     private static final String LIST = "categoryList";
     private static final String OFFER = "offer";
@@ -59,19 +59,13 @@ public class CategoryFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.user_order_fragment_category, container, false);
-        setCategoryList(view);
-        return view;
+        return inflater.inflate(R.layout.user_order_fragment_category, container, false);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-    }
-
-    //@Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        mCallback.onCategorySelected(categoryList.get(position));
+        setCategoryList(getView());
     }
 
     @Override
@@ -89,6 +83,11 @@ public class CategoryFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mCallback = null;
+    }
+
+    @Override
+    public void onClick(View v) {
+        mCallback.onCategorySelected("test");
     }
 
     public interface OnActionListener {
