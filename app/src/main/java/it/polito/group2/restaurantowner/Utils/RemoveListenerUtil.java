@@ -21,4 +21,12 @@ public class RemoveListenerUtil {
         q.removeEventListener(l);
     }
 
+    public static void remove_value_event_listener(Query q, ValueEventListener l){
+        q.removeEventListener(l);
+    }
+
+    public static void remove_child_event_listener(Query q, ChildEventListener l){
+        q.removeEventListener(l);
+    }
+
 }
