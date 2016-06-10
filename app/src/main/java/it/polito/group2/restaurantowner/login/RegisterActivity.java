@@ -65,7 +65,7 @@ public class RegisterActivity extends AppCompatActivity{
 
     private TextInputLayout inputLayoutFirstName, inputLayoutLastName, inputLayoutPassword, inputLayoutConfirmPassword, inputLayoutEmail;
     private EditText inputFirstName, inputLastName, inputPassword, inputConfirmPassword, inputEmail, inputPhoneNumber;
-    private CheckBox is_owner;
+    private CheckBox isOwnerCheckBox;
     private FirebaseAuth mAuth;
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
@@ -98,7 +98,7 @@ public class RegisterActivity extends AppCompatActivity{
         inputPhoneNumber = (EditText) findViewById(R.id.input_phone_number);
         inputPassword = (EditText) findViewById(R.id.input_password);
         inputConfirmPassword = (EditText) findViewById(R.id.input_confirm_password);
-        is_owner = (CheckBox) findViewById(R.id.is_owner);
+        isOwnerCheckBox = (CheckBox) findViewById(R.id.is_owner);
         //adding TextWatcher
 
         inputFirstName.addTextChangedListener(new MyTextWatcher(inputFirstName));
@@ -159,6 +159,9 @@ public class RegisterActivity extends AppCompatActivity{
         final String password = inputConfirmPassword.getText().toString().trim();
         final String fullName = inputFirstName.getText().toString().trim() + " " + inputLastName.getText().toString().trim();
         final String phoneNumber = inputPhoneNumber.getText().toString().trim();
+        final boolean isOwner = isOwnerCheckBox.isChecked();
+
+        Log.d("prova", ""+isOwner);
 
         Query userQuery = userRef.orderByChild("user_email").equalTo(email);
         userQuery.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -170,7 +173,7 @@ public class RegisterActivity extends AppCompatActivity{
                                 @Override
                                 public void onSuccess(AuthResult authResult) {
                                     User user = new User(authResult.getUser().getUid(), fullName, phoneNumber, email);
-                                    user.setOwnerUser(is_owner.isChecked());
+                                    user.setOwnerUser(isOwner);
                                     user.getProviders().put("password", true);
                                     userRef.child(authResult.getUser().getUid()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
@@ -400,6 +403,7 @@ public class RegisterActivity extends AppCompatActivity{
                         public void onSuccess(AuthResult authResult) {
                             Toast.makeText(RegisterActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
 
+                            userRef.child(user.getUid() + "/ownerUser").setValue(isOwnerCheckBox.isChecked());
                             signOut();
 
                             Intent i = new Intent(RegisterActivity.this, LoginManagerActivity.class);

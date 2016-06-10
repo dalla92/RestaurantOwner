@@ -78,6 +78,7 @@ import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.RecyclerItemClickListener;
@@ -480,8 +481,7 @@ public class UserRestaurantList extends AppCompatActivity
                                                 });
                                             }
                                         }
-                                    }
-                                    else {
+                                    } else {
                                         if (lat != null && lon != null) {
                                             if (is_restaurant_near_without_position(new LatLng(lat, lon), range)) {
                                                 DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "");
@@ -633,7 +633,7 @@ public class UserRestaurantList extends AppCompatActivity
                     TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
                     TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
                     ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
-                    it.polito.group2.restaurantowner.firebasedata.User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
+                    User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
 
                     if (target.getOwnerUser())
                         ownerItem.setVisible(true);

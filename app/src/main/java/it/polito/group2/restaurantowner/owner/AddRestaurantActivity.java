@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.owner;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
@@ -56,6 +57,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
     private Restaurant res = null;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseDatabase firebase;
+    private ProgressDialog mProssesDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         setContentView(R.layout.activity_add_restaurant);
         Intent intent = getIntent();
 
+        mProssesDialog = FirebaseUtil.initProgressDialog(this);
         firebase = FirebaseDatabase.getInstance();
         if(intent.hasExtra("Restaurant"))
             res = (Restaurant) intent.getExtras().get("Restaurant");
@@ -107,6 +110,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         int id = item.getItemId();
 
         if (id == R.id.action_save) {
+            FirebaseUtil.showProgressDialog(mProssesDialog);
             saveData();
             if (res.getRestaurant_name().equals(""))
                 Toast.makeText(this, "Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
@@ -171,6 +175,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
                             //saving the names of the restaurant with the id in restaurant_names for search purpose
                             firebase.getReference("restaurant_names/" + finalRes.getRestaurant_name().toLowerCase()).setValue(finalRes.getRestaurant_id());
+                            FirebaseUtil.hideProgressDialog(mProssesDialog);
                             Toast.makeText(AddRestaurantActivity.this, "Restaurant added successfully", Toast.LENGTH_SHORT).show();
                             finish();
                         }
