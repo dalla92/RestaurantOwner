@@ -201,8 +201,8 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealCategory> tags) {
         current_meal.setMeal_description(meal_description);
         current_meal.setMeal_cooking_time(cooking_time);
-        current_meal.setMeal_additions(mealAdditions);
-        current_meal.setMeal_tags(tags);
+        current_meal.addManyAdditions(mealAdditions);
+        current_meal.addManyTags(tags);
 
         //save photo
         ImageView image = (ImageView) findViewById(R.id.imageView);

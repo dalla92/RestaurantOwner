@@ -4,8 +4,8 @@ package it.polito.group2.restaurantowner.firebasedata;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by Alessio on 16/05/2016.
@@ -24,8 +24,8 @@ public class Meal implements Parcelable {
     private Boolean mealVegetarian;
     private Boolean mealGlutenFree;
     private Boolean mealAvailable;
-    private ArrayList<MealAddition> meal_additions;
-    private ArrayList<MealCategory> meal_tags;
+    private HashMap<String, MealAddition> meal_additions = new HashMap<>();
+    private HashMap<String, MealCategory> meal_tags = new HashMap<>();
     private Boolean mealTakeAway;
     private String meal_thumbnail; //for meal preview with Glide in AsyncTask
     private String meal_photo_firebase_URL; //for enlarging image with Glide in AsyncTask
@@ -33,6 +33,42 @@ public class Meal implements Parcelable {
 
     public Meal(){
 
+    }
+
+    public void addAddition(MealAddition addition) {
+        meal_additions.put(addition.getMeal_addition_id(), addition);
+    }
+
+    public void addManyAdditions(ArrayList<MealAddition> list) {
+        for(MealAddition add : list) {
+            addAddition(add);
+        }
+    }
+
+    public void remAddition(MealAddition addition) {
+        meal_additions.remove(addition.getMeal_addition_id());
+    }
+
+    public ArrayList<MealAddition> allAdditions() {
+        return (ArrayList<MealAddition>) meal_additions.values();
+    }
+
+    public void addTag(MealCategory tag) {
+        meal_tags.put(tag.getMeal_category_id(), tag);
+    }
+
+    public void addManyTags(ArrayList<MealCategory> list) {
+        for(MealCategory tag : list) {
+            addTag(tag);
+        }
+    }
+
+    public void remTag(MealCategory tag) {
+        meal_tags.remove(tag.getMeal_category_id());
+    }
+
+    public ArrayList<MealCategory> allTags() {
+        return (ArrayList<MealCategory>) meal_tags.values();
     }
 
     public String getMeal_id() {
@@ -123,19 +159,19 @@ public class Meal implements Parcelable {
         this.mealAvailable = mealAvailable;
     }
 
-    public ArrayList<MealAddition> getMeal_additions() {
+    public HashMap<String, MealAddition> getMeal_additions() {
         return meal_additions;
     }
 
-    public void setMeal_additions(ArrayList<MealAddition> meal_additions) {
+    public void setMeal_additions(HashMap<String, MealAddition> meal_additions) {
         this.meal_additions = meal_additions;
     }
 
-    public ArrayList<MealCategory> getMeal_tags() {
+    public HashMap<String, MealCategory> getMeal_tags() {
         return meal_tags;
     }
 
-    public void setMeal_tags(ArrayList<MealCategory> meal_tags) {
+    public void setMeal_tags(HashMap<String, MealCategory> meal_tags) {
         this.meal_tags = meal_tags;
     }
 
@@ -249,8 +285,8 @@ public class Meal implements Parcelable {
         this.mealVegetarian = parcel.readInt() != 0;
         this.mealGlutenFree = parcel.readInt() != 0;
         this.mealAvailable = parcel.readInt() != 0;
-        this.meal_additions = parcel.readArrayList(null);
-        this.meal_tags = parcel.readArrayList(null);
+        this.meal_additions = parcel.readHashMap(null);
+        this.meal_tags = parcel.readHashMap(null);
         this.mealTakeAway = parcel.readInt() != 0;
         this.meal_thumbnail = parcel.readString();
         this.meal_photo_firebase_URL = parcel.readString();
@@ -269,9 +305,9 @@ public class Meal implements Parcelable {
         dest.writeInt(this.mealVegan ? 1 : 0);
         dest.writeInt(this.mealVegetarian ? 1 : 0);
         dest.writeInt(this.mealGlutenFree? 1 : 0);
-        dest.writeInt(this.mealAvailable? 1 : 0);
-        dest.writeList(this.meal_additions);
-        dest.writeList(this.meal_tags);
+        dest.writeInt(this.mealAvailable ? 1 : 0);
+        dest.writeMap(this.meal_additions);
+        dest.writeMap(this.meal_tags);
         dest.writeInt(this.mealTakeAway? 1 : 0);
         dest.writeString(this.meal_thumbnail);
         dest.writeString(this.meal_photo_firebase_URL);

@@ -117,98 +117,14 @@ public class FirebaseUtil {
         return firebase.getReference("offers/" + restaurantID + "/" + offerID);
     }
 
-
-
-
-
-
-
-
-
-
-    @Deprecated
-    public static User getCurrentUser() {
-        return null;
-    }
-
-    //TODO deprecata
-    @Deprecated
-    public static Restaurant getRestaurant(String restaurantID) {
+    public static Query getOrdersByRestaurantRef(String restaurantID) {
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
-        DatabaseReference ref = firebase.getReference("restaurants/" + restaurantID);
-        final Restaurant[] restaurant = new Restaurant[1];
-        if(ref != null) {
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    restaurant[0] = dataSnapshot.getValue(Restaurant.class);
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {}
-            });
-            return restaurant[0];
-        }
-        return null;
+        return firebase.getReference("orders").orderByChild("restaurant_id").equalTo(restaurantID);
     }
 
-    @Deprecated
-    public static Offer getOffer(String offerID) {
-        return null;
-    }
-
-    @Deprecated
-    public static ArrayList<Meal> getMealsByRestaurant(String restaurantID) {
-        return null;
-    }
-
-    //TODO deprecata
-    @Deprecated
-    public static ArrayList<Order> getOrdersByRestaurant(String restaurantID) {
+    public static Query getOrdersByUserRef(String userID) {
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
-        Query ref = firebase.getReference("orders").orderByChild("restaurant_id").equalTo(restaurantID);
-        final ArrayList<Order> orders = new ArrayList<Order>();
-        if(ref != null) {
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot d : dataSnapshot.getChildren()) {
-                        orders.add(d.getValue(Order.class));
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
-            return orders;
-        }
-        return null;
+        return firebase.getReference("orders").orderByChild("user_id").equalTo(userID);
     }
 
-    //TODO deprecata
-    @Deprecated
-    public static ArrayList<Order> getOrdersByUser(String userID) {
-        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
-        Query ref = firebase.getReference("orders").orderByChild("user_id").equalTo(userID);
-        final ArrayList<Order> orders = new ArrayList<Order>();
-        if(ref != null) {
-            ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    for(DataSnapshot d : dataSnapshot.getChildren()) {
-                        orders.add(d.getValue(Order.class));
-                    }
-                }
-                @Override
-                public void onCancelled(DatabaseError databaseError) {}
-            });
-            return orders;
-        }
-        return null;
-    }
-
-    @Deprecated
-    public static ArrayList<Offer> getOffersByRestaurant(String restaurantID) {
-        return null;
-    }
 }

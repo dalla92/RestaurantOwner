@@ -17,10 +17,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -59,18 +61,21 @@ public class OrderActivity extends AppCompatActivity
         QuantityFragment.OnActionListener,
         CartFragment.OnActionListener {
 
-    private Order order;
-    private Meal meal;
+    private Toolbar toolbar;
+    private ProgressDialog mProgressDialog;
+    private boolean orderStarted = false;
 
     private String userID;
-    private String restaurantID;
-
-    private Restaurant restaurant;
     private User user;
-    private ProgressDialog mProgressDialog;
-    private ArrayList<Meal> mealList;
-    private ArrayList<Order> orderList;
-    private ArrayList<Offer> offerList;
+
+    private String restaurantID;
+    private Restaurant restaurant;
+
+    private ArrayList<Meal> mealList = null;
+    private ArrayList<Offer> offerList = null;
+
+    private Order order = null;
+    private Meal meal = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,83 +83,138 @@ public class OrderActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_order_activity);
 
-        userID = FirebaseUtil.getCurrentUserId();
-        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null) {
-            restaurantID = getIntent().getExtras().getString("restaurant_id");
-        }
-
-        if(userID == null || restaurantID == null) {
-            Log.d("FILIPPO", "utente non loggato o restaurantID non ricevuto");
-            Intent intent = new Intent(this, HaveBreak.class);
-            finish();
-            startActivity(intent);
-        }
-
-        showProgressDialog();
-        user = FirebaseUtil.getCurrentUser();
-        restaurant = FirebaseUtil.getRestaurant(restaurantID);
-        mealList = FirebaseUtil.getMealsByRestaurant(restaurantID);
-        orderList = FirebaseUtil.getOrdersByRestaurant(restaurantID);
-        offerList = FirebaseUtil.getOffersByRestaurant(restaurantID);
-        hideProgressDialog();
-
-        if(!restaurant.getTakeAwayAllowed()) {
-            Log.d("FILIPPO", "l'tente non sarebbe dovuto arrivare a questa pagina");
-            Intent intent = new Intent(this, HaveBreak.class);
-            finish();
-            startActivity(intent);
-        }
-
-        if(restaurantOrderLimit()) {
-            //TODO lanciare un alert perché il massimo numero di prenotazioni in un'ora è stato raggiunto
-        }
-
-        order = setNewOrder();
-
         //Toolbar setting
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //Navigation drawer setting
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
 
-        //Navigation drawer user info
-        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-        ImageView nav_photo = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-        if(user != null) {
-            if (user.getUser_full_name() != null)
-                nav_username.setText(user.getUser_full_name());
-            if (user.getUser_email() != null)
-                nav_email.setText(user.getUser_email());
-        }
-        SharedPreferences userDetails = getSharedPreferences("userdetails", MODE_PRIVATE);
-        Uri photouri = null;
-        if(userDetails.getString("photouri", null) != null) {
-            photouri = Uri.parse(userDetails.getString("photouri", null));
-            File f = new File(getRealPathFromURI(photouri));
-            Drawable d = Drawable.createFromPath(f.getAbsolutePath());
-            navigationView.getHeaderView(0).setBackground(d);
-        } else {
-            nav_photo.setImageResource(R.drawable.blank_profile);
-        }
+        //user reference
+        DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
+        userID = FirebaseUtil.getCurrentUserId();
+        if(userRef == null || userID == null)
+            abortActivity();
 
-        //Fragment loader
-        if(findViewById(R.id.fragment_container) != null) {
-            if (savedInstanceState != null) {
-                return;
+        //restaurant reference
+        if (getIntent().getExtras() == null || getIntent().getExtras().getString("restaurant_id") == null)
+            abortActivity();
+        restaurantID = getIntent().getExtras().getString("restaurant_id");
+        DatabaseReference restaurantRef = FirebaseUtil.getRestaurantRef(restaurantID);
+        if(restaurantRef == null)
+            abortActivity();
+
+        //meals reference
+        DatabaseReference mealsRef = FirebaseUtil.getMealsRef(restaurantID);
+        if (mealsRef == null)
+            abortActivity();
+
+        //offers refercence
+        DatabaseReference offersRef = FirebaseUtil.getOffersRef(restaurantID);
+        if (offersRef == null)
+            abortActivity();
+
+        //user firebase data getting
+        assert userRef != null;
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User user = dataSnapshot.getValue(User.class);
+                if(user == null)
+                    abortActivity();
+                setDrawer(user);
+                //TODO gestire i suoi punti
+                startOrder(user);
             }
-            CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(), getActiveOffer());
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.fragment_container, categoryFragment, "CATEGORY");
-            transaction.commit();
-        }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        //restaurant firebase data getting
+        assert restaurantRef != null;
+        restaurantRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Restaurant rest = dataSnapshot.getValue(Restaurant.class);
+                if(rest == null)
+                    abortActivity();
+                if(!rest.getTakeAwayAllowed())
+                    abortActivity();
+
+                startOrder(rest);
+
+                //orders reference
+                Query ordersRef = FirebaseUtil.getOrdersByRestaurantRef(restaurantID);
+                if(ordersRef != null) {
+                    ordersRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            ArrayList<Order> orders = new ArrayList<>();
+                            for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                orders.add(d.getValue(Order.class));
+                            }
+                            if(restaurantOrderLimit(orders)) {
+                                //TODO lanciare un alert perché il massimo numero di prenotazioni in un'ora è stato raggiunto
+                                abortActivity();
+                            }
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {}
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        //meals firebase data getting
+        assert mealsRef != null;
+        mealsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<Meal> meals = new ArrayList<>();
+                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                    meals.add(d.getValue(Meal.class));
+                }
+                startOrder(meals);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+        //offers firebase data getting
+        assert offersRef != null;
+        offersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<Offer> offers = new ArrayList<>();
+                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                    offers.add(d.getValue(Offer.class));
+                }
+                startOrder(restaurantID, offers);
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
     @Override
@@ -239,9 +299,66 @@ public class OrderActivity extends AppCompatActivity
             return true;
         }
 
+        assert drawer != null;
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+
+    private void updatePrice(Calendar now) {
+        Double price = 0.0;
+        Double mealprice = 0.0;
+
+        for(Meal m : this.order.allMeals()) {
+            mealprice = getRightMealPrice(m, now);
+            for(MealAddition a : m.allAdditions()) {
+                mealprice += a.getMeal_addition_price();
+            }
+            mealprice *= m.getMeal_quantity();
+            price += mealprice;
+        }
+        order.setOrder_price(price);
+    }
+
+    private void savePricesInOffer(Calendar now) {
+        for(int i=0; i < this.order.allMeals().size(); i++) {
+            this.order.allMeals().get(i).setMeal_price(getRightMealPrice(this.order.allMeals().get(i), now));
+        }
+    }
+
+    private double getRightMealPrice(Meal meal, Calendar time) {
+        Offer offer = getActiveOffer();
+        if(offer != null) {
+            return offer.getNewMealPrice(meal, time);
+        }
+        return meal.getMeal_price();
+    }
+
+    private Order setNewOrder() {
+        Order o = new Order();
+        o.setUser_id(userID);
+        o.setUser_full_name(user != null ? user.getUser_full_name() : "");
+        o.setRestaurant_id(restaurantID);
+        o.setOrder_price(0.0);
+        return o;
+    }
+
+
+
+    private ArrayList<Meal> getMealListByCategory(String categoryName) {
+        ArrayList<Meal> mealCategoryList = new ArrayList<Meal>();
+        for(Meal m : mealList) {
+            if(m.getMeal_category().equals(categoryName)) {
+                if(m.getMealAvailable() && m.getMealTakeAway())
+                    mealCategoryList.add(m);
+            }
+        }
+        return mealCategoryList;
+    }
+
+
+    //FRAGMENT CALL BACKS ==========================================================================
 
     @Override
     public void onCategorySelected(String categoryName) {
@@ -249,7 +366,7 @@ public class OrderActivity extends AppCompatActivity
         this.meal.setRestaurant_id(restaurantID);
         this.meal.setMeal_category(categoryName);
         ArrayList<MealAddition> additionList = new ArrayList<MealAddition>();
-        this.meal.setMeal_additions(additionList);
+        this.meal.addManyAdditions(additionList);
 
         MealFragment mealFragment = MealFragment.newInstance(getMealListByCategory(categoryName), getActiveOffer());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
@@ -272,7 +389,7 @@ public class OrderActivity extends AppCompatActivity
         this.meal.setMealVegan(meal.getMealVegan());
         this.meal.setMealVegetarian(meal.getMealVegetarian());
 
-        AdditionFragment additionFragment = AdditionFragment.newInstance(meal.getMeal_additions());
+        AdditionFragment additionFragment = AdditionFragment.newInstance(meal.allAdditions());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, additionFragment, "ADDITION");
         transaction.addToBackStack(null);
@@ -282,7 +399,7 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onAdditionsSelected(ArrayList<MealAddition> selectedAdditions) {
         for(MealAddition a : selectedAdditions) {
-            this.meal.getMeal_additions().add(a);
+            this.meal.addAddition(a);
         }
 
         QuantityFragment quantityFragment = new QuantityFragment();
@@ -322,7 +439,7 @@ public class OrderActivity extends AppCompatActivity
         Calendar now = Calendar.getInstance();
         updatePrice(now);
         savePricesInOffer(now);
-        this.order.setOrder_date(now);
+        this.order.calendarToOrderDate(now);
 
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         DatabaseReference ordersReference = firebase.getReference("orders/");
@@ -340,11 +457,7 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onContinueOrderClicked(Order order){
         this.order = order;
-        CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(), getActiveOffer());
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
-        transaction.addToBackStack(null);
-        transaction.commit();
+        loadCategoryFragment(false);
     }
 
     @Override
@@ -364,110 +477,24 @@ public class OrderActivity extends AppCompatActivity
     @Override
     public void onCancelOrderClicked() {
         this.order = setNewOrder();
-        CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(),getActiveOffer());
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
-        transaction.addToBackStack(null);
-        transaction.commit();
-        Intent intent = new Intent(this, UserRestaurantActivity.class);
-        intent.putExtra("restaurant_id", restaurantID);
-        startActivity(intent);
+        loadCategoryFragment(false);
+        comeBackToRestaurantActivity();
     }
 
-    private void updatePrice(Calendar now) {
-        Double price = 0.0;
-        Double mealprice = 0.0;
+    //MODEL FUNCTIONS ==============================================================================
 
-        for(Meal m : this.order.getMealList()) {
-            mealprice = getRightMealPrice(m, now);
-            for(MealAddition a : m.getMeal_additions()) {
-                mealprice += a.getMeal_addition_price();
-            }
-            mealprice *= m.getMeal_quantity();
-            price += mealprice;
-        }
-        order.setOrder_price(price);
-    }
-
-    private void savePricesInOffer(Calendar now) {
-        for(int i=0; i < this.order.getMealList().size(); i++) {
-            this.order.getMealList().get(i).setMeal_price(getRightMealPrice(this.order.getMealList().get(i), now));
-        }
-    }
-
-    private double getRightMealPrice(Meal meal, Calendar time) {
-        Offer offer = getActiveOffer();
-        if(offer != null) {
-            return offer.getNewMealPrice(meal, time);
-        }
-        return meal.getMeal_price();
-    }
-
-    private Order setNewOrder() {
-        Order o = new Order();
-        o.setUser_id(userID);
-        o.setUser_full_name(user != null ? user.getUser_full_name() : "");
-        o.setRestaurant_id(restaurantID);
-        o.setOrder_price(0.0);
-        return o;
-    }
-
-    private ArrayList<String> getCategoryList() {
-        ArrayList<String> categoryList = new ArrayList<String>();
-        for(Meal m : mealList) {
-            if(categoryList.indexOf(m.getMeal_category()) == -1)
-                categoryList.add(m.getMeal_category());
-        }
-
-        return categoryList;
-    }
-
-    private ArrayList<Meal> getMealListByCategory(String categoryName) {
-        ArrayList<Meal> mealCategoryList = new ArrayList<Meal>();
-        for(Meal m : mealList) {
-            if(m.getMeal_category().equals(categoryName)) {
-                if(m.getMealAvailable() && m.getMealTakeAway())
-                    mealCategoryList.add(m);
-            }
-        }
-        return mealCategoryList;
-    }
-
-    private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage("Loading...");
-            mProgressDialog.setIndeterminate(true);
-        }
-        mProgressDialog.show();
-    }
-
-    private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
-        }
-    }
-
-    private String getRealPathFromURI(Uri contentURI) {
-        Cursor cursor = getContentResolver().query(contentURI, null, null, null, null);
-        if (cursor == null) { // Source is Dropbox or other similar local file path
-            return contentURI.getPath();
-        } else {
-            cursor.moveToFirst();
-            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-            return cursor.getString(idx);
-        }
-    }
-
-    private boolean restaurantOrderLimit() {
+    private boolean restaurantOrderLimit(ArrayList<Order> orders) {
         Calendar now = Calendar.getInstance();
         Calendar start = Calendar.getInstance();
         Calendar stop = Calendar.getInstance();
-        start.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY), 0, 0);
+        start.set(now.get(Calendar.YEAR),
+                now.get(Calendar.MONTH),
+                now.get(Calendar.DAY_OF_MONTH),
+                now.get(Calendar.HOUR_OF_DAY), 0, 0);
         stop.setTimeInMillis(start.getTimeInMillis()+65*60*1000);
         int orderCounter = 0;
-        for(Order o : orderList) {
-            if(o.getOrder_date().after(start.getTime()) && o.getOrder_date().before(stop.getTime())) {
+        for(Order o : orders) {
+            if(o.orderDateToCalendar().after(start.getTime()) && o.orderDateToCalendar().before(stop.getTime())) {
                 orderCounter++;
             }
         }
@@ -483,5 +510,136 @@ public class OrderActivity extends AppCompatActivity
                 return o;
         }
         return null;
+    }
+
+    private ArrayList<String> getCategoryList() {
+        ArrayList<String> categoryList = new ArrayList<>();
+        for(Meal m : mealList) {
+            if(categoryList.indexOf(m.getMeal_category()) == -1)
+                categoryList.add(m.getMeal_category());
+        }
+
+        return categoryList;
+    }
+
+    //ACTIVITY FUNCTIONS ===========================================================================
+
+    private synchronized void startOrder(ArrayList<Meal> meals) {
+        mealList = meals;
+        checkForStart();
+    }
+
+    private synchronized void startOrder(Restaurant r) {
+        restaurant = r;
+        checkForStart();
+    }
+
+    private synchronized void startOrder(User u) {
+        user = u;
+        checkForStart();
+    }
+
+    private synchronized void startOrder(String restID, ArrayList<Offer> offers) {
+        offerList = offers;
+        checkForStart();
+    }
+
+    private void checkForStart() {
+        if(mealList != null &&
+                user != null &&
+                restaurant != null &&
+                offerList != null &&
+                !orderStarted) {
+            order = setNewOrder();
+            FirebaseUtil.hideProgressDialog(mProgressDialog);
+            loadCategoryFragment(true);
+        }
+    }
+
+    private void loadCategoryFragment(boolean start) {
+        if (findViewById(R.id.fragment_container) != null) {
+            CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(), getActiveOffer());
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            if(start) {
+                transaction.add(R.id.fragment_container, categoryFragment, "CATEGORY");
+            } else {
+                transaction.replace(R.id.fragment_container, categoryFragment, "CATEGORY");
+                transaction.addToBackStack(null);
+            }
+            transaction.commit();
+        }
+    }
+
+    private void setDrawer(User user) {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        assert drawer != null;
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        assert navigationView != null;
+        navigationView.setNavigationItemSelectedListener(this);
+
+        Menu menu = navigationView.getMenu();
+        final MenuItem ownerItem = menu.findItem(R.id.nav_owner);
+        MenuItem loginItem = menu.findItem(R.id.nav_login);
+        MenuItem logoutItem = menu.findItem(R.id.nav_logout);
+        MenuItem myProfileItem = menu.findItem(R.id.nav_my_profile);
+        MenuItem myOrdersItem = menu.findItem(R.id.nav_my_orders);
+        MenuItem mrResItem = menu.findItem(R.id.nav_my_reservations);
+        MenuItem myReviewsItem = menu.findItem(R.id.nav_my_reviews);
+        MenuItem myFavItem = menu.findItem(R.id.nav_my_favourites);
+
+        ownerItem.setVisible(false);
+        loginItem.setVisible(false);
+        logoutItem.setVisible(true);
+        myProfileItem.setVisible(true);
+        myOrdersItem.setVisible(true);
+        mrResItem.setVisible(true);
+        myReviewsItem.setVisible(true);
+        myFavItem.setVisible(true);
+
+        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+        ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+
+        if (user.getOwnerUser())
+            ownerItem.setVisible(true);
+
+        nav_username.setText(user.getUser_full_name());
+        nav_email.setText(user.getUser_email());
+        String photoUri = user.getUser_photo_firebase_URL();
+
+        if (photoUri == null || photoUri.equals("")) {
+            Glide
+                    .with(OrderActivity.this)
+                    .load(R.drawable.blank_profile_nav)
+                    .centerCrop()
+                    .into(nav_picture);
+        } else {
+            Glide
+                    .with(OrderActivity.this)
+                    .load(photoUri)
+                    .centerCrop()
+                    .into(nav_picture);
+        }
+
+    }
+
+    private void abortActivity() {
+        Intent intent = new Intent(this, UserRestaurantList.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
+    private void comeBackToRestaurantActivity() {
+        Intent intent = new Intent(this, UserRestaurantActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("restaurant_id", restaurantID);
+        startActivity(intent);
+        finish();
     }
 }

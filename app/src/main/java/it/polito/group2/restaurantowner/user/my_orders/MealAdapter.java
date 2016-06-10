@@ -59,7 +59,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         holder.quantity.setText(mealList.get(position).getMeal_quantity());
         holder.additionList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.additionList.setNestedScrollingEnabled(false);
-        AdditionAdapter adapter = new AdditionAdapter(context, mealList.get(position).getMeal_additions());
+        AdditionAdapter adapter = new AdditionAdapter(context, mealList.get(position).allAdditions());
         holder.additionList.setAdapter(adapter);
     }
 

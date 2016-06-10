@@ -63,7 +63,7 @@ public class CartMealAdapter extends RecyclerView.Adapter<CartMealAdapter.MealVi
         holder.quantity.setText(mealList.get(position).getMeal_quantity());
         holder.additionList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.additionList.setNestedScrollingEnabled(false);
-        CartAdditionAdapter adapter = new CartAdditionAdapter(context, mealList.get(position).getMeal_additions());
+        CartAdditionAdapter adapter = new CartAdditionAdapter(context, mealList.get(position).allAdditions());
         holder.additionList.setAdapter(adapter);
 
         if(isInOffer(mealList.get(position))) {

@@ -14,26 +14,34 @@ public class Order implements Serializable {
     private String restaurant_id;
     private String user_id;
     private String user_full_name;
-    private Calendar order_date;
+    private Long order_date;
     private String order_notes;
-    private HashMap<Integer, Meal> order_meals = new HashMap<Integer, Meal>();
+    private HashMap<String, Meal> order_meals = new HashMap<>();
     private Double order_price;
 
     public Order(){
 
     }
 
+    public void calendarToOrderDate(Calendar date) {
+        setOrder_date(date.getTimeInMillis());
+    }
+
+    public Calendar orderDateToCalendar() {
+        Calendar date = Calendar.getInstance();
+        date.setTimeInMillis(getOrder_date());
+        return date;
+    }
+
     public void addMeal(Meal meal) {
-        if(!order_meals.containsValue(meal))
-            order_meals.put(meal.hashCode(), meal);
+        order_meals.put(Integer.toString(meal.hashCode()), meal);
     }
 
     public void delMeal(Meal meal) {
-        if(order_meals.containsValue(meal))
-            order_meals.remove(meal.hashCode());
+        order_meals.remove(Integer.toString(meal.hashCode()));
     }
 
-    public ArrayList<Meal> getMealList() {
+    public ArrayList<Meal> allMeals() {
         return (ArrayList<Meal>) order_meals.values();
     }
 
@@ -69,11 +77,11 @@ public class Order implements Serializable {
         this.user_full_name = user_full_name;
     }
 
-    public Calendar getOrder_date() {
+    public Long getOrder_date() {
         return order_date;
     }
 
-    public void setOrder_date(Calendar order_date) {
+    public void setOrder_date(Long order_date) {
         this.order_date = order_date;
     }
 
@@ -85,11 +93,11 @@ public class Order implements Serializable {
         this.order_notes = order_notes;
     }
 
-    public HashMap<Integer, Meal> getOrder_meals() {
+    public HashMap<String, Meal> getOrder_meals() {
         return order_meals;
     }
 
-    public void setOrder_meals(HashMap<Integer, Meal> order_meals) {
+    public void setOrder_meals(HashMap<String, Meal> order_meals) {
         this.order_meals = order_meals;
     }
 
@@ -145,10 +153,10 @@ public class Order implements Serializable {
                 ", restaurant_id='" + restaurant_id + '\'' +
                 ", user_id='" + user_id + '\'' +
                 ", user_full_name='" + user_full_name + '\'' +
-                ", order_date=" + order_date.toString() +
+                ", order_date=" + order_date +
                 ", order_notes='" + order_notes + '\'' +
-                ", order_meals=" + order_meals.toString() +
-                ", order_price=" + order_price.toString() +
+                ", order_meals=" + order_meals +
+                ", order_price=" + order_price +
                 '}';
     }
 }

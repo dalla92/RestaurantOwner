@@ -129,7 +129,7 @@ public class FragmentOtherInfo extends Fragment {
             }
         });
         //expandable additions
-        childMealAdditions = current_meal.getMeal_additions();
+        childMealAdditions = current_meal.allAdditions();
         parentAddition = "Meal additions";
         additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
         additions_adapter = new MyExpandableAdapter(parentAddition, childMealAdditions);
@@ -139,7 +139,7 @@ public class FragmentOtherInfo extends Fragment {
         additions.setClickable(true);
         //expandable categorie
         if(current_meal.getMeal_tags()!=null)
-            for(MealCategory mc : current_meal.getMeal_tags()){
+            for(MealCategory mc : current_meal.allTags()){
                 MealAddition ma = new MealAddition();
                 ma.setMeal_addition_name(mc.getMeal_category_name());
                 childCategories.add(ma);

@@ -99,7 +99,7 @@ public class CartFragment extends ListFragment {
                                 public void onClick(DialogInterface dialog, int whichButton) {
                                     EditText note = (EditText) view.findViewById(R.id.ordernote);
                                     order.setOrder_notes(note.getText().toString());
-                                    order.setOrder_date(Calendar.getInstance());
+                                    order.calendarToOrderDate(Calendar.getInstance());
                                     mCallback.onConfirmOrderClicked(order);
                                 }
                             })
@@ -174,7 +174,7 @@ public class CartFragment extends ListFragment {
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         list.setNestedScrollingEnabled(false);
-        CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.getMealList(), offer);
+        CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.allMeals(), offer);
         list.setAdapter(adapter);
     }
 

@@ -60,13 +60,13 @@ public class CategoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.user_order_fragment_category, container, false);
+        setCategoryList(view);
         return view;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setCategoryList();
     }
 
     //@Override
@@ -114,8 +114,8 @@ public class CategoryFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setCategoryList() {
-        final RecyclerView catList = (RecyclerView) getView().findViewById(R.id.category_list);
+    private void setCategoryList(View view) {
+        final RecyclerView catList = (RecyclerView) view.findViewById(R.id.category_list);
         assert catList != null;
         catList.setLayoutManager(new LinearLayoutManager(getContext()));
         catList.setNestedScrollingEnabled(false);

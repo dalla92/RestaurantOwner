@@ -531,8 +531,8 @@ public class DataInitialization {
         m.setMealTakeAway(true);
         m.setMealVegan(false);
         m.setMealVegetarian(false);
-        m.setMeal_additions(m_a);
-        m.setMeal_tags(m_c);
+        m.addManyAdditions(m_a);
+        m.addManyTags(m_c);
         m.setMeal_category("Primo");
         m.setMeal_cooking_time(10);
         m.setMeal_description("Salsa rustica");
@@ -549,8 +549,8 @@ public class DataInitialization {
         m2.setMealTakeAway(true);
         m2.setMealVegan(false);
         m2.setMealVegetarian(false);
-        m2.setMeal_additions(m_a);
-        m2.setMeal_tags(m_c);
+        m2.addManyAdditions(m_a);
+        m2.addManyTags(m_c);
         m2.setMeal_category("Secondo");
         m2.setMeal_cooking_time(6);
         m2.setMeal_description("Alla brace");
@@ -601,7 +601,7 @@ public class DataInitialization {
         ArrayList<Meal> order_meals = new ArrayList<>();
         order_meals.add(m);
         //or.setOrder_meals(order_meals);
-        or.setOrder_date(Calendar.getInstance());
+        //or.setOrder_date(Calendar.getInstance());
         or.setOrder_notes("Portali il prima possibile");
         or.setUser_full_name("Alessando Del Piero");
 
@@ -612,7 +612,7 @@ public class DataInitialization {
         //ArrayList<Meal> order_meals2 = new ArrayList<>();
         order_meals.add(m2);
         //or2.setOrder_meals(order_meals);
-        or2.setOrder_date(Calendar.getInstance());
+        //or2.setOrder_date(Calendar.getInstance());
         or2.setOrder_notes("Bella calda, grazie!");
         or2.setUser_full_name("Alessando Del Piero");
     }

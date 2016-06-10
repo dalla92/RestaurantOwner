@@ -18,6 +18,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -51,25 +56,53 @@ public class MyOrdersActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_myorders_activity);
 
+        //Toolbar setting
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+
+        //user reference
+        DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
         userID = FirebaseUtil.getCurrentUserId();
+        if(userRef == null || userID == null)
+            abortActivity();
 
-        if(userID == null) {
-            Log.d("FILIPPO", "utente non loggato");
-            Intent intent = new Intent(this, HaveBreak.class);
-            finish();
-            startActivity(intent);
-        }
+        //user firebase data getting
+        assert userRef != null;
+        userRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User u = dataSnapshot.getValue(User.class);
+                if(u == null)
+                    abortActivity();
+                setDrawer(u);
+                user = u;
 
-        showProgressDialog();
-        user = FirebaseUtil.getCurrentUser();
-        orderList = FirebaseUtil.getOrdersByUser(userID);
-        hideProgressDialog();
+                //orders reference
+                Query ordersRef = FirebaseUtil.getOrdersByUserRef(userID);
+                if(ordersRef != null) {
+                    ordersRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            ArrayList<Order> orders = new ArrayList<>();
+                            for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                orders.add(d.getValue(Order.class));
+                            }
+                            FirebaseUtil.hideProgressDialog(mProgressDialog);
+                            orderList = orders;
+                            setOrderList();
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {}
+                    });
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        });
 
-        setOrderList();
-        setDrawer();
     }
 
     private void setOrderList() {
@@ -107,7 +140,7 @@ public class MyOrdersActivity extends AppCompatActivity
         }
     }
 
-    private void setDrawer() {
+    private void setDrawer(User user) {
         //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -223,6 +256,13 @@ public class MyOrdersActivity extends AppCompatActivity
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void abortActivity() {
+        Intent intent = new Intent(this, UserRestaurantList.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
 }

@@ -59,7 +59,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(final OrderAdapter.OrderViewHolder holder, int position) {
-        Date date = orderList.get(position).getOrder_date().getTime();
+        Date date = orderList.get(position).orderDateToCalendar().getTime();
         SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
         holder.date.setText(formatDate.format(date));
         //TODO stampare il nome del ristorante e non il suo id
@@ -67,7 +67,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.price.setText(formatEuro(orderList.get(position).getOrder_price()));
         holder.mealList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.mealList.setNestedScrollingEnabled(false);
-        MealAdapter adapter = new MealAdapter(context, orderList.get(position).getMealList());
+        MealAdapter adapter = new MealAdapter(context, orderList.get(position).allMeals());
         holder.mealList.setAdapter(adapter);
 
 

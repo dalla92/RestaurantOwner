@@ -36,6 +36,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.AddRestaurantActivity;
@@ -46,6 +47,7 @@ import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
 import it.polito.group2.restaurantowner.owner.StatisticsActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
+import it.polito.group2.restaurantowner.user.restaurant_list.SendNotificationAsync;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class OfferActivity extends AppCompatActivity
@@ -58,6 +60,7 @@ public class OfferActivity extends AppCompatActivity
     private ArrayList<Meal> mealList = null;
 
     private String restaurantID = null;
+    private Restaurant restaurant = null;
 
     private ProgressDialog mProgressDialog;
     private final int MODIFY_INFO = 0;
@@ -96,9 +99,20 @@ public class OfferActivity extends AppCompatActivity
             goAway();
         }
 
-        //MealList object
         if (getIntent().getExtras() != null && getIntent().getExtras().getString("restaurant_id") != null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
+            DatabaseReference restaurantRef = FirebaseUtil.getRestaurantRef(restaurantID);
+            if (restaurantRef != null) {
+                restaurantRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        restaurant = dataSnapshot.getValue(Restaurant.class);
+                        FirebaseUtil.hideProgressDialog(mProgressDialog);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
+            }
             DatabaseReference mealsRef = FirebaseUtil.getMealsRef(restaurantID);
             if (mealsRef == null)
                 goAway();
@@ -113,10 +127,8 @@ public class OfferActivity extends AppCompatActivity
                     FirebaseUtil.hideProgressDialog(mProgressDialog);
                     openOfferFragment(meals);
                 }
-
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
+                public void onCancelled(DatabaseError databaseError) {}
             });
         } else {
             goAway();
@@ -277,6 +289,8 @@ public class OfferActivity extends AppCompatActivity
             DatabaseReference keyReference = offersReference.push();
             this.offer.setOfferID(keyReference.getKey());
             keyReference.setValue(this.offer);
+            if(this.offer.getOfferEnabled() && restaurant != null)
+                new SendNotificationAsync().execute(restaurant.getRestaurant_name(),restaurantID);
         }
         this.offer = null;
         Intent intent = new Intent(this, MyOffersActivity.class);
