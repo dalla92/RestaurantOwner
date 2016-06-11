@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner.user.order;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,22 +25,19 @@ import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 
-public class CartFragment extends ListFragment {
+public class CartFragment extends Fragment {
 
     public static final String ORDER = "order";
-    private static final String OFFER = "offer";
     private Order order;
-    private Offer offer;
 
     private OnActionListener mCallback;
 
     public CartFragment() {}
 
-    public static CartFragment newInstance(Order order, Offer offer) {
+    public static CartFragment newInstance(Order order) {
         CartFragment fragment = new CartFragment();
         Bundle args = new Bundle();
         args.putSerializable(ORDER, order);
-        args.putSerializable(OFFER, offer);
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,15 +47,8 @@ public class CartFragment extends ListFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             order = (Order)getArguments().getSerializable(ORDER);
-            offer = (Offer) getArguments().getSerializable(OFFER);
         }
-
-        try {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
-                    getResources().getString(R.string.user_order_cart_title));
-        } catch (Exception e) {
-            Log.d("FILIPPO", e.getMessage());
-        }
+        getActivity().setTitle(getActivity().getResources().getString(R.string.user_order_cart_title));
     }
 
     @Override
@@ -128,9 +119,10 @@ public class CartFragment extends ListFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setCartList();
+        setCartList(getView());
     }
 
+    /*
     @Override
     public void onListItemClick(ListView l, View v, final int position, long id) {
         new AlertDialog.Builder(getContext())
@@ -144,6 +136,7 @@ public class CartFragment extends ListFragment {
                 })
                 .setNegativeButton(android.R.string.no, null).show();
     }
+    */
 
     @Override
     public void onAttach(Context context) {
@@ -163,18 +156,18 @@ public class CartFragment extends ListFragment {
     }
 
     public interface OnActionListener {
-        public void onConfirmOrderClicked(Order order);
-        public void onContinueOrderClicked(Order order);
-        public void onCancelOrderClicked();
-        public void onMealDeleted(Order order, Meal meal);
+        void onConfirmOrderClicked(Order order);
+        void onContinueOrderClicked(Order order);
+        void onCancelOrderClicked();
+        void onMealDeleted(Order order, Meal meal);
     }
 
-    private void setCartList() {
-        final RecyclerView list = (RecyclerView) getView().findViewById(R.id.order_meal_list);
+    private void setCartList(View view) {
+        final RecyclerView list = (RecyclerView) view.findViewById(R.id.order_meal_list);
         assert list != null;
         list.setLayoutManager(new LinearLayoutManager(getContext()));
         list.setNestedScrollingEnabled(false);
-        CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.allMeals(), offer);
+        CartMealAdapter adapter = new CartMealAdapter(getContext(), this.order.allMeals(), order.getOffer_applied());
         list.setAdapter(adapter);
     }
 

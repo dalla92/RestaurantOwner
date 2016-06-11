@@ -1,16 +1,17 @@
 package it.polito.group2.restaurantowner.user.order;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.NumberPicker;
 
 import it.polito.group2.restaurantowner.R;
@@ -18,6 +19,7 @@ import it.polito.group2.restaurantowner.R;
 public class QuantityFragment extends Fragment {
 
     private OnActionListener mCallback;
+    private int quantity = 0;
 
     public QuantityFragment() {}
 
@@ -25,12 +27,7 @@ public class QuantityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        try {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
-                    getResources().getString(R.string.user_order_info_title));
-        } catch (Exception e) {
-            Log.d("FILIPPO", e.getMessage());
-        }
+        getActivity().setTitle(getActivity().getResources().getString(R.string.user_order_info_title));
     }
 
     @Override
@@ -41,6 +38,19 @@ public class QuantityFragment extends Fragment {
         qty.setMinValue(1);
         qty.setMaxValue(30);
         qty.setWrapSelectorWheel(false);
+        qty.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
+                quantity = newVal;
+            }
+        });
+        Button addToCart = (Button) view.findViewById(R.id.add_cart);
+        addToCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCallback.onQuantitySelected(quantity);
+            }
+        });
         return view;
     }
 
@@ -62,8 +72,8 @@ public class QuantityFragment extends Fragment {
     }
 
     public interface OnActionListener {
-        public void onQuantitySelected(Integer quantity);
-        public void onCartClicked();
+        void onQuantitySelected(Integer quantity);
+        void onCartClicked();
     }
 
     @Override
@@ -74,15 +84,17 @@ public class QuantityFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if(id == R.id.action_add){
-
-            NumberPicker qty = (NumberPicker)getView().findViewById(R.id.meal_quantity);
-            mCallback.onQuantitySelected(qty.getValue());
-            return true;
-        }
-        if(id == R.id.goto_cart){
-            mCallback.onCartClicked();
+        if(item.getItemId() == R.id.goto_cart){
+            new AlertDialog.Builder(getContext())
+                    .setTitle(getResources().getString(R.string.user_order_alert_cart_title))
+                    .setMessage(getResources().getString(R.string.user_order_alert_cart_message))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            mCallback.onCartClicked();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, null).show();
             return true;
         }
         return super.onOptionsItemSelected(item);

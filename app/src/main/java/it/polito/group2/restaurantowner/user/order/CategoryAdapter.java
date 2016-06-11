@@ -1,6 +1,5 @@
 package it.polito.group2.restaurantowner.user.order;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,34 +13,28 @@ import java.util.ArrayList;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 
-/**
- * Created by Filippo on 10/05/2016.
- */
 public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.CategoryViewHolder> {
 
     private final ArrayList<String> categoryList;
     private final Offer offer;
-    private final Context context;
+    private final CategoryFragment fragment;
 
-    public CategoryAdapter(Context context, ArrayList<String> list, Offer offer) {
-        this.context = context;
+    public CategoryAdapter(ArrayList<String> list, Offer offer, CategoryFragment fragment) {
         this.categoryList = list;
         this.offer = offer;
+        this.fragment = fragment;
     }
 
-    public class CategoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class CategoryViewHolder extends RecyclerView.ViewHolder {
         public TextView categoryName;
         public ImageView offerActive;
+        public LinearLayout item;
 
         public CategoryViewHolder(View view){
             super(view);
             categoryName = (TextView) itemView.findViewById(R.id.category_name);
             offerActive = (ImageView) itemView.findViewById(R.id.offer_active);
-        }
-
-        @Override
-        public void onClick(View v) {
-            //categoryList.get(this.getLayoutPosition())
+            item = (LinearLayout) itemView.findViewById(R.id.category_item);
         }
     }
 
@@ -52,13 +45,19 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     }
 
     @Override
-    public void onBindViewHolder(CategoryAdapter.CategoryViewHolder holder, final int position) {
+    public void onBindViewHolder(final CategoryAdapter.CategoryViewHolder holder, final int position) {
         holder.categoryName.setText(categoryList.get(position));
         if(inOffer(categoryList.get(position))) {
             holder.offerActive.setVisibility(View.VISIBLE);
         } else {
             holder.offerActive.setVisibility(View.GONE);
         }
+        holder.item.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fragment.onCategorySelected(categoryList.get(position));
+            }
+        });
     }
 
     @Override

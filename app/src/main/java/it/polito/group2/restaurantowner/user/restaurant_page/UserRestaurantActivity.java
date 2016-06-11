@@ -701,6 +701,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         ordersButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 AlertDialog.Builder alert = new AlertDialog.Builder(UserRestaurantActivity.this);
                 alert.setTitle("Warning");
                 alert.setMessage("Questa funzionalità è in fase sviluppo, stay tuned!");
@@ -713,11 +714,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 });
 
                 alert.show();
-
-                /* TODO fix order
+*/
+                // TODO fix order
                 Intent intent = new Intent(UserRestaurantActivity.this, OrderActivity.class);
                 intent.putExtra("restaurant_id", targetRestaurant.getRestaurant_id());
-                startActivity(intent);*/
+                startActivity(intent);
             }
         });
 

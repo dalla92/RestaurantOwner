@@ -327,14 +327,14 @@
     <string name="user_order_mealnote">Additional note</string>
     <string name="user_order_category_title">What do you want to eat?</string>
     <string name="user_order_meal_title">Select it</string>
-    <string name="user_order_addition_title">Any additions?</string>
+    <string name="user_order_addition_title">Additions?</string>
     <string name="user_order_cart_button">Cart</string>
     <string name="user_order_cart_title">Here\'s your order:</string>
     <string name="user_order_cart_btn_confirm">Confirm order</string>
     <string name="user_order_cart_btn_continue">Continue order</string>
     <string name="user_order_cart_btn_cancel">Cancel order</string>
     <string name="user_order_cart_hint_note">Additional order info</string>
-    <string name="user_order_info_title">How many?</string>
+    <string name="user_order_info_title">Quantity</string>
     <string name="user_order_confirm_title">Order confirm</string>
     <string name="user_order_confirm_message">Are you sure to confirm your order?</string>
     <string name="user_order_info_alert_title">Attention!</string>
@@ -350,6 +350,10 @@
     <string name="user_order_alert_fidelity_title">Fidelity program</string>
     <string name="user_order_alert_fidelityuse_message">With your 1000 points you have 10% of discount extra.</string>
     <string name="user_order_alert_fidelityup_message">You will have 1 point per each 10 euro of order</string>
+    <string name="user_order_fragment_quantity_lable">How many do you want?</string>
+    <string name="user_order_fragment_quantity_button">Add to cart</string>
+    <string name="user_order_alert_cart_title">Attention!</string>
+    <string name="user_order_alert_cart_message">If you go to the cart you lose the current meal chose</string>
 
     <!-- Google Maps strings -->
     <string name="last_update_time_label">Last location update time</string>

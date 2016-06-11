@@ -6,10 +6,25 @@
     android:layout_gravity="center_horizontal|top"
     tools:context=".user.order.QuantityFragment">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:textSize="25sp"
+        android:text="@string/user_order_fragment_quantity_lable"/>
     <NumberPicker
+        android:scrollbarSize="20sp"
+        android:scrollbarStyle="insideOverlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/meal_quantity"
         android:layout_gravity="center"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/add_cart"
+        android:text="@string/user_order_fragment_quantity_button"
+        android:layout_gravity="center_horizontal"/>
 
 </LinearLayout>

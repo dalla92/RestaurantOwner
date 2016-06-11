@@ -18,7 +18,8 @@ public class Order implements Serializable {
     private String order_notes;
     private HashMap<String, Meal> order_meals = new HashMap<>();
     private Double order_price;
-    private Boolean fidelity_applied = false;
+    private boolean fidelity_applied = false;
+    private Offer offer_applied = null;
 
     public Order(){
 
@@ -104,11 +105,11 @@ public class Order implements Serializable {
         this.order_meals = order_meals;
     }
 
-    public Boolean getFidelity_applied() {
+    public boolean getFidelity_applied() {
         return fidelity_applied;
     }
 
-    public void setFidelity_applied(Boolean fidelity_applied) {
+    public void setFidelity_applied(boolean fidelity_applied) {
         this.fidelity_applied = fidelity_applied;
     }
 
@@ -120,6 +121,14 @@ public class Order implements Serializable {
         this.order_price = order_price;
     }
 
+    public Offer getOffer_applied() {
+        return offer_applied;
+    }
+
+    public void setOffer_applied(Offer offer_applied) {
+        this.offer_applied = offer_applied;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -127,6 +136,7 @@ public class Order implements Serializable {
 
         Order order = (Order) o;
 
+        if (fidelity_applied != order.fidelity_applied) return false;
         if (order_id != null ? !order_id.equals(order.order_id) : order.order_id != null)
             return false;
         if (restaurant_id != null ? !restaurant_id.equals(order.restaurant_id) : order.restaurant_id != null)
@@ -142,7 +152,7 @@ public class Order implements Serializable {
             return false;
         if (order_price != null ? !order_price.equals(order.order_price) : order.order_price != null)
             return false;
-        return !(fidelity_applied != null ? !fidelity_applied.equals(order.fidelity_applied) : order.fidelity_applied != null);
+        return !(offer_applied != null ? !offer_applied.equals(order.offer_applied) : order.offer_applied != null);
 
     }
 
@@ -156,7 +166,8 @@ public class Order implements Serializable {
         result = 31 * result + (order_notes != null ? order_notes.hashCode() : 0);
         result = 31 * result + (order_meals != null ? order_meals.hashCode() : 0);
         result = 31 * result + (order_price != null ? order_price.hashCode() : 0);
-        result = 31 * result + (fidelity_applied != null ? fidelity_applied.hashCode() : 0);
+        result = 31 * result + (fidelity_applied ? 1 : 0);
+        result = 31 * result + (offer_applied != null ? offer_applied.hashCode() : 0);
         return result;
     }
 

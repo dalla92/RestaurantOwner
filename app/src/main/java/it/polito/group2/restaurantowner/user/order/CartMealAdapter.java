@@ -16,9 +16,6 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 
-/**
- * Created by Filippo on 12/05/2016.
- */
 public class CartMealAdapter extends RecyclerView.Adapter<CartMealAdapter.MealViewHolder> {
 
     private final ArrayList<Meal> mealList;
@@ -60,7 +57,7 @@ public class CartMealAdapter extends RecyclerView.Adapter<CartMealAdapter.MealVi
     public void onBindViewHolder(CartMealAdapter.MealViewHolder holder, int position) {
         holder.name.setText(mealList.get(position).getMeal_name());
         holder.category.setText(mealList.get(position).getMeal_category());
-        holder.quantity.setText(mealList.get(position).getMeal_quantity());
+        holder.quantity.setText(mealList.get(position).getMeal_quantity().toString());
         holder.additionList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.additionList.setNestedScrollingEnabled(false);
         CartAdditionAdapter adapter = new CartAdditionAdapter(context, mealList.get(position).allAdditions());

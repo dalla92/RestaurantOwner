@@ -8,12 +8,5 @@
         android:id="@+id/goto_cart"
         android:title="@string/user_order_cart_button"
         android:icon="@drawable/ic_cart_white_24dp"
-        app:showAsAction="ifRoom"
-        />
-
-    <item
-        android:id="@+id/action_add"
-        android:title="@string/user_order_addtocart"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom" />
 </menu>

@@ -1,28 +1,27 @@
 package it.polito.group2.restaurantowner.user.order;
 
-
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 
-public class MealFragment extends ListFragment {
+public class MealFragment extends Fragment {
 
     public static final String LIST = "mealList";
     private static final String OFFER = "offer";
@@ -51,30 +50,19 @@ public class MealFragment extends ListFragment {
         }
 
         setHasOptionsMenu(true);
-        try {
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(getActivity().
-                    getResources().getString(R.string.user_order_meal_title));
-        } catch (Exception e) {
-            Log.d("FILIPPO", e.getMessage());
-        }
+        getActivity().setTitle(getActivity().getResources().getString(R.string.user_order_meal_title));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.user_order_fragment_meal, container, false);
-        return view;
+        return inflater.inflate(R.layout.user_order_fragment_meal, container, false);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setMealList();
-    }
-
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        mCallback.onMealSelected(mealList.get(position));
+        setMealList(getView());
     }
 
     @Override
@@ -94,9 +82,13 @@ public class MealFragment extends ListFragment {
         mCallback = null;
     }
 
+    public void onMealSelected(Meal meal) {
+        mCallback.onMealSelected(meal);
+    }
+
     public interface OnActionListener {
-        public void onMealSelected(Meal meal);
-        public void onCartClicked();
+        void onMealSelected(Meal meal);
+        void onCartClicked();
     }
 
     @Override
@@ -107,23 +99,29 @@ public class MealFragment extends ListFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if(id == R.id.goto_cart){
-            mCallback.onCartClicked();
+        if(item.getItemId() == R.id.goto_cart){
+            new AlertDialog.Builder(getContext())
+                    .setTitle(getResources().getString(R.string.user_order_alert_cart_title))
+                    .setMessage(getResources().getString(R.string.user_order_alert_cart_message))
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            mCallback.onCartClicked();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.no, null).show();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    private void setMealList() {
-        final RecyclerView list = (RecyclerView) getView().findViewById(R.id.meal_list);
-        assert list != null;
-        list.setLayoutManager(new LinearLayoutManager(getContext()));
-        list.setNestedScrollingEnabled(false);
-        MealAdapter adapter = new MealAdapter(getContext(), mealList, offer);
-        list.setAdapter(adapter);
+    private void setMealList(View view) {
+        final RecyclerView mList = (RecyclerView) view.findViewById(R.id.meal_list);
+        assert mList != null;
+        mList.setLayoutManager(new LinearLayoutManager(getContext()));
+        mList.setNestedScrollingEnabled(false);
+        MealAdapter adapter = new MealAdapter(mealList, offer, MealFragment.this);
+        mList.setAdapter(adapter);
     }
 
 }

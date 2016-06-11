@@ -46,9 +46,13 @@ public class OrderActivity extends AppCompatActivity
         QuantityFragment.OnActionListener,
         CartFragment.OnActionListener {
 
+    private static final int FIDELITY_MIN_POINT_TO_DISCOUNT = 100;
+    private static final int FIDELITY_APPLIED_DISCOUNT = 20;
+    private static final int FIDELITY_POINT_RECHARGE = 1;
+    private static final int FIDELITY_MIN_ORDER_TO_CHARGE = 10;
+
     private Toolbar toolbar;
     private ProgressDialog mProgressDialog;
-    private boolean orderStarted = false;
 
     private String userID;
     private User user;
@@ -232,9 +236,6 @@ public class OrderActivity extends AppCompatActivity
         return DrawerUtil.drawer_user_not_restaurant_page(this, item);
     }
 
-
-
-
     //FRAGMENT CALL BACKS ==========================================================================
 
     @Override
@@ -245,7 +246,7 @@ public class OrderActivity extends AppCompatActivity
         ArrayList<MealAddition> additionList = new ArrayList<>();
         this.meal.addManyAdditions(additionList);
 
-        MealFragment mealFragment = MealFragment.newInstance(getMealListByCategory(categoryName), getActiveOffer());
+        MealFragment mealFragment = MealFragment.newInstance(getMealListByCategory(categoryName), order.getOffer_applied());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, mealFragment, "MEAL");
         transaction.addToBackStack(null);
@@ -265,7 +266,6 @@ public class OrderActivity extends AppCompatActivity
         this.meal.setMealGlutenFree(meal.getMealGlutenFree());
         this.meal.setMealVegan(meal.getMealVegan());
         this.meal.setMealVegetarian(meal.getMealVegetarian());
-
         AdditionFragment additionFragment = AdditionFragment.newInstance(meal.allAdditions());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragment_container, additionFragment, "ADDITION");
@@ -313,14 +313,17 @@ public class OrderActivity extends AppCompatActivity
         DatabaseReference keyReference = ordersReference.push();
         if(keyReference == null)
             OnBackUtil.clean_stack_and_go_to_user_restaurant_page(this, restaurantID);
+        assert keyReference != null;
         this.order.setOrder_id(keyReference.getKey());
         keyReference.setValue(this.order);
 
         if(this.order.getFidelity_applied() || this.restaurant.getFidelityProgramAccepted()) {
-            DatabaseReference pointRef = FirebaseUtil.getCurrentUserRef().child("user_fidelity_points");
-            pointRef.setValue(this.user.getUser_fidelity_points());
+            DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
+            if(userRef != null) {
+                DatabaseReference pointRef = userRef.child("user_fidelity_points");
+                pointRef.setValue(this.user.getUser_fidelity_points());
+            }
         }
-
 
         this.order = setNewOrder();
 
@@ -363,7 +366,7 @@ public class OrderActivity extends AppCompatActivity
             price += mealprice;
         }
         if(order.getFidelity_applied())
-            price -= price*0.2; //20% per 100 punti
+            price -= price*(FIDELITY_APPLIED_DISCOUNT/100);
         order.setOrder_price(price);
     }
 
@@ -372,20 +375,19 @@ public class OrderActivity extends AppCompatActivity
             this.order.allMeals().get(i).setMeal_price(getRightMealPrice(this.order.allMeals().get(i), now));
         }
 
-        //se ha 100 punti li tolgo e applico il 20% di sconto
-        //altrimenti aggiungo un punto per ogni 10 euro di spesa se il ristorante aderisce
         if(order.getFidelity_applied()) {
-            user.setUser_fidelity_points(user.getUser_fidelity_points() - 100);
+            user.setUser_fidelity_points(user.getUser_fidelity_points() - FIDELITY_MIN_POINT_TO_DISCOUNT);
         } else {
-            if(restaurant.getFidelityProgramAccepted())
-                user.setUser_fidelity_points(user.getUser_fidelity_points()+((int)(this.order.getOrder_price()/10)));
+            if(restaurant.getFidelityProgramAccepted()) {
+                user.setUser_fidelity_points(user.getUser_fidelity_points() +
+                        ((int) (this.order.getOrder_price() / FIDELITY_MIN_ORDER_TO_CHARGE)) * FIDELITY_POINT_RECHARGE);
+            }
         }
     }
 
     private double getRightMealPrice(Meal meal, Calendar time) {
-        Offer offer = getActiveOffer();
-        if (offer != null) {
-            return offer.getNewMealPrice(meal, time);
+        if(order.getOffer_applied() != null) {
+            return order.getOffer_applied().getNewMealPrice(meal, time);
         }
         return meal.getMeal_price();
     }
@@ -396,6 +398,11 @@ public class OrderActivity extends AppCompatActivity
         o.setUser_full_name(user != null ? user.getUser_full_name() : "");
         o.setRestaurant_id(restaurantID);
         o.setOrder_price(0.0);
+        if(restaurant.getFidelityProgramAccepted() && user.getUser_fidelity_points() >= FIDELITY_MIN_POINT_TO_DISCOUNT)
+            o.setFidelity_applied(true);
+        else
+            o.setFidelity_applied(false);
+        o.setOffer_applied(getActiveOffer());
         return o;
     }
 
@@ -492,12 +499,8 @@ public class OrderActivity extends AppCompatActivity
         if (mealList != null &&
                 user != null &&
                 restaurant != null &&
-                offerList != null &&
-                !orderStarted) {
+                offerList != null) {
             order = setNewOrder();
-
-            if(restaurant.getFidelityProgramAccepted() && user.getUser_fidelity_points() >= 100)
-                order.setFidelity_applied(true);
 
             FirebaseUtil.hideProgressDialog(mProgressDialog);
             loadCategoryFragment(true);
@@ -506,7 +509,7 @@ public class OrderActivity extends AppCompatActivity
 
     private void loadCategoryFragment(boolean start) {
         if (findViewById(R.id.fragment_container) != null) {
-            CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(), getActiveOffer());
+            CategoryFragment categoryFragment = CategoryFragment.newInstance(getCategoryList(), order.getOffer_applied());
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             if (start) {
                 transaction.add(R.id.fragment_container, categoryFragment, "CATEGORY");
@@ -520,7 +523,7 @@ public class OrderActivity extends AppCompatActivity
 
     private void loadCartFragment() {
         if (findViewById(R.id.fragment_container) != null) {
-            CartFragment cartFragment = CartFragment.newInstance(this.order, getActiveOffer());
+            CartFragment cartFragment = CartFragment.newInstance(this.order);
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.fragment_container, cartFragment, "CART");
             transaction.addToBackStack(null);
@@ -605,6 +608,7 @@ public class OrderActivity extends AppCompatActivity
                 MealAddition add = new MealAddition();
                 add.setMeal_addition_name("Addition " + j + " name");
                 add.setMeal_addition_price(1.0);
+                additions.add(add);
             }
             meal.addManyAdditions(additions);
             DatabaseReference keyReference = mealsReference.push();

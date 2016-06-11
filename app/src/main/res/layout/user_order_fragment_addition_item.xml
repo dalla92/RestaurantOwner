@@ -1,37 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/addition_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp">
+    android:orientation="vertical"
+    android:layout_marginTop="10dp">
 
     <RelativeLayout
-        android:id="@+id/addition_box"
-        android:clickable="true"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp">
+        android:layout_marginBottom="10dp">
         <TextView
             android:id="@+id/addition_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="AdditionName"
-            android:textSize="20dp" />
+            android:layout_marginStart="5dp"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/addition_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="2.50"
-            android:textSize="20dp"
-            android:layout_marginRight="50dp"
-            android:layout_alignParentRight="true"/>
+            android:textSize="20sp"
+            android:layout_marginEnd="5dp"
+            android:layout_alignParentEnd="true"/>
     </RelativeLayout>
 
-    <CheckBox
-        android:id="@+id/check"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="10px" />
-
-</RelativeLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
+</LinearLayout>

@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
 
 /**
  * Created by Alessio on 16/05/2016.
@@ -34,6 +35,8 @@ public class MealAddition implements Parcelable {
 
     public void setMeal_addition_name(String meal_addition_name) {
         this.meal_addition_name = meal_addition_name;
+        if(this.getMeal_addition_id() == null)
+            this.setMeal_addition_id(Integer.toString(meal_addition_name.hashCode()));
     }
 
     public double getMeal_addition_price() {
