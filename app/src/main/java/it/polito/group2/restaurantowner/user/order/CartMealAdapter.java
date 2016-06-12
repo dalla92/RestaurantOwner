@@ -21,11 +21,13 @@ public class CartMealAdapter extends RecyclerView.Adapter<CartMealAdapter.MealVi
     private final ArrayList<Meal> mealList;
     private final Offer offer;
     private final Context context;
+    private final CartFragment fragment;
 
-    public CartMealAdapter(Context context, ArrayList<Meal> list, Offer offer) {
+    public CartMealAdapter(Context context, ArrayList<Meal> list, Offer offer, CartFragment fragment) {
         this.context = context;
         this.mealList = list;
         this.offer = offer;
+        this.fragment = fragment;
     }
 
     public class MealViewHolder extends RecyclerView.ViewHolder {

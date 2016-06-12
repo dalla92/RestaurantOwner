@@ -335,14 +335,8 @@
     <string name="user_order_cart_btn_cancel">Cancel order</string>
     <string name="user_order_cart_hint_note">Additional order info</string>
     <string name="user_order_info_title">Quantity</string>
-    <string name="user_order_confirm_title">Order confirm</string>
-    <string name="user_order_confirm_message">Are you sure to confirm your order?</string>
     <string name="user_order_info_alert_title">Attention!</string>
     <string name="user_order_info_alert_message">You must enter the quantity to add the meal to the cart.</string>
-    <string name="user_order_cancel_title">Attention!</string>
-    <string name="user_order_cancel_message">Do you want to delete the order?</string>
-    <string name="user_order_cart_deltitle">Delete meal</string>
-    <string name="user_order_cart_delmessage">Do you want to delete this meal?</string>
     <string name="user_order_alert_back_title">Attention!</string>
     <string name="user_order_alert_back_message">If you go back, you will lose your order if you don\'t confirm it.</string>
     <string name="user_order_alert_limit_title">Restaurant order limit</string>
@@ -354,6 +348,16 @@
     <string name="user_order_fragment_quantity_button">Add to cart</string>
     <string name="user_order_alert_cart_title">Attention!</string>
     <string name="user_order_alert_cart_message">If you go to the cart you lose the current meal chose</string>
+    <string name="user_order_fragment_cart_alert_mealdel_title">Delete meal</string>
+    <string name="user_order_fragment_cart_alert_mealdel_message">Are you sure to delete this meal?</string>
+    <string name="user_order_fragment_cart_alert_adddel_title">Delete addition</string>
+    <string name="user_order_fragment_cart_alert_adddel_message">Are you sure to delete this addition?</string>
+    <string name="user_order_fragment_cart_alert_ordercancel_title">Attention!</string>
+    <string name="user_order_fragment_cart_alert_ordercancel_message">Do you want to delete the order?</string>
+    <string name="user_order_fragment_cart_alert_orderconfirm_title">Order confirm</string>
+    <string name="user_order_fragment_cart_alert_orderconfirm_message">Are you sure to confirm your order?</string>
+    <string name="user_order_fragment_cart_confirmdialog_confirmbtn">confirm</string>
+    <string name="user_order_fragment_cart_confirmdialog_cancelbtn">cancel</string>
 
     <!-- Google Maps strings -->
     <string name="last_update_time_label">Last location update time</string>

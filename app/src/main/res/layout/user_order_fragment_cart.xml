@@ -10,20 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/user_order_cart_hint_note"
-        android:inputType="textMultiLine"
-        android:ems="10"
-        android:id="@+id/ordernote" />
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/order_price"
         android:text="Euro 52.20"
-        android:textSize="30dp"
+        android:textSize="30sp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:textAlignment="center"/>

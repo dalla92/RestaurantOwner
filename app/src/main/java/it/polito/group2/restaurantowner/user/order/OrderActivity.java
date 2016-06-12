@@ -302,7 +302,7 @@ public class OrderActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConfirmOrderClicked(Order order) {
+    public void onOrderConfirm(Order order) {
         this.order = order;
         Calendar now = Calendar.getInstance();
         updatePrice(now);
@@ -331,22 +331,21 @@ public class OrderActivity extends AppCompatActivity
     }
 
     @Override
-    public void onContinueOrderClicked(Order order) {
+    public void onOrderContinue(Order order) {
         this.order = order;
         loadCategoryFragment(false);
     }
 
     @Override
-    public void onMealDeleted(Order order, Meal meal) {
+    public void onOrderChange(Order order) {
         this.order = order;
-        this.order.delMeal(meal);
         Calendar now = Calendar.getInstance();
         updatePrice(now);
         loadCartFragment();
     }
 
     @Override
-    public void onCancelOrderClicked() {
+    public void onOrderDelete() {
         this.order = setNewOrder();
         loadCategoryFragment(false);
         OnBackUtil.clean_stack_and_go_to_user_restaurant_page(getApplicationContext(), restaurantID);
