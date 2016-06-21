@@ -54,6 +54,9 @@ public class TableFragment extends Fragment {
 
         firebase = FirebaseDatabase.getInstance();
 
+        if(reservation_list==null)
+            reservation_list = new ArrayList<>();
+
         q = firebase.getReference("table_reservations").orderByChild("restaurant_id").equalTo(restaurantId);
         l = new ValueEventListener() {
             @Override

@@ -198,12 +198,14 @@ public class MenuRestaurant_page extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        q.addValueEventListener(l);
+        if(q!=null)
+            q.addValueEventListener(l);
     }
     @Override
     protected void onStop() {
         super.onStop();
-        RemoveListenerUtil.remove_value_event_listener(q, l);
+        if(q!=null)
+            RemoveListenerUtil.remove_value_event_listener(q, l);
     }
 
     @Override

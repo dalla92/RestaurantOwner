@@ -15,15 +15,21 @@
         android:orientation="vertical"
         android:padding="5dp">
 
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
             android:ems="10"
             android:hint="@string/name"
-            android:id="@+id/resadd_info_name"
+            android:id="@+id/resadd_info_name" />
 
-            />
+        </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -39,6 +45,12 @@
 
         </android.support.design.widget.TextInputLayout>
 
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,6 +60,8 @@
             android:id="@+id/resadd_info_phone"
             android:layout_marginTop="10dp"
             />
+
+        </android.support.design.widget.TextInputLayout>
 
     </LinearLayout>
 

@@ -414,19 +414,26 @@ public class MapsActivity extends AppCompatActivity implements
                             .build();
             Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
             */
-            Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
+            if(!Dexter.isRequestOngoing()) {
+                Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
 
-            Dexter.checkPermission(new PermissionListener() {
-                @Override public void onPermissionGranted(PermissionGrantedResponse response) {
-                    permission_granted();
-                }
-                @Override public void onPermissionDenied(PermissionDeniedResponse response) {
-                    gps_denied();
-                }
-                @Override public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                    token.continuePermissionRequest();
-                }
-            }, Manifest.permission.ACCESS_FINE_LOCATION);
+                Dexter.checkPermission(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        permission_granted();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        gps_denied();
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }, Manifest.permission.ACCESS_FINE_LOCATION);
+            }
         }
         else{
             mGoogleApiClient.connect();

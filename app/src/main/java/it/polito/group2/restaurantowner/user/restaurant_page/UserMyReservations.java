@@ -219,8 +219,10 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
                     }
                 }
 
-                if (all_table_reservations.isEmpty())
-                    Toast.makeText(getApplicationContext(), "No reservations", Toast.LENGTH_SHORT).show();
+                if (all_table_reservations.isEmpty()) {
+                    mProgressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(), R.string.missing_reservation, Toast.LENGTH_SHORT).show();
+                }
                 else {
                     //ordering from last done
                     Collections.reverse(all_table_reservations);

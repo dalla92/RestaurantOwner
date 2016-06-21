@@ -347,7 +347,7 @@ public class UserRestaurantList extends AppCompatActivity
                             .build();
             Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
             */
-            Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
+//            Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
 
             Dexter.checkPermission(new PermissionListener() {
                 @Override public void onPermissionGranted(PermissionGrantedResponse response) {
@@ -739,6 +739,7 @@ public class UserRestaurantList extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+        mGoogleApiClient.connect();
         if(!haveNetworkConnection())
             create_dialog(this);
     }

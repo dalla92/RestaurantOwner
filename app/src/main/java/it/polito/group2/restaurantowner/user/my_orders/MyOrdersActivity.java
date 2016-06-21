@@ -148,7 +148,7 @@ public class MyOrdersActivity extends AppCompatActivity
 
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-        ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+        ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
 
         if (user.getOwnerUser())
             ownerItem.setVisible(true);

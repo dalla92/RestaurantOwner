@@ -241,4 +241,5 @@
     <string name="user_order_info_alert_title">Attenzione!</string>
     <string name="offers">Offerte</string>
     <string name="reviews">Recensioni</string>
+    <string name="missing_reservation">Nessuna prenotazione</string>
 </resources>
