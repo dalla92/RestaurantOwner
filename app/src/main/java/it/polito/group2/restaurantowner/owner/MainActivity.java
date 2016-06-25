@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,10 +18,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
@@ -31,9 +37,11 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
+import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 
 public class MainActivity extends AppCompatActivity
@@ -45,14 +53,15 @@ public class MainActivity extends AppCompatActivity
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private Query resPreviewQuery;
-    private ValueEventListener resPreviewValueListener;
+    private ChildEventListener resPreviewValueListener;
+    Toolbar toolbar;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         String userID = FirebaseUtil.getCurrentUserId();
@@ -98,30 +107,53 @@ public class MainActivity extends AppCompatActivity
         ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
         mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
+        firebase = FirebaseDatabase.getInstance();
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
+        setDrawer();
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        firebase = FirebaseDatabase.getInstance();
         resPreviewQuery = firebase.getReference("restaurants_previews").orderByChild("user_id").equalTo(userID);
-        resPreviewValueListener = new ValueEventListener() {
+        resPreviewValueListener = new ChildEventListener() {
+
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                mAdapter.clear();
-                resList = new ArrayList<>();
-                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
-                    resList.add(0, postSnapshot.getValue(RestaurantPreview.class));
-                    mAdapter.addItem(0, postSnapshot.getValue(RestaurantPreview.class));
-                }
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                RestaurantPreview snap_res = dataSnapshot.getValue(RestaurantPreview.class);
+                mAdapter.addItem(0, snap_res);
                 FirebaseUtil.hideProgressDialog(mProgressDialog);
             }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                int res = mAdapter.findRestPrev(dataSnapshot.getValue(RestaurantPreview.class));
+                if(res!=-1){
+                    mAdapter.removeItem(res);
+                    mAdapter.addItem(res, dataSnapshot.getValue(RestaurantPreview.class));
+                    //        adapter.notifyItemChanged(res);
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                int res = mAdapter.findRestPrev(dataSnapshot.getValue(RestaurantPreview.class));
+                if(res!=-1){
+                    mAdapter.removeItem(res);
+                    //        adapter.notifyItemRemoved(res);
+                }
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
             @Override
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
@@ -134,13 +166,15 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         FirebaseUtil.showProgressDialog(mProgressDialog);
-        resPreviewQuery.addValueEventListener(resPreviewValueListener);
+        resPreviewQuery.addChildEventListener(resPreviewValueListener);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        RemoveListenerUtil.remove_value_event_listener(resPreviewQuery, resPreviewValueListener);
+        RemoveListenerUtil.remove_child_event_listener(resPreviewQuery, resPreviewValueListener);
+        resList.clear();
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -151,6 +185,58 @@ public class MainActivity extends AppCompatActivity
         } else {
             OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
         }
+    }
+
+    private void setDrawer() {
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
+
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
+
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
+
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(getApplicationContext())
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                    else{
+                        Glide
+                                .with(getApplicationContext())
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
+
+        }
+
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override

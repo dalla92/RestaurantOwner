@@ -70,6 +70,7 @@ import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
 import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
@@ -102,6 +103,7 @@ public class Restaurant_page extends AppCompatActivity
     private StorageReference photo_reference;
     private StorageReference user_storage_reference;
     private FirebaseDatabase firebase;
+    Toolbar toolbar;
 
     /*private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int SELECT_PICTURE = 2;
@@ -131,7 +133,7 @@ public class Restaurant_page extends AppCompatActivity
         collapsingToolbarLayout.setExpandedTitleColor(getResources().getColor(android.R.color.transparent));
 
         //toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //navigation drawer
@@ -200,11 +202,13 @@ public class Restaurant_page extends AppCompatActivity
 
     private void get_data_from_firebase(){
         firebase = FirebaseDatabase.getInstance();
+        setDrawer();
         q = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id);
         l = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 my_restaurant = snapshot.getValue(Restaurant.class);
+                getSupportActionBar().setTitle(my_restaurant.getRestaurant_name());
                 if(my_restaurant!=null)
                     fill_data();
                 FirebaseUtil.hideProgressDialog(mProgressDialog);
@@ -457,6 +461,58 @@ public class Restaurant_page extends AppCompatActivity
         }
 
         hide();
+    }
+
+    private void setDrawer() {
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
+
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
+
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
+
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(getApplicationContext())
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                    else{
+                        Glide
+                                .with(getApplicationContext())
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
+
+        }
+
+        navigationView.setNavigationItemSelectedListener(this);
     }
 
     @Override

@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * Created by Alessio on 16/05/2016.
  */
-public class RestaurantTimeSlot implements Parcelable{
+public class RestaurantTimeSlot implements Parcelable, Serializable{
 
     private Boolean lunch;
     private Boolean dinner; //is_open is not needed anymore because lunch and dinner are both false when close

@@ -540,6 +540,9 @@
     <string name="tap_screen">tap screen</string>
     <string name="long_press_screen">long press screen</string>
     <string name="walk_panorama">Walk</string>
+    <string name="valid_for">Valid for </string>
+    <string name="from">From</string>
+    <string name="to">To</string>
 
     <!--    Permissions    -->
     <string name="permission_rationale_location">Access to the location service is required to demonstrate the \'my location\' feature, which shows your current location on the map.</string>

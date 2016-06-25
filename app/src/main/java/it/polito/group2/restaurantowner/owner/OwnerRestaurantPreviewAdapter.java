@@ -103,6 +103,16 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
             notifyItemRangeChanged(position, mDataset.size());
         }
 
+    public int findRestPrev(RestaurantPreview m){
+        int i = 0;
+        for(;i<mDataset.size();i++){
+            RestaurantPreview meal = mDataset.get(i);
+            if(m.getRestaurant_id().equals(meal.getRestaurant_id()))
+                return i;
+        }
+        return -1;
+    }
+
 
         @Override
         public void onItemMove(int fromPosition, int toPosition) {

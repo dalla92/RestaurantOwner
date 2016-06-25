@@ -58,17 +58,21 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
     private GoogleApiClient mGoogleApiClient;
     private FirebaseDatabase firebase;
     private ProgressDialog mProssesDialog;
+    private boolean editMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_restaurant);
         Intent intent = getIntent();
+        editMode = false;
 
         mProssesDialog = FirebaseUtil.initProgressDialog(this);
         firebase = FirebaseDatabase.getInstance();
-        if(intent.hasExtra("Restaurant"))
+        if(intent.hasExtra("Restaurant")) {
             res = (Restaurant) intent.getExtras().get("Restaurant");
+            editMode = true;
+        }
         if(res==null){
             res = new Restaurant();
         }
@@ -117,13 +121,19 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             else {
                 final String userID = FirebaseUtil.getCurrentUserId();
                 if (userID != null) {
-                    res.setUser_id(userID);
+                    DatabaseReference restaurantRef;
+                    if(editMode){
+                        restaurantRef = firebase.getReference("restaurants/" + res.getRestaurant_id());
+                    }
+                    else {
+                        res.setUser_id(userID);
 
-                    //resList.add(0,res);
-                    //mAdapter.addItem(0, res);
-                    DatabaseReference restaurantsReference = firebase.getReference("restaurants");
-                    DatabaseReference restaurantRef = restaurantsReference.push();
-                    res.setRestaurant_id(restaurantRef.getKey());
+                        //resList.add(0,res);
+                        //mAdapter.addItem(0, res);
+                        DatabaseReference restaurantsReference = firebase.getReference("restaurants");
+                        restaurantRef = restaurantsReference.push();
+                        res.setRestaurant_id(restaurantRef.getKey());
+                    }
                     if (res.getRestaurant_address() != null && !res.getRestaurant_address().trim().equals("")) {
                         String address = res.getRestaurant_address();
                         try {
@@ -146,7 +156,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                             //save also the restaurant preview if the restaurant was succefully written
                             DatabaseReference restaurantReference2 = firebase.getReference("restaurants_previews/" + finalRes.getRestaurant_id());
                             RestaurantPreview r_p = new RestaurantPreview();
-                            if(finalRes.getRestaurant_address() != null && !finalRes.getRestaurant_address().trim().equals("")) {
+                            if (finalRes.getRestaurant_address() != null && !finalRes.getRestaurant_address().trim().equals("")) {
                                 String address = finalRes.getRestaurant_address();
                                 Geocoder geocoder = new Geocoder(AddRestaurantActivity.this, Locale.ITALY);
                                 try {
@@ -241,7 +251,6 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         if(takeAway)
             res.setRestaurant_orders_per_hour(Integer.parseInt(orderPerHour));
         ArrayList<RestaurantTimeSlot> openTimeList = new ArrayList<>();
-        if(!lunchOpenTime.isEmpty()) {
             for (int i = 0; i < 7; i++) {
                 RestaurantTimeSlot daySlot = new RestaurantTimeSlot();
                 //daySlot.setRestaurant_id(res.getRestaurant_id());
@@ -264,7 +273,6 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
                 openTimeList.add(daySlot);
             }
-        }
         res.setRestaurant_time_slot(openTimeList);
 
     }
