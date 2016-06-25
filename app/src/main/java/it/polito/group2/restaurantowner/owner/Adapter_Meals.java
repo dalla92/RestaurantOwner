@@ -151,11 +151,21 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     }
 
     public void removeItem(int position) {
+
+
         meals.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, meals.size());
     }
-
+    public int findMeal(Meal m){
+        int i = 0;
+        for(;i<meals.size();i++){
+            Meal meal = meals.get(i);
+            if(m.getMeal_id().equals(meal.getMeal_id()))
+                return i;
+        }
+        return -1;
+    }
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
@@ -177,7 +187,12 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
                 DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
                 //delete
                 ref.setValue(null);
-                removeItem(position);
+                //removeItem(position);
+                Meal m = meals.get(position);
+                FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+                DatabaseReference mealReference = firebase.getReference("meals/" + m.getRestaurant_id() + "/" + m.getMeal_id());
+
+                mealReference.setValue(null);
                 dialog.dismiss();
 
             }

@@ -242,4 +242,5 @@
     <string name="offers">Offerte</string>
     <string name="reviews">Recensioni</string>
     <string name="missing_reservation">Nessuna prenotazione</string>
+    <string name="owner_offer_fragment_offer_calendartext_offerend">Offer ends on</string>
 </resources>

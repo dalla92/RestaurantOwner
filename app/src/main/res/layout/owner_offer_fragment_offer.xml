@@ -143,7 +143,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/owner_offer_fragment_offer_calendartext_offerstart"
+                    android:text="@string/owner_offer_fragment_offer_calendartext_offerend"
                     android:textSize="15sp"
                     android:layout_gravity="center" />
 

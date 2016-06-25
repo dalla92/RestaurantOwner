@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.design.widget.TabLayout;
 import android.support.v4.widget.DrawerLayout;
@@ -132,7 +133,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                 Toast.makeText(this,"Please insert meal name to continue", Toast.LENGTH_SHORT).show();
             else {
                 Intent intent = new Intent();
-                intent.putExtra("meal", (Serializable) current_meal);
+                intent.putExtra("meal", current_meal);
                 setResult(RESULT_OK, intent);
                 finish();//finishing activity
                 return true;
@@ -224,7 +225,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
             public void onFailure(Exception e) {
                 e.printStackTrace();
                 Log.d("my_ex", e.getMessage());
-                Toast failure_message = Toast.makeText(context, "The upload is failed", Toast.LENGTH_LONG);
+                Toast failure_message = Toast.makeText(context, "The upload of the photo is failed", Toast.LENGTH_LONG);
                 failure_message.show();
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

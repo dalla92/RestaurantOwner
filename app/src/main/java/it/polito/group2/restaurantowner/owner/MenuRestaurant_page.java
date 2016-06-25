@@ -5,9 +5,11 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -26,6 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.graphics.Rect;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
@@ -70,7 +73,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
     public Context context;
     private FirebaseDatabase firebase;
     private DatabaseReference q;
-    private ValueEventListener l;
+    private ChildEventListener l;
     private ProgressDialog mProgressDialog;
     private Activity a;
 
@@ -94,6 +97,16 @@ public class MenuRestaurant_page extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(true);
         adapter = new Adapter_Meals((Activity)context, 0, meals, restaurant_id);
         mRecyclerView.setAdapter(adapter);
+        GridLayoutManager mLayoutManager = null;
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mLayoutManager = new GridLayoutManager(this, 1);
+            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(1, 5, true));
+        }
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mLayoutManager = new GridLayoutManager(this, 2);
+            mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, 5, true));
+        }
+        //mRecyclerView.setLayoutManager(mLayoutManager);
 
         ImageView add_button = (ImageView) findViewById(R.id.imageButton);
         add_button.setOnClickListener(new View.OnClickListener() {
@@ -116,7 +129,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                 m.setMeal_thumbnail("");
                 m.setMeal_quantity(0);
                 mealRef.setValue(m);
-                adapter.addItem(0, m);
+//                adapter.addItem(0, m);
             }
         });
 
@@ -126,34 +139,65 @@ public class MenuRestaurant_page extends AppCompatActivity {
     }
     
     private void get_data_from_firebase(){
-        DatabaseReference q = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+restaurant_id);
-        l = new ValueEventListener() {
+        q = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+restaurant_id);
+        l = new ChildEventListener() {
+
             @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot meSnapshot : snapshot.getChildren()) {
-                    Meal snap_meal = meSnapshot.getValue(Meal.class);
-                    adapter.addItem(0, snap_meal);
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Meal snap_meal = dataSnapshot.getValue(Meal.class);
+                adapter.addItem(0, snap_meal);
+             //   adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                int res = adapter.findMeal(dataSnapshot.getValue(Meal.class));
+                if(res!=-1){
+                    adapter.removeItem(res);
+                    adapter.addItem(res, dataSnapshot.getValue(Meal.class));
+            //        adapter.notifyItemChanged(res);
                 }
+            }
 
-                //toolbar
-                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-                setSupportActionBar(toolbar);
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+                int res = adapter.findMeal(dataSnapshot.getValue(Meal.class));
+                if(res!=-1){
+                    adapter.removeItem(res);
+            //        adapter.notifyItemRemoved(res);
+                }
+            }
 
-                //navigation drawer
-                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                        (Activity) context, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-                drawer.setDrawerListener(toggle);
-                toggle.syncState();
-                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-                navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-                    @SuppressWarnings("StatementWithEmptyBody")
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem item) {
-                        // Handle navigation view item clicks here.
-                        return DrawerUtil.drawer_owner_not_restaurant_page(a, item, restaurant_id);
-                    }
-                });
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError firebaseError) {
+                System.out.println("The read failed: " + firebaseError.getMessage());
+            }
+        };
+
+        //toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                (Activity) context, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @SuppressWarnings("StatementWithEmptyBody")
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                // Handle navigation view item clicks here.
+                return DrawerUtil.drawer_owner_not_restaurant_page(a, item, restaurant_id);
+            }
+        });
 
                 /*
                 if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -165,47 +209,44 @@ public class MenuRestaurant_page extends AppCompatActivity {
                     mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2,5,true));
                 }
                 */
-                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
-                mRecyclerView.setLayoutManager(mLayoutManager);
-                mRecyclerView.addOnItemTouchListener(
-                        new RecyclerItemClickListener(context, new RecyclerItemClickListener.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(View view, int position) {
-                                meal_to_edit = meals.get(position);
-                                Intent intent = new Intent(getApplicationContext(), MenuRestaurant_edit.class);
-                                intent.putExtra("meal", meal_to_edit);
-                                startActivityForResult(intent, MODIFY_MEAL);
-                            }
-                        }));
-                //delete with swipe
-                ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-                ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
-                mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(context);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(context, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        meal_to_edit = meals.get(position);
+                        Intent intent = new Intent(getApplicationContext(), MenuRestaurant_edit.class);
+                        intent.putExtra("meal", meal_to_edit);
+                        startActivityForResult(intent, MODIFY_MEAL);
+                    }
+                }));
+        //delete with swipe
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
+        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
-                Menu menu = navigationView.getMenu();
-                MenuItem i = menu.findItem(R.id.action_edit);
-                i.setVisible(false);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError firebaseError) {
-                System.out.println("The read failed: " + firebaseError.getMessage());
-            }
-        };
+        Menu menu = navigationView.getMenu();
+        MenuItem i = menu.findItem(R.id.action_edit);
+        i.setVisible(false);
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        if(q!=null)
-            q.addValueEventListener(l);
+        if(q!=null) {
+            q.addChildEventListener(l);
+        }
     }
     @Override
     protected void onStop() {
         super.onStop();
-        if(q!=null)
-            RemoveListenerUtil.remove_value_event_listener(q, l);
+        if(q!=null) {
+            RemoveListenerUtil.remove_child_event_listener(q, l);
+            meals.clear();
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -290,8 +331,6 @@ public class MenuRestaurant_page extends AppCompatActivity {
                 Meal m = (Meal) data.getExtras().get("meal");
                 DatabaseReference dr = firebase.getReference("meals/" + m.getRestaurant_id() + "/" + m.getMeal_id());
                 dr.setValue(m);
-                meals.set(index_position, m);
-                adapter.notifyDataSetChanged();
             }
         }
     }

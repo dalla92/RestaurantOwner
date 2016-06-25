@@ -151,7 +151,8 @@ public class MyOffersActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            OnBackUtil.clean_stack_and_go_to_main_activity(this);
+            //OnBackUtil.clean_stack_and_go_to_main_activity(this);
+            super.onBackPressed();
         }
     }
 
@@ -174,7 +175,6 @@ public class MyOffersActivity extends AppCompatActivity
                 Intent intent = new Intent(this, OfferActivity.class);
                 intent.putExtra("restaurant_id", restaurantID);
                 startActivity(intent);
-                finish();
                 break;
         }
         return true;

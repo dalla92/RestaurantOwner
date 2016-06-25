@@ -174,11 +174,11 @@ public class OfferActivity extends AppCompatActivity
                     .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             offer = null;
-                            Intent intent = new Intent(getBaseContext(), Restaurant_page.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            intent.putExtra("restaurant_id", restaurantID);
-                            startActivity(intent);
-                            finish();
+                            //Intent intent = new Intent(getBaseContext(), Restaurant_page.class);
+                            //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            //intent.putExtra("restaurant_id", restaurantID);
+                            //startActivity(intent);
+                            OfferActivity.super.onBackPressed();
                         }
                     })
                     .setNegativeButton(android.R.string.no, null).show();
