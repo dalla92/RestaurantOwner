@@ -37,7 +37,7 @@ public class SendNotificationAsync extends AsyncTask<String, Void, Void> {
             msg.put("body",resName);
             msg.put("title","New offer from your favourite restaurant!");
 
-            root.put("to","/topics/asd");
+            root.put("to","/topics/"+resId);
             root.put("notification", msg);
 
             String str = root.toString();
