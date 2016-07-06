@@ -726,6 +726,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         reservationsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                /*
                 AlertDialog.Builder alert = new AlertDialog.Builder(UserRestaurantActivity.this);
                 alert.setTitle("Warning");
                 alert.setMessage("Questa funzionalità è in fase sviluppo, stay tuned!");
@@ -738,11 +739,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 });
 
                 alert.show();
-
-                /* TODO fix reservation
+                */
+                // TODO fix reservation
                 Intent intent = new Intent(UserRestaurantActivity.this, UserTableReservationActivity.class);
                 intent.putExtra("restaurant_id", targetRestaurant.getRestaurant_id());
-                startActivity(intent);*/
+                startActivity(intent);
             }
         });
     }

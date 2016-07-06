@@ -268,23 +268,25 @@ public class GalleryViewActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot data: dataSnapshot.getChildren())
-                    isOwner = data.getValue(Boolean.class);
+        if(userRef != null) {
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot data : dataSnapshot.getChildren())
+                        isOwner = data.getValue(Boolean.class);
 
-                if(isOwner)
-                    getMenuInflater().inflate(R.menu.menu_gallery_owner, menu);
-                else
+                    if (isOwner)
+                        getMenuInflater().inflate(R.menu.menu_gallery_owner, menu);
+                    else
+                        getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
                     getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
-            }
-        });
+                }
+            });
+        }
 
         return true;
     }

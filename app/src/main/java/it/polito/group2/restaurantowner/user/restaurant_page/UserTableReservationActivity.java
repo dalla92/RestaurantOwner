@@ -386,7 +386,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        RemoveListenerUtil.remove_value_event_listener(q, l);
+        if(l !=null && q != null)RemoveListenerUtil.remove_value_event_listener(q, l);
     }
 
     @Override
