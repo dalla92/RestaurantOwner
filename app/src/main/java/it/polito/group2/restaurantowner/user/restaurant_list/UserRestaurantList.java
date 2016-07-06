@@ -598,9 +598,9 @@ public class UserRestaurantList extends AppCompatActivity
             range = DEFAULT_RANGE;
         }
         b.putDouble("range", range);
-        b.putParcelableArrayList("restaurants_previews_list", restaurants_previews_list);
+        b.putParcelableArrayList("restaurants_previews_list", mAdapter.getPreviews());
         intent.putExtras(b);
-        if(restaurants_previews_list!=null)
+        if(mAdapter.getPreviews()!=null && mAdapter.getPreviews().size() > 0)
             startActivity(intent);
     }
 

@@ -272,7 +272,7 @@ public class MapsActivity extends AppCompatActivity implements
             if (mCurrentLocation != null) {
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), DEFAULT_ZOOM2));
                 mLastUpdateTimeTextView.setText(String.format("%s: %s", mLastUpdateTimeLabel, mLastUpdateTime));
-                /*
+
                 if(mLastUserMarker==null) {
                     mLastUserMarker = mMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
@@ -283,7 +283,7 @@ public class MapsActivity extends AppCompatActivity implements
                     );
                 }
                 mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
-                */
+
                 prepare_clustering();
                 if(DEFAULT_RADIUS!=0 && mLastUserMarker!=null){
                     //add circle
@@ -692,7 +692,7 @@ public class MapsActivity extends AppCompatActivity implements
             address.setText(retrieve_address_by_geocoding(mLastSelectedMarker.getPosition(), mLastSelectedMarker.getPosition())); //or with one query
             String string_to_round = calculate_distance(mLastSelectedMarker.getPosition(), mLastUserMarker);
             String[] parts_to_round = string_to_round.split("\\s+");
-            int rounded_value = Math.round(Float.valueOf(parts_to_round[0]));
+            int rounded_value = Math.round(Float.valueOf(parts_to_round[0].replace(",",".")));
             String string_result = String.valueOf(rounded_value) + " " + parts_to_round[1];
             distance.setText(string_result);
             if(restaurant_preview.isOpenNow()) {
