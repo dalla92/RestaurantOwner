@@ -129,6 +129,7 @@ public class UserRestaurantList extends AppCompatActivity
     private TextView search;
     private FloatingActionButton fab;
     public static int index;
+    private boolean isRequestedPermission = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -312,6 +313,11 @@ public class UserRestaurantList extends AppCompatActivity
 
         mCurrentLocation = location;
         updateUI();
+
+        if(isRequestedPermission) {
+            read_restaurants_from_firebase(true);
+            isRequestedPermission = false;
+        }
         /*
         Toast.makeText(this, getResources().getString(R.string.location_updated_message),
                 Toast.LENGTH_SHORT).show();
@@ -576,6 +582,8 @@ public class UserRestaurantList extends AppCompatActivity
     }
 
     public boolean is_restaurant_near_without_position(LatLng res_position, double range){
+        if(searchedPosition == null)
+            return true;
         double distance = calculate_distance2(res_position, searchedPosition);
         if(distance<range){
             return true;
@@ -762,21 +770,21 @@ public class UserRestaurantList extends AppCompatActivity
                 final LocationSettingsStates state = result.getLocationSettingsStates();
                 switch (status.getStatusCode()) {
                     case LocationSettingsStatusCodes.SUCCESS:
+                        isRequestedPermission = true;
                         //I have already the GPS activated
                         // All location settings are satisfied. The client can initialize location
                         // requests here.
                         startLocationUpdates();
-                        read_restaurants_from_firebase(true);
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         //GPS permission is requested
                         // Location settings are not satisfied. But could be fixed by showing the user
                         // a dialog.
                         try {
+                            isRequestedPermission = true;
                             // Show the dialog by calling startResolutionForResult(),
                             // and check the result in onActivityResult().
                             status.startResolutionForResult(UserRestaurantList.this, REQUEST_CHECK_SETTINGS);
-                            read_restaurants_from_firebase(true);
                         } catch (IntentSender.SendIntentException e) {
                             // Ignore the error.
                         }
@@ -861,6 +869,8 @@ public class UserRestaurantList extends AppCompatActivity
                 mRequestingLocationUpdates = true;
                 startLocationUpdates();
             }
+            else
+                read_restaurants_from_firebase(false);
         }
     }
 

@@ -53,6 +53,7 @@ public class Restaurant implements Serializable {
 
         Calendar now = Calendar.getInstance();
         RestaurantTimeSlot tSlot = null;
+        assert restaurant_time_slot != null;
         for(RestaurantTimeSlot s : restaurant_time_slot) {
             if(s.getDay_of_week() == now.get(Calendar.DAY_OF_WEEK) -1)  {
                 tSlot = s;
