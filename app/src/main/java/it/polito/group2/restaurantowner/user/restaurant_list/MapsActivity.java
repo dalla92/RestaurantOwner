@@ -678,7 +678,7 @@ public class MapsActivity extends AppCompatActivity implements
                 public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                     Drawable drawable = new BitmapDrawable(resource);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        d.findViewById(R.id.father_linear_layout).setBackground(drawable);
+                        d.findViewById(R.id.restaurant_image).setBackground(drawable);
                         d.findViewById(R.id.father_linear_layout).setAlpha(0.88f);
                     }
                 }
