@@ -112,7 +112,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
             if (current_meal.getMeal_name().equals("") || current_meal.getMeal_name() == null)
                 Toast.makeText(this, "Please insert meal name to continue", Toast.LENGTH_SHORT).show();
             else {
-                if (current_meal.getMeal_category().equals("") || current_meal.getMeal_category() == null)
+                if (current_meal.getMeal_category().equals("") || current_meal.getMeal_category().equals("Nessuno") || current_meal.getMeal_category().equals("None") || current_meal.getMeal_category() == null)
                     Toast.makeText(this, "Please insert category to continue", Toast.LENGTH_SHORT).show();
                 else {
                     Intent intent = new Intent();
