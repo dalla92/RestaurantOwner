@@ -155,7 +155,8 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.order.OrderActivity"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="com.google.android.gms.version"

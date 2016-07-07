@@ -20,10 +20,10 @@ public class Meal implements Parcelable {
     private int meal_cooking_time;
     private String meal_description;
     private String meal_category;
-    private Boolean mealVegan;
-    private Boolean mealVegetarian;
-    private Boolean mealGlutenFree;
-    private Boolean mealAvailable;
+    private Boolean mealVegan = false;
+    private Boolean mealVegetarian = false;
+    private Boolean mealGlutenFree = false;
+    private Boolean mealAvailable = true;
     private HashMap<String, MealAddition> meal_additions = new HashMap<>();
     private HashMap<String, MealCategory> meal_tags = new HashMap<>();
     private Boolean mealTakeAway;

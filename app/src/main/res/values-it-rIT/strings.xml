@@ -202,8 +202,8 @@
     <string name="next">Avanti</string>
     <string name="user_order_addition_title">Qualche supplemento?</string>
     <string name="user_order_addtocart">Aggiungi</string>
-    <string name="user_order_cart_btn_confirm">Conferma ordine</string>
-    <string name="user_order_cart_btn_continue">Continua ordine</string>
+    <string name="user_order_cart_btn_confirm">Conferma</string>
+    <string name="user_order_cart_btn_continue">Continua</string>
     <string name="user_order_cart_hint_note">Info sui supplementi dell\' ordine</string>
     <string name="user_order_cart_title">Ecco il tuo ordine:</string>
     <string name="user_order_category_title">Cosa vuoi mangiare?</string>

@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -30,10 +32,11 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
 
     public class MealViewHolder extends RecyclerView.ViewHolder {
         public TextView name;
+        public TextView description;
         public TextView price;
         public ImageView offer_active;
         public LinearLayout item;
-        //TODO aggiungere immagine del piatto
+        public ImageView thumbnail;
 
         public MealViewHolder(View view){
             super(view);
@@ -41,6 +44,8 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
             price = (TextView) itemView.findViewById(R.id.meal_price);
             offer_active = (ImageView) itemView.findViewById(R.id.offer_active);
             item = (LinearLayout) itemView.findViewById(R.id.meal_item);
+            thumbnail = (ImageView) itemView.findViewById(R.id.meal_thumbnail);
+            description = (TextView) itemView.findViewById(R.id.meal_description);
         }
     }
 
@@ -53,6 +58,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
     @Override
     public void onBindViewHolder(MealAdapter.MealViewHolder holder, final int position) {
         holder.name.setText(mealList.get(position).getMeal_name());
+        holder.description.setText(mealList.get(position).getMeal_description());
         if(isInOffer(mealList.get(position))) {
             Calendar c = Calendar.getInstance();
             holder.price.setText(formatEuro(offer.getNewMealPrice(mealList.get(position),c)));
@@ -67,6 +73,20 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
                 fragment.onMealSelected(mealList.get(position));
             }
         });
+
+        if (mealList.get(position).getMeal_thumbnail() == null || mealList.get(position).getMeal_thumbnail().equals("")) {
+            Glide
+                    .with(fragment.getContext())
+                    .load(R.drawable.no_image)
+                    .fitCenter()
+                    .into(holder.thumbnail);
+        } else {
+            Glide
+                    .with(fragment.getContext())
+                    .load(mealList.get(position).getMeal_thumbnail())
+                    .fitCenter()
+                    .into(holder.thumbnail);
+        }
     }
 
     @Override

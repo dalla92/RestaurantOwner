@@ -331,9 +331,9 @@
     <string name="user_order_addition_title">Additions?</string>
     <string name="user_order_cart_button">Cart</string>
     <string name="user_order_cart_title">Here\'s your order:</string>
-    <string name="user_order_cart_btn_confirm">Confirm order</string>
-    <string name="user_order_cart_btn_continue">Continue order</string>
-    <string name="user_order_cart_btn_cancel">Cancel order</string>
+    <string name="user_order_cart_btn_confirm">Confirm</string>
+    <string name="user_order_cart_btn_continue">Continue</string>
+    <string name="user_order_cart_btn_cancel">Cancel</string>
     <string name="user_order_cart_hint_note">Additional order info</string>
     <string name="user_order_info_title">Quantity</string>
     <string name="user_order_info_alert_title">Attention!</string>
@@ -359,6 +359,7 @@
     <string name="user_order_fragment_cart_alert_orderconfirm_message">Are you sure to confirm your order?</string>
     <string name="user_order_fragment_cart_confirmdialog_confirmbtn">confirm</string>
     <string name="user_order_fragment_cart_confirmdialog_cancelbtn">cancel</string>
+    <string name="user_order_fragment_cart_empty">No meals in this order</string>
 
     <!-- Google Maps strings -->
     <string name="last_update_time_label">Last location update time</string>

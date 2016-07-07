@@ -19,7 +19,7 @@ import it.polito.group2.restaurantowner.R;
 public class QuantityFragment extends Fragment {
 
     private OnActionListener mCallback;
-    private int quantity = 0;
+    private int quantity = 1;
 
     public QuantityFragment() {}
 

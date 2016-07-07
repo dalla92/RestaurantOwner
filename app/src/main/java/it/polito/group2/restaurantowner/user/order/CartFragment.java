@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -67,6 +68,8 @@ public class CartFragment extends Fragment {
         Button confirm_btn = (Button) view.findViewById(R.id.confirm_order);
         Button continue_btn = (Button) view.findViewById(R.id.continue_order);
         Button cancel_btn = (Button) view.findViewById(R.id.cancel_order);
+        LinearLayout order_detail = (LinearLayout) view.findViewById(R.id.order_detail);
+        TextView empty_msg = (TextView) view.findViewById(R.id.order_empty);
 
         continue_btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -76,8 +79,12 @@ public class CartFragment extends Fragment {
 
         if(order.getOrder_meals().size() == 0) {
             confirm_btn.setVisibility(View.GONE);
+            order_detail.setVisibility(View.GONE);
+            empty_msg.setVisibility(View.VISIBLE);
         } else {
+            order_detail.setVisibility(View.VISIBLE);
             confirm_btn.setVisibility(View.VISIBLE);
+            empty_msg.setVisibility(View.GONE);
             confirm_btn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     final Dialog dialog = new Dialog(getContext());
