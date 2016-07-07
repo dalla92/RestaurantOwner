@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -54,6 +55,6 @@ public class CartAdditionAdapter extends RecyclerView.Adapter<CartAdditionAdapte
     }
 
     private String formatEuro(double number) {
-        return "€ "+String.format("%10.2f", number);
+        return "€ "+String.format("%5.2f", number);
     }
 }
