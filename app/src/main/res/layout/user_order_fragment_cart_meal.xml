@@ -5,37 +5,40 @@
     android:layout_marginBottom="10dp">
 
     <RelativeLayout
+        android:id="@+id/meal_item"
+        android:paddingTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+            <ImageView
+                android:id="@+id/meal_delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginTop="-4dp"
+                android:src="@android:drawable/ic_delete"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="nr. "
+                android:textSize="18sp" />
             <TextView
                 android:id="@+id/meal_quantity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="3"
-                android:textSize="20dp" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="x"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:textSize="20dp" />
+                android:textSize="18sp" />
+
             <TextView
                 android:id="@+id/meal_name"
+                android:layout_marginStart="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="MealName"
-                android:textSize="20dp" />
-            <TextView
-                android:id="@+id/category_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="CategoryName"
-                android:layout_marginLeft="5dp"
-                android:textSize="10dp" />
+                android:textSize="18sp" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="wrap_content"
@@ -58,10 +61,59 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/order_meal_addition_list"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"/>
+        android:layout_marginStart="35dp">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:id="@+id/order_meal_addition_resume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:id="@+id/order_meal_addition_resume_icon"
+                android:src="@android:drawable/arrow_up_float"/>
+            <TextView
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"
+                android:text="@string/user_order_fragment_cart_addition_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"
+                android:text="("
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"
+                android:text="2.50"
+                android:id="@+id/order_meal_addition_resume_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"
+                android:text=")"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
 
+        <android.support.v7.widget.RecyclerView
+            android:visibility="gone"
+            android:id="@+id/order_meal_addition_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+    <View
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@android:color/darker_gray"/>
 </LinearLayout>

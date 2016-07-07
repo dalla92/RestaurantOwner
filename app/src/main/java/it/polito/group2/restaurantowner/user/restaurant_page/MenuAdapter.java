@@ -61,8 +61,10 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
     private ArrayList<Meal> getMealsFromCategory(String category) {
         ArrayList<Meal> targetMeals = new ArrayList<>();
         for(Meal m: meals){
-            if(m.getMeal_category().equals(category))
-                targetMeals.add(m);
+            if(m.getMeal_category() != null) {
+                if (m.getMeal_category().equals(category))
+                    targetMeals.add(m);
+            }
         }
 
         return targetMeals;

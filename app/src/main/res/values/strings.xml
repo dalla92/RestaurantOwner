@@ -360,6 +360,7 @@
     <string name="user_order_fragment_cart_confirmdialog_confirmbtn">confirm</string>
     <string name="user_order_fragment_cart_confirmdialog_cancelbtn">cancel</string>
     <string name="user_order_fragment_cart_empty">No meals in this order</string>
+    <string name="user_order_fragment_cart_addition_label">Additions included</string>
 
     <!-- Google Maps strings -->
     <string name="last_update_time_label">Last location update time</string>

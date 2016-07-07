@@ -153,14 +153,14 @@ public class CartFragment extends Fragment {
         mCallback = null;
     }
 
-    public void onMealDeleted(final String mealID) {
+    public void onMealDeleted(final Meal meal) {
         new AlertDialog.Builder(getContext())
                 .setTitle(getContext().getResources().getString(R.string.user_order_fragment_cart_alert_mealdel_title))
                 .setMessage(getContext().getResources().getString(R.string.user_order_fragment_cart_alert_mealdel_message))
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        order.getOrder_meals().remove(mealID);
+                        order.delMeal(meal);
                         mCallback.onOrderChange(order);
                     }
                 })
