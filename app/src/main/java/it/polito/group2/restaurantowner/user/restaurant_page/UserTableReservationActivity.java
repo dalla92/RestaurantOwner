@@ -46,6 +46,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.timessquare.CalendarCellDecorator;
 import com.squareup.timessquare.CalendarPickerView;
@@ -81,7 +82,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
     private ArrayList<TableReservation> reservations_that_day = new ArrayList<TableReservation>();
     private String user_id;
     private FirebaseDatabase firebase;
-    private DatabaseReference q;
+    private Query q;
     private ValueEventListener l;
     private ProgressDialog mProgressDialog;
 
@@ -321,7 +322,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
     }
 
     public void find_max_guests() {
-        q = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
+        q = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/").orderByChild("restaurant_id").equalTo(restaurant_id);
         l = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -409,7 +410,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog,
                                                 int which) {
-                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/" + restaurant_id);
+                                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
                                 DatabaseReference ref2 = ref.push();
                                 current_table_reservation.setTable_reservation_id(ref2.getKey());
                                 ref2.setValue(current_table_reservation);

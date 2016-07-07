@@ -76,7 +76,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
     private int j=0;
     private ProgressDialog mProgressDialog;
     private FirebaseDatabase firebase;
-    private DatabaseReference q;
+    private Query q;
     private ValueEventListener l;
 
     @Override
@@ -199,7 +199,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
     }
 
     public void get_data_from_firebase(){
-        q = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
+        q = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/").orderByChild("user_id").equalTo(user_id);
         l = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {

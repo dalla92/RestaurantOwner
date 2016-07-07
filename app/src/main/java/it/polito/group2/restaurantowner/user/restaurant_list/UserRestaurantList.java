@@ -40,7 +40,6 @@ import android.widget.TextView;
 
 import it.polito.group2.restaurantowner.R;
 
-
 import com.bumptech.glide.Glide;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;

@@ -9,6 +9,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import it.polito.group2.restaurantowner.owner.MainActivity;
+import it.polito.group2.restaurantowner.owner.Restaurant_page;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
@@ -16,6 +17,12 @@ import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActiv
  * Created by Alessio on 10/06/2016.
  */
 public class OnBackUtil {
+
+    public static void clean_stack_and_go_to_restaurant_page(Context c, String restaurantId) {
+        Intent intent = new Intent(c, Restaurant_page.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        c.startActivity(intent);
+    }
 
     public static void clean_stack_and_go_to_main_activity(Context c) {
         Intent intent = new Intent(c, MainActivity.class);

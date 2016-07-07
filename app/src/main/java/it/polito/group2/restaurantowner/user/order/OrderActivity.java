@@ -83,15 +83,15 @@ public class OrderActivity extends AppCompatActivity
         DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
         userID = FirebaseUtil.getCurrentUserId();
         if (userRef == null || userID == null)
-            OnBackUtil.clean_stack_and_go_to_main_activity(this);
+            OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurantID);
 
         //restaurant reference
         if (getIntent().getExtras() == null || getIntent().getExtras().getString("restaurant_id") == null)
-            OnBackUtil.clean_stack_and_go_to_main_activity(this);
+            OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurantID);
         restaurantID = getIntent().getExtras().getString("restaurant_id");
         DatabaseReference restaurantRef = FirebaseUtil.getRestaurantRef(restaurantID);
         if (restaurantRef == null)
-            OnBackUtil.clean_stack_and_go_to_main_activity(this);
+            OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurantID);
 
         //meals reference
         DatabaseReference mealsRef = FirebaseUtil.getMealsRef(restaurantID);
@@ -108,7 +108,7 @@ public class OrderActivity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
                 User user = dataSnapshot.getValue(User.class);
                 if (user == null)
-                    OnBackUtil.clean_stack_and_go_to_main_activity(getApplicationContext());
+                    OnBackUtil.clean_stack_and_go_to_restaurant_page(getApplicationContext(), restaurantID);
                 setDrawer(user);
                 startOrder(user);
             }
@@ -125,7 +125,7 @@ public class OrderActivity extends AppCompatActivity
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Restaurant rest = dataSnapshot.getValue(Restaurant.class);
                 if (rest == null)
-                    OnBackUtil.clean_stack_and_go_to_main_activity(getApplicationContext());
+                    OnBackUtil.clean_stack_and_go_to_restaurant_page(getApplicationContext(), restaurantID);
                 assert rest != null;
                 if (!rest.getTakeAwayAllowed())
                     OnBackUtil.clean_stack_and_go_to_user_restaurant_page(getApplicationContext(), restaurantID);

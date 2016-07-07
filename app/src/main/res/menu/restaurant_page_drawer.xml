@@ -14,11 +14,6 @@
             android:icon="@drawable/ic_edit_primary_24dp"/>
 
         <item
-            android:id="@+id/action_edit_cover"
-            android:title="@string/action_edit_cover"
-            android:icon="@drawable/ic_menu_camera" />
-
-        <item
             android:id="@+id/action_show_as"
             android:icon="@drawable/ic_store_mall_directory_24dp"
             android:title="Show as user" />

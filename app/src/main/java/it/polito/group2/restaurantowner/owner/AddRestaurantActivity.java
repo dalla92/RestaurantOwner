@@ -27,13 +27,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import org.json.JSONException;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
@@ -236,7 +233,10 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
 
     @Override
     public void onBackPressed() {
-        OnBackUtil.clean_stack_and_go_to_main_activity(this);
+        if(res == null || res.getRestaurant_id() == null)
+            OnBackUtil.clean_stack_and_go_to_main_activity(this);
+        else
+            OnBackUtil.clean_stack_and_go_to_restaurant_page(this, res.getRestaurant_id());
     }
 
     @Override

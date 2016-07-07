@@ -27,6 +27,7 @@ import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
+import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 
 /**
  * Created by Daniele on 05/04/2016.
@@ -215,12 +216,12 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
             today_year = today.get(Calendar.YEAR);
             firebase = FirebaseDatabase.getInstance();
             total_tables_number = r.getTables_number();
-            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/" + restaurant_id + "");
+            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
             ref2.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
-                        it.polito.group2.restaurantowner.firebasedata.TableReservation snap_t_b = (it.polito.group2.restaurantowner.firebasedata.TableReservation) dataSnapshot.getValue();
+                        TableReservation snap_t_b = (TableReservation) dataSnapshot.getValue();
                         Calendar that = snap_t_b.getTable_reservation_date();
                         int that_day = that.get(Calendar.DAY_OF_MONTH);
                         int that_month = that.get(Calendar.MONTH);

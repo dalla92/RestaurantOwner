@@ -3,12 +3,9 @@ package it.polito.group2.restaurantowner.owner;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -33,8 +30,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -46,12 +41,6 @@ import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
-import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
-import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
-import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
-import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
-import it.polito.group2.restaurantowner.owner.statistics.StatisticsActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class MenuRestaurant_page extends AppCompatActivity {
     private Menu menu;
@@ -267,7 +256,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            OnBackUtil.clean_stack_and_go_to_main_activity(this);
+            OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurant_id);
         }
     }
 

@@ -151,8 +151,7 @@ public class MyOffersActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            //OnBackUtil.clean_stack_and_go_to_main_activity(this);
-            super.onBackPressed();
+            OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurantID);
         }
     }
 

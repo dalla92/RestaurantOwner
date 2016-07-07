@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -43,15 +42,7 @@ import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 import it.polito.group2.restaurantowner.firebasedata.User;
-import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
-import it.polito.group2.restaurantowner.owner.AddRestaurantActivity;
-import it.polito.group2.restaurantowner.owner.MainActivity;
-import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
 import it.polito.group2.restaurantowner.owner.Restaurant_page;
-import it.polito.group2.restaurantowner.owner.my_offers.MyOffersActivity;
-import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
-import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
-import it.polito.group2.restaurantowner.user.restaurant_page.UserRestaurantActivity;
 
 public class StatisticsActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -145,6 +136,7 @@ public class StatisticsActivity extends AppCompatActivity
         }
 
     }
+
 
     @Override
     protected void onStart() {
@@ -381,7 +373,7 @@ public class StatisticsActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            OnBackUtil.clean_stack_and_go_to_main_activity(this);
+            OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurantID);
         }
     }
 

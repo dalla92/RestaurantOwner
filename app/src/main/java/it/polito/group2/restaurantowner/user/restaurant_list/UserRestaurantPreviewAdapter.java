@@ -233,7 +233,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             final TextView res_num_text_view = reservationNumber;
             firebase = FirebaseDatabase.getInstance();
             total_tables_number = r.getTables_number();
-            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/" + restaurant_id);
+            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
             ref2.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
