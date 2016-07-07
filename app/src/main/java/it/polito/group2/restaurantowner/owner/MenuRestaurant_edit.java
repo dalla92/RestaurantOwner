@@ -109,14 +109,18 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         int id = item.getItemId();
         if (id == R.id.action_save) {
             mSectionsPagerAdapter.saveDataFromFragments();
-            if(current_meal.getMeal_name().equals(""))
-                Toast.makeText(this,"Please insert meal name to continue", Toast.LENGTH_SHORT).show();
+            if (current_meal.getMeal_name().equals("") || current_meal.getMeal_name() == null)
+                Toast.makeText(this, "Please insert meal name to continue", Toast.LENGTH_SHORT).show();
             else {
-                Intent intent = new Intent();
-                intent.putExtra("meal", current_meal);
-                setResult(RESULT_OK, intent);
-                finish();//finishing activity
-                return true;
+                if (current_meal.getMeal_category().equals("") || current_meal.getMeal_category() == null)
+                    Toast.makeText(this, "Please insert category to continue", Toast.LENGTH_SHORT).show();
+                else {
+                    Intent intent = new Intent();
+                    intent.putExtra("meal", current_meal);
+                    setResult(RESULT_OK, intent);
+                    finish();//finishing activity
+                    return true;
+                }
             }
         }
         if (id == android.R.id.home) {
