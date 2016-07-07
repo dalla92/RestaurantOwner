@@ -36,6 +36,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
@@ -194,43 +195,50 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         current_meal.addManyAdditions(mealAdditions);
         current_meal.addManyTags(tags);
 
-        //save photo
-        ImageView image = (ImageView) findViewById(R.id.imageView);
-        storage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com");
-        // Create a child reference
-        // imagesRef now points to "images"
-        StorageReference photo_reference = storage.child("images/meals/" + current_meal.getMeal_id());
-        Log.d("ciao",""+photouri);
-        File f = new File(photouri);
-        Uri imageUri = Uri.fromFile(f);
-        //upload
+        if(photouri == null || photouri.equals("")){
+            String meal_key = current_meal.getMeal_id();
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + current_meal.getRestaurant_id() + "/" + meal_key);
+            ref.setValue(current_meal);
+        }
+        else {
 
-        UploadTask uploadTask = photo_reference.putFile(imageUri);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(Exception e) {
-                e.printStackTrace();
-                Log.d("my_ex", e.getMessage());
-                Toast failure_message = Toast.makeText(context, "The upload of the photo is failed", Toast.LENGTH_LONG);
-                failure_message.show();
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                current_meal.setMeal_photo_firebase_URL(downloadUrl.toString());
-                String meal_key = current_meal.getMeal_id();
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
-                ref.setValue(current_meal);
+            //save photo
+            ImageView image = (ImageView) findViewById(R.id.imageView);
+            storage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com/");
+            // Create a child reference
+            // imagesRef now points to "images"
+            StorageReference photo_reference = storage.child("images/meals/" + current_meal.getMeal_id() + ".jpg");
+            File f = new File(photouri);
+            Uri imageUri = Uri.fromFile(f);
+            //upload
+
+            UploadTask uploadTask = photo_reference.putFile(imageUri);
+            uploadTask.addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(Exception e) {
+                    e.printStackTrace();
+                    Log.d("my_ex", e.getMessage());
+                    Toast failure_message = Toast.makeText(context, "The upload of the photo is failed", Toast.LENGTH_LONG);
+                    failure_message.show();
+                }
+            }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
+                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                    current_meal.setMeal_photo_firebase_URL(downloadUrl.toString());
+                    String meal_key = current_meal.getMeal_id();
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + current_meal.getRestaurant_id() + "/" + meal_key);
+                    ref.setValue(current_meal);
                 /*DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
                 DatabaseReference ref3 = ref2.push();
                 current_meal.setMeal_id(ref3.getKey());
                 ref3.setValue(current_meal);*/
 
-                //TODO save also thumbnail
-            }
-        });
+                    //TODO save also thumbnail
+                }
+            });
+        }
     }
 
     /*@Override

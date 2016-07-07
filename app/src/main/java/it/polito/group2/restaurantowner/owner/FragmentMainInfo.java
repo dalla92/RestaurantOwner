@@ -331,7 +331,7 @@ public class FragmentMainInfo extends Fragment {
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.blank_profile)
                         .into(image);
-                photouri = (contentUri.toString()); // ***MAYBE***
+                //photouri = (contentUri.toString()); // ***MAYBE***
             }
         }
         //choose a photo result

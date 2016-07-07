@@ -24,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.graphics.Rect;
+import android.widget.Toast;
 
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -117,7 +118,8 @@ public class MenuRestaurant_page extends AppCompatActivity {
                 m.setMeal_thumbnail("");
                 m.setMeal_quantity(0);
                 mealRef.setValue(m);
-                adapter.addItem(0, m);
+                adapter.addItem(m);
+                Toast.makeText(MenuRestaurant_page.this, getString(R.string.meal_added), Toast.LENGTH_SHORT).show();
             }
         });
 

@@ -12,9 +12,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -44,6 +49,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         ImageView Type1;
         ImageView Type2;
         Switch availability;
+        ProgressBar progressBar;
 
         MealViewHolder(View itemView) {
             super(itemView);
@@ -53,6 +59,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
             Type1 = (ImageView) itemView.findViewById(R.id.meal_type1);
             Type2 = (ImageView) itemView.findViewById(R.id.meal_type2);
             availability = (Switch) itemView.findViewById(R.id.meal_availability);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
         }
     }
 
@@ -71,11 +78,31 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     }
 
     @Override
-    public void onBindViewHolder(MealViewHolder MealViewHolder, int i) {
+    public void onBindViewHolder(final MealViewHolder MealViewHolder, int i) {
         index = i;
 
-        if (meals.get(i).getMeal_thumbnail() != null && !meals.get(i).getMeal_thumbnail().equals(""))
-            MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_thumbnail()));
+        String url = meals.get(i).getMeal_photo_firebase_URL();
+        MealViewHolder.progressBar.setVisibility(View.VISIBLE);
+        if (url != null && !url.equals(""))
+            Glide
+                    .with(activity)
+                    .load(url)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            MealViewHolder.progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            MealViewHolder.progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .error(R.mipmap.ic_launcher)
+                    .into(MealViewHolder.MealImage);
+
         MealViewHolder.MealName.setText(meals.get(i).getMeal_name());
         MealViewHolder.MealPrice.setText(String.valueOf(meals.get(i).getMeal_price()));
         /*
@@ -138,21 +165,21 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         return meals.size();
     }
 
-    public void addItem(int position, Meal m) {
-        meals.add(position, m);
+    public void addItem(Meal m) {
+        meals.add(m);
         notifyDataSetChanged();
     }
 
     public void replaceItem(Meal m){
-        int index = findMeal(m);
-        meals.set(index, m);
+        removeItem(m);
+        meals.add(m);
+        /*int index = findMeal(m);
+        meals.set(index, m);*/
         notifyDataSetChanged();
     }
 
-    public void removeItem(int position) {
-        meals.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, meals.size());
+    public void removeItem(Meal m) {
+        meals.remove(findMeal(m));
     }
 
     public int findMeal(Meal m){
