@@ -14,6 +14,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -176,7 +177,11 @@ public class ReviewsActivity extends AppCompatActivity implements NavigationView
         toggle.syncState();
 
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-
+        Menu menu = navigationView.getMenu();
+        MenuItem i = menu.findItem(R.id.action_edit);
+        i.setVisible(false);
+        MenuItem i2 = menu.findItem(R.id.action_show_as);
+        i.setVisible(false);
         DatabaseReference userRef = firebase.getReference("users/" + userID);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

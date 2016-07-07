@@ -130,6 +130,8 @@ public class MyOffersActivity extends AppCompatActivity
         } else {
             goAway();
         }
+
+
     }
 
     @Override
@@ -201,10 +203,14 @@ public class MyOffersActivity extends AppCompatActivity
         toggle.syncState();
 
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        MenuItem i = menu.findItem(R.id.action_edit);
+        i.setVisible(false);
+        MenuItem i2 = menu.findItem(R.id.action_show_as);
+        i.setVisible(false);
         assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(this);
 
-        Menu menu = navigationView.getMenu();
         final MenuItem ownerItem = menu.findItem(R.id.nav_owner);
         MenuItem loginItem = menu.findItem(R.id.nav_login);
         MenuItem logoutItem = menu.findItem(R.id.nav_logout);
