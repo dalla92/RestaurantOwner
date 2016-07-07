@@ -30,6 +30,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -84,8 +85,6 @@ public class MenuRestaurant_page extends AppCompatActivity {
         //recycler view
         mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         mRecyclerView.setHasFixedSize(true);
-        adapter = new Adapter_Meals((Activity)context, 0, meals, restaurant_id);
-        mRecyclerView.setAdapter(adapter);
         GridLayoutManager mLayoutManager = null;
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             mLayoutManager = new GridLayoutManager(this, 1);
@@ -118,7 +117,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                 m.setMeal_thumbnail("");
                 m.setMeal_quantity(0);
                 mealRef.setValue(m);
-//                adapter.addItem(0, m);
+                adapter.addItem(0, m);
             }
         });
 
@@ -129,7 +128,22 @@ public class MenuRestaurant_page extends AppCompatActivity {
     
     private void get_data_from_firebase(){
         q = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/"+restaurant_id);
-        l = new ChildEventListener() {
+        q.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot data: dataSnapshot.getChildren()){
+                    meals.add(data.getValue(Meal.class));
+                }
+                adapter = new Adapter_Meals((Activity)context, 0, meals, restaurant_id);
+                mRecyclerView.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        /*l = new ChildEventListener() {
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -166,7 +180,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
-        };
+        };*/
 
         //toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -221,7 +235,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
 
     }
 
-    @Override
+   /*@Override
     protected void onStart() {
         super.onStart();
         if(q!=null) {
@@ -236,7 +250,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
             meals.clear();
             adapter.notifyDataSetChanged();
         }
-    }
+    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -320,6 +334,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
                 Meal m = (Meal) data.getExtras().get("meal");
                 DatabaseReference dr = firebase.getReference("meals/" + m.getRestaurant_id() + "/" + m.getMeal_id());
                 dr.setValue(m);
+                adapter.replaceItem(m);
             }
         }
     }

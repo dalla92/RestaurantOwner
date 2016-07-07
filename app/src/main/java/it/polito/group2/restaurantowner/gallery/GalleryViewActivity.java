@@ -12,6 +12,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -49,6 +51,7 @@ import java.util.HashMap;
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.ImageUtils;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantGallery;
 
 /**
@@ -334,6 +337,13 @@ public class GalleryViewActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public void onBackPressed() {
+        if(isOwner)
+            OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurantID);
+        else
+            OnBackUtil.clean_stack_and_go_to_user_restaurant_page(this, restaurantID);
     }
 
     private void dispatchTakePictureIntent() {

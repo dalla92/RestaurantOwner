@@ -184,7 +184,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                             firebase.getReference("restaurant_names/" + finalRes.getRestaurant_name().toLowerCase() + "/" + finalRes.getRestaurant_id()).setValue(true);
                             FirebaseUtil.hideProgressDialog(mProssesDialog);
                             Toast.makeText(AddRestaurantActivity.this, "Restaurant added successfully", Toast.LENGTH_SHORT).show();
-                            finish();
+                            OnBackUtil.clean_stack_and_go_to_restaurant_page(AddRestaurantActivity.this, res.getRestaurant_id());
                         }
                     });
 

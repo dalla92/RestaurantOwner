@@ -74,12 +74,6 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     public void onBindViewHolder(MealViewHolder MealViewHolder, int i) {
         index = i;
 
-        //boolean initializations
-        meals.get(i).setMealVegan(false);
-        meals.get(i).setMealGlutenFree(false);
-        meals.get(i).setMealAvailable(false);
-        meals.get(i).setMealTakeAway(false);
-
         if (meals.get(i).getMeal_thumbnail() != null && !meals.get(i).getMeal_thumbnail().equals(""))
             MealViewHolder.MealImage.setImageURI(Uri.parse(meals.get(i).getMeal_thumbnail()));
         MealViewHolder.MealName.setText(meals.get(i).getMeal_name());
@@ -90,12 +84,12 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
         if(meals.get(i).getType2()!=null)
             MealViewHolder.Type2.setImageResource(Integer.parseInt(meals.get(i).getType2()));
         */
-        MealViewHolder.availability.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        /*MealViewHolder.availability.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
             }
-        });
+        });*/
         MealViewHolder.availability.setOnCheckedChangeListener(null);
         MealViewHolder.availability.setChecked(meals.get(i).getMealAvailable());
         MealViewHolder.availability.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +98,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
                 boolean checked = ((Switch)v).isChecked();
                 String meal_key = meals.get(index).getMeal_id();
                 FirebaseDatabase ref = FirebaseDatabase.getInstance();
-                DatabaseReference ref2 = ref.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key + "/_meal_available");
+                DatabaseReference ref2 = ref.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + restaurant_id + "/" + meal_key + "/mealAvailable");
                 ref2.setValue(checked);
                 ((Switch)v).setChecked(checked);
             }
@@ -146,17 +140,21 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
 
     public void addItem(int position, Meal m) {
         meals.add(position, m);
-        notifyItemInserted(position);
-        notifyItemRangeChanged(position, meals.size());
+        notifyDataSetChanged();
+    }
+
+    public void replaceItem(Meal m){
+        int index = findMeal(m);
+        meals.set(index, m);
+        notifyDataSetChanged();
     }
 
     public void removeItem(int position) {
-
-
         meals.remove(position);
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, meals.size());
     }
+
     public int findMeal(Meal m){
         int i = 0;
         for(;i<meals.size();i++){

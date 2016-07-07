@@ -196,9 +196,11 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         // Create a child reference
         // imagesRef now points to "images"
         StorageReference photo_reference = storage.child("images/meals/" + current_meal.getMeal_id());
+        Log.d("ciao",""+photouri);
         File f = new File(photouri);
         Uri imageUri = Uri.fromFile(f);
         //upload
+
         UploadTask uploadTask = photo_reference.putFile(imageUri);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override

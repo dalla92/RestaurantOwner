@@ -23,13 +23,13 @@ public class Meal implements Parcelable {
     private Boolean mealVegan = false;
     private Boolean mealVegetarian = false;
     private Boolean mealGlutenFree = false;
-    private Boolean mealAvailable = true;
+    private Boolean mealAvailable = false;
     private HashMap<String, MealAddition> meal_additions = new HashMap<>();
     private HashMap<String, MealCategory> meal_tags = new HashMap<>();
     private Boolean mealTakeAway;
     private String meal_thumbnail; //for meal preview with Glide in AsyncTask
     private String meal_photo_firebase_URL; //for enlarging image with Glide in AsyncTask
-    private Integer meal_quantity; //for takeaway order quantity
+    private int meal_quantity; //for takeaway order quantity
 
     public Meal(){
 
@@ -219,35 +219,15 @@ public class Meal implements Parcelable {
         Meal meal = (Meal) o;
 
         if (Double.compare(meal.meal_price, meal_price) != 0) return false;
-        if (meal_cooking_time != meal.meal_cooking_time) return false;
-        if (meal_id != null ? !meal_id.equals(meal.meal_id) : meal.meal_id != null) return false;
-        if (restaurant_id != null ? !restaurant_id.equals(meal.restaurant_id) : meal.restaurant_id != null)
-            return false;
-        if (meal_name != null ? !meal_name.equals(meal.meal_name) : meal.meal_name != null)
-            return false;
-        if (meal_description != null ? !meal_description.equals(meal.meal_description) : meal.meal_description != null)
-            return false;
-        if (meal_category != null ? !meal_category.equals(meal.meal_category) : meal.meal_category != null)
-            return false;
-        if (mealVegan != null ? !mealVegan.equals(meal.mealVegan) : meal.mealVegan != null)
-            return false;
-        if (mealVegetarian != null ? !mealVegetarian.equals(meal.mealVegetarian) : meal.mealVegetarian != null)
-            return false;
-        if (mealGlutenFree != null ? !mealGlutenFree.equals(meal.mealGlutenFree) : meal.mealGlutenFree != null)
-            return false;
-        if (mealAvailable != null ? !mealAvailable.equals(meal.mealAvailable) : meal.mealAvailable != null)
-            return false;
-        if (meal_additions != null ? !meal_additions.equals(meal.meal_additions) : meal.meal_additions != null)
-            return false;
-        if (meal_tags != null ? !meal_tags.equals(meal.meal_tags) : meal.meal_tags != null)
-            return false;
-        if (mealTakeAway != null ? !mealTakeAway.equals(meal.mealTakeAway) : meal.mealTakeAway != null)
-            return false;
-        if (meal_thumbnail != null ? !meal_thumbnail.equals(meal.meal_thumbnail) : meal.meal_thumbnail != null)
-            return false;
-        if (meal_photo_firebase_URL != null ? !meal_photo_firebase_URL.equals(meal.meal_photo_firebase_URL) : meal.meal_photo_firebase_URL != null)
-            return false;
-        return !(meal_quantity != null ? !meal_quantity.equals(meal.meal_quantity) : meal.meal_quantity != null);
+        if (!restaurant_id.equals(meal.restaurant_id)) return false;
+        if (!meal_name.equals(meal.meal_name)) return false;
+        if (!meal_category.equals(meal.meal_category)) return false;
+        if (!mealVegan.equals(meal.mealVegan)) return false;
+        if (!mealVegetarian.equals(meal.mealVegetarian)) return false;
+        if (!mealGlutenFree.equals(meal.mealGlutenFree)) return false;
+        if (!mealAvailable.equals(meal.mealAvailable)) return false;
+        if (!meal_additions.equals(meal.meal_additions)) return false;
+        return meal_tags.equals(meal.meal_tags);
 
     }
 
@@ -255,24 +235,17 @@ public class Meal implements Parcelable {
     public int hashCode() {
         int result;
         long temp;
-        result = meal_id != null ? meal_id.hashCode() : 0;
-        result = 31 * result + (restaurant_id != null ? restaurant_id.hashCode() : 0);
-        result = 31 * result + (meal_name != null ? meal_name.hashCode() : 0);
+        result = restaurant_id.hashCode();
+        result = 31 * result + meal_name.hashCode();
         temp = Double.doubleToLongBits(meal_price);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + meal_cooking_time;
-        result = 31 * result + (meal_description != null ? meal_description.hashCode() : 0);
-        result = 31 * result + (meal_category != null ? meal_category.hashCode() : 0);
-        result = 31 * result + (mealVegan != null ? mealVegan.hashCode() : 0);
-        result = 31 * result + (mealVegetarian != null ? mealVegetarian.hashCode() : 0);
-        result = 31 * result + (mealGlutenFree != null ? mealGlutenFree.hashCode() : 0);
-        result = 31 * result + (mealAvailable != null ? mealAvailable.hashCode() : 0);
-        result = 31 * result + (meal_additions != null ? meal_additions.hashCode() : 0);
-        result = 31 * result + (meal_tags != null ? meal_tags.hashCode() : 0);
-        result = 31 * result + (mealTakeAway != null ? mealTakeAway.hashCode() : 0);
-        result = 31 * result + (meal_thumbnail != null ? meal_thumbnail.hashCode() : 0);
-        result = 31 * result + (meal_photo_firebase_URL != null ? meal_photo_firebase_URL.hashCode() : 0);
-        result = 31 * result + (meal_quantity != null ? meal_quantity.hashCode() : 0);
+        result = 31 * result + meal_category.hashCode();
+        result = 31 * result + mealVegan.hashCode();
+        result = 31 * result + mealVegetarian.hashCode();
+        result = 31 * result + mealGlutenFree.hashCode();
+        result = 31 * result + mealAvailable.hashCode();
+        result = 31 * result + meal_additions.hashCode();
+        result = 31 * result + meal_tags.hashCode();
         return result;
     }
 
@@ -289,8 +262,8 @@ public class Meal implements Parcelable {
         this.mealVegetarian = parcel.readInt() != 0;
         this.mealGlutenFree = parcel.readInt() != 0;
         this.mealAvailable = parcel.readInt() != 0;
-        this.meal_additions = parcel.readHashMap(null);
-        this.meal_tags = parcel.readHashMap(null);
+        this.meal_additions = parcel.readHashMap(MealAddition.class.getClassLoader());
+        this.meal_tags = parcel.readHashMap(MealCategory.class.getClassLoader());
         this.mealTakeAway = parcel.readInt() != 0;
         this.meal_thumbnail = parcel.readString();
         this.meal_photo_firebase_URL = parcel.readString();

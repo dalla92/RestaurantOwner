@@ -21,6 +21,7 @@ public class OnBackUtil {
     public static void clean_stack_and_go_to_restaurant_page(Context c, String restaurantId) {
         Intent intent = new Intent(c, Restaurant_page.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.putExtra("RestaurantId", restaurantId);
         c.startActivity(intent);
     }
 
