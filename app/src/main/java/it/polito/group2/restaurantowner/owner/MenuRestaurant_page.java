@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.graphics.Rect;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
@@ -45,6 +46,7 @@ import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.firebasedata.User;
 
 public class MenuRestaurant_page extends AppCompatActivity {
     private Menu menu;
@@ -69,6 +71,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
     private ChildEventListener l;
     private ProgressDialog mProgressDialog;
     private Activity a;
+    Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +101,8 @@ public class MenuRestaurant_page extends AppCompatActivity {
             mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, 5, true));
         }
         //mRecyclerView.setLayoutManager(mLayoutManager);
+
+        setDrawer();
 
         ImageView add_button = (ImageView) findViewById(R.id.imageButton);
         add_button.setOnClickListener(new View.OnClickListener() {
@@ -135,11 +140,11 @@ public class MenuRestaurant_page extends AppCompatActivity {
         q.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot data: dataSnapshot.getChildren()){
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
                     meals.add(data.getValue(Meal.class));
                 }
                 FirebaseUtil.hideProgressDialog(mProgressDialog);
-                adapter = new Adapter_Meals((Activity)context, 0, meals, restaurant_id);
+                adapter = new Adapter_Meals((Activity) context, 0, meals, restaurant_id);
                 mRecyclerView.setAdapter(adapter);
                 ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
                 ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
@@ -190,31 +195,6 @@ public class MenuRestaurant_page extends AppCompatActivity {
             }
         };*/
 
-        //toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        //navigation drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                (Activity) context, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
-        MenuItem i = menu.findItem(R.id.action_edit);
-        i.setVisible(false);
-        MenuItem i2 = menu.findItem(R.id.action_show_as);
-        i.setVisible(false);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @SuppressWarnings("StatementWithEmptyBody")
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                // Handle navigation view item clicks here.
-                return DrawerUtil.drawer_owner_not_restaurant_page(a, item, restaurant_id);
-            }
-        });
-
                 /*
                 if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                     mLayoutManager = new GridLayoutManager(this, 1);
@@ -240,6 +220,75 @@ public class MenuRestaurant_page extends AppCompatActivity {
         //delete with swipe
 
     }
+
+    private void setDrawer() {
+        //toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
+
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
+
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
+
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(getApplicationContext())
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                    else{
+                        Glide
+                                .with(getApplicationContext())
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
+
+        }
+
+        Menu menu = navigationView.getMenu();
+        MenuItem i = menu.findItem(R.id.action_edit);
+        i.setVisible(false);
+        MenuItem i2 = menu.findItem(R.id.action_show_as);
+        i.setVisible(false);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @SuppressWarnings("StatementWithEmptyBody")
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                // Handle navigation view item clicks here.
+                return DrawerUtil.drawer_owner_not_restaurant_page(a, item, restaurant_id);
+            }
+        });
+    }
+
 
    /*@Override
     protected void onStart() {

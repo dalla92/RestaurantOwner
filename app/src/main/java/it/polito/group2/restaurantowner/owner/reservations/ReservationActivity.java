@@ -11,16 +11,28 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.DatePicker;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.firebasedata.User;
 
 public class ReservationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -28,6 +40,8 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
     private String restaurant_id;
     public Context context;
     public int MODIFY_INFO = 4;
+    Toolbar toolbar;
+    private FirebaseDatabase firebase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,20 +50,6 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         restaurant_id = getIntent().getExtras().getString("restaurant_id");
-
-        //navigation drawer
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
-        MenuItem i = menu.findItem(R.id.action_edit);
-        i.setVisible(false);
-        MenuItem i2 = menu.findItem(R.id.action_show_as);
-        i.setVisible(false);
-        navigationView.setNavigationItemSelectedListener(this);
 
         Calendar date;
         if(getIntent().getExtras().getSerializable("date") == null)
@@ -81,6 +81,74 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
 
+            }
+        });
+    }
+
+    private void setDrawer() {
+        //toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //navigation drawer
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
+
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
+
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
+
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(getApplicationContext())
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                    else{
+                        Glide
+                                .with(getApplicationContext())
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
+
+        }
+
+        Menu menu = navigationView.getMenu();
+        MenuItem i = menu.findItem(R.id.action_edit);
+        i.setVisible(false);
+        MenuItem i2 = menu.findItem(R.id.action_show_as);
+        i.setVisible(false);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @SuppressWarnings("StatementWithEmptyBody")
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                // Handle navigation view item clicks here.
+                return DrawerUtil.drawer_owner_not_restaurant_page(ReservationActivity.this, item, restaurant_id);
             }
         });
     }
