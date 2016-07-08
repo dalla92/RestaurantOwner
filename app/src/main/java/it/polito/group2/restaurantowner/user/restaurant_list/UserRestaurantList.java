@@ -820,7 +820,7 @@ public class UserRestaurantList extends AppCompatActivity
             if(resultCode == RESULT_OK){
                 String searchedText = data.getExtras().getString("searchedText");
                 search.setText(searchedText);
-                Log.d("prova", searchedText);
+
                 final ArrayList<String> restaurantIDs = data.getExtras().getStringArrayList("restaurant_list");
                 LatLng coordinates = (LatLng) data.getExtras().get("coordinates");
 

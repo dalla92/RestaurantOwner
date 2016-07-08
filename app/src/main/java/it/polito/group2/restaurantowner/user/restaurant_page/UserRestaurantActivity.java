@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
@@ -126,10 +127,8 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 targetRestaurant = dataSnapshot.getValue(Restaurant.class);
 
                 //restaurantID = targetRestaurant.getRestaurant_id();
-                TextView rating = (TextView) findViewById(R.id.restaurant_stars_text);
                 RatingBar ratingBar = (RatingBar) findViewById(R.id.restaurant_stars);
 
-                rating.setText(String.format("%.1f", targetRestaurant.getRestaurant_rating()));
                 ratingBar.setRating(targetRestaurant.getRestaurant_rating());
                 collapsing.setTitle(targetRestaurant.getRestaurant_name());
 
@@ -141,7 +140,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     theUserIsTheOwner = false;
                 }
 
-                ImageView button_get_directions = (ImageView) findViewById(R.id.button_get_directions);
+                ImageButton button_get_directions = (ImageButton) findViewById(R.id.button_get_directions);
                 assert button_get_directions != null;
                 button_get_directions.setOnClickListener(
                         new View.OnClickListener() {
@@ -764,13 +763,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         TextView name = (TextView) findViewById(R.id.restaurant_name);
         TextView address = (TextView) findViewById(R.id.restaurant_address);
         TextView phone = (TextView) findViewById(R.id.restaurant_phone);
-        TextView text_rating = (TextView) findViewById(R.id.restaurant_stars_text);
         RatingBar rating = (RatingBar) findViewById(R.id.restaurant_stars);
 
         name.setText(targetRestaurant.getRestaurant_name());
         address.setText(targetRestaurant.getRestaurant_address());
         phone.setText(targetRestaurant.getRestaurant_telephone_number());
-        text_rating.setText(Float.toString(targetRestaurant.getRestaurant_rating()));
         rating.setRating(targetRestaurant.getRestaurant_rating());
     }
 

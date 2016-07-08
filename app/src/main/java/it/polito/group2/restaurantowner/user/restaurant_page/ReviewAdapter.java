@@ -32,7 +32,14 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         this.context = context;
     }
 
+    public void clearReviews(){
+        this.reviews = new ArrayList<>();
+        notifyDataSetChanged();
+    }
+
     public void addReview(Review review){
+        if(reviews.contains(review))
+            return;
         this.reviews.add(0, review);
         notifyDataSetChanged();
     }

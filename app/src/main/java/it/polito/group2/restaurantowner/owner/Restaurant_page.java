@@ -92,7 +92,7 @@ public class Restaurant_page extends AppCompatActivity
     private DatabaseReference q;
     private Query q2;
     private ValueEventListener l;
-    private ChildEventListener l2;
+    private ValueEventListener l2;
     private ProgressDialog mProgressDialog;
     private ReviewAdapter adapter;
     private StorageReference photo_reference;
@@ -215,28 +215,12 @@ public class Restaurant_page extends AppCompatActivity
 
         //reviews
         q2 = firebase.getReference("reviews/" + restaurant_id).orderByPriority();
-        l2 = new ChildEventListener() {
+        l2 = new ValueEventListener() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d("prova", "review added");
-                adapter.addReview(dataSnapshot.getValue(Review.class));
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                Log.d("prova", "child changed");
-                adapter.modifyReview(dataSnapshot.getValue(Review.class));
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-                Log.d("prova", "review removed");
-                adapter.removeReview(dataSnapshot.getValue(Review.class));
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                Log.d("prova", "child moved");
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                adapter.clearReviews();
+                for(DataSnapshot data: dataSnapshot.getChildren())
+                    adapter.addReview(data.getValue(Review.class));
             }
 
             @Override
@@ -252,13 +236,13 @@ public class Restaurant_page extends AppCompatActivity
         super.onStart();
         //FirebaseUtil.initProgressDialog(this);
         q.addListenerForSingleValueEvent(l);
-        q2.addChildEventListener(l2);
+        q2.addValueEventListener(l2);
     }
     @Override
     protected void onStop() {
         super.onStop();
         RemoveListenerUtil.remove_value_event_listener(q, l);
-        RemoveListenerUtil.remove_child_event_listener(q2, l2);
+        RemoveListenerUtil.remove_value_event_listener(q2, l2);
     }
 
     private void fill_data(){

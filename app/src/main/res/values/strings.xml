@@ -171,7 +171,7 @@
     <string name="register_btn">Sign Up</string>
     <string name="no_account">Don\'t have an account?</string>
     <string name="delete">Delete</string>
-    <string name="search_hint">Search...</string>
+    <string name="search_hint">start with # for tag search</string>
     <!--string name="facebook_app_id">1003333209754047</string-->
     <string name="facebook_app_id">988598407901956</string>
     <string name="distance">Distance</string>

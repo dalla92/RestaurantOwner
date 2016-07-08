@@ -191,7 +191,8 @@
         <activity
             android:name=".user.search.SearchActivity"
             android:label="@string/title_activity_search"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateVisible"/>
         <activity
             android:name=".user.restaurant_list.MapsActivity"
             android:label="@string/title_activity_maps"
