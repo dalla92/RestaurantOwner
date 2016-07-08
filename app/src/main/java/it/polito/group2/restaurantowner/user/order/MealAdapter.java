@@ -7,9 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -37,6 +41,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         public ImageView offer_active;
         public LinearLayout item;
         public ImageView thumbnail;
+        public ProgressBar progressBar;
 
         public MealViewHolder(View view){
             super(view);
@@ -46,6 +51,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
             item = (LinearLayout) itemView.findViewById(R.id.meal_item);
             thumbnail = (ImageView) itemView.findViewById(R.id.meal_thumbnail);
             description = (TextView) itemView.findViewById(R.id.meal_description);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
         }
     }
 
@@ -56,7 +62,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
     }
 
     @Override
-    public void onBindViewHolder(MealAdapter.MealViewHolder holder, final int position) {
+    public void onBindViewHolder(final MealAdapter.MealViewHolder holder, final int position) {
         holder.name.setText(mealList.get(position).getMeal_name());
         holder.description.setText(mealList.get(position).getMeal_description());
         if(isInOffer(mealList.get(position))) {
@@ -74,16 +80,31 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
             }
         });
 
-        if (mealList.get(position).getMeal_thumbnail() == null || mealList.get(position).getMeal_thumbnail().equals("")) {
+        if (mealList.get(position).getMeal_photo_firebase_URL() == null || mealList.get(position).getMeal_photo_firebase_URL().equals("")) {
             Glide
                     .with(fragment.getContext())
                     .load(R.drawable.no_image)
                     .fitCenter()
                     .into(holder.thumbnail);
         } else {
+            holder.progressBar.setVisibility(View.VISIBLE);
             Glide
                     .with(fragment.getContext())
-                    .load(mealList.get(position).getMeal_thumbnail())
+                    .load(mealList.get(position).getMeal_photo_firebase_URL())
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            holder.progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            holder.progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .error(R.drawable.no_image)
                     .fitCenter()
                     .into(holder.thumbnail);
         }
