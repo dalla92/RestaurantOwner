@@ -656,6 +656,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                                                     Review r = dataSnapshot.getValue(Review.class);
                                                     total_reviews_rating += r.getReview_rating();
                                                 }
+                                                total_reviews_rating = total_reviews_rating/snapshot.getChildrenCount();
                                                 DatabaseReference ref2 = firebase.getReference("restaurants/" + restaurantID + "/restaurant_rating");
                                                 ref2.setValue(total_reviews_rating);
                                                 DatabaseReference ref3 = firebase.getReference("restaurants_previews/" + restaurantID + "/restaurant_rating");
