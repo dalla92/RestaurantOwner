@@ -2,6 +2,7 @@ package it.polito.group2.restaurantowner.user.order;
 
 
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -211,9 +212,7 @@ public class OrderActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            if (getSupportFragmentManager().findFragmentByTag("CART") != null) {
-                loadCategoryFragment(false);
-            } else if (getSupportFragmentManager().findFragmentByTag("CATEGORY") != null) {
+            if(getSupportFragmentManager().getBackStackEntryCount() <= 1) {
                 new AlertDialog.Builder(this)
                         .setTitle(getResources().getString(R.string.user_order_alert_back_title))
                         .setMessage(getResources().getString(R.string.user_order_alert_back_message))
@@ -225,9 +224,11 @@ public class OrderActivity extends AppCompatActivity
                             }
                         })
                         .setNegativeButton(android.R.string.no, null).show();
-            } else {
-                super.onBackPressed();
             }
+
+            getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            loadCategoryFragment(false);
+
         }
     }
 
@@ -471,12 +472,8 @@ public class OrderActivity extends AppCompatActivity
     //ACTIVITY FUNCTIONS ===========================================================================
 
     private synchronized void startOrder(ArrayList<Meal> meals) {
-        if (meals.size() <= 0) {
-            tempCreateFakeMeals(restaurantID);
-        } else {
-            mealList = filterAvailableMeals(meals);
-            checkForStart();
-        }
+        mealList = filterAvailableMeals(meals);
+        checkForStart();
     }
 
     private synchronized void startOrder(Restaurant r) {
@@ -589,7 +586,7 @@ public class OrderActivity extends AppCompatActivity
 
     }
 
-    //TODO quando il sistema è a regime eliminare questo metodo
+    /*
     private void tempCreateFakeMeals(String restID) {
         String[] cats = {"Primi", "Secondi", "Contorni", "Frutta", "Bevande", "Dolci", "Antipasti", "Specialità"};
         DatabaseReference mealsReference = FirebaseUtil.getMealsRef(restID);
@@ -616,4 +613,6 @@ public class OrderActivity extends AppCompatActivity
             keyReference.setValue(meal);
         }
     }
+    */
+
 }
