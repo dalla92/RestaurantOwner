@@ -1,16 +1,17 @@
 package it.polito.group2.restaurantowner.owner;
 
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 
 public class Enlarged_image extends AppCompatActivity {
 
@@ -19,25 +20,30 @@ public class Enlarged_image extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.enlarged_image);
-        String photouri = getIntent().getExtras().getString("photouri");
-        Log.d("ccc", "Photo uri is " + photouri);
-        Uri image_uri = Uri.parse(photouri);
-        ImageView myimage = (ImageView) findViewById(R.id.enlarged_image);
+        if(getIntent().getExtras()!=null && getIntent().getExtras().getString("photouri") != null) {
+            String photoUri = getIntent().getExtras().getString("photouri");
 
-        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-        if (currentapiVersion <= Build.VERSION_CODES.KITKAT){
-            myimage.setImageURI(image_uri);
-        } else {
-            Bitmap bitmap = null;
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), image_uri);
-            } catch (Exception e) {
-                Log.e("Exception", "Exception occurred in MediaStore.Images.Media.getBitmap");
-            }
-            if (bitmap != null) {
-                myimage.setImageBitmap(bitmap);
-                //myimage.setScaleType(ImageView.ScaleType.MATRIX);
-            }
+            ImageView myImage = (ImageView) findViewById(R.id.enlarged_image);
+            final ProgressBar progressBar = (ProgressBar)findViewById(R.id.progress_bar);
+
+            progressBar.setVisibility(View.VISIBLE);
+            Glide
+                    .with(this)
+                    .load(photoUri)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .into(myImage);
         }
     }
 

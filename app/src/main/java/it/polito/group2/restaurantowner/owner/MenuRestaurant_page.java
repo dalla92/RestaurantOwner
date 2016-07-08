@@ -10,6 +10,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,6 +20,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -136,8 +138,12 @@ public class MenuRestaurant_page extends AppCompatActivity {
                 for(DataSnapshot data: dataSnapshot.getChildren()){
                     meals.add(data.getValue(Meal.class));
                 }
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
                 adapter = new Adapter_Meals((Activity)context, 0, meals, restaurant_id);
                 mRecyclerView.setAdapter(adapter);
+                ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
+                ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
+                mItemTouchHelper.attachToRecyclerView(mRecyclerView);
             }
 
             @Override
@@ -232,9 +238,6 @@ public class MenuRestaurant_page extends AppCompatActivity {
                     }
                 }));
         //delete with swipe
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(adapter);
-        ItemTouchHelper mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
 
     }
 
@@ -279,7 +282,8 @@ public class MenuRestaurant_page extends AppCompatActivity {
 
     public void myClickHandler_enlarge(View v) {
         ImageView imageview = (ImageView) v.findViewById(R.id.meal_image);
-        LinearLayout ll = (LinearLayout) v.getParent();
+        FrameLayout f = (FrameLayout) v.getParent();
+        LinearLayout ll = (LinearLayout) f.getParent();
         TextView child = (TextView) ll.findViewById(R.id.meal_name);
         String meal_name = child.getText().toString();
 

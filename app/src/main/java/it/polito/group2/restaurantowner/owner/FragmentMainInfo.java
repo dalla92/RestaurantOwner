@@ -31,10 +31,14 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
@@ -60,6 +64,7 @@ public class FragmentMainInfo extends Fragment {
     public int REQUEST_TAKE_PHOTO = 1;
     public View rootView = null;
     public static FragmentMainInfo fragment;
+    private boolean photoUploaded;
 
     public FragmentMainInfo() {
     }
@@ -118,11 +123,12 @@ public class FragmentMainInfo extends Fragment {
                         is_vegetarian,
                         is_celiac,
                         String.valueOf(category.getSelectedItem()),
-                        is_take_away);
+                        is_take_away,
+                        photoUploaded);
     }
 
     public interface onMainInfoPass {
-        public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  boolean is_vegan, boolean is_vegetarian, boolean is_celiac, String category, boolean take_away);
+        public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  boolean is_vegan, boolean is_vegetarian, boolean is_celiac, String category, boolean take_away, boolean photoUploaded);
     }
 
     @Override
@@ -144,14 +150,28 @@ public class FragmentMainInfo extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main_info_meal, container, false);
 
+        final ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.progress_bar);
         //feed already present data and set behaviour
         ImageView image = (ImageView) rootView.findViewById(R.id.meal_photo);
         if(!getArguments().isEmpty()) {
             if (getArguments().getString("meal_photo") != null) {
+                progressBar.setVisibility(View.VISIBLE);
                 Glide.with(getContext())
                         .load(getArguments().getString("meal_photo")) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .placeholder(R.drawable.blank_profile)
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .error(R.drawable.no_image)
                         .into(image);
                 photouri = getArguments().getString("meal_photo");
             }
@@ -331,6 +351,7 @@ public class FragmentMainInfo extends Fragment {
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .placeholder(R.drawable.blank_profile)
                         .into(image);
+                photoUploaded = true;
                 //photouri = (contentUri.toString()); // ***MAYBE***
             }
         }
@@ -348,6 +369,7 @@ public class FragmentMainInfo extends Fragment {
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .into(meal_photo);
                 photouri = saveToInternalStorage(bitmap);
+                photoUploaded = true;
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {

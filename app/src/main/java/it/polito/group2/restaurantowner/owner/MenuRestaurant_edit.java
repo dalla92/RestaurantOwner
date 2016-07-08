@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.owner;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -20,6 +21,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.MealAddition;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
@@ -58,6 +61,8 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     private static final int PRICE_BOUNDARY_2 = 10;
     private static final int PRICE_BOUNDARY_3 = 15;
     private StorageReference storage;
+    private boolean photoUploaded;
+    private ProgressDialog mProsessDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +70,8 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         setContentView(R.layout.activity_add_restaurant);
 
         context = this;
+
+        mProsessDialog = FirebaseUtil.initProgressDialog(this);
 
         //get current_meal
         Bundle b = getIntent().getExtras();
@@ -109,17 +116,14 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_save) {
-            mSectionsPagerAdapter.saveDataFromFragments();
             if (current_meal.getMeal_name().equals("") || current_meal.getMeal_name() == null)
                 Toast.makeText(this, "Please insert meal name to continue", Toast.LENGTH_SHORT).show();
             else {
                 if (current_meal.getMeal_category().equals("") || current_meal.getMeal_category().equals("Nessuno") || current_meal.getMeal_category().equals("None") || current_meal.getMeal_category() == null)
                     Toast.makeText(this, "Please insert category to continue", Toast.LENGTH_SHORT).show();
                 else {
-                    Intent intent = new Intent();
-                    intent.putExtra("meal", current_meal);
-                    setResult(RESULT_OK, intent);
-                    finish();//finishing activity
+                    FirebaseUtil.showProgressDialog(mProsessDialog);
+                    mSectionsPagerAdapter.saveDataFromFragments();
                     return true;
                 }
             }
@@ -134,12 +138,13 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     }
 
     @Override
-    public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  boolean is_vegan, boolean is_vegetarian, boolean is_celiac, String category, boolean take_away) {
+    public void onMainInfoPass(String meal_name, double meal_price, String  photouri,  boolean is_vegan, boolean is_vegetarian, boolean is_celiac, String category, boolean take_away, boolean photoUploaded) {
         current_meal.setMeal_name(meal_name);
         current_meal.setMeal_price(meal_price);
         //TODO upload both thumbnail and full size pictures
         //current_meal.setMeal_photo_firebase_URL(photouri);
         this.photouri = photouri;
+        this.photoUploaded = photoUploaded;
         current_meal.setMealGlutenFree(is_celiac);
         current_meal.setMealVegan(is_vegan);
         current_meal.setMealVegetarian(is_vegetarian);
@@ -195,13 +200,20 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         current_meal.addManyAdditions(mealAdditions);
         current_meal.addManyTags(tags);
 
-        if(photouri == null || photouri.equals("")){
+
+        if(photouri == null || photouri.equals("") || !photoUploaded){
+            Log.d("null", "" + photouri + " " + photoUploaded);
             String meal_key = current_meal.getMeal_id();
             DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + current_meal.getRestaurant_id() + "/" + meal_key);
             ref.setValue(current_meal);
+            Intent intent = new Intent();
+            intent.putExtra("meal", current_meal);
+            setResult(RESULT_OK, intent);
+            FirebaseUtil.hideProgressDialog(mProsessDialog);
+            finish();//finishing activity
         }
         else {
-
+            Log.d("not null", ""+photouri + " " + photoUploaded);
             //save photo
             ImageView image = (ImageView) findViewById(R.id.imageView);
             storage = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com/");
@@ -220,6 +232,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                     Log.d("my_ex", e.getMessage());
                     Toast failure_message = Toast.makeText(context, "The upload of the photo is failed", Toast.LENGTH_LONG);
                     failure_message.show();
+                    FirebaseUtil.hideProgressDialog(mProsessDialog);
                 }
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -230,6 +243,11 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                     String meal_key = current_meal.getMeal_id();
                     DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + current_meal.getRestaurant_id() + "/" + meal_key);
                     ref.setValue(current_meal);
+                    Intent intent = new Intent();
+                    intent.putExtra("meal", current_meal);
+                    setResult(RESULT_OK, intent);
+                    FirebaseUtil.hideProgressDialog(mProsessDialog);
+                    finish();//finishing activity
                 /*DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/");
                 DatabaseReference ref3 = ref2.push();
                 current_meal.setMeal_id(ref3.getKey());

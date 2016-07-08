@@ -171,10 +171,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     }
 
     public void replaceItem(Meal m){
-        removeItem(m);
-        meals.add(m);
-        /*int index = findMeal(m);
-        meals.set(index, m);*/
+        meals.set(findMeal(m), m);
         notifyDataSetChanged();
     }
 
@@ -183,8 +180,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     }
 
     public int findMeal(Meal m){
-        int i = 0;
-        for(;i<meals.size();i++){
+        for(int i = 0;i<meals.size();i++){
             Meal meal = meals.get(i);
             if(m.getMeal_id().equals(meal.getMeal_id()))
                 return i;
@@ -208,15 +204,12 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String meal_key = meals.get(position).getMeal_id();
-                DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + meal_key);
-                //delete
-                ref.setValue(null);
-                //removeItem(position);
                 Meal m = meals.get(position);
                 FirebaseDatabase firebase = FirebaseDatabase.getInstance();
                 DatabaseReference mealReference = firebase.getReference("meals/" + m.getRestaurant_id() + "/" + m.getMeal_id());
 
+                removeItem(meals.get(position));
+                notifyDataSetChanged();
                 mealReference.setValue(null);
                 dialog.dismiss();
 
@@ -227,7 +220,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                notifyDataSetChanged();
+
                 dialog.dismiss();
             }
         });
