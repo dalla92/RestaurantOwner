@@ -58,8 +58,6 @@ public class CartFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.user_order_fragment_cart, container, false);
 
-        //TODO fare spuntare fidelity point presi oppure lo sconto fidelity
-
         TextView orderPrice = (TextView) view.findViewById(R.id.order_price);
         orderPrice.setText(formatEuro(this.order.getOrder_price()));
 

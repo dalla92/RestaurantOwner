@@ -472,12 +472,8 @@ public class OrderActivity extends AppCompatActivity
     //ACTIVITY FUNCTIONS ===========================================================================
 
     private synchronized void startOrder(ArrayList<Meal> meals) {
-        if (meals.size() <= 0) {
-            tempCreateFakeMeals(restaurantID);
-        } else {
-            mealList = filterAvailableMeals(meals);
-            checkForStart();
-        }
+        mealList = filterAvailableMeals(meals);
+        checkForStart();
     }
 
     private synchronized void startOrder(Restaurant r) {
@@ -590,7 +586,7 @@ public class OrderActivity extends AppCompatActivity
 
     }
 
-    //TODO quando il sistema è a regime eliminare questo metodo
+    /*
     private void tempCreateFakeMeals(String restID) {
         String[] cats = {"Primi", "Secondi", "Contorni", "Frutta", "Bevande", "Dolci", "Antipasti", "Specialità"};
         DatabaseReference mealsReference = FirebaseUtil.getMealsRef(restID);
@@ -617,4 +613,6 @@ public class OrderActivity extends AppCompatActivity
             keyReference.setValue(meal);
         }
     }
+    */
+
 }
