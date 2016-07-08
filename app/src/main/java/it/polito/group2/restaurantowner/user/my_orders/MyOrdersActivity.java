@@ -29,6 +29,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
@@ -37,12 +38,13 @@ import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
 public class MyOrdersActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private String userID;
-    private User user;
-
-    private ProgressDialog mProgressDialog;
-    private ArrayList<Order> orderList;             //order list got from firebase
     private Toolbar toolbar;
+    private ProgressDialog mProgressDialog;
+    private ArrayList<Order> orderList = null;
+    private DatabaseReference q;
+    private ValueEventListener l;
+    //private String userID;
+    //private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,58 +56,68 @@ public class MyOrdersActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mProgressDialog = FirebaseUtil.initProgressDialog(this);
-        FirebaseUtil.showProgressDialog(mProgressDialog);
-
-        //user reference
+        //User object
         DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
-        userID = FirebaseUtil.getCurrentUserId();
-        if(userRef == null || userID == null)
-            abortActivity();
+        if (userRef != null) {
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    User user = dataSnapshot.getValue(User.class);
+                    setDrawer(user);
 
-        //user firebase data getting
-        assert userRef != null;
-        userRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User u = dataSnapshot.getValue(User.class);
-                if(u == null)
-                    abortActivity();
-                setDrawer(u);
-                user = u;
-
-                //orders reference
-                Query ordersRef = FirebaseUtil.getOrdersByUserRef(userID);
-                if(ordersRef != null) {
-                    ordersRef.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            ArrayList<Order> orders = new ArrayList<>();
-                            for (DataSnapshot d : dataSnapshot.getChildren()) {
-                                orders.add(d.getValue(Order.class));
+                    //orders reference
+                    Query ordersRef = FirebaseUtil.getOrdersByUserRef(user.getUser_id());
+                    if (ordersRef != null) {
+                        ordersRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                ArrayList<Order> orders = new ArrayList<>();
+                                for (DataSnapshot d : dataSnapshot.getChildren()) {
+                                    orders.add(d.getValue(Order.class));
+                                }
+                                FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                orderList = orders;
+                                setOrderList();
                             }
-                            FirebaseUtil.hideProgressDialog(mProgressDialog);
-                            orderList = orders;
-                            setOrderList();
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {}
-                    });
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        });
+                    }
                 }
-            }
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-        });
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+        } else {
+            OnBackUtil.clean_stack_and_go_to_main_activity(this);
+        }
 
     }
 
-    private void setOrderList() {
-        final RecyclerView list = (RecyclerView) findViewById(R.id.order_list);
-        assert list != null;
-        list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        list.setNestedScrollingEnabled(false);
-        OrderAdapter adapter = new OrderAdapter(this, orderList);
-        list.setAdapter(adapter);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+        q.addValueEventListener(l);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        RemoveListenerUtil.remove_value_event_listener(q, l);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        assert drawer != null;
+        if (drawer.isDrawerOpen(GravityCompat.START))
+            drawer.closeDrawer(GravityCompat.START);
     }
 
     @Override
@@ -117,6 +129,25 @@ public class MyOrdersActivity extends AppCompatActivity
             OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
         }
     }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        return DrawerUtil.drawer_user_not_restaurant_page(this, item);
+    }
+
+    //MODEL FUNCTIONS ==============================================================================
+
+    private void setOrderList() {
+        final RecyclerView list = (RecyclerView) findViewById(R.id.order_list);
+        assert list != null;
+        list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        list.setNestedScrollingEnabled(false);
+        OrderAdapter adapter = new OrderAdapter(this, orderList);
+        list.setAdapter(adapter);
+    }
+
+    //ACTIVITY FUNCTIONS ===========================================================================
 
     private void setDrawer(User user) {
         //navigation drawer
@@ -172,31 +203,6 @@ public class MyOrdersActivity extends AppCompatActivity
         }
 
         navigationView.setNavigationItemSelectedListener(this);
-    }
-
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        assert drawer != null;
-        if (drawer.isDrawerOpen(GravityCompat.START))
-            drawer.closeDrawer(GravityCompat.START);
-    }
-
-
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        return DrawerUtil.drawer_user_not_restaurant_page(this, item);
-    }
-
-    private void abortActivity() {
-        Intent intent = new Intent(this, UserRestaurantList.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
     }
 
 }

@@ -20,7 +20,6 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -33,14 +32,8 @@ import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.User;
-import it.polito.group2.restaurantowner.gallery.GalleryViewActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
-import it.polito.group2.restaurantowner.owner.MenuRestaurant_page;
-import it.polito.group2.restaurantowner.owner.Restaurant_page;
-import it.polito.group2.restaurantowner.owner.statistics.StatisticsActivity;
 import it.polito.group2.restaurantowner.owner.offer.OfferActivity;
-import it.polito.group2.restaurantowner.owner.reservations.ReservationActivity;
-import it.polito.group2.restaurantowner.owner.reviews.ReviewsActivity;
 
 public class MyOffersActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -63,8 +56,8 @@ public class MyOffersActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        mProgressDialog = FirebaseUtil.initProgressDialog(this);
-        FirebaseUtil.showProgressDialog(mProgressDialog);
+        //mProgressDialog = FirebaseUtil.initProgressDialog(this);
+        //FirebaseUtil.showProgressDialog(mProgressDialog);
 
         //User object
         DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
@@ -82,14 +75,14 @@ public class MyOffersActivity extends AppCompatActivity
                 }
             });
         } else {
-            goAway();
+            OnBackUtil.clean_stack_and_go_to_main_activity(this);
         }
 
         if (getIntent().getExtras() != null && getIntent().getExtras().getString("restaurant_id") != null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
             q = FirebaseUtil.getOffersRef(restaurantID);
             if (q == null)
-                goAway();
+                OnBackUtil.clean_stack_and_go_to_main_activity(this);
             assert q != null;
             l = new ValueEventListener() {
                 @Override
@@ -101,7 +94,7 @@ public class MyOffersActivity extends AppCompatActivity
                     offerList = offers;
                     DatabaseReference mealsRef = FirebaseUtil.getMealsRef(restaurantID);
                     if (mealsRef == null)
-                        goAway();
+                        OnBackUtil.clean_stack_and_go_to_main_activity(getBaseContext());
                     assert mealsRef != null;
                     mealsRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -126,7 +119,7 @@ public class MyOffersActivity extends AppCompatActivity
                 }
             };
         } else {
-            goAway();
+            OnBackUtil.clean_stack_and_go_to_main_activity(this);
         }
 
 
@@ -254,19 +247,6 @@ public class MyOffersActivity extends AppCompatActivity
                     .into(nav_picture);
         }
 
-    }
-
-    private void goAway() {
-        /*
-        Intent intent = new Intent(this, Restaurant_page.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.putExtra("restaurant_id", restaurantID);
-        startActivity(intent);
-        finish();
-        */
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
     }
 
 }

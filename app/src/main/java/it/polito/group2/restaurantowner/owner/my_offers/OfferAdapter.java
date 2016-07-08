@@ -38,7 +38,7 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
         this.offerList = list;
         this.mealRestaurantList = meals;
     }
-
+//TODO rivedere tutta la presentazione della lista degli ordini
     public class OfferViewHolder extends RecyclerView.ViewHolder {
         public TextView name;
         public TextView enabled;
