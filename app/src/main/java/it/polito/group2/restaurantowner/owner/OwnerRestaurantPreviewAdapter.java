@@ -95,6 +95,10 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
             DatabaseReference resReference = firebase.getReference("restaurants/" + r.getRestaurant_id());
             DatabaseReference resPreviewReference = firebase.getReference("restaurants_previews/" + r.getRestaurant_id());
             DatabaseReference resNameRef = firebase.getReference("restaurant_names/" + r.getRestaurant_name() + "/" + r.getRestaurant_id());
+            DatabaseReference resMealsReference = firebase.getReference("meals/" + r.getRestaurant_id());
+            DatabaseReference resOffersReference = firebase.getReference("offers/" + r.getRestaurant_id());
+            DatabaseReference resGalleriesReference = firebase.getReference("restaurants_galleries/" + r.getRestaurant_id());
+            DatabaseReference resReviewsReference = firebase.getReference("reviews/" + r.getRestaurant_id());
 
             //TODO the data change callback is not called
             DatabaseReference userRef = firebase.getReference("restaurants/" + r.getRestaurant_id() + "/favourite_users");
@@ -119,8 +123,11 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
 
             resNameRef.setValue(null);
             resReference.setValue(null);
-            //delete also its preview
             resPreviewReference.setValue(null);
+            resMealsReference.setValue(null);
+            resOffersReference.setValue(null);
+            resGalleriesReference.setValue(null);
+            resReviewsReference.setValue(null);
             mDataset.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, mDataset.size());
