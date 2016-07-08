@@ -38,7 +38,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
         public MealViewHolder(View view){
             super(view);
             name = (TextView) itemView.findViewById(R.id.meal_name);
-            category = (TextView) itemView.findViewById(R.id.category_name);
+//            category = (TextView) itemView.findViewById(R.id.category_name);
             price = (TextView) itemView.findViewById(R.id.meal_price);
             quantity = (TextView) itemView.findViewById(R.id.meal_quantity);
             additionList = (RecyclerView) itemView.findViewById(R.id.order_meal_addition_list);
@@ -54,12 +54,13 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
     @Override
     public void onBindViewHolder(MealAdapter.MealViewHolder holder, int position) {
         holder.name.setText(mealList.get(position).getMeal_name());
-        holder.category.setText(mealList.get(position).getMeal_category());
+//        holder.category.setText(mealList.get(position).getMeal_category());
         holder.price.setText(formatEuro(mealList.get(position).getMeal_price()));
-        holder.quantity.setText(mealList.get(position).getMeal_quantity());
+        holder.quantity.setText(mealList.get(position).getMeal_quantity().toString());
         holder.additionList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.additionList.setNestedScrollingEnabled(false);
         AdditionAdapter adapter = new AdditionAdapter(context, mealList.get(position).allAdditions());
+        //TODO sistemare i dati corretti nelle addition
         holder.additionList.setAdapter(adapter);
     }
 

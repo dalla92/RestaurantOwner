@@ -14,6 +14,12 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,8 +68,20 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         Date date = orderList.get(position).orderDateToCalendar().getTime();
         SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
         holder.date.setText(formatDate.format(date));
-        //TODO stampare il nome del ristorante e non il suo id
-        holder.restaurantName.setText(orderList.get(position).getRestaurant_id());
+        FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+        DatabaseReference resReference = firebase.getReference("restaurants/" + orderList.get(position).getRestaurant_id() + "/restaurant_name");
+        resReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                String name = dataSnapshot.getValue(String.class);
+                holder.restaurantName.setText(name);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         holder.price.setText(formatEuro(orderList.get(position).getOrder_price()));
         holder.mealList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.mealList.setNestedScrollingEnabled(false);

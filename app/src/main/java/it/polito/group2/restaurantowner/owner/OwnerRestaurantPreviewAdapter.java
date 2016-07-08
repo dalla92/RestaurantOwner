@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,11 +90,32 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
         }
 
         public void removeItem(int position) {
-            RestaurantPreview r = mDataset.get(position);
-            FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+            final RestaurantPreview r = mDataset.get(position);
+            final FirebaseDatabase firebase = FirebaseDatabase.getInstance();
             DatabaseReference resReference = firebase.getReference("restaurants/" + r.getRestaurant_id());
             DatabaseReference resPreviewReference = firebase.getReference("restaurants_previews/" + r.getRestaurant_id());
             DatabaseReference resNameRef = firebase.getReference("restaurant_names/" + r.getRestaurant_name() + "/" + r.getRestaurant_id());
+
+            //TODO the data change callback is not called
+            DatabaseReference userRef = firebase.getReference("restaurants/" + r.getRestaurant_id() + "/favourite_users");
+            userRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    // Get Post object and use the values to update the UI
+                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                        String userId = postSnapshot.getValue(String.class);
+                        DatabaseReference favUserRef = firebase.getReference("users/" + userId + "/favourites_restaurants/" + r.getRestaurant_id() + "/");
+                        favUserRef.setValue(null);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    // Getting Post failed, log a message
+                    Log.w("Firebase error", "loadPost:onCancelled", databaseError.toException());
+                    // ...
+                }
+            });
 
             resNameRef.setValue(null);
             resReference.setValue(null);

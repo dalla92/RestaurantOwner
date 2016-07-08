@@ -396,7 +396,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             servicesBuilder.append(", ");
         }
         if(targetRestaurant.getTvPresent()) {
-            servicesBuilder.append(getString(R.string.credit_card));
+            servicesBuilder.append(getString(R.string.tv));
             servicesBuilder.append(", ");
         }
         if(targetRestaurant.getAnimalAllowed()){

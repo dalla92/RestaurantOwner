@@ -43,16 +43,17 @@ public class FavouriteAdapter extends ArrayAdapter<RestaurantPreview> {
         ImageView image = (ImageView) convertView.findViewById(R.id.restaurant_image);
 
         RestaurantPreview p = bookmarked_restaurants.get(position);
-        name.setText(p.getRestaurant_name());
+        if(p!=null) {
+            name.setText(p.getRestaurant_name());
 
-        String pictureURL = p.getRestaurant_cover_firebase_URL();
-        if (pictureURL !=null && !pictureURL.trim().equals("")) {
-            Glide.with(context)
-                    .load(p.getRestaurant_cover_firebase_URL()) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into(image);
+            String pictureURL = p.getRestaurant_cover_firebase_URL();
+            if (pictureURL != null && !pictureURL.trim().equals("")) {
+                Glide.with(context)
+                        .load(p.getRestaurant_cover_firebase_URL()) //"http://nuuneoi.com/uploads/source/playstore/cover.jpg"
+                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                        .into(image);
+            }
         }
-
         return convertView;
     }
 
