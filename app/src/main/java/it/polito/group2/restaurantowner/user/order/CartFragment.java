@@ -58,9 +58,7 @@ public class CartFragment extends Fragment {
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.user_order_fragment_cart, container, false);
 
-        //TODO aggiustare la lista annidata
         //TODO fare spuntare fidelity point presi oppure lo sconto fidelity
-        //TODO stampa lista vuota se non ci sono articoli
 
         TextView orderPrice = (TextView) view.findViewById(R.id.order_price);
         orderPrice.setText(formatEuro(this.order.getOrder_price()));
@@ -70,6 +68,8 @@ public class CartFragment extends Fragment {
         Button cancel_btn = (Button) view.findViewById(R.id.cancel_order);
         LinearLayout order_detail = (LinearLayout) view.findViewById(R.id.order_detail);
         TextView empty_msg = (TextView) view.findViewById(R.id.order_empty);
+        TextView fidelitymsg = (TextView) view.findViewById(R.id.fidelityApplied);
+
 
         continue_btn.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -85,6 +85,13 @@ public class CartFragment extends Fragment {
             order_detail.setVisibility(View.VISIBLE);
             confirm_btn.setVisibility(View.VISIBLE);
             empty_msg.setVisibility(View.GONE);
+
+            if(order.getFidelity_applied()) {
+                fidelitymsg.setVisibility(View.VISIBLE);
+            } else {
+                fidelitymsg.setVisibility(View.GONE);
+            }
+
             confirm_btn.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     final Dialog dialog = new Dialog(getContext());
@@ -167,6 +174,7 @@ public class CartFragment extends Fragment {
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
+    /*
     public void onAdditionDeleted(final String mealID, final String addID) {
         new AlertDialog.Builder(getContext())
                 .setTitle(getContext().getResources().getString(R.string.user_order_fragment_cart_alert_adddel_title))
@@ -185,6 +193,7 @@ public class CartFragment extends Fragment {
         this.order.getOrder_meals().get(mealID).setMeal_quantity(quantity);
         mCallback.onOrderChange(this.order);
     }
+    */
 
     public interface OnActionListener {
         void onOrderConfirm(Order order);
