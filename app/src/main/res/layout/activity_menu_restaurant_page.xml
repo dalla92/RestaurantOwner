@@ -21,7 +21,7 @@
         app:itemTextColor="@color/gray"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_menu_restaurant_page"
+        app:headerLayout="@layout/nav_header_login"
         app:menu="@menu/restaurant_page_drawer" />
 
 </android.support.v4.widget.DrawerLayout>

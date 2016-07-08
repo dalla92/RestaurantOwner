@@ -60,7 +60,7 @@
         app:itemIconTint="@color/colorAccent"
         app:itemTextColor="@color/gray"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_main"
+        app:headerLayout="@layout/nav_header_login"
         app:menu="@menu/restaurant_page_drawer" />
 
 
