@@ -144,7 +144,7 @@ public class FragmentOtherInfo extends Fragment {
                 ma.setMeal_addition_name(mc.getMeal_category_name());
                 childCategories.add(ma);
             }
-        parentCategory = "Meal categories";
+        parentCategory = "Meal tags";
         categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
         categories_adapter = new MyExpandableAdapter(parentCategory, childCategories);
         categories.setAdapter(categories_adapter);
