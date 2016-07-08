@@ -117,7 +117,7 @@ public class Restaurant_page extends AppCompatActivity
         if(b!=null)
             restaurant_id = b.getString("RestaurantId");
 
-        FirebaseUtil.initProgressDialog(this);
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
         //get and fill related data
@@ -206,7 +206,6 @@ public class Restaurant_page extends AppCompatActivity
                 getSupportActionBar().setTitle(my_restaurant.getRestaurant_name());
                 if(my_restaurant!=null)
                     fill_data();
-                FirebaseUtil.hideProgressDialog(mProgressDialog);
             }
             @Override
             public void onCancelled(DatabaseError firebaseError) {
@@ -280,6 +279,8 @@ public class Restaurant_page extends AppCompatActivity
             edit_restaurant_telephone_number.setText(my_restaurant.getRestaurant_telephone_number());
 
         getSupportActionBar().setTitle(my_restaurant.getRestaurant_name());
+        FirebaseUtil.hideProgressDialog(mProgressDialog);
+
     }
 
     private void setUpPicture() {

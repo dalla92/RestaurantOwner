@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(MainActivity.this, "You need to be logged in.", Toast.LENGTH_SHORT).show();
             finish();
         }
-        FirebaseUtil.initProgressDialog(this);
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
         RecyclerView mRecyclerView = (RecyclerView) findViewById(R.id.recyclerView);

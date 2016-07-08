@@ -63,10 +63,8 @@ public class MyOffersActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*
         mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
-        */
 
         //User object
         DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
@@ -205,9 +203,11 @@ public class MyOffersActivity extends AppCompatActivity
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
         MenuItem i = menu.findItem(R.id.action_edit);
-        i.setVisible(false);
+        if(i!=null)
+            i.setVisible(false);
         MenuItem i2 = menu.findItem(R.id.action_show_as);
-        i.setVisible(false);
+        if(i!=null)
+            i2.setVisible(false);
         assert navigationView != null;
         navigationView.setNavigationItemSelectedListener(this);
 

@@ -26,7 +26,8 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:id="@+id/imageView4"
-            android:src="@drawable/ic_money_prymary" />
+            android:src="@mipmap/ic_euro"
+        />
 
         <TextView
             android:layout_width="70dp"

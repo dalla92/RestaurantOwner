@@ -77,7 +77,7 @@ public class MenuRestaurant_page extends AppCompatActivity {
         a = this;
         firebase = FirebaseDatabase.getInstance();
 
-        FirebaseUtil.initProgressDialog(this);
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id") != null)
