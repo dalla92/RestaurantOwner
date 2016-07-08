@@ -24,10 +24,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
+import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 
 /**
@@ -100,15 +102,15 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
             DatabaseReference resGalleriesReference = firebase.getReference("restaurants_galleries/" + r.getRestaurant_id());
             DatabaseReference resReviewsReference = firebase.getReference("reviews/" + r.getRestaurant_id());
 
-            //TODO the data change callback is not called
+            //TODO test
             DatabaseReference userRef = firebase.getReference("restaurants/" + r.getRestaurant_id() + "/favourite_users");
             userRef.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // Get Post object and use the values to update the UI
-                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                        String userId = postSnapshot.getValue(String.class);
-                        DatabaseReference favUserRef = firebase.getReference("users/" + userId + "/favourites_restaurants/" + r.getRestaurant_id() + "/");
+                    HashMap<String,Boolean> hm = (HashMap<String,Boolean>)dataSnapshot.getValue();
+                    for(String id : hm.keySet()){
+                        DatabaseReference favUserRef = firebase.getReference("users/" + id + "/favourites_restaurants/" + r.getRestaurant_id());
                         favUserRef.setValue(null);
                     }
                 }
@@ -121,7 +123,10 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
                 }
             });
 
+            DatabaseReference revRef = firebase.getReference("reviews/" + r.getRestaurant_id());
+
             resNameRef.setValue(null);
+            revRef.setValue(null);
             resReference.setValue(null);
             resPreviewReference.setValue(null);
             resMealsReference.setValue(null);

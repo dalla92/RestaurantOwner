@@ -81,6 +81,7 @@ public class DrawerUtil {
             intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             Bundle b = new Bundle();
             b.putString("restaurant_id", restaurant_id);
+            b.putBoolean("coming_from_owner_restaurant_page", true);
             intent1.putExtras(b);
             a.startActivity(intent1);
             return true;

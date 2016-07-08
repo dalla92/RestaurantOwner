@@ -86,6 +86,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     private TextView timesText;
     private Query reviewsQuery;
     private ChildEventListener reviewsChildListener;
+    private boolean coming_from_owner_restaurant_page = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +108,9 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         firebase = FirebaseDatabase.getInstance();
         mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
+
+        if(getIntent().getExtras()!=null)
+            coming_from_owner_restaurant_page = getIntent().getExtras().getBoolean("coming_from_owner_restaurant_page");
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id")!=null)
             restaurantID = getIntent().getExtras().getString("restaurant_id");
@@ -277,7 +281,10 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
+            if(!coming_from_owner_restaurant_page)
+                OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
+            else
+                OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurantID);
         }
     }
 
@@ -715,10 +722,14 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
 
                 alert.show();
 */
-                // TODO fix order
-                Intent intent = new Intent(UserRestaurantActivity.this, OrderActivity.class);
-                intent.putExtra("restaurant_id", targetRestaurant.getRestaurant_id());
-                startActivity(intent);
+                if(targetRestaurant.openNow()) {
+                    Intent intent = new Intent(UserRestaurantActivity.this, OrderActivity.class);
+                    intent.putExtra("restaurant_id", targetRestaurant.getRestaurant_id());
+                    startActivity(intent);
+                }
+                else{
+                    Toast.makeText(UserRestaurantActivity.this, "This restaurant is closed now", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

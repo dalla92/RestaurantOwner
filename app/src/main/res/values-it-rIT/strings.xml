@@ -231,7 +231,7 @@
     <string name="title_activity_user_restaurant"></string>
     <string name="valid_for">Valido per</string>
     <string name="make_a_reservation">Prenota Tavolo</string>
-    <string name="make_an_order">Ordina Piatto</string>
+    <string name="make_an_order">Ordina ora</string>
     <string name="user_order_cart_button">Carrello</string>
     <string name="profile_full_name">Nome e cognome</string>
     <string name="user_order_cancel_message">Vuoi cancellare questo ordine?</string>
