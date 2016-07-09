@@ -178,7 +178,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                 if(targetRestaurant.openNow())
                     timesText.setText("Open now");
                 else{
-                    timesText.setText("Closed now");
+                    timesText.setText("Close now");
                 }
 
                 setButtons();

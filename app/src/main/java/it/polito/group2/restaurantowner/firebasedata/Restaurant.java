@@ -1,5 +1,7 @@
 package it.polito.group2.restaurantowner.firebasedata;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -47,10 +49,6 @@ public class Restaurant implements Serializable {
     }
 
     public boolean openNow() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.ENGLISH);
-        Calendar openTime = Calendar.getInstance();
-        Calendar closeTime = Calendar.getInstance();
-
         Calendar now = Calendar.getInstance();
         RestaurantTimeSlot tSlot = null;
         assert restaurant_time_slot != null;
@@ -61,26 +59,53 @@ public class Restaurant implements Serializable {
             }
         }
         assert tSlot != null;
-        if(tSlot.getLunch()) {
-            try {
-                openTime.setTime(sdf.parse(tSlot.getOpen_lunch_time()));
-                closeTime.setTime(sdf.parse(tSlot.getClose_lunch_time()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            if(openTime.before(now.getTime()) && closeTime.after(now.getTime()))
+        Log.d("prova", tSlot.getDay_of_week() + " " + tSlot.getOpen_dinner_time() + " " + tSlot.getClose_dinner_time());
+        if(!tSlot.getLunch() && ! tSlot.getDinner())
+            return false;
+
+        if(tSlot.getLunch()){
+            int nowHour = now.get(Calendar.HOUR_OF_DAY);
+            int nowMinute = now.get(Calendar.MINUTE);
+            String openTime = tSlot.getOpen_lunch_time();
+            String closeTime = tSlot.getClose_lunch_time();
+            int openHour = Integer.valueOf(openTime.substring(0, 2));
+            int closeHour = Integer.valueOf(closeTime.substring(0, 2));
+            int openMinute = Integer.valueOf(openTime.substring(3, 5));
+            int closeMinute = Integer.valueOf(closeTime.substring(3,5));
+
+            if(nowHour < closeHour && nowHour > openHour)
                 return true;
+            if(nowHour == closeHour){
+                if(nowMinute < closeMinute)
+                    return true;
+            }
+            if(nowHour == openHour){
+                if(nowMinute > openMinute)
+                    return true;
+            }
         }
         if(tSlot.getDinner()) {
-            try {
-                openTime.setTime(sdf.parse(tSlot.getOpen_dinner_time()));
-                closeTime.setTime(sdf.parse(tSlot.getClose_dinner_time()));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            if(openTime.before(now.getTime()) && closeTime.after(now.getTime()))
+            int nowHour = now.get(Calendar.HOUR_OF_DAY);
+            int nowMinute = now.get(Calendar.MINUTE);
+            String openTime = tSlot.getOpen_dinner_time();
+            String closeTime = tSlot.getClose_dinner_time();
+            int openHour = Integer.valueOf(openTime.substring(0, 2));
+            int closeHour = Integer.valueOf(closeTime.substring(0, 2));
+            int openMinute = Integer.valueOf(openTime.substring(3, 5));
+            int closeMinute = Integer.valueOf(closeTime.substring(3,5));
+
+            if(nowHour < closeHour && nowHour > openHour)
                 return true;
+            if(nowHour == closeHour){
+                if(nowMinute < closeMinute)
+                    return true;
+            }
+            if(nowHour == openHour){
+                if(nowMinute > openMinute)
+                    return true;
+            }
         }
+
         return false;
     }
 

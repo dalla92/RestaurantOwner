@@ -37,8 +37,10 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import it.polito.group2.restaurantowner.R;
 
@@ -217,12 +219,40 @@ public class UserRestaurantList extends AppCompatActivity
                         public void onItemClick(View view, int position) {
                             Intent mIntent = new Intent(UserRestaurantList.this, UserRestaurantActivity.class);
                             RestaurantPreview resPrev = mAdapter.getItem(position);
-                            if(resPrev != null)
-                            mIntent.putExtra("restaurant_id", resPrev.getRestaurant_id());
+                            if (resPrev != null)
+                                mIntent.putExtra("restaurant_id", resPrev.getRestaurant_id());
                             startActivity(mIntent);
                         }
                     })
             );
+
+            mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (dy > 0) {
+                        Log.d("prova", "scrolling up");
+                        fab.setVisibility(View.INVISIBLE);
+                    } else {
+                        Log.d("prova", "scrolling down");
+                        fab.setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+
+                    if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {
+                        // Do something
+                    } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                        // Do something
+                    } else {
+                        // Do something
+                    }
+                }
+            });
 
             mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
             mRecyclerView.setAdapter(mAdapter);
