@@ -235,6 +235,8 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_google_log_in">GoogleLogInActivity</string>
     <string name="title_activity_test">Sign in</string>
+    <string name="bookmark_added">Bookmark saved</string>
+    <string name="bookmark_removed">Bookmark removed</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
@@ -555,6 +557,9 @@
     <string name="permission_required_toast">Location permission is required for this demo.</string>
     <string name="missing_reservation">No reservations</string>
     <string name="owner_offer_fragment_offer_calendartext_offerend">Offer ends on</string>
+    <string name="add">Add</string>
+    <string name="april">April</string>
+    <string name="august">Agust</string>
 
 
 </resources>

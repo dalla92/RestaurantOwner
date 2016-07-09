@@ -392,6 +392,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+
         OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
     }
 

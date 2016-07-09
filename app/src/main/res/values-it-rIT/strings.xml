@@ -244,4 +244,25 @@
     <string name="reviews">Recensioni</string>
     <string name="missing_reservation">Nessuna prenotazione</string>
     <string name="owner_offer_fragment_offer_calendartext_offerend">Offer ends on</string>
+    <string name="action_sign_in">Accedi o Registrati</string>
+    <string name="action_sign_in_short">Accedi</string>
+    <string name="activate_higher_level">Attiva liello superiore</string>
+    <string name="air_conditioned">A/C</string>
+    <string name="alpha">Alpha</string>
+    <string name="animal_allowed">Animali permessi</string>
+    <string name="animate">Anima</string>
+    <string name="basic_map_demo_description">Lancia mappa</string>
+    <string name="basic_map_demo_label">Mappa </string>
+    <string name="buildings">Edifici</string>
+    <string name="bus_stop">Fermata bus</string>
+    <string name="camera_demo_description">Dimostra fotocamera</string>
+    <string name="camera_demo_label">Fotocamera</string>
+    <string name="circle_demo_description">Dimostra come aggiungere cerchio alla mappa</string>
+    <string name="circle_demo_label">Cerchio</string>
+    <string name="clear_map">Reset</string>
+    <string name="clickable">Cliccabile</string>
+    <string name="close">chiudi</string>
+    <string name="compass">Bussola</string>
+    <string name="custom_info_contents">Custom Info</string>
+    <string name="custom_info_window">Custom info window</string>
 </resources>

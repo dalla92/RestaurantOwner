@@ -969,9 +969,11 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if (dataSnapshot.getValue() == null) {
                                 FirebaseMessaging.getInstance().subscribeToTopic(restaurantID);
+                                Toast.makeText(UserRestaurantActivity.this, getString(R.string.bookmark_added), Toast.LENGTH_SHORT).show();
                                 updateBookmark(restaurantBookmarksRef, userBookmarksRef, true);
                             } else {
                                 FirebaseMessaging.getInstance().unsubscribeFromTopic(restaurantID);
+                                Toast.makeText(UserRestaurantActivity.this, getString(R.string.bookmark_removed), Toast.LENGTH_SHORT).show();
                                 updateBookmark(restaurantBookmarksRef, userBookmarksRef, false);
                             }
                         }
