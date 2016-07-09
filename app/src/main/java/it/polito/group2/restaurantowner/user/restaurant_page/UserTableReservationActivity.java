@@ -61,7 +61,8 @@ public class UserTableReservationActivity extends AppCompatActivity {
     private TableReservation current_table_reservation = null;
     Toolbar toolbar;
     private String current_year, current_month, current_day, current_hour, current_minute;
-    private String chosen_year, chosen_month, chosen_day, chosen_hour, chosen_minute, chosen_weekday;
+    private Integer chosen_year, chosen_month, chosen_day, chosen_weekday;
+    private String chosen_hour, chosen_minute;
     Button timepicker_button;
     Button datepicker_button;
     private String userID;
@@ -195,9 +196,12 @@ public class UserTableReservationActivity extends AppCompatActivity {
                     //searching closing days
                     closing_days = new ArrayList<>();
                     for (RestaurantTimeSlot rts : current_restaurant.getRestaurant_time_slot()) {
-                        closing_days.add(rts.getDay_of_week());
+                        if(!rts.getDinner() && !rts.getLunch())
+                            closing_days.add(rts.getDay_of_week());
                     }
                 }
+
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
             }
             @Override
             public void onCancelled(DatabaseError firebaseError) {
@@ -243,10 +247,10 @@ public class UserTableReservationActivity extends AppCompatActivity {
             public void onDateSelected(Date date) {
                 Calendar selected_calendar = Calendar.getInstance();
                 selected_calendar.setTime(date);
-                chosen_day = Integer.toString(selected_calendar.get(Calendar.DAY_OF_MONTH));
-                chosen_weekday = Integer.toString(selected_calendar.get(Calendar.DAY_OF_WEEK));
-                chosen_month = Integer.toString(selected_calendar.get(Calendar.MONTH) + 1); //need to correct +1
-                chosen_year = Integer.toString(selected_calendar.get(Calendar.YEAR));
+                chosen_day = selected_calendar.get(Calendar.DAY_OF_MONTH);
+                chosen_weekday = selected_calendar.get(Calendar.DAY_OF_WEEK);
+                chosen_month = selected_calendar.get(Calendar.MONTH) + 1; //need to correct +1
+                chosen_year = selected_calendar.get(Calendar.YEAR);
                 date_reserved_text.setText(chosen_day + "/" + chosen_month + "/" + chosen_year);
                 time_reserved_text.setText(R.string.insert_time);
                 guests_number.setMaxValue(0);
@@ -273,7 +277,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
             Log.d("what", "what");
         } else {
             // Launch Time Picker Dialog with current hour and minute
-            CustomTimePickerDialog timePickerDialog = new CustomTimePickerDialog(this, chosen_weekday, current_restaurant.getRestaurant_time_slot(), current_table_reservation.getRestaurant_id(),
+            CustomTimePickerDialog timePickerDialog = new CustomTimePickerDialog(this, Integer.toString(chosen_weekday), current_restaurant.getRestaurant_time_slot(), current_table_reservation.getRestaurant_id(),
                     new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay,
@@ -282,7 +286,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
                             List<String> displayed_hours_values = new ArrayList<String>();
                             //find hours of lunch
                             for (RestaurantTimeSlot o : current_restaurant.getRestaurant_time_slot()) {
-                                if (o.getDay_of_week() + 1 == Integer.parseInt(chosen_weekday)) {
+                                if (o.getDay_of_week() + 1 == chosen_weekday) {
                                     if (o.getLunch() == true) {
                                         int open_time = Integer.parseInt(o.getOpen_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                         int close_time = Integer.parseInt(o.getClose_lunch_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
@@ -294,7 +298,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
                             }
                             //find hours of dinner
                             for (RestaurantTimeSlot o : current_restaurant.getRestaurant_time_slot()) {
-                                if (o.getDay_of_week() + 1 == Integer.parseInt(chosen_weekday)) {
+                                if (o.getDay_of_week() + 1 == chosen_weekday) {
                                     if (o.getDinner() == true) {
                                         int open_time = Integer.parseInt(o.getOpen_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
                                         int close_time = Integer.parseInt(o.getClose_dinner_time().substring(0, 2)); //I take only the hour because minutes are fixed to 00
@@ -316,7 +320,6 @@ public class UserTableReservationActivity extends AppCompatActivity {
 
     public void initToolBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.title_table_reservation_activity);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
@@ -329,10 +332,24 @@ public class UserTableReservationActivity extends AppCompatActivity {
                 for (DataSnapshot tsSnapshot : snapshot.getChildren()) {
                     TableReservation snap_table_reservations = tsSnapshot.getValue(TableReservation.class);
                     String snap_restaurant_id = snap_table_reservations.getRestaurant_id();
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(snap_table_reservations.getTable_reservation_date());
+                    target_day = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                    try {
+                        target_day.setTime(sdf.parse(chosen_day + "/" + chosen_month + "/" + chosen_year + " " + chosen_hour + ":" + chosen_minute));
+                    } catch (java.text.ParseException e) {
+                        Log.e("EXCEPTION", "SDF.PARSE RAISED AN EXCEPTION IN onOptionsItemSelected");
+                    }
+                    if (target_day.before(mMinDate)) {
+                        Log.e("EXCEPTION", "mMinDate: " + mMinDate.getTime()
+                                + " does not precede cal: " + date.getTime() + " IN onOptionsItemSelected");
+                    }
+
                     if (snap_restaurant_id.equals(restaurant_id)) {
-                        if (snap_table_reservations.getTable_reservation_date().YEAR == target_day.get(Calendar.YEAR) &&
-                                snap_table_reservations.getTable_reservation_date().MONTH == target_day.get(Calendar.MONTH) &&
-                                snap_table_reservations.getTable_reservation_date().DAY_OF_MONTH == target_day.get(Calendar.DAY_OF_MONTH)) {
+                        if (c.get(Calendar.YEAR) == target_day.get(Calendar.YEAR) &&
+                                c.get(Calendar.MONTH) == target_day.get(Calendar.MONTH) &&
+                                c.get(Calendar.DAY_OF_MONTH) == target_day.get(Calendar.DAY_OF_MONTH)) {
                             reservations_that_day.add(snap_table_reservations);
                         }
                     }
@@ -342,21 +359,13 @@ public class UserTableReservationActivity extends AppCompatActivity {
                 int max_guests = current_restaurant.getRestaurant_total_tables_number() * 2; //I do not have the information about the number of max_guests, so I suppose that each table is composed by 4 chairs
                 //I do not have either the information about the number of tables/hour, so I suppose that at each clock hour I wil have full capacity
                 //compose chosen_date_reservation
-                target_day = Calendar.getInstance();
-                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                try {
-                    target_day.setTime(sdf.parse(chosen_day + "/" + chosen_month + "/" + chosen_year + " " + chosen_hour + ":" + chosen_minute));
-                } catch (java.text.ParseException e) {
-                    Log.e("EXCEPTION", "SDF.PARSE RAISED AN EXCEPTION IN onOptionsItemSelected");
-                }
-                if (target_day.before(mMinDate)) {
-                    Log.e("EXCEPTION", "mMinDate: " + mMinDate.getTime()
-                            + " does not precede cal: " + date.getTime() + " IN onOptionsItemSelected");
-                }
+
                 //counter of reservations with that hour (that day)
                 int already_booked_guests = 0;
                 for (TableReservation tr : reservations_that_day) {
-                    int hour = tr.getTable_reservation_date().HOUR;
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(tr.getTable_reservation_date());
+                    int hour = c.get(Calendar.HOUR);
                     if (hour == Integer.parseInt(chosen_hour)) {
                         already_booked_guests += tr.getTable_reservation_guests_number();
                     }
@@ -392,8 +401,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
-        OnBackUtil.clean_stack_and_go_to_user_restaurant_list(this);
+        OnBackUtil.clean_stack_and_go_to_user_restaurant_page(this, restaurant_id);
     }
 
     private void showConfirmationDialog() throws Resources.NotFoundException {
@@ -426,6 +434,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
                                                         Intent intent = new Intent(
                                                                 getApplicationContext(),
                                                                 UserRestaurantActivity.class);
+                                                        intent.putExtra("restaurant_id", restaurant_id);
                                                         startActivity(intent);
                                                     }
                                                 }
@@ -457,20 +466,22 @@ public class UserTableReservationActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (item.getItemId()) {
 
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
             case R.id.table_reservation:
                 try {
                     last_chosen_date = Calendar.getInstance();
-                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-                    try {
-                        last_chosen_date.setTime(sdf.parse(chosen_day + "/" + chosen_month + "/" + chosen_year + " " + chosen_hour + ":" + chosen_minute));
-                    } catch (java.text.ParseException e) {
-                        Log.e("EXCEPTION", "SDF.PARSE RAISED AN EXCEPTION IN onOptionsItemSelected");
-                    }
-                    if (last_chosen_date.before(mMinDate)) {
-                        Log.e("EXCEPTION", "mMinDate: " + mMinDate.getTime()
-                                + " does not precede last_chosen_date: " + date.getTime() + " IN onOptionsItemSelected");
-                    } else
-                        current_table_reservation.setTable_reservation_date((GregorianCalendar) last_chosen_date);
+                    last_chosen_date.set(Calendar.MONTH, chosen_month - 1);
+                    last_chosen_date.set(Calendar.YEAR, chosen_year);
+                    last_chosen_date.set(Calendar.DAY_OF_MONTH, chosen_day);
+                    last_chosen_date.set(Calendar.HOUR_OF_DAY, Integer.valueOf(chosen_hour));
+                    last_chosen_date.set(Calendar.MINUTE, Integer.valueOf(chosen_minute));
+
+                    SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                    Log.d("prova", format.format(last_chosen_date.getTime()));
+                    current_table_reservation.setTable_reservation_date(last_chosen_date.getTimeInMillis());
                     current_table_reservation.setTable_reservation_guests_number(guests_number.getValue());
                     if (notes.getText() != null)
                         current_table_reservation.setTable_reservation_notes(notes.getText().toString());
@@ -505,9 +516,9 @@ public class UserTableReservationActivity extends AppCompatActivity {
 
         outState.putString("chosen_hour", chosen_hour);
         outState.putString("chosen_minute", chosen_minute);
-        outState.putString("chosen_year", chosen_year);
-        outState.putString("chosen_month", chosen_month);
-        outState.putString("chosen_day", chosen_day);
+        outState.putInt("chosen_year", chosen_year);
+        outState.putInt("chosen_month", chosen_month);
+        outState.putInt("chosen_day", chosen_day);
         outState.putInt("guests_number", guests_number.getValue());
         outState.putString("notes", notes.getText().toString());
     }
@@ -518,9 +529,9 @@ public class UserTableReservationActivity extends AppCompatActivity {
 
         chosen_hour = savedInstanceState.getString("chosen_hour");
         chosen_minute = savedInstanceState.getString("chosen_minute");
-        chosen_year = savedInstanceState.getString("chosen_year");
-        chosen_month = savedInstanceState.getString("chosen_month");
-        chosen_day = savedInstanceState.getString("chosen_day");
+        chosen_year = savedInstanceState.getInt("chosen_year");
+        chosen_month = savedInstanceState.getInt("chosen_month");
+        chosen_day = savedInstanceState.getInt("chosen_day");
         guests_number.setValue(savedInstanceState.getInt("guests_number"));
         notes.setText(savedInstanceState.getString("notes"));
 

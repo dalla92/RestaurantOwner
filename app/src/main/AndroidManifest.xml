@@ -120,13 +120,11 @@
             </activity>
         <activity
             android:name=".user.restaurant_page.UserTableReservationActivity"
-            android:label="@string/title_activity_reservation"
-            android:parentActivityName=".user.restaurant_page.UserRestaurantActivity"
+            android:label="@string/title_table_reservation_activity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.UserMyReservations"
             android:label="@string/title_activity_my_reservation"
-            android:parentActivityName=".user.restaurant_page.UserRestaurantActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".gallery.GalleryViewActivity"

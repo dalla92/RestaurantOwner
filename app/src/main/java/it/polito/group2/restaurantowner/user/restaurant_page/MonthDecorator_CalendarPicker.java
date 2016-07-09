@@ -29,14 +29,14 @@ public class MonthDecorator_CalendarPicker implements CalendarCellDecorator{
         selected_calendar.setTime(date);
         Calendar today_calendar = Calendar.getInstance();
         today_calendar.add(Calendar.DAY_OF_YEAR, -1);
-        int day_of_week = selected_calendar.get(Calendar.DAY_OF_WEEK);
+        int day_of_week = selected_calendar.get(Calendar.DAY_OF_WEEK) -1;
         if(this.closing_days.contains(day_of_week)){
             calendarCellView.setBackgroundColor(Color.parseColor("#8b0000"));
-            calendarCellView.setSelectable(false);
+            calendarCellView.setClickable(false);
         } else {
             calendarCellView.setBackgroundColor(Color.parseColor("#006400"));
         }
         if(today_calendar.getTimeInMillis() > selected_calendar.getTimeInMillis())
-            calendarCellView.setBackgroundColor(Color.BLACK);
+            calendarCellView.setBackgroundColor(Color.GRAY);
     }
 }

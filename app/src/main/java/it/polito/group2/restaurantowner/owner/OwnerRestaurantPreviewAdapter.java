@@ -256,7 +256,8 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
                 public void onDataChange(DataSnapshot snapshot) {
                     for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                         TableReservation snap_t_b = (TableReservation) dataSnapshot.getValue();
-                        Calendar that = snap_t_b.getTable_reservation_date();
+                        Calendar that = Calendar.getInstance();
+                        that.setTimeInMillis(snap_t_b.getTable_reservation_date());
                         int that_day = that.get(Calendar.DAY_OF_MONTH);
                         int that_month = that.get(Calendar.MONTH);
                         int that_year = that.get(Calendar.YEAR);

@@ -65,7 +65,9 @@ public class TableFragment extends Fragment {
                 for(DataSnapshot data: dataSnapshot.getChildren()) {
                     TableReservation res = data.getValue(TableReservation.class);
                     Calendar today = Calendar.getInstance();
-                    if (isEqualTo(res.getTable_reservation_date(), today))
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(res.getTable_reservation_date());
+                    if (isEqualTo(c, today))
                         reservation_list.add(res);
                 }
 
@@ -118,13 +120,16 @@ public class TableFragment extends Fragment {
 
                 TableReservation reservation = reservation_list.get(position);
                 text_client_name.setText(reservation.getUser_id());
-                text_time.setText(timeFormat.format(reservation.getTable_reservation_date().getTime()));
+                Calendar c =  Calendar.getInstance();
+                c.setTimeInMillis(reservation.getTable_reservation_date());
+                text_time.setText(timeFormat.format(c.getTime()));
                 text_people.setText(String.format("%d %s", reservation.getTable_reservation_guests_number(), getString(R.string.reservation_people)));
                 text_notes.setText(reservation.getTable_reservation_notes());
 
                 ImageView delete = (ImageView) convertView.findViewById(R.id.table_reservation_delete);
                 Calendar today = Calendar.getInstance();
-                Calendar target = reservation.getTable_reservation_date();
+                Calendar target = Calendar.getInstance();
+                target.setTimeInMillis(reservation.getTable_reservation_date());
                 if(target.after(today)) {
 
                     delete.setClickable(true);
@@ -188,7 +193,9 @@ public class TableFragment extends Fragment {
     public void changeData(Calendar date){
         ArrayList<TableReservation> reservations = new ArrayList<>();
         for(TableReservation res: reservation_list){
-            if(isEqualTo(res.getTable_reservation_date(), date))
+            Calendar c =  Calendar.getInstance();
+            c.setTimeInMillis(res.getTable_reservation_date());
+            if(isEqualTo(c, date))
                 reservations.add(res);
         }
         reservation_list = new ArrayList<>();
@@ -196,7 +203,7 @@ public class TableFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    private boolean isEqualTo(GregorianCalendar target, Calendar date){
+    private boolean isEqualTo(Calendar target, Calendar date){
         return (target.get(Calendar.YEAR) == date.get(Calendar.YEAR) &&
                 target.get(Calendar.MONTH) == date.get(Calendar.MONTH) &&
                 target.get(Calendar.DAY_OF_MONTH) == date.get(Calendar.DAY_OF_MONTH));

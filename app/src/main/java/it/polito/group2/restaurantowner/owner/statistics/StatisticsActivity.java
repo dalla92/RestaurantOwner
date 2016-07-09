@@ -208,7 +208,9 @@ public class StatisticsActivity extends AppCompatActivity
                             orderCounter[i]++;
                     }
                     for(TableReservation r : reservationList) {
-                        if(r.getTable_reservation_date().after(start) && r.getTable_reservation_date().after(stop))
+                        Calendar c = Calendar.getInstance();
+                        c.setTimeInMillis(r.getTable_reservation_date());
+                        if(c.after(start) && c.after(stop))
                             bookingCounter[i]++;
                     }
                     start.setTimeInMillis(start.getTimeInMillis()+(24*60*60*1000));
@@ -236,7 +238,9 @@ public class StatisticsActivity extends AppCompatActivity
                             orderCounter[i]++;
                     }
                     for(TableReservation r : reservationList) {
-                        if(r.getTable_reservation_date().after(start) && r.getTable_reservation_date().after(stop))
+                        Calendar c = Calendar.getInstance();
+                        c.setTimeInMillis(r.getTable_reservation_date());
+                        if(c.after(start) && c.after(stop))
                             bookingCounter[i]++;
                     }
                     start.setTimeInMillis(start.getTimeInMillis()+(24*60*60*1000));
@@ -267,7 +271,9 @@ public class StatisticsActivity extends AppCompatActivity
                             orderCounter[i]++;
                     }
                     for(TableReservation r : reservationList) {
-                        if(r.getTable_reservation_date().after(start) && r.getTable_reservation_date().after(stop))
+                        Calendar c = Calendar.getInstance();
+                        c.setTimeInMillis(r.getTable_reservation_date());
+                        if(c.after(start) && c.after(stop))
                             bookingCounter[i]++;
                     }
                 }
