@@ -1,8 +1,11 @@
 package it.polito.group2.restaurantowner.owner.my_offers;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
@@ -14,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 
 import java.text.SimpleDateFormat;
@@ -24,6 +28,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
+import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.offer.OfferActivity;
 
 public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHolder> {
@@ -32,11 +37,13 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
     private final ArrayList<Meal> mealRestaurantList;
     private final Context context;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALIAN);
+    private ProgressDialog mProgressDialog;
 
     public OfferAdapter(Context context, ArrayList<Offer> list, ArrayList<Meal> meals) {
         this.context = context;
         this.offerList = list;
         this.mealRestaurantList = meals;
+        mProgressDialog = FirebaseUtil.initProgressDialog(context);
     }
 //TODO rivedere tutta la presentazione della lista degli ordini
     public class OfferViewHolder extends RecyclerView.ViewHolder {
@@ -112,13 +119,33 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
         holder.del.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO mettere un alert di avviso
-                DatabaseReference offersReference = FirebaseUtil.getOfferRef(offerList.get(position).getRestaurantID(),
-                        offerList.get(position).getOfferID());
-                offersReference.setValue(null);
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                        context);
+                alertDialogBuilder.setTitle("Delete offer");
+                alertDialogBuilder
+                        .setMessage("Are you sure to delete this offer?")
+                        .setCancelable(false)
+                        .setPositiveButton("Yes",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                FirebaseUtil.showProgressDialog(mProgressDialog);
+                                DatabaseReference offersReference = FirebaseUtil.getOfferRef(offerList.get(position).getRestaurantID(), offerList.get(position).getOfferID());
+                                offersReference.setValue(null).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        FirebaseUtil.hideProgressDialog(mProgressDialog);
+                                    }
+                                });
+                            }
+                        })
+                        .setNegativeButton("No",new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
             }
         });
-
 
         if(!offerList.get(position).getOfferEnabled())
             holder.enabled.setVisibility(View.VISIBLE);
