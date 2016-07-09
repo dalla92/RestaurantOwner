@@ -17,9 +17,11 @@ import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationServices;
 
+import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -64,6 +66,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.clustering.Cluster;
@@ -129,7 +132,7 @@ public class UserRestaurantList extends AppCompatActivity
     private FloatingActionButton fab;
     public static int index;
     private boolean isRequestedPermission = false;
-
+    private boolean position_already_active = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -138,23 +141,22 @@ public class UserRestaurantList extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         fab = (FloatingActionButton) findViewById(R.id.gps_fab);
+        CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
+        p.setAnchorId(View.NO_ID);
+        fab.setLayoutParams(p);
+        fab.setVisibility(View.GONE);
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        position_already_active = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER); // Return a boolean
+        Log.d("prova", "" + position_already_active);
         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mRequestingLocationUpdates == false) {
-                    //enable gps
-                    mRequestingLocationUpdates = true;
-                    startLocationUpdates();
-                    fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
-                } else {
-                    //disable gps
-                    mRequestingLocationUpdates = false;
-                    stopLocationUpdates();
-                    fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
-                }
-            }
-        });
+        if(!position_already_active) {
+            fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
+            position_already_active = true;
+        }
+        else {
+            fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
+            position_already_active = false;
+        }
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -172,8 +174,6 @@ public class UserRestaurantList extends AppCompatActivity
         else {
             // Create an instance of GoogleAPIClient.
             createLocationRequest();
-
-            //grantPermissions(); only in onResume
 
             ImageView filter_icon = (ImageView) findViewById(R.id.icon_filter);
             assert filter_icon != null;
@@ -275,7 +275,7 @@ public class UserRestaurantList extends AppCompatActivity
     @Override
     public void onConnected(Bundle connectionHint) { //Runs when a GoogleApiClient object successfully connects.
         Log.i(TAG, "Connected to GoogleApiClient");
-        fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
+        //fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
         // If the initial location was never previously requested, we use
         // FusedLocationApi.getLastLocation() to get it. If it was previously requested, we store
         // its value in the Bundle and check for it in onCreate(). We
@@ -337,6 +337,14 @@ public class UserRestaurantList extends AppCompatActivity
     }
 
     public void grantPermissions() {
+        if(!position_already_active) {
+            fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
+            position_already_active = true;
+        }
+        else {
+            fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
+            position_already_active = false;
+        }
         if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
             // only for Marshmallow and newer versions
             //I want that first I request GPS, but if rejected, request WIFI
@@ -392,7 +400,15 @@ public class UserRestaurantList extends AppCompatActivity
             return;
         }
 
-        grantPermissions();
+        fab.setVisibility(View.VISIBLE);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                grantPermissions();
+            }
+        });
+
+        read_restaurants_from_firebase(false);
 
         mMap = map;
         mMap.getUiSettings().setZoomControlsEnabled(true);
@@ -436,11 +452,21 @@ public class UserRestaurantList extends AppCompatActivity
 
     public void read_restaurants_from_firebase(final boolean isPositionUp){
         mAdapter.clear();
+        if(mClusterManager!=null)
+            mClusterManager.clearItems();
+
         FirebaseUtil.showProgressDialog(mProgressDialog);
         //I want to get all restaurants within 2Km: I get all the ids of the restaurants, for each id I get its latitude and longitude, and if distance<2km I add it to restaurant_preview_list and cluster_manager
 
         DatabaseReference resPreviewRef = firebase.getReference("restaurants_previews");
-        resPreviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query recentPostsQuery;
+        if(!isPositionUp){
+            recentPostsQuery = resPreviewRef.limitToFirst(15);
+        }
+        else{
+            recentPostsQuery = resPreviewRef;
+        }
+        recentPostsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot data : dataSnapshot.getChildren()) {
@@ -773,7 +799,8 @@ public class UserRestaurantList extends AppCompatActivity
                         //I have already the GPS activated
                         // All location settings are satisfied. The client can initialize location
                         // requests here.
-                        startLocationUpdates();
+                        Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(intent);
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         //GPS permission is requested
@@ -866,10 +893,16 @@ public class UserRestaurantList extends AppCompatActivity
         if(requestCode == REQUEST_CHECK_SETTINGS){
             if(resultCode == RESULT_OK){
                 mRequestingLocationUpdates = true;
+                fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
                 startLocationUpdates();
             }
-            else
+            else {
+                //disable gps
+                mRequestingLocationUpdates = false;
+                stopLocationUpdates();
+                fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
                 read_restaurants_from_firebase(false);
+            }
         }
     }
 
