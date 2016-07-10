@@ -109,9 +109,11 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     // Get Post object and use the values to update the UI
                     HashMap<String,Boolean> hm = (HashMap<String,Boolean>)dataSnapshot.getValue();
-                    for(String id : hm.keySet()){
-                        DatabaseReference favUserRef = firebase.getReference("users/" + id + "/favourites_restaurants/" + r.getRestaurant_id());
-                        favUserRef.setValue(null);
+                    if(hm!=null) {
+                        for (String id : hm.keySet()) {
+                            DatabaseReference favUserRef = firebase.getReference("users/" + id + "/favourites_restaurants/" + r.getRestaurant_id());
+                            favUserRef.setValue(null);
+                        }
                     }
                 }
 
@@ -250,6 +252,8 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
             today_year = today.get(Calendar.YEAR);
             firebase = FirebaseDatabase.getInstance();
             total_tables_number = r.getTables_number();
+            res_num_text_view.setText(String.valueOf(total_tables_number));
+            /*
             DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
             ref2.addValueEventListener(new ValueEventListener() {
                 @Override
@@ -273,6 +277,7 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
                     System.out.println("The read failed: " + firebaseError.getMessage());
                 }
             });
+            */
         }
     }
 

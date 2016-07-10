@@ -56,6 +56,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
     private FirebaseDatabase firebase;
     private ProgressDialog mProssesDialog;
     private boolean editMode;
+    boolean times_changed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +116,8 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             saveData();
             if (res.getRestaurant_name().equals(""))
                 Toast.makeText(this, "Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
+            else if(alwaysClosed(res))
+                Toast.makeText(this, "Please set restaurant open and close times", Toast.LENGTH_SHORT).show();
             else {
                 final String userID = FirebaseUtil.getCurrentUserId();
                 if (userID != null) {
@@ -195,6 +198,17 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public boolean alwaysClosed(Restaurant res){
+        boolean alwaysClosed = true;
+        for(RestaurantTimeSlot rts : res.getRestaurant_time_slot()){
+            if(rts.getDinner())
+                alwaysClosed = false;
+            if(rts.getLunch())
+                alwaysClosed = false;
+        }
+        return alwaysClosed;
     }
 
     public void saveData(){

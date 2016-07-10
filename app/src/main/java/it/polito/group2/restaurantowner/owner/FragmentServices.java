@@ -46,8 +46,8 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
     ArrayList<String> lunchCloseTime = new ArrayList<String>();
     ArrayList<String> dinnerOpenTime = new ArrayList<String>();
     ArrayList<String> dinnerCloseTime = new ArrayList<String>();
-    boolean[] listLunchClose = new boolean[]{false,false,false,false,false,false,false,false};
-    boolean[] listDinnerClose = new boolean[]{false,false,false,false,false,false,false,false};
+    boolean[] listLunchClose = new boolean[]{true,true,true,true,true,true,true,true};
+    boolean[] listDinnerClose = new boolean[]{true,true,true,true,true,true,true,true};
     Boolean allDays=false;
     int selectedDay = 0;
     CheckBox fidelity;
@@ -58,7 +58,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
 
     OnServicesPass dataPasser;
 
-    boolean times_changed;
+    //boolean times_changed;
 
     public FragmentServices() {
     }
@@ -106,7 +106,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
         else
             takeAway.setChecked(false);
 
-        if(!times_changed){
+        /*if(!times_changed){
             lunchOpenTime = new ArrayList<>();
             lunchCloseTime = new ArrayList<>();
             dinnerOpenTime = new ArrayList<>();
@@ -114,7 +114,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
             listLunchClose = new boolean[]{true,true,true,true,true,true,true,true};
             listDinnerClose = new boolean[]{true,true,true,true,true,true,true,true};
         }
-
+*/
         dataPasser.onServicesPass(fidelity.isChecked(), tableRes.isChecked(), tableResEdit.getText().toString(), takeAway.isChecked(), takeAwayEdit.getText().toString(),
                 lunchOpenTime, lunchCloseTime, dinnerOpenTime, dinnerCloseTime, listLunchClose, listDinnerClose);
     }
@@ -157,10 +157,10 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                 listDinnerClose = savedInstanceState.getBooleanArray("listDinnerClose");
             } else {
                 for (int i = 0; i < 8; i++) {
-                    lunchOpenTime.add(i, "10:00");
-                    lunchCloseTime.add(i, "13:00");
-                    dinnerOpenTime.add(i, "19:00");
-                    dinnerCloseTime.add(i, "23:00");
+                    lunchOpenTime.add(i, "CLOSED");
+                    lunchCloseTime.add(i, "CLOSED");
+                    dinnerOpenTime.add(i, "CLOSED");
+                    dinnerCloseTime.add(i, "CLOSED");
                 }
             }
         } else{
@@ -210,7 +210,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                             lunchOpenTime.set(selectedDay,time);
                         buttonLunchOpen.setText(time);
 
-                        times_changed = true;
+                        //times_changed = true;
                     }
                 };
                 newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
@@ -246,7 +246,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                             lunchCloseTime.set(selectedDay,time);
                         buttonLunchClose.setText(time);
 
-                        times_changed = true;
+                        //times_changed = true;
                     }
                 };
                 newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
@@ -283,7 +283,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                             dinnerOpenTime.set(selectedDay,time);
                         buttonDinnerOpen.setText(time);
 
-                        times_changed = true;
+                        //times_changed = true;
                     }
                 };
                 newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
@@ -319,7 +319,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                             dinnerCloseTime.set(selectedDay,time);
                         buttonDinnerClose.setText(time);
 
-                        times_changed = true;
+                        //times_changed = true;
                     }
                 };
                 newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");

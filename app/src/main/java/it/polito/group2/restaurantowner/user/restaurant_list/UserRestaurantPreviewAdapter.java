@@ -66,6 +66,11 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
         today_year = today.get(Calendar.YEAR);
     }
 
+    public void setLastUserMarker(Marker mLastUserMarker){
+        this.mLastUserMarker = mLastUserMarker;
+        return;
+    }
+
     public ArrayList<RestaurantPreview> getPreviews(){
         return this.mDataset;
     }
@@ -203,19 +208,18 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
 
             switch (restaurant.getRestaurant_price_range()) {
                 case 1:
-                    this.price_range.setText("Average price: 5 euro");
+                    this.price_range.setText("€");
                     break;
                 case 2:
-                    this.price_range.setText("Average price: 10 euro");
+                    this.price_range.setText("€€");
                     break;
                 case 3:
-                    this.price_range.setText("Average price: 15 euro");
+                    this.price_range.setText("€€€");
                     break;
                 case 4:
-                    this.price_range.setText("Average price: 20 euro");
+                    this.price_range.setText("€€€€");
                     break;
             }
-            this.price_range.setText("Average price: " + restaurant.getRestaurant_price_range());
             this.resName.setText(restaurant.getRestaurant_name());
             this.rating.setText(String.valueOf(restaurant.getRestaurant_rating()));
 
@@ -233,7 +237,8 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
             final TextView res_num_text_view = reservationNumber;
             firebase = FirebaseDatabase.getInstance();
             total_tables_number = r.getTables_number();
-            DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
+            res_num_text_view.setText(String.valueOf(total_tables_number));
+    /*        DatabaseReference ref2 = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
             ref2.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
@@ -256,6 +261,7 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
                     System.out.println("The read failed: " + firebaseError.getMessage());
                 }
             });
+            */
         }
 
 
@@ -266,16 +272,17 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
 
         private String formatNumber(double distance) {
             String unit = "m";
-            if (distance < 1) {
-                distance *= 1000;
-                unit = "mm";
-            } else if (distance > 1000) {
-                distance /= 1000;
-                unit = "km";
-            }
+    /*    if (distance < 1) {
+            distance *= 1000;
+            unit = "mm";
+        } else if (distance > 1000) {
+            distance /= 1000;
+            unit = "km";
+        }
+*/
             //return String.format("%4.3f%s", distance, unit);
             //trying to add space to split later
-            return String.format("%4.3f %s", distance, unit);
+            return String.format("%4.0f %s", distance, unit);
         }
     }
 }

@@ -39,7 +39,7 @@ public class Filter extends AppCompatActivity {
     private SeekBar seekBar;
     private TextView textView;
     private int DEFAULT_RANGE = 5000;
-    private double range = DEFAULT_RANGE;
+    private int range = DEFAULT_RANGE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,17 +95,17 @@ public class Filter extends AppCompatActivity {
 
     private String formatNumber(double distance) {
         String unit = "m";
-        if (distance < 1) {
+    /*    if (distance < 1) {
             distance *= 1000;
             unit = "mm";
         } else if (distance > 1000) {
             distance /= 1000;
             unit = "km";
         }
-
+*/
         //return String.format("%4.3f%s", distance, unit);
         //trying to add space to split later
-        return String.format("%4.3f %s", distance, unit);
+        return String.format("%4.0f %s", distance, unit);
     }
 
     @Override

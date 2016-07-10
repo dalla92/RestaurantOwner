@@ -102,13 +102,15 @@ public class MyOrdersActivity extends AppCompatActivity
         super.onStart();
         FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
-        q.addValueEventListener(l);
+        if(q!=null)
+            q.addValueEventListener(l);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        RemoveListenerUtil.remove_value_event_listener(q, l);
+        if(q!=null)
+            RemoveListenerUtil.remove_value_event_listener(q, l);
     }
 
     @Override

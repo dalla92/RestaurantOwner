@@ -508,6 +508,7 @@ public class UserRestaurantList extends AppCompatActivity
                         //if i have the position of the user
                         if (lat != null && lon != null) {
                             if (is_restaurant_near_with_position(new LatLng(lat, lon), range)) {
+                                restaurants_previews_list.add(resPreview);
                                 mAdapter.addItem(resPreview);
                                 mClusterManager.addItem(new MyItem(lat, lon));
                                 mClusterManager.cluster();
@@ -517,6 +518,7 @@ public class UserRestaurantList extends AppCompatActivity
                         //if I have the location searched by the user
                         if (lat != null && lon != null) {
                             if (is_restaurant_near_without_position(new LatLng(lat, lon), range)) {
+                                restaurants_previews_list.add(resPreview);
                                 mAdapter.addItem(resPreview);
                                 mClusterManager.addItem(new MyItem(lat, lon));
                                 mClusterManager.cluster();
@@ -896,7 +898,7 @@ public class UserRestaurantList extends AppCompatActivity
                                 RestaurantPreview restaurantPreview = dataSnapshot.getValue(RestaurantPreview.class);
                                 if(restaurantPreview != null) {
                                     mAdapter.addItem(restaurantPreview);
-                                    //restaurants_previews_list.add(restaurantPreview);
+                                    restaurants_previews_list.add(restaurantPreview);
                                 }
 
                                 if(index == restaurantIDs.size() - 1)
@@ -940,48 +942,37 @@ public class UserRestaurantList extends AppCompatActivity
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         //filter by time
         final Calendar today = Calendar.getInstance();
-        restaurants_previews_list = mAdapter.getPreviews();
-        for (index = 0; index < restaurants_previews_list.size()-1; index++) {
+        //restaurants_previews_list = mAdapter.getPreviews();
+        mAdapter.clear();
+        mClusterManager.clearItems();
+        for (index = 0; index < restaurants_previews_list.size(); index++) {
             DatabaseReference resPreviewRef = firebase.getReference("restaurants/" + restaurants_previews_list.get(index).getRestaurant_id() + "/restaurant_time_slot");
             resPreviewRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
-                    ArrayList<RestaurantPreview> filtered_restaurants_previews_list = new ArrayList<RestaurantPreview>();
+                    String resId = snapshot.getRef().getParent().getKey();
+                    RestaurantPreview rp = getRestaurantPreviewFromId(resId);
                     for (DataSnapshot snap_slot : snapshot.getChildren()) {
                         RestaurantTimeSlot timeSlot = snap_slot.getValue(RestaurantTimeSlot.class);
                         if (timeSlot.getDay_of_week() == today.get(Calendar.DAY_OF_WEEK) - 2) {
-                            boolean addRes = true;
-                            if (lunch && !timeSlot.getLunch())
-                                addRes = false;
-                            if (dinner && !timeSlot.getDinner())
-                                addRes = false;
+                            boolean addRes = false;
+                            if (lunch && timeSlot.getLunch())
+                                addRes = true;
+                            if (dinner && timeSlot.getDinner())
+                                addRes = true;
                             if (addRes) {
-                                if (category.equals("0")){
-                                    if (price1 && restaurants_previews_list.get(index).getRestaurant_price_range() == 1 ||
-                                            price2 && restaurants_previews_list.get(index).getRestaurant_price_range() == 2 ||
-                                            price3 && restaurants_previews_list.get(index).getRestaurant_price_range() == 3 ||
-                                            price4 && restaurants_previews_list.get(index).getRestaurant_price_range() == 4 )
-                                        if (is_restaurant_near(new LatLng(restaurants_previews_list.get(index).getPosition().latitude, restaurants_previews_list.get(index).getPosition().longitude), mLastUserMarker, range)) {
-                                            filtered_restaurants_previews_list.add(restaurants_previews_list.get(index));
-                                            mClusterManager.addItem(new MyItem(restaurants_previews_list.get(index).getLat(), restaurants_previews_list.get(index).getLon()));
+                                if (category.equals("0") || rp.getRestaurant_category().equals(category)){
+                                    if (price1 && rp.getRestaurant_price_range() == 1 ||
+                                            price2 && rp.getRestaurant_price_range() == 2 ||
+                                            price3 && rp.getRestaurant_price_range() == 3 ||
+                                            price4 && rp.getRestaurant_price_range() == 4 )
+                                        if (is_restaurant_near(new LatLng(rp.getPosition().latitude, rp.getPosition().longitude), mLastUserMarker, range)) {
+                                            mClusterManager.addItem(new MyItem(rp.getLat(), rp.getLon()));
                                             mClusterManager.cluster();
+                                            mAdapter.addItem(rp);
                                             mAdapter.notifyDataSetChanged();
                                         }
-                                }
-                                else{
-                                    if (restaurants_previews_list.get(index).getRestaurant_category().equals(category))
-                                        if (price1 && restaurants_previews_list.get(index).getRestaurant_price_range() == 1 ||
-                                                price2 && restaurants_previews_list.get(index).getRestaurant_price_range() == 2 ||
-                                                price3 && restaurants_previews_list.get(index).getRestaurant_price_range() == 3 ||
-                                                price4 && restaurants_previews_list.get(index).getRestaurant_price_range() == 4 )
-                                            if (is_restaurant_near(new LatLng(restaurants_previews_list.get(index).getPosition().latitude, restaurants_previews_list.get(index).getPosition().longitude), mLastUserMarker, range)) {
-                                                filtered_restaurants_previews_list.add(restaurants_previews_list.get(index));
-                                                mClusterManager.addItem(new MyItem(restaurants_previews_list.get(index).getLat(), restaurants_previews_list.get(index).getLon()));
-                                                mClusterManager.cluster();
-                                                mAdapter.notifyDataSetChanged();
-                                            }
-
-                                }
+                                    }
                                 }
 
                             }
@@ -1001,6 +992,14 @@ public class UserRestaurantList extends AppCompatActivity
             return true;
         } else
             return false;
+    }
+
+    public RestaurantPreview getRestaurantPreviewFromId(String resId) {
+        for(RestaurantPreview rp : restaurants_previews_list){
+            if(rp.getRestaurant_id().equals(resId))
+                return rp;
+        }
+        return null;
     }
 
     public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
@@ -1071,9 +1070,11 @@ public class UserRestaurantList extends AppCompatActivity
                                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
                                     .visible(false)
                     );
+                    mAdapter.setLastUserMarker(mLastUserMarker);
                 }
                 else {
                     mLastUserMarker.setPosition(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+                    mAdapter.setLastUserMarker(mLastUserMarker);
                 }
             }
             if(range!=0 && mLastUserMarker!=null){
