@@ -73,6 +73,7 @@ public class GalleryViewActivity extends AppCompatActivity {
     private Boolean isOwner = false;
     private String userID;
     private DatabaseReference userRef;
+    private boolean coming_from_user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,9 @@ public class GalleryViewActivity extends AppCompatActivity {
 
         if(getIntent().getExtras()!=null && getIntent().getExtras().getString("restaurant_id") != null)
             restaurantID = getIntent().getExtras().getString("restaurant_id");
+
+        if(getIntent().getExtras()!=null)
+            coming_from_user = getIntent().getExtras().getBoolean("coming_from_user");
 
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
@@ -340,8 +344,14 @@ public class GalleryViewActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        if(isOwner)
-            OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurantID);
+        if(isOwner) {
+            if (coming_from_user) {
+                OnBackUtil.clean_stack_and_go_to_user_restaurant_page(this, restaurantID);
+            }
+            else{
+                OnBackUtil.clean_stack_and_go_to_restaurant_page(this, restaurantID);
+            }
+        }
         else
             OnBackUtil.clean_stack_and_go_to_user_restaurant_page(this, restaurantID);
     }

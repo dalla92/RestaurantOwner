@@ -774,6 +774,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
     public void openGallery(View v){
         Intent intent = new Intent(this, GalleryViewActivity.class);
         intent.putExtra("restaurant_id", restaurantID);
+        intent.putExtra("coming_from_user", new Boolean(true));
         startActivity(intent);
     }
 

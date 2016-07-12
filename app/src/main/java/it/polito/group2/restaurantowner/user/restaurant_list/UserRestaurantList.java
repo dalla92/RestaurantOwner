@@ -134,7 +134,7 @@ public class UserRestaurantList extends AppCompatActivity
     private FloatingActionButton fab;
     public static int index;
     private boolean isRequestedPermission = false;
-    private boolean position_already_active = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,7 +148,7 @@ public class UserRestaurantList extends AppCompatActivity
         fab.setLayoutParams(p);
         fab.setVisibility(View.GONE);
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        position_already_active = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER); // Return a boolean
+        boolean position_already_active = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER); // Return a boolean
         Log.d("prova", "" + position_already_active);
         fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
         if(!position_already_active) {
@@ -367,14 +367,6 @@ public class UserRestaurantList extends AppCompatActivity
     }
 
     public void grantPermissions() {
-        if(!position_already_active) {
-            fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_24dp));
-            position_already_active = true;
-        }
-        else {
-            fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantList.this, R.drawable.ic_my_location_on));
-            position_already_active = false;
-        }
         if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
             // only for Marshmallow and newer versions
             //I want that first I request GPS, but if rejected, request WIFI
@@ -832,7 +824,6 @@ public class UserRestaurantList extends AppCompatActivity
                         // All location settings are satisfied. The client can initialize location
                         // requests here.
                         Intent intent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(intent);
                         break;
                     case LocationSettingsStatusCodes.RESOLUTION_REQUIRED:
                         //GPS permission is requested
