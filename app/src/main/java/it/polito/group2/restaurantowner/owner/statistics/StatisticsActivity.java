@@ -10,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -80,7 +81,7 @@ public class StatisticsActivity extends AppCompatActivity
         q_orders = FirebaseUtil.getOrdersByRestaurantRef(restaurantID);
         if (q_orders == null)
             abortActivity();
-        q_reservations = FirebaseUtil.getOrdersByRestaurantRef(restaurantID);
+        q_reservations = FirebaseUtil.getReservationsByRestaurantRef(restaurantID);
         if (q_reservations == null)
             abortActivity();
 
@@ -203,15 +204,19 @@ public class StatisticsActivity extends AppCompatActivity
                 for(int i=0; i<7; i++) {
                     orderCounter[i] = 0;
                     bookingCounter[i] = 0;
-                    for(Order o : orderList) {
-                        if(o.orderDateToCalendar().after(start) && o.orderDateToCalendar().after(stop))
-                            orderCounter[i]++;
+                    if(orderList.size() > 0) {
+                        for (Order o : orderList) {
+                            if (o.orderDateToCalendar().after(start) && o.orderDateToCalendar().after(stop))
+                                orderCounter[i]++;
+                        }
                     }
-                    for(TableReservation r : reservationList) {
-                        Calendar c = Calendar.getInstance();
-                        c.setTimeInMillis(r.getTable_reservation_date());
-                        if(c.after(start) && c.after(stop))
-                            bookingCounter[i]++;
+                    if(reservationList.size() > 0) {
+                        for (TableReservation r : reservationList) {
+                            Calendar c = Calendar.getInstance();
+                            c.setTimeInMillis(r.getTable_reservation_date());
+                            if (c.after(start) && c.after(stop))
+                                bookingCounter[i]++;
+                        }
                     }
                     start.setTimeInMillis(start.getTimeInMillis()+(24*60*60*1000));
                     stop.setTimeInMillis(start.getTimeInMillis()+(24*60*60*1000));

@@ -49,18 +49,17 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
     }
 
     @Override
-    public void onBindViewHolder(final MealAdapter.MealViewHolder holder, int position) {
+    public void onBindViewHolder(final MealAdapter.MealViewHolder holder, final int position) {
         holder.name.setText(mealList.get(position).getMeal_name());
         holder.checkbox.setChecked(offer.isInMealList(mealList.get(position)));
         holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
-                Meal element = (Meal) holder.checkbox.getTag();
                 if(buttonView.isChecked()) {
-                    offer.addMealInOffer(element);
+                    offer.addMealInOffer(mealList.get(position));
                 } else {
-                    offer.delMealInOffer(element);
+                    offer.delMealInOffer(mealList.get(position));
                 }
             }
         });

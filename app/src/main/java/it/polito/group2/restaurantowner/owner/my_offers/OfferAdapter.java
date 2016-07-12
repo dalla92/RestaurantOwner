@@ -45,7 +45,7 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
         this.mealRestaurantList = meals;
         mProgressDialog = FirebaseUtil.initProgressDialog(context);
     }
-//TODO rivedere tutta la presentazione della lista degli ordini
+
     public class OfferViewHolder extends RecyclerView.ViewHolder {
         public TextView name;
         public TextView enabled;
@@ -207,7 +207,7 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
     private ArrayList<String> getMealNameList(int position) {
         ArrayList<String> list = new ArrayList<>();
         for(Meal m : mealRestaurantList) {
-            if(offerList.get(position).getOfferOnMeals().get(m.getMeal_id()))
+            if(offerList.get(position).isMealInOffer(m))
                 list.add(m.getMeal_name());
         }
         return list;

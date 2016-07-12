@@ -47,18 +47,16 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     }
 
     @Override
-    public void onBindViewHolder(final CategoryAdapter.CategoryViewHolder holder, int position) {
+    public void onBindViewHolder(final CategoryAdapter.CategoryViewHolder holder, final int position) {
         holder.name.setText(categoryList.get(position));
         holder.checkbox.setChecked(offer.isInCategoryList(categoryList.get(position)));
         holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                String element = (String) holder.checkbox.getTag();
-                if(buttonView.isChecked()) {
-                    offer.addCategoryInOffer(element);
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (buttonView.isChecked()) {
+                    offer.addCategoryInOffer(categoryList.get(position));
                 } else {
-                    offer.delCategoryInOffer(element);
+                    offer.delCategoryInOffer(categoryList.get(position));
                 }
             }
         });

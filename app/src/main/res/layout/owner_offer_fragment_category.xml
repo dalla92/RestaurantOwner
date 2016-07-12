@@ -4,6 +4,17 @@
     android:layout_height="match_parent"
     tools:context=".owner.offer.CategoryFragment">
 
+    <TextView
+        android:id="@+id/empty_lable"
+        android:layout_marginTop="15dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/owner_offer_fragment_offer_lable_listempty"
+        android:textSize="15sp"
+        android:visibility="gone"
+        android:layout_marginBottom="5dp"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/category_list"
         android:layout_width="match_parent"

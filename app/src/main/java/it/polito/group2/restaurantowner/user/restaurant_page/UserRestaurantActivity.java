@@ -788,7 +788,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             assert offerList != null;
             offerList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
             offerList.setNestedScrollingEnabled(false);
-            OfferAdapter adapter = new OfferAdapter(offers, this);
+            OfferAdapter adapter = new OfferAdapter(offers, this, meals);
             offerList.setAdapter(adapter);
         }
     }

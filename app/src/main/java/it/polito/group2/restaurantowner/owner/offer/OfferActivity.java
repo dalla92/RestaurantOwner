@@ -2,6 +2,7 @@ package it.polito.group2.restaurantowner.owner.offer;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -34,6 +35,7 @@ import java.util.Locale;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.OnBackUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
@@ -167,21 +169,22 @@ public class OfferActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            new AlertDialog.Builder(this)
-                    .setTitle(getResources().getString(R.string.owner_offer_activity_onbackalert_title))
-                    .setMessage(getResources().getString(R.string.owner_offer_activity_onbackalert_message))
-                    .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            offer = null;
-                            //Intent intent = new Intent(getBaseContext(), Restaurant_page.class);
-                            //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            //intent.putExtra("restaurant_id", restaurantID);
-                            //startActivity(intent);
-                            OfferActivity.super.onBackPressed();
-                        }
-                    })
-                    .setNegativeButton(android.R.string.no, null).show();
+            if(getSupportFragmentManager().getBackStackEntryCount() < 1) {
+                new AlertDialog.Builder(this)
+                        .setTitle(getResources().getString(R.string.owner_offer_activity_onbackalert_title))
+                        .setMessage(getResources().getString(R.string.owner_offer_activity_onbackalert_message))
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int whichButton) {
+                                offer = null;
+                                OfferActivity.super.onBackPressed();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null).show();
+            } else {
+                OfferActivity.super.onBackPressed();
+                getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            }
         }
     }
 

@@ -91,13 +91,15 @@
             android:name=".owner.my_offers.MyOffersActivity"
             android:label="@string/title_activity_offer_list"
             android:parentActivityName=".owner.Restaurant_page"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".owner.offer.OfferActivity"
             android:label="@string/title_activity_add_offer"
             android:parentActivityName=".owner.my_offers.MyOffersActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden" />
+            android:windowSoftInputMode="stateHidden"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".owner.reservations.ReservationActivity"
             android:label="@string/title_activity_reservation"
@@ -173,7 +175,8 @@
         <activity
             android:name=".user.my_orders.MyOrdersActivity"
             android:label="@string/title_activity_my_orders"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".login.LoginManagerActivity"
             android:label="@string/title_activity_login"

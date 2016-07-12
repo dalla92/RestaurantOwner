@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -109,11 +110,17 @@ public class CategoryFragment extends Fragment {
     }
 
     private void setCategoryList(View view) {
-        final RecyclerView list = (RecyclerView) view.findViewById(R.id.category_list);
-        assert list != null;
-        list.setLayoutManager(new LinearLayoutManager(getContext()));
-        list.setNestedScrollingEnabled(false);
-        CategoryAdapter adapter = new CategoryAdapter(getContext(), categoryList, offer);
-        list.setAdapter(adapter);
+        TextView empty = (TextView) view.findViewById(R.id.empty_lable);
+        if(categoryList.size() > 0) {
+            empty.setVisibility(View.GONE);
+            final RecyclerView list = (RecyclerView) view.findViewById(R.id.category_list);
+            assert list != null;
+            list.setLayoutManager(new LinearLayoutManager(getContext()));
+            list.setNestedScrollingEnabled(false);
+            CategoryAdapter adapter = new CategoryAdapter(getContext(), categoryList, offer);
+            list.setAdapter(adapter);
+        } else {
+            empty.setVisibility(View.VISIBLE);
+        }
     }
 }
