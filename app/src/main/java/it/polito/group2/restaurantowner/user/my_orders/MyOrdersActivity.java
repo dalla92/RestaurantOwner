@@ -56,6 +56,9 @@ public class MyOrdersActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        FirebaseUtil.initProgressDialog(this);
+        FirebaseUtil.showProgressDialog(mProgressDialog);
+
         //User object
         DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
         if (userRef != null) {
@@ -95,22 +98,6 @@ public class MyOrdersActivity extends AppCompatActivity
             OnBackUtil.clean_stack_and_go_to_main_activity(this);
         }
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        FirebaseUtil.initProgressDialog(this);
-        FirebaseUtil.showProgressDialog(mProgressDialog);
-        if(q!=null)
-            q.addValueEventListener(l);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if(q!=null)
-            RemoveListenerUtil.remove_value_event_listener(q, l);
     }
 
     @Override

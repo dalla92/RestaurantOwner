@@ -70,6 +70,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         Date date = orderList.get(position).orderDateToCalendar().getTime();
         SimpleDateFormat formatDate = new SimpleDateFormat("dd/MM/yyyy");
         holder.date.setText(formatDate.format(date));
+
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
         DatabaseReference resReference = firebase.getReference("restaurants/" + orderList.get(position).getRestaurant_id() + "/restaurant_name");
         resReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -84,78 +85,23 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
             }
         });
+
         holder.price.setText(formatEuro(orderList.get(position).getOrder_price()));
+
         holder.mealList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
         holder.mealList.setNestedScrollingEnabled(false);
         MealAdapter adapter = new MealAdapter(context, orderList.get(position).allMeals());
         holder.mealList.setAdapter(adapter);
-
-
-        holder.mealList.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        final int targetHeight = holder.mealList.getMeasuredHeight();
-        holder.mealList.setVisibility(View.INVISIBLE);
-        holder.mealList.measure(ViewGroup.LayoutParams.MATCH_PARENT, 0);
+        holder.mealList.setVisibility(View.GONE);
 
         holder.orderItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int currentHeight, newHeight;
-
                 if (holder.mealList.getVisibility() == View.VISIBLE) {
-                    currentHeight = targetHeight;
-                    newHeight = 0;
+                    holder.mealList.setVisibility(View.GONE);
                 } else {
-                    currentHeight = 0;
-                    newHeight = targetHeight;
+                    holder.mealList.setVisibility(View.VISIBLE);
                 }
-
-                ValueAnimator slideAnimator = ValueAnimator.ofInt(currentHeight, newHeight).setDuration(300);
-                slideAnimator.addListener(new Animator.AnimatorListener() {
-                    boolean modified = false;
-
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                        if (holder.mealList.getVisibility() == View.VISIBLE) {
-                            holder.mealList.setVisibility(View.INVISIBLE);
-                            modified = true;
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        if (holder.mealList.getVisibility() == View.INVISIBLE && !modified) {
-                            holder.mealList.setVisibility(View.VISIBLE);
-                            modified = false;
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                });
-
-                slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        // get the value the interpolator is at
-                        Integer value = (Integer) animation.getAnimatedValue();
-                        // I'm going to set the layout's height 1:1 to the tick
-                        holder.mealList.getLayoutParams().height = value.intValue();
-                        // force all layouts to see which ones are affected by
-                        // this layouts height change
-                        holder.mealList.requestLayout();
-                    }
-                });
-                AnimatorSet set = new AnimatorSet();
-                set.play(slideAnimator);
-                set.setInterpolator(new AccelerateDecelerateInterpolator());
-                set.start();
             }
         });
 
@@ -169,6 +115,6 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
     private String formatEuro(Double number) {
         if(number == null)
             return "€ 0.00";
-        return "€ "+String.format("%10.2f", number);
+        return "€ "+String.format("%4.2f", number);
     }
 }
