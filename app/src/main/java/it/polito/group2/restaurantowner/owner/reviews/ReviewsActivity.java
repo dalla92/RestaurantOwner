@@ -90,7 +90,7 @@ public class ReviewsActivity extends AppCompatActivity implements NavigationView
 
         firebase = FirebaseDatabase.getInstance();
 
-        FirebaseUtil.initProgressDialog(this);
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
         Query reviewsQuery = firebase.getReference("reviews/" + restaurantID).orderByPriority().limitToFirst(10);

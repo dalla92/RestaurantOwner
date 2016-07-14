@@ -783,12 +783,52 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             cardOffers.setVisibility(View.GONE);
         }
         else {
-            RecyclerView offerList = (RecyclerView) findViewById(R.id.user_offer_list);
+            final RecyclerView offerList = (RecyclerView) findViewById(R.id.user_offer_list);
             assert offerList != null;
             offerList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
             offerList.setNestedScrollingEnabled(false);
             OfferAdapter adapter = new OfferAdapter(offers, this, meals);
             offerList.setAdapter(adapter);
+
+            final TextView offerText = (TextView) findViewById(R.id.offer_text);
+            assert offerText != null;
+            offerText.setOnClickListener(new View.OnClickListener() {
+                boolean clicked = false;
+
+                @Override
+                public void onClick(View v) {
+                    offerList.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    int targetHeight = offerList.getMeasuredHeight();
+                    ValueAnimator slideAnimator;
+                    if (!clicked) {
+                        offerText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_up_24dp, 0);
+                        slideAnimator = ValueAnimator.ofInt(0, targetHeight).setDuration(300);
+                        clicked = true;
+                    } else {
+                        offerText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_arrow_down_24dp, 0);
+                        slideAnimator = ValueAnimator.ofInt(targetHeight, 0).setDuration(300);
+                        clicked = false;
+                    }
+
+                    slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            // get the value the interpolator is at
+                            Integer value = (Integer) animation.getAnimatedValue();
+                            // I'm going to set the layout's height 1:1 to the tick
+                            offerList.getLayoutParams().height = value.intValue();
+                            // force all layouts to see which ones are affected by
+                            // this layouts height change
+                            offerList.requestLayout();
+                        }
+                    });
+                    AnimatorSet set = new AnimatorSet();
+                    set.play(slideAnimator);
+                    set.setInterpolator(new AccelerateDecelerateInterpolator());
+                    set.start();
+                }
+
+            });
         }
     }
 

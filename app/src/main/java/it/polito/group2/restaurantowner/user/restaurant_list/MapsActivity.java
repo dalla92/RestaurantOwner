@@ -39,13 +39,18 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -402,18 +407,7 @@ public class MapsActivity extends AppCompatActivity implements
         if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
             // only for Marshmallow and newer versions
             //I want that first I request GPS, but if rejected, request WIFI
-            /*
-            dialogPermissionListener_gps =
-    /*        dialogPermissionListener_gps =
-                    DialogOnDeniedPermissionListener.Builder
-                            .withContext(this)
-                            .withTitle("GPS permission")
-                            .withMessage("GPS permission is needed to take your accurate position")
-                            .withButtonText(android.R.string.ok)
-                            .withIcon(R.mipmap.ic_launcher)
-                            .build();
-            Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
-            */
+
             if(!Dexter.isRequestOngoing()) {
                 Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
 
@@ -659,6 +653,8 @@ public class MapsActivity extends AppCompatActivity implements
             ImageButton button_get_info;
             ImageButton button_get_street_view;
             TextView open_now;
+            ImageView image;
+            final ProgressBar progressBar;
 
             resName = (TextView) d.findViewById(R.id.textViewName);
             rating = (RatingBar) d.findViewById(R.id.ratingBar);
@@ -669,20 +665,27 @@ public class MapsActivity extends AppCompatActivity implements
             button_get_info = (ImageButton) d.findViewById(R.id.button_get_info);
             button_get_street_view = (ImageButton) d.findViewById(R.id.button_get_street_view);
             open_now = (TextView) d.findViewById(R.id.restaurant_today_time);
+            image = (ImageView) d.findViewById(R.id.restaurant_image);
+            progressBar = (ProgressBar) d.findViewById(R.id.progress_bar);
 
-            d_height = getWindow().getDecorView().getHeight();
-            d_width = getWindow().getDecorView().getWidth();
-            Glide.with(getApplicationContext()).load(restaurant_preview.getRestaurant_cover_firebase_URL()).asBitmap().into(new SimpleTarget<Bitmap>(
-                    d_width, d_height) {
-                @Override
-                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                    Drawable drawable = new BitmapDrawable(resource);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        d.findViewById(R.id.restaurant_image).setBackground(drawable);
-                        d.findViewById(R.id.father_linear_layout).setAlpha(0.88f);
-                    }
-                }
-            });
+            progressBar.setVisibility(View.VISIBLE);
+            Glide
+                    .with(getApplicationContext())
+                    .load(restaurant_preview.getRestaurant_cover_firebase_URL())
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .into(image);
 
             //fill_restaurant_preview
             resName.setText(restaurant_preview.getRestaurant_name());

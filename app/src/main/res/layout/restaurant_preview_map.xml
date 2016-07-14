@@ -150,11 +150,22 @@
         </LinearLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_below="@+id/ll0"
-        android:id="@+id/restaurant_image"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </LinearLayout>
+        android:layout_height="match_parent"
+        android:layout_below="@+id/ll0">
+
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+        <ImageView
+            android:id="@+id/restaurant_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </ImageView>
+
+    </FrameLayout>
 </RelativeLayout>
