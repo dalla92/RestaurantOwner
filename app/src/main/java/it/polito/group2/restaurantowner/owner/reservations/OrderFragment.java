@@ -1,221 +1,130 @@
 package it.polito.group2.restaurantowner.owner.reservations;
 
-import android.content.DialogInterface;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
-import org.json.JSONException;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import it.polito.group2.restaurantowner.R;
-import it.polito.group2.restaurantowner.data.JSONUtil;
-import it.polito.group2.restaurantowner.data.OrderMeal;
-import it.polito.group2.restaurantowner.data.Order;
-import it.polito.group2.restaurantowner.owner.MealListDialog;
+import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
+import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
+import it.polito.group2.restaurantowner.firebasedata.Order;
 
 public class OrderFragment extends Fragment {
 
-    private ArrayList<Order> reservation_list;
-    private BaseAdapter adapter;
+    private ArrayList<Order> orderList = null;
+    private ArrayList<Order> orderListDate = null;
+    String restaurantID;
+
+    private Query q;
+    private ValueEventListener l;
+    private ProgressDialog mProgressDialog = null;
+
+    private View rootView;
+    private Calendar targetDate;
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_table_reservation, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.owner_reservations_fragment_order, container, false);
 
         Bundle bundle = getArguments();
-        long date_millis = bundle.getLong("date");
-        String restaurantId = bundle.getString("id");
-        Calendar date = Calendar.getInstance();
-        date.setTimeInMillis(date_millis);
-        createFakeData(date, restaurantId);
-        reservation_list = getDataJson(date, restaurantId);
+        restaurantID = bundle.getString("restaurant_id");
 
-        TextView reservation_title = (TextView) rootView.findViewById(R.id.reservation_list_title);
-        if(reservation_list.isEmpty()) {
-            reservation_title.setVisibility(View.VISIBLE);
-            reservation_title.setText(getString(R.string.no_reservation));
-        }
-        else
-            reservation_title.setVisibility(View.GONE);
+        mProgressDialog = FirebaseUtil.initProgressDialog(getActivity());
+        FirebaseUtil.showProgressDialog(mProgressDialog);
 
-        ListView lv = (ListView) rootView.findViewById(R.id.table_list_view);
-        adapter = new BaseAdapter() {
+        targetDate = Calendar.getInstance();
 
+        if(orderList==null)
+            orderList = new ArrayList<>();
+
+        q = FirebaseUtil.getOrdersByRestaurantRef(restaurantID);
+        l = new ValueEventListener() {
             @Override
-            public int getCount() {
-                return reservation_list.size();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                orderList = new ArrayList<>();
+                orderListDate = new ArrayList<>();
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
+                    Order res = data.getValue(Order.class);
+                    orderList.add(res);
+                    Calendar c = Calendar.getInstance();
+                    c.setTimeInMillis(res.getOrder_date());
+                    if (isEqualTo(c, targetDate))
+                        orderListDate.add(res);
+                }
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
+                setOrderList(getView());
             }
 
             @Override
-            public Object getItem(int position) {
-                return reservation_list.get(position);
-            }
+            public void onCancelled(DatabaseError databaseError) {
 
-            @Override
-            public long getItemId(int position) {
-                return 0;
-            }
-
-            @Override
-            public View getView(final int position, View convertView, ViewGroup parent) {
-                if(convertView == null){
-                    convertView = inflater.inflate(R.layout.takeaway_reservation_item, parent, false);
-                }
-
-
-                SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
-                TextView text_client_name = (TextView) convertView.findViewById(R.id.reservation_client);
-                TextView text_time = (TextView) convertView.findViewById(R.id.reservation_time);
-                TextView text_notes = (TextView) convertView.findViewById(R.id.reservation_notes);
-
-                Order reservation = reservation_list.get(position);
-                text_client_name.setText(reservation.getUserID());
-                text_time.setText(timeFormat.format(reservation.getTimestamp().getTime()));
-                text_notes.setText(reservation.getNote());
-
-                LinearLayout list = (LinearLayout) convertView.findViewById(R.id.takeaway_reservation_list);
-                list.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ArrayList<OrderMeal> ordered_meals = reservation_list.get(position).getMealList();
-                        MealListDialog dialog = MealListDialog.newInstance(ordered_meals);
-                        dialog.show(getActivity().getFragmentManager(), null);
-                    }
-                });
-
-                ImageView delete = (ImageView) convertView.findViewById(R.id.reservation_delete);
-                Calendar today = Calendar.getInstance();
-                Calendar target = reservation.getTimestamp();
-                if(target.after(today.getTime()) ||
-                        (target.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
-                                target.get(Calendar.MONTH) == today.get(Calendar.MONTH) &&
-                                target.get(Calendar.DAY_OF_MONTH) == today.get(Calendar.DAY_OF_MONTH))) {
-                    delete.setOnClickListener(new View.OnClickListener() {
-
-                        @Override
-                        public void onClick(View v) {
-
-                            AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-                            alert.setTitle("Confirmation!");
-                            alert.setMessage("Are you sure you want to delete this reservation?\nThe operation cannot be undone!");
-                            alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    reservation_list.remove(position);
-                                    notifyDataSetChanged();
-                                    dialog.dismiss();
-
-                                }
-                            });
-                            alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
-
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-
-                                    dialog.dismiss();
-                                }
-                            });
-
-                            alert.show();
-                        }
-                    });
-                }
-                else{
-                    delete.setClickable(false);
-                    delete.setVisibility(View.GONE);
-                }
-                return convertView;
             }
         };
-
-        lv.setAdapter(adapter);
 
         return rootView;
     }
 
-    private void createFakeData(Calendar date, String restaurantId) {
-        ArrayList<Order> reservations = new ArrayList<>();
-        /*Calendar today = Calendar.getInstance();
-        Calendar tomorrow = Calendar.getInstance();
-        tomorrow.set(Calendar.DAY_OF_MONTH, today.get(Calendar.DAY_OF_MONTH) + 1);
-        String id1 = UUID.randomUUID().toString();
-        String id2 = UUID.randomUUID().toString();
-        String id3 = UUID.randomUUID().toString();
-        ArrayList<OrderMeal> mealOrdered1 = new ArrayList<>();
-        mealOrdered1.add(new OrderMeal("Spaghetti alla carbonara", 2, id1));
-        mealOrdered1.add(new OrderMeal("Pizza Margerita", 3, id1));
-        mealOrdered1.add(new OrderMeal("Antipasto di mare", 2, id1));
-        mealOrdered1.add(new OrderMeal("Heineken", 5, id1));
-        Order res1 = new Order("Andrea Cuiuli", mealOrdered1, date, "Una persona allergica alle noci", restaurantId, id1);
-
-        ArrayList<OrderMeal> mealOrdered2 = new ArrayList<>();
-        mealOrdered2.add(new OrderMeal("Linguine allo scoglio", 2, id2));
-        mealOrdered2.add(new OrderMeal("Pizza Napoletana", 3, id2));
-        Order res2 = new Order("Andrea Cuiuli", mealOrdered2, date, "Una persona allergica alle noci", restaurantId, id2);
-
-        ArrayList<OrderMeal> mealOrdered3 = new ArrayList<>();
-        mealOrdered3.add(new OrderMeal("Antipasto Rustico", 1, id3));
-        mealOrdered3.add(new OrderMeal("Vino della casa", 1, id3));
-        mealOrdered3.add(new OrderMeal("Carpaccio di manzo", 1, id3));
-        Order res3 = new Order("Andrea Cuiuli", mealOrdered3 , date, "Una persona allergica alle noci", restaurantId, id3);
-
-        reservations.add(res1);
-        reservations.add(res2);
-        reservations.add(res3);
-
-        try {
-            JSONUtil.saveJSONTakeAwayResList(getActivity(), reservations);
-        } catch (JSONException e) {
-            Log.d("failed", "problema nel createFakeData delle takeAwayReservations");
-        }*/
+    @Override
+    public void onStart() {
+        super.onStart();
+        q.addValueEventListener(l);
     }
 
-    private void saveDataToJson(ArrayList<Order> reservations) {
-        try {
-            JSONUtil.saveJSONTakeAwayResList(getActivity(), reservations);
-        } catch (JSONException e) {
-            Log.d("failed", "problema nel saveDataJson delle takeAwayReservations");
+    @Override
+    public void onStop() {
+        super.onStop();
+        RemoveListenerUtil.remove_value_event_listener(q, l);
+    }
+
+    //TODO capire quando viene chiamato
+    public void changeData(Calendar date){
+        targetDate = date;
+        orderListDate = new ArrayList<>();
+        for(Order res: orderList){
+            Calendar c =  Calendar.getInstance();
+            c.setTimeInMillis(res.getOrder_date());
+            if(isEqualTo(c, date))
+                orderListDate.add(res);
         }
+
+        setOrderList(getView());
     }
 
-    private ArrayList<Order> getDataJson(Calendar date, String restaurantId) {
+    private boolean isEqualTo(Calendar target, Calendar date) {
+        return (target.get(Calendar.YEAR) == date.get(Calendar.YEAR) &&
+                target.get(Calendar.MONTH) == date.get(Calendar.MONTH) &&
+                target.get(Calendar.DAY_OF_MONTH) == date.get(Calendar.DAY_OF_MONTH));
+    }
 
-        try {
-            return JSONUtil.readJSONTakeAwayResList(getActivity(), date, restaurantId);
-        } catch (JSONException e) {
-            return new ArrayList<>();
+    private void setOrderList(View v) {
+        final RecyclerView list = (RecyclerView) v.findViewById(R.id.order_list);
+        TextView empty_lable = (TextView) v.findViewById((R.id.empty_list));
+        if(orderListDate.size() <= 0) {
+            empty_lable.setVisibility(View.VISIBLE);
+            list.setVisibility(View.GONE);
+        } else {
+            empty_lable.setVisibility(View.GONE);
+            list.setVisibility(View.VISIBLE);
+            list.setLayoutManager(new LinearLayoutManager(getContext()));
+            list.setNestedScrollingEnabled(false);
+            OrderAdapter adapter = new OrderAdapter(this.getContext(), orderListDate);
+            list.setAdapter(adapter);
         }
-    }
-
-    public void changeData(Calendar date, String restaurantId){
-        reservation_list = getDataJson(date, restaurantId);
-        TextView reservation_title = (TextView) getActivity().findViewById(R.id.reservation_list_title);
-        if(reservation_list.isEmpty()) {
-            reservation_title.setVisibility(View.VISIBLE);
-            reservation_title.setText(getString(R.string.no_reservation));
-        }
-        else
-            reservation_title.setVisibility(View.GONE);
-        adapter.notifyDataSetChanged();
-    }
-
-    private String getMonthName(int month){
-        return new DateFormatSymbols().getMonths()[month];
     }
 
 }
