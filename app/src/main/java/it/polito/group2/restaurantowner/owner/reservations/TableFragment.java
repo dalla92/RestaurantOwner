@@ -98,6 +98,8 @@ public class TableFragment extends Fragment {
 
             @Override
             public int getCount() {
+                if(reservationDate == null)
+                    return 0;
                 return reservationDate.size();
             }
 

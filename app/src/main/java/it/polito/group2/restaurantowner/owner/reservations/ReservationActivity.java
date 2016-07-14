@@ -198,7 +198,7 @@ public class ReservationActivity extends AppCompatActivity implements Navigation
                     c.set(Calendar.MONTH, monthOfYear);
                     c.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                    adapter.getTakeaway_fragment().changeData(c, restaurant_id);
+                    adapter.getTakeaway_fragment().changeData(c);
                     adapter.getTable_fragment().changeData(c);
 
                     c = Calendar.getInstance();

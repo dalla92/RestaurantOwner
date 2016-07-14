@@ -30,7 +30,7 @@
     <string name="closest_metro_stop">Closest metro stop</string>
     <string name="closest_bus_stop">Closest bus stop</string>
     <string name="credit_card">Credit Card</string>
-    <string name="tv" translatable="false">TV</string>
+    <string name="tv">TV</string>
     <string name="wifi">WI-FI</string>
     <string name="inside">Inside</string>
     <string name="outside">Outside</string>
@@ -526,5 +526,8 @@
     <string name="new_offer_notification">New offer from your favourite restaurant!</string>
     <string name="new_order_notification">An user has ordered!</string>
     <string name="new_table_reservation_notification">An user hhas booked a table!</string>
+
+    <string name="owner_reservations_fragment_order_title">Orders</string>
+    <string name="owner_reservations_fragment_order_empty_label">No order in this date</string>
 
 </resources>
