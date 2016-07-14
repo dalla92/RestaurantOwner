@@ -22,4 +22,15 @@ public class PermissionUtil {
                     REQUEST_WRITE_STORAGE);
         }
     }
+
+    public static void checkLocationPermission(Activity activity, final int REQUEST_LOCATION) {
+
+        boolean hasPermission = (ContextCompat.checkSelfPermission(activity,
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED);
+        if (!hasPermission) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_LOCATION);
+        }
+    }
 }

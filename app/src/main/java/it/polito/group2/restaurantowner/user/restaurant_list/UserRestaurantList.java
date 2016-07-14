@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -21,6 +22,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -87,6 +89,7 @@ import java.util.List;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.PermissionUtil;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantPreview;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 import it.polito.group2.restaurantowner.firebasedata.User;
@@ -123,6 +126,7 @@ public class UserRestaurantList extends AppCompatActivity
     protected boolean mRequestingLocationUpdates = false; //Tracks the status of the location updates request if started or not
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 10000; //The desired interval for location updates. Inexact. Updates may be more or less frequent.
     public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS = UPDATE_INTERVAL_IN_MILLISECONDS * 3; //The fastest rate for active location updates. Exact. Updates will never be more frequent than this value.
+    private static final int REQUEST_LOCATION = 111;
     protected Location mCurrentLocation;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
@@ -141,6 +145,8 @@ public class UserRestaurantList extends AppCompatActivity
         setContentView(R.layout.activity_user_restaurant_list);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        PermissionUtil.checkLocationPermission(UserRestaurantList.this, REQUEST_LOCATION);
 
         fab = (FloatingActionButton) findViewById(R.id.gps_fab);
         CoordinatorLayout.LayoutParams p = (CoordinatorLayout.LayoutParams) fab.getLayoutParams();
@@ -263,6 +269,24 @@ public class UserRestaurantList extends AppCompatActivity
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case REQUEST_LOCATION: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    //reload my activity with permission granted or use the features what required the permission
+                } else
+                {
+                    Toast.makeText(UserRestaurantList.this, "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
+    }
+
     public void create_dialog(Context context){
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 context);
@@ -367,40 +391,9 @@ public class UserRestaurantList extends AppCompatActivity
     }
 
     public void grantPermissions() {
-        if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
-            // only for Marshmallow and newer versions
-            //I want that first I request GPS, but if rejected, request WIFI
-            /*
-            dialogPermissionListener_gps =
-    /*        dialogPermissionListener_gps =
-                    DialogOnDeniedPermissionListener.Builder
-                            .withContext(this)
-                            .withTitle("GPS permission")
-                            .withMessage("GPS permission is needed to take your accurate position")
-                            .withButtonText(android.R.string.ok)
-                            .withIcon(R.mipmap.ic_launcher)
-                            .build();
-            Dexter.checkPermissionOnSameThread(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
-            */
-//            Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
+        mGoogleApiClient.connect();
 
-            Dexter.checkPermission(new PermissionListener() {
-                @Override public void onPermissionGranted(PermissionGrantedResponse response) {
-                    permission_granted();
-                }
-                @Override public void onPermissionDenied(PermissionDeniedResponse response) {
-                    gps_denied();
-                }
-                @Override public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                    token.continuePermissionRequest();
-                }
-            }, Manifest.permission.ACCESS_FINE_LOCATION);
-        }
-        else{
-            mGoogleApiClient.connect();
-
-            settingsrequest();
-        }
+        settingsrequest();
     }
 
     public void permission_granted(){

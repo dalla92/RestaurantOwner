@@ -404,36 +404,8 @@ public class MapsActivity extends AppCompatActivity implements
     }
 
     public void grantPermissions() {
-        if (android.os.Build.VERSION.RELEASE.startsWith("6.")){
-            // only for Marshmallow and newer versions
-            //I want that first I request GPS, but if rejected, request WIFI
-
-            if(!Dexter.isRequestOngoing()) {
-                Dexter.checkPermission(dialogPermissionListener_gps, Manifest.permission.ACCESS_FINE_LOCATION);
-
-                Dexter.checkPermission(new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse response) {
-                        permission_granted();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse response) {
-                        gps_denied();
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                        token.continuePermissionRequest();
-                    }
-                }, Manifest.permission.ACCESS_FINE_LOCATION);
-            }
-        }
-        else{
-            mGoogleApiClient.connect();
-
-            settingsrequest();
-        }
+        mGoogleApiClient.connect();
+        settingsrequest();
     }
 
     public void settingsrequest(){
