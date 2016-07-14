@@ -36,6 +36,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -52,6 +53,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.ImageUtils;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantGallery;
 
 /**
@@ -97,11 +99,15 @@ public class GalleryViewActivity extends AppCompatActivity {
 
         userID = FirebaseUtil.getCurrentUserId();
         if(userID != null){
-            userRef = firebase.getReference("users/" + userID + "/ownerUser");
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            DatabaseReference resRef = firebase.getReference("restaurants/" + restaurantID);
+            resRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    isOwner = dataSnapshot.getValue(Boolean.class);
+                    Restaurant res = dataSnapshot.getValue(Restaurant.class);
+                    if(res != null && res.getUser_id().equals(userID))
+                        isOwner = true;
+                    else
+                        isOwner = false;
 
                     if(isOwner){
                         mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -205,6 +211,18 @@ public class GalleryViewActivity extends AppCompatActivity {
 
                 }
             });
+            /*userRef = firebase.getReference("users/" + userID + "/ownerUser");
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    isOwner = dataSnapshot.getValue(Boolean.class);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });*/
         }
 
         storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com");
@@ -275,12 +293,19 @@ public class GalleryViewActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        if(userRef != null) {
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        userID = FirebaseUtil.getCurrentUserId();
+        if(userID == null)
+            getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
+        else {
+            DatabaseReference resRef = firebase.getReference("restaurants/" + restaurantID);
+            resRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    for (DataSnapshot data : dataSnapshot.getChildren())
-                        isOwner = data.getValue(Boolean.class);
+                    Restaurant res = dataSnapshot.getValue(Restaurant.class);
+                    if(res != null && res.getUser_id().equals(userID))
+                        isOwner = true;
+                    else
+                        isOwner = false;
 
                     if (isOwner)
                         getMenuInflater().inflate(R.menu.menu_gallery_owner, menu);
@@ -290,10 +315,26 @@ public class GalleryViewActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
+
                 }
             });
         }
+        /*if(userRef != null) {
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot data : dataSnapshot.getChildren())
+                        isOwner = data.getValue(Boolean.class);
+
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    getMenuInflater().inflate(R.menu.menu_gallery_user, menu);
+                }
+            });
+        }*/
 
         return true;
     }

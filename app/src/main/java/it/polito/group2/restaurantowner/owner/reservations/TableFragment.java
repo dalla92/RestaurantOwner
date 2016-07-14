@@ -35,12 +35,14 @@ import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 public class TableFragment extends Fragment {
 
     private ArrayList<TableReservation> reservation_list;
+    private ArrayList<TableReservation> reservationDate;
     private BaseAdapter adapter;
     private View rootView;
     private FirebaseDatabase firebase;
     private Query q;
     private ValueEventListener l;
     private ProgressDialog mProgressDialog;
+    private Calendar targetDate;
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,10 +51,12 @@ public class TableFragment extends Fragment {
         Bundle bundle = getArguments();
         String restaurantId = bundle.getString("restaurant_id");
         
-        FirebaseUtil.initProgressDialog(getActivity());
+        mProgressDialog = FirebaseUtil.initProgressDialog(getActivity());
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
         firebase = FirebaseDatabase.getInstance();
+
+        targetDate = Calendar.getInstance();
 
         if(reservation_list==null)
             reservation_list = new ArrayList<>();
@@ -62,17 +66,18 @@ public class TableFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 reservation_list = new ArrayList<>();
+                reservationDate = new ArrayList<>();
                 for(DataSnapshot data: dataSnapshot.getChildren()) {
                     TableReservation res = data.getValue(TableReservation.class);
-                    Calendar today = Calendar.getInstance();
+                    reservation_list.add(res);
                     Calendar c = Calendar.getInstance();
                     c.setTimeInMillis(res.getTable_reservation_date());
-                    if (isEqualTo(c, today))
-                        reservation_list.add(res);
+                    if (isEqualTo(c, targetDate))
+                        reservationDate.add(res);
                 }
 
                 TextView reservation_title = (TextView) rootView.findViewById(R.id.reservation_list_title);
-                if(reservation_list.isEmpty()) {
+                if(reservationDate.isEmpty()) {
                     reservation_title.setText("");
                     Toast.makeText(getActivity(), getResources().getString(R.string.none_reservations), Toast.LENGTH_SHORT).show();
                 }
@@ -93,12 +98,12 @@ public class TableFragment extends Fragment {
 
             @Override
             public int getCount() {
-                return reservation_list.size();
+                return reservationDate.size();
             }
 
             @Override
             public Object getItem(int position) {
-                return reservation_list.get(position);
+                return reservationDate.get(position);
             }
 
             @Override
@@ -118,7 +123,7 @@ public class TableFragment extends Fragment {
                 TextView text_people = (TextView) convertView.findViewById(R.id.reservation_people);
                 TextView text_notes = (TextView) convertView.findViewById(R.id.reservation_notes);
 
-                TableReservation reservation = reservation_list.get(position);
+                TableReservation reservation = reservationDate.get(position);
                 text_client_name.setText(reservation.getUser_id());
                 Calendar c =  Calendar.getInstance();
                 c.setTimeInMillis(reservation.getTable_reservation_date());
@@ -147,7 +152,7 @@ public class TableFragment extends Fragment {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    reservation_list.remove(position);
+                                    reservationDate.remove(position);
                                     notifyDataSetChanged();
                                     dialog.dismiss();
 
@@ -191,15 +196,15 @@ public class TableFragment extends Fragment {
     }
 
     public void changeData(Calendar date){
-        ArrayList<TableReservation> reservations = new ArrayList<>();
+        targetDate = date;
+        reservationDate = new ArrayList<>();
         for(TableReservation res: reservation_list){
             Calendar c =  Calendar.getInstance();
             c.setTimeInMillis(res.getTable_reservation_date());
             if(isEqualTo(c, date))
-                reservations.add(res);
+                reservationDate.add(res);
         }
-        reservation_list = new ArrayList<>();
-        reservation_list.addAll(reservations);
+
         adapter.notifyDataSetChanged();
     }
 
