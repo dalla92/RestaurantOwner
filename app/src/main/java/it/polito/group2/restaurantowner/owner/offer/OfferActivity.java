@@ -292,8 +292,10 @@ public class OfferActivity extends AppCompatActivity
             DatabaseReference keyReference = offersReference.push();
             this.offer.setOfferID(keyReference.getKey());
             keyReference.setValue(this.offer);
-            if(this.offer.getOfferEnabled() && restaurant != null)
-                new SendNotificationAsync().execute(restaurant.getRestaurant_name(),restaurantID);
+            if(this.offer.getOfferEnabled() && restaurant != null) {
+                String title = getResources().getString(R.string.new_offer_notification);
+                new SendNotificationAsync().execute(restaurant.getRestaurant_name(), restaurantID+ "offer", title);
+            }
         }
         this.offer = null;
         Intent intent = new Intent(this, MyOffersActivity.class);

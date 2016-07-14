@@ -26,6 +26,7 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -115,9 +116,9 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             FirebaseUtil.showProgressDialog(mProssesDialog);
             saveData();
             if (res.getRestaurant_name().equals(""))
-                Toast.makeText(this, "Please insert restaurant name to continue", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.insert_restaurant_name), Toast.LENGTH_SHORT).show();
             else if(alwaysClosed(res))
-                Toast.makeText(this, "Please set restaurant open and close times", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.insert_category_name), Toast.LENGTH_SHORT).show();
             else {
                 final String userID = FirebaseUtil.getCurrentUserId();
                 if (userID != null) {
@@ -153,6 +154,9 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                     restaurantRef.setValue(res).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
+                            //subscribe to topice to receive notifications about users reservations and orders
+                            FirebaseMessaging.getInstance().subscribeToTopic(finalRes.getRestaurant_id() + "reservation");
+                            FirebaseMessaging.getInstance().subscribeToTopic(finalRes.getRestaurant_id() + "order");
                             //save also the restaurant preview if the restaurant was succefully written
                             DatabaseReference restaurantReference2 = firebase.getReference("restaurants_previews/" + finalRes.getRestaurant_id());
                             RestaurantPreview r_p = new RestaurantPreview();
@@ -186,14 +190,14 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                             //saving the names of the restaurant with the id in restaurant_names for search purpose
                             firebase.getReference("restaurant_names/" + finalRes.getRestaurant_name().toLowerCase() + "/" + finalRes.getRestaurant_id()).setValue(true);
                             FirebaseUtil.hideProgressDialog(mProssesDialog);
-                            Toast.makeText(AddRestaurantActivity.this, "Restaurant added successfully", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddRestaurantActivity.this, getResources().getString(R.string.insert_restaurant_name), Toast.LENGTH_SHORT).show();
                             OnBackUtil.clean_stack_and_go_to_restaurant_page(AddRestaurantActivity.this, res.getRestaurant_id());
                         }
                     });
 
                 }
                 else
-                    Toast.makeText(this,"You are not logged in!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this,getResources().getString(R.string.need_login), Toast.LENGTH_SHORT).show();
             }
         }
 

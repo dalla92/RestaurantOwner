@@ -225,7 +225,7 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
             });
         } else {
             hideProgressDialog();
-            Toast.makeText(this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -269,34 +269,33 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
                 final HashMap<String, Boolean> providers = target.getProviders();
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(LoginManagerActivity.this);
-                alert.setTitle("Confirmation!");
-                alert.setMessage("You have already an account with email: " + fbEmail +
-                        "\nClick Yes to link your account and access your data or No to log in with another method.");
+                alert.setTitle(getResources().getString(R.string.action_confirm));
+                alert.setMessage(getResources().getString(R.string.already_account));
 
-                alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                alert.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (providers.containsKey("password")) {
                             AlertDialog.Builder alert = new AlertDialog.Builder(LoginManagerActivity.this);
-                            alert.setTitle("Insert your password!");
+                            alert.setTitle(getResources().getString(R.string.insert_password));
 
                             final EditText input = new EditText(LoginManagerActivity.this);
                             input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
                             alert.setView(input);
 
-                            alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                            alert.setPositiveButton(getResources().getString(R.string.action_confirm), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     String password = input.getText().toString();
                                     mergeWithPassword(password, token);
                                 }
                             });
-                            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            alert.setNegativeButton(getResources().getString(R.string.action_cancel), new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     hideProgressDialog();
                                     Log.d("prova", "input password cancelled");
-                                    Toast.makeText(LoginManagerActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginManagerActivity.this, getResources().getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
                                     dialog.dismiss();
                                 }
                             });
@@ -306,13 +305,13 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
 
                     }
                 });
-                alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                alert.setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         hideProgressDialog();
                         Log.d("prova", "link account refused");
-                        Toast.makeText(LoginManagerActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginManagerActivity.this, getResources().getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                     }
                 });
@@ -323,7 +322,7 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 hideProgressDialog();
-                Toast.makeText(LoginManagerActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginManagerActivity.this, getResources().getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -347,7 +346,7 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
                                 .addOnFailureListener(new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Toast.makeText(LoginManagerActivity.this, "Account linking failed", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(LoginManagerActivity.this, getResources().getString(R.string.authentication_failed), Toast.LENGTH_SHORT).show();
                                         signOut();
                                     }
                                 });
@@ -357,11 +356,11 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         if (e instanceof FirebaseAuthInvalidCredentialsException)
-                            Toast.makeText(LoginManagerActivity.this, "Wrong password", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginManagerActivity.this, getResources().getString(R.string.wrong_password), Toast.LENGTH_SHORT).show();
                         else {
                             e.printStackTrace();
                             Log.d("prova", "auth:onFailure:" + e.getMessage());
-                            Toast.makeText(LoginManagerActivity.this, "Error during login!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginManagerActivity.this, getResources().getString(R.string.login_error), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -529,20 +528,20 @@ public class LoginManagerActivity extends AppCompatActivity implements View.OnCl
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Toast.makeText(LoginManagerActivity.this, "Email sent", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(LoginManagerActivity.this, getResources().getString(R.string.email_sent), Toast.LENGTH_SHORT).show();
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 if(e instanceof FirebaseAuthInvalidUserException)
-                                    Toast.makeText(LoginManagerActivity.this, "No account exists with this email", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(LoginManagerActivity.this, getResources().getString(R.string.none_account), Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
                             }
                         });
             }
         });
-        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(getResources().getString(R.string.action_cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

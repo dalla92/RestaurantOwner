@@ -119,17 +119,17 @@ public class RegisterActivity extends AppCompatActivity{
                         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                                 RegisterActivity.this);
                         // set title
-                        alertDialogBuilder.setTitle("Missing telephone number");
+                        alertDialogBuilder.setTitle(getResources().getString(R.string.missing_telephone_number));
                         // set dialog message
                         alertDialogBuilder
-                                .setMessage("You did't provide a telephone number. Do you want to put it in order to be notified by the restaurant owners?")
+                                .setMessage(getResources().getString(R.string.continue_missing_telephone_number))
                                 .setCancelable(false)
-                                .setPositiveButton("Yes, I do", new DialogInterface.OnClickListener() {
+                                .setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.cancel();
                                     }
                                 })
-                                .setNegativeButton("Register anyway", new DialogInterface.OnClickListener() {
+                                .setNegativeButton(getResources().getString(R.string.register_anyway), new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int id) {
                                         dialog.cancel();
                                         continue_registration();
@@ -179,7 +179,7 @@ public class RegisterActivity extends AppCompatActivity{
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             hideProgressDialog();
-                                            Toast.makeText(RegisterActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(RegisterActivity.this, getResources().getString(R.string.registration_successful), Toast.LENGTH_SHORT).show();
 
                                             signOut();
 
@@ -205,7 +205,7 @@ public class RegisterActivity extends AppCompatActivity{
                                 public void onFailure(@NonNull Exception e) {
                                     hideProgressDialog();
                                     e.printStackTrace();
-                                    Toast.makeText(RegisterActivity.this, "Registration failed, try again!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RegisterActivity.this, getResources().getString(R.string.registration_failed), Toast.LENGTH_SHORT).show();
                                 }
                             });
 
@@ -227,7 +227,7 @@ public class RegisterActivity extends AppCompatActivity{
                         }
                     }
                     else{
-                        Toast.makeText(RegisterActivity.this, "This account already exists!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, getResources().getString(R.string.account_already_existing), Toast.LENGTH_SHORT).show();
                         hideProgressDialog();
                     }
                 }
@@ -390,8 +390,7 @@ public class RegisterActivity extends AppCompatActivity{
                     Log.d("prova", "different name");
                     signOut();
                     userRef.child(user.getUid() + "/providers/password").setValue(null);
-                    Toast.makeText(RegisterActivity.this, "This email is already register with Facebook with a different name," +
-                            "\nTry again with the correct First name and Last name to merge the account data!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(RegisterActivity.this, getResources().getString(R.string.already_registered_with_facebook), Toast.LENGTH_LONG).show();
                     return;
                 }
             }
@@ -401,7 +400,7 @@ public class RegisterActivity extends AppCompatActivity{
                     .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                         @Override
                         public void onSuccess(AuthResult authResult) {
-                            Toast.makeText(RegisterActivity.this, "Registration successful.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, getResources().getString(R.string.registration_successful), Toast.LENGTH_SHORT).show();
 
                             userRef.child(user.getUid() + "/ownerUser").setValue(isOwnerCheckBox.isChecked());
                             signOut();
@@ -421,13 +420,13 @@ public class RegisterActivity extends AppCompatActivity{
                         public void onFailure(@NonNull Exception e) {
                             signOut();
                             userRef.child(user.getUid() + "/providers/password").setValue(null);
-                            Toast.makeText(RegisterActivity.this, "Registration failed in link.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RegisterActivity.this, getResources().getString(R.string.account_linking_failed), Toast.LENGTH_SHORT).show();
                         }
                     });
 
         } else {
             userRef.child(userID + "/providers/password").setValue(null);
-            Toast.makeText(this, "Registration failed result = null.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getResources().getString(R.string.registration_failed), Toast.LENGTH_SHORT).show();
         }
     }
 

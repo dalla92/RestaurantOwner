@@ -552,7 +552,7 @@ public class Restaurant_page extends AppCompatActivity
                     public void onFailure(Exception e) {
                         e.printStackTrace();
                         Log.d("my_ex", e.getMessage());
-                        Toast failure_message = Toast.makeText(context, "The upload is failed", Toast.LENGTH_LONG);
+                        Toast failure_message = Toast.makeText(context, getResources().getString(R.string.upload_failed), Toast.LENGTH_LONG);
                         failure_message.show();
                     }
                 })

@@ -74,7 +74,7 @@ public class TableFragment extends Fragment {
                 TextView reservation_title = (TextView) rootView.findViewById(R.id.reservation_list_title);
                 if(reservation_list.isEmpty()) {
                     reservation_title.setText("");
-                    Toast.makeText(getActivity(), "No reservations", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), getResources().getString(R.string.none_reservations), Toast.LENGTH_SHORT).show();
                 }
                 else
                     reservation_title.setVisibility(View.GONE);
@@ -141,9 +141,9 @@ public class TableFragment extends Fragment {
                         public void onClick(View v) {
 
                             AlertDialog.Builder alert = new AlertDialog.Builder(getActivity());
-                            alert.setTitle("Confirmation!");
-                            alert.setMessage("Are you sure you want to delete this reservation?\nThe operation cannot be undone!");
-                            alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                            alert.setTitle(getResources().getString(R.string.action_confirm));
+                            alert.setMessage(getResources().getString(R.string.sure_delete_reservation));
+                            alert.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
@@ -153,7 +153,7 @@ public class TableFragment extends Fragment {
 
                                 }
                             });
-                            alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                            alert.setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
 
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {

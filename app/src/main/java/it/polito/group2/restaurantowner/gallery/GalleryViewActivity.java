@@ -133,11 +133,11 @@ public class GalleryViewActivity extends AppCompatActivity {
                                 switch (item.getItemId()) {
                                     case R.id.action_delete:
                                         AlertDialog.Builder alert = new AlertDialog.Builder(GalleryViewActivity.this);
-                                        alert.setTitle("Confirmation!");
-                                        alert.setMessage("Are you sure you want to delete the selected images?\nThis operation cannot be undone!");
-                                        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
+                                        alert.setTitle(getResources().getString(R.string.action_confirm));
+                                        alert.setMessage(getResources().getString(R.string.delete_image));
+                                                alert.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(DialogInterface dialog, int which) {
                                                 // Calls getSelectedIds method from ListViewAdapter Class
                                                 dialog.dismiss();
                                                 SparseBooleanArray selected = mGridAdapter.getSelectedIds();
@@ -168,7 +168,7 @@ public class GalleryViewActivity extends AppCompatActivity {
                                                         }).addOnFailureListener(new OnFailureListener() {
                                                             @Override
                                                             public void onFailure(@NonNull Exception e) {
-                                                                Toast.makeText(GalleryViewActivity.this, "Error during removal of the pictures, try again!", Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(GalleryViewActivity.this, getResources().getString(R.string.error_saving_picture), Toast.LENGTH_SHORT).show();
                                                             }
                                                         });
 
@@ -178,7 +178,7 @@ public class GalleryViewActivity extends AppCompatActivity {
                                                 mode.finish();
                                             }
                                         });
-                                        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                                        alert.setNegativeButton(getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 mode.finish();
@@ -422,7 +422,7 @@ public class GalleryViewActivity extends AppCompatActivity {
                     uploadTask.addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(GalleryViewActivity.this, "Error during save of the picture, try again!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GalleryViewActivity.this, getResources().getString(R.string.error_saving_picture), Toast.LENGTH_SHORT).show();
                             hideProgressDialog();
                         }
                     }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -458,7 +458,7 @@ public class GalleryViewActivity extends AppCompatActivity {
             uploadTask.addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(GalleryViewActivity.this, "Error during save of the picture, try again!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GalleryViewActivity.this, getResources().getString(R.string.error_saving_picture), Toast.LENGTH_SHORT).show();
                     hideProgressDialog();
                 }
             }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

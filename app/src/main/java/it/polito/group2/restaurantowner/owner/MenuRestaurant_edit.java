@@ -117,10 +117,10 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         int id = item.getItemId();
         if (id == R.id.action_save) {
             if (current_meal.getMeal_name().equals("") || current_meal.getMeal_name() == null)
-                Toast.makeText(this, "Please insert meal name to continue", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.insert_meal_name), Toast.LENGTH_SHORT).show();
             else {
                 if (current_meal.getMeal_category().equals("") || current_meal.getMeal_category().equals("Nessuno") || current_meal.getMeal_category().equals("None") || current_meal.getMeal_category() == null)
-                    Toast.makeText(this, "Please insert category to continue", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getResources().getString(R.string.insert_category_name), Toast.LENGTH_SHORT).show();
                 else {
                     FirebaseUtil.showProgressDialog(mProsessDialog);
                     mSectionsPagerAdapter.saveDataFromFragments();
@@ -230,7 +230,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                 public void onFailure(Exception e) {
                     e.printStackTrace();
                     Log.d("my_ex", e.getMessage());
-                    Toast failure_message = Toast.makeText(context, "The upload of the photo is failed", Toast.LENGTH_LONG);
+                    Toast failure_message = Toast.makeText(context, getResources().getString(R.string.upload_failed), Toast.LENGTH_LONG);
                     failure_message.show();
                     FirebaseUtil.hideProgressDialog(mProsessDialog);
                 }

@@ -130,7 +130,7 @@ public class FragmentOtherInfo extends Fragment {
         });
         //expandable additions
         childMealAdditions = current_meal.allAdditions();
-        parentAddition = "Meal additions";
+        parentAddition = getResources().getString(R.string.meal_additions);
         additions = (ExpandableListView) rootView.findViewById(R.id.additions_list);
         additions_adapter = new MyExpandableAdapter(parentAddition, childMealAdditions);
         additions.setAdapter(additions_adapter);
@@ -144,7 +144,7 @@ public class FragmentOtherInfo extends Fragment {
                 ma.setMeal_addition_name(mc.getMeal_category_name());
                 childCategories.add(ma);
             }
-        parentCategory = "Meal tags";
+        parentCategory = getResources().getString(R.string.meal_tags);
         categories = (ExpandableListView) rootView.findViewById(R.id.categories_list);
         categories_adapter = new MyExpandableAdapter(parentCategory, childCategories);
         categories.setAdapter(categories_adapter);
@@ -228,12 +228,12 @@ public class FragmentOtherInfo extends Fragment {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.possible_additions_layout, null);
             }
-            if(parentItem.equals("Meal categories")){
+        if(parentItem.equals("Meal tags")||parentItem.equals("Tag piatti")){
                 convertView.findViewById(R.id.edit_addition_price).setVisibility(View.INVISIBLE);
             }
             checkbox_text = (CheckBox) convertView.findViewById(R.id.meal_addition);
             checkbox_text.setText(childItems.get(childPosition).getMeal_addition_name());
-            if(parentItem.equals("Meal additions")) {
+            if(parentItem.equals("Meal additions")||parentItem.equals("Supplementi piatti")) {
                 textview = (TextView) convertView.findViewById(R.id.edit_addition_price);
                 textview.setText( String.valueOf(childItems.get(childPosition).getMeal_addition_price()));
             }
@@ -259,7 +259,7 @@ public class FragmentOtherInfo extends Fragment {
                 public void onClick(View v) {
                     LayoutInflater li = LayoutInflater.from(context);
                     promptsView = null;
-                    if (parentItem.equals("Meal additions")) {
+                    if (parentItem.equals("Meal additions")||parentItem.equals("Supplementi piatti")) {
                         promptsView = li.inflate(R.layout.addition_prompt, null);
                     } else {
                         promptsView = li.inflate(R.layout.category_prompt, null);
@@ -277,7 +277,7 @@ public class FragmentOtherInfo extends Fragment {
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int id) {
                                             childItems.get(childPosition).setMeal_addition_name(userInput_name.getText().toString());
-                                            if (parentItem.equals("Meal additions")) {
+                                            if (parentItem.equals("Meal additions")||parentItem.equals("Supplementi piatti")) {
                                                 userInput_price = (EditText) promptsView
                                                         .findViewById(R.id.new_price);
                                                 if(!userInput_price.getText().toString().trim().equals(""))

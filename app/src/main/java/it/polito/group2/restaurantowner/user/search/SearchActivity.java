@@ -274,7 +274,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
             // Confirm that the query completed successfully, otherwise return null
             final Status status = autocompletePredictions.getStatus();
             if (!status.isSuccess()) {
-                Toast.makeText(this, "Error contacting API: " + status.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.technical_problem), Toast.LENGTH_SHORT).show();
                 Log.e("prova", "Error getting autocomplete prediction API call: " + status.toString());
                 autocompletePredictions.release();
                 return null;
@@ -313,7 +313,7 @@ public class SearchActivity extends AppCompatActivity implements GoogleApiClient
 
     @Override
     public void onConnectionFailed(@NotNull ConnectionResult connectionResult) {
-        Toast.makeText(SearchActivity.this, "Connection to the google API failed!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(SearchActivity.this, getResources().getString(R.string.technical_problem), Toast.LENGTH_SHORT).show();
     }
 
     @Override

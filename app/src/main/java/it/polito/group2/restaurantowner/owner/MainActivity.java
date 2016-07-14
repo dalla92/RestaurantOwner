@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity
 
         String userID = FirebaseUtil.getCurrentUserId();
         if(userID == null){
-            Toast.makeText(MainActivity.this, "You need to be logged in.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, getResources().getString(R.string.need_login), Toast.LENGTH_SHORT).show();
             finish();
         }
         mProgressDialog = FirebaseUtil.initProgressDialog(this);

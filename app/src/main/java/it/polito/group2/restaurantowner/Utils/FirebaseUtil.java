@@ -22,6 +22,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.Order;
@@ -60,10 +61,10 @@ public class FirebaseUtil {
 
     public static void showLoginDialog(final Context context) {
         AlertDialog.Builder alert = new AlertDialog.Builder(context);
-        alert.setTitle("Do you want to log in?");
-        alert.setMessage("You must be logged in to perform this action");
+        alert.setTitle(context.getResources().getString(R.string.want_to_login));
+        alert.setMessage(context.getResources().getString(R.string.need_login));
 
-        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        alert.setPositiveButton(context.getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 Intent intent = new Intent(context, LoginManagerActivity.class);
@@ -71,7 +72,7 @@ public class FirebaseUtil {
                 context.startActivity(intent);
             }
         });
-        alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(context.getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();

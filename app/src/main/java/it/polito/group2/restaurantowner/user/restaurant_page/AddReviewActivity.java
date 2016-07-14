@@ -59,8 +59,8 @@ public class AddReviewActivity extends AppCompatActivity {
 
             if(stars.getRating() == 0.0f){
                 AlertDialog alertDialog = new AlertDialog.Builder(AddReviewActivity.this).create();
-                alertDialog.setTitle("Warning");
-                alertDialog.setMessage("You cannot add a review without rating it!");
+                alertDialog.setTitle(getResources().getString(R.string.warning));
+                alertDialog.setMessage(getResources().getString(R.string.error_review));
                 alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {

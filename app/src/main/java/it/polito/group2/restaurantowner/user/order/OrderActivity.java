@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,6 +39,7 @@ import it.polito.group2.restaurantowner.firebasedata.Offer;
 import it.polito.group2.restaurantowner.firebasedata.Order;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.User;
+import it.polito.group2.restaurantowner.user.restaurant_list.SendNotificationAsync;
 
 public class OrderActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,
@@ -316,8 +318,14 @@ public class OrderActivity extends AppCompatActivity
             OnBackUtil.clean_stack_and_go_to_user_restaurant_page(this, restaurantID);
         assert keyReference != null;
         this.order.setOrder_id(keyReference.getKey());
-        keyReference.setValue(this.order);
-
+        final Restaurant temp = this.restaurant;
+        keyReference.setValue(this.order).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                String title = getResources().getString(R.string.new_order_notification);
+                new SendNotificationAsync().execute(temp.getRestaurant_name(),restaurantID + "order");
+            }
+        });
         if(this.order.getFidelity_applied() || this.restaurant.getFidelityProgramAccepted()) {
             DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
             if(userRef != null) {

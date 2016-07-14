@@ -1,5 +1,7 @@
 package it.polito.group2.restaurantowner.user.restaurant_list;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -16,6 +18,8 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import it.polito.group2.restaurantowner.R;
+
 /**
  * Created by Daniele on 05/06/2016.
  */
@@ -25,6 +29,7 @@ public class SendNotificationAsync extends AsyncTask<String, Void, Void> {
         try{
             String resName = params[0];
             String resId = params[1];
+            String title = params[2];
             URL url = new URL("https://fcm.googleapis.com/fcm/send");
             HttpURLConnection client = (HttpURLConnection) url.openConnection();
             client.setRequestMethod("POST");
@@ -35,8 +40,7 @@ public class SendNotificationAsync extends AsyncTask<String, Void, Void> {
             JSONObject root = new JSONObject();
             JSONObject msg = new JSONObject();
             msg.put("body",resName);
-            msg.put("title","New offer from your favourite restaurant!");
-
+            msg.put("title",title);
             root.put("to","/topics/"+resId);
             root.put("notification", msg);
 

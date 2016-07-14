@@ -71,7 +71,7 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
         user_id = FirebaseUtil.getCurrentUserId();
 
         if(user_id == null){
-            Toast.makeText(UserMyFavourites.this, "You must be logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(UserMyFavourites.this, getResources().getString(R.string.need_login), Toast.LENGTH_SHORT).show();
             finish();
         }
         //list view implementation
@@ -103,7 +103,7 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
                 HashMap<String, Boolean> favourites = (HashMap<String, Boolean>) snapshot.getValue();
                 final ArrayList<String> favouritesID = new ArrayList<>();
                 if(favourites == null) {
-                    Toast.makeText(getApplicationContext(), "No favourite restaurants", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.none_bookmarks), Toast.LENGTH_SHORT).show();
                     FirebaseUtil.hideProgressDialog(mProgressDialog);
                 }
                 else {
@@ -112,7 +112,7 @@ public class UserMyFavourites extends AppCompatActivity implements NavigationVie
                     }
 
                     if (favouritesID.isEmpty()) {
-                        Toast.makeText(getApplicationContext(), "No favourite restaurants", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.none_bookmarks), Toast.LENGTH_SHORT).show();
                         FirebaseUtil.hideProgressDialog(mProgressDialog);
                     }
                     else {

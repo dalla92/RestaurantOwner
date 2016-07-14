@@ -40,7 +40,9 @@ import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantTimeSlot;
 import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
+import it.polito.group2.restaurantowner.user.restaurant_list.SendNotificationAsync;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.DatabaseError;
@@ -422,7 +424,15 @@ public class UserTableReservationActivity extends AppCompatActivity {
                                 DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/table_reservations/");
                                 DatabaseReference ref2 = ref.push();
                                 current_table_reservation.setTable_reservation_id(ref2.getKey());
-                                ref2.setValue(current_table_reservation);
+                                final Restaurant temp = current_restaurant;
+                                ref2.setValue(current_table_reservation).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        String title = getResources().getString(R.string.new_table_reservation_notification);
+                                        new SendNotificationAsync().execute(temp.getRestaurant_name(), restaurant_id + "reservation");
+                                    }
+                                });
+
                                 //readdress after feedback
                                 new AlertDialog.Builder(context)
                                         .setPositiveButton(

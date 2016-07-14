@@ -129,7 +129,7 @@ public class GoogleLogInActivity extends AppCompatActivity implements
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             //GoogleAuthUtil.getToken(this, String.format("oauth2:%s", Scopes.PLUS_LOGIN));
-            mStatusTextView.setText("signed in as:" + acct.getDisplayName() + " " + acct.getEmail());
+            mStatusTextView.setText(getResources().getString(R.string.signed_as) + acct.getDisplayName() + " " + acct.getEmail());
             updateUI(true);
         } else {
             // Signed out, show unauthenticated UI.
@@ -201,7 +201,7 @@ public class GoogleLogInActivity extends AppCompatActivity implements
             findViewById(R.id.sign_in_button).setVisibility(View.GONE);
             findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
         } else {
-            mStatusTextView.setText("Signed out");
+            mStatusTextView.setText(getResources().getString(R.string.signed_out));
 
             findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);

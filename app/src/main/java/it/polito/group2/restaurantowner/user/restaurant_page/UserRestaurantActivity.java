@@ -176,9 +176,9 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     fab.setImageDrawable(ContextCompat.getDrawable(UserRestaurantActivity.this, R.drawable.ic_star_off_24dp));
 
                 if(targetRestaurant.openNow())
-                    timesText.setText("Open now");
+                    timesText.setText(getResources().getString(R.string.open_now));
                 else{
-                    timesText.setText("Close now");
+                    timesText.setText(getResources().getString(R.string.close_now));
                 }
 
                 setButtons();
@@ -551,15 +551,14 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     }
                     else{
                         AlertDialog.Builder alert = new AlertDialog.Builder(UserRestaurantActivity.this);
-                        alert.setTitle("Warning");
-                        alert.setMessage("You already added a review to this restaurant," +
-                                "\nDo you want to modify it?");
+                        alert.setTitle(getResources().getString(R.string.warning));
+                        alert.setMessage(getResources().getString(R.string.already_review));
 
-                        alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        alert.setPositiveButton(getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 Review review = null;
-                                for(DataSnapshot data: dataSnapshot.getChildren())
+                                for (DataSnapshot data : dataSnapshot.getChildren())
                                     review = data.getValue(Review.class);
 
                                 Intent intent = new Intent(getApplicationContext(), AddReviewActivity.class);
@@ -595,7 +594,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
             if (resultCode == RESULT_OK) {
                 final String userID = FirebaseUtil.getCurrentUserId();
                 if(userID == null){
-                    Toast.makeText(UserRestaurantActivity.this, "Error while adding the review, try again!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserRestaurantActivity.this, getResources().getString(R.string.error_review), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -728,7 +727,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     startActivity(intent);
                 }
                 else{
-                    Toast.makeText(UserRestaurantActivity.this, "This restaurant is closed now", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UserRestaurantActivity.this, getResources().getString(R.string.cant_order), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -1009,7 +1008,7 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
                     @Override
                     public void onFailure(Exception e) {
                         FirebaseUtil.hideProgressDialog(mProgressDialog);
-                        Toast.makeText(UserRestaurantActivity.this, "Technical Problem, try again or restart the app!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UserRestaurantActivity.this, getResources().getString(R.string.technical_problem), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

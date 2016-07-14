@@ -161,9 +161,9 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
         @Override
         public void onItemDismiss(final int position) {
             AlertDialog.Builder alert = new AlertDialog.Builder(mContext);
-            alert.setTitle("Confirmation!");
-            alert.setMessage("Are you sure you want to delete the restaurant?\nThe operation cannot be undone!");
-            alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            alert.setTitle(mContext.getResources().getString(R.string.action_confirm));
+            alert.setMessage(mContext.getResources().getString(R.string.sure_delete_restaurant));
+            alert.setPositiveButton(mContext.getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -172,7 +172,7 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
 
                 }
             });
-            alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            alert.setNegativeButton(mContext.getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
 
                 @Override
                 public void onClick(DialogInterface dialog, int which) {

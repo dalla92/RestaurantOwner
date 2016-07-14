@@ -267,10 +267,10 @@ public class UserRestaurantList extends AppCompatActivity
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 context);
         // set title
-        alertDialogBuilder.setTitle("Attention");
+        alertDialogBuilder.setTitle(getResources().getString(R.string.warning));
         // set dialog message
         alertDialogBuilder
-                .setMessage("You need to provide internet access")
+                .setMessage(getResources().getString(R.string.provide_internet_access))
                 .setCancelable(false)
                 .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
@@ -1056,7 +1056,7 @@ public class UserRestaurantList extends AppCompatActivity
                 if(mLastUserMarker == null) {
                     mLastUserMarker = mMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
-                                    .title("Your position")
+                                    .title(getResources().getString(R.string.your_position))
                                             //.snippet("Population: 2,074,200")
                                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
                                     .visible(false)

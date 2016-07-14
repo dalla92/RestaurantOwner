@@ -276,7 +276,7 @@ public class MapsActivity extends AppCompatActivity implements
                 if(mLastUserMarker==null) {
                     mLastUserMarker = mMap.addMarker(new MarkerOptions()
                                     .position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
-                                    .title("Your position")
+                                    .title(getResources().getString(R.string.your_position))
                                             //.snippet("Population: 2,074,200")
                                     .icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_navigation_arrow))
                                     .visible(false)
@@ -532,10 +532,10 @@ public class MapsActivity extends AppCompatActivity implements
                 public boolean onMyLocationButtonClick() {
                     if (mMap.getUiSettings().isMyLocationButtonEnabled()) {
                         stopLocationUpdates();
-                        Toast.makeText(MapsActivity.this, "Location updates stopped", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsActivity.this, getResources().getString(R.string.start_updates), Toast.LENGTH_SHORT).show();
                     } else {
                         startLocationUpdates();
-                        Toast.makeText(MapsActivity.this, "Location updates started", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MapsActivity.this, getResources().getString(R.string.stop_updates), Toast.LENGTH_SHORT).show();
                     }
                     return false;
                 }
@@ -696,10 +696,10 @@ public class MapsActivity extends AppCompatActivity implements
             String string_result = String.valueOf(rounded_value) + " " + parts_to_round[1];
             distance.setText(string_result);
             if(restaurant_preview.isOpenNow()) {
-                open_now.setText("Open now");
+                open_now.setText(getResources().getString(R.string.open_now));
             }
             else{
-                open_now.setText("Closed now");
+                open_now.setText(getResources().getString(R.string.close_now));
             }
             button_get_info.setOnClickListener(
                     new View.OnClickListener() {
@@ -815,7 +815,7 @@ public class MapsActivity extends AppCompatActivity implements
 
     @Override
     public void onInfoWindowClick(Marker marker) {
-        Toast.makeText(this, "Click Info Window", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getResources().getString(R.string.info_window), Toast.LENGTH_SHORT).show();
     }
 
     /*Customizing the info window and/or its contents.
@@ -948,7 +948,7 @@ public class MapsActivity extends AppCompatActivity implements
     private void progress_dialog(){
         progressDialog = new ProgressDialog(this);
         progressDialog.setMax(100);
-        progressDialog.setMessage("Its loading....");
+        progressDialog.setMessage("Loading....");
         progressDialog.setTitle("");
         progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progressDialog.show();

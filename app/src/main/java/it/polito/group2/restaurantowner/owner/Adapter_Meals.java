@@ -198,9 +198,9 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     @Override
     public void onItemDismiss(final int position) {
         AlertDialog.Builder alert = new AlertDialog.Builder(activity);
-        alert.setTitle("Confirmation!");
-        alert.setMessage("Are you sure you want to delete the restaurant?\nThe operation cannot be undone!");
-        alert.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+        alert.setTitle(activity.getResources().getString(R.string.action_confirm));
+        alert.setMessage(activity.getResources().getString(R.string.sure_delete_restaurant));
+        alert.setPositiveButton(activity.getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -215,7 +215,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
 
             }
         });
-        alert.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+        alert.setNegativeButton(activity.getResources().getString(R.string.no), new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {

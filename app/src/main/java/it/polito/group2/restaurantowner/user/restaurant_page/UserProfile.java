@@ -107,7 +107,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         //get the right user
         user_id = FirebaseUtil.getCurrentUserId();
         if(user_id == null){
-            Toast.makeText(UserProfile.this, "You need to be logged in.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(UserProfile.this, getResources().getString(R.string.need_login), Toast.LENGTH_SHORT).show();
             finish();
         }
 
@@ -384,7 +384,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
             DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/" + user_id);
             ref2.setValue(current_user);
             FirebaseUtil.hideProgressDialog(mProgressDialog);
-            Toast.makeText(UserProfile.this, "Information saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(UserProfile.this, getResources().getString(R.string.information_saved), Toast.LENGTH_SHORT).show();
             end();
         }
 
@@ -406,7 +406,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                                 public void onFailure(@NotNull Exception e) {
                                     e.printStackTrace();
                                     FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                    Toast.makeText(UserProfile.this, "The upload is failed", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(UserProfile.this, getResources().getString(R.string.upload_failed), Toast.LENGTH_LONG).show();
                                     end();
                                 }
                             })
@@ -428,7 +428,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                                         public void onFailure(@NotNull Exception e) {
                                             e.printStackTrace();
                                             FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                            Toast.makeText(UserProfile.this, "The thumbnail upload is failed", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(UserProfile.this, getResources().getString(R.string.thumbnail_upload_failed), Toast.LENGTH_LONG).show();
                                             end();
                                         }
                                     }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -440,7 +440,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                                             DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/users/" + user_id);
                                             ref2.setValue(current_user);
                                             FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                            Toast.makeText(UserProfile.this, "Information saved", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(UserProfile.this, getResources().getString(R.string.information_saved), Toast.LENGTH_SHORT).show();
                                             end();
                                         }
                                     });
@@ -463,7 +463,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                         public void onFailure(@NotNull Exception e) {
                             e.printStackTrace();
                             FirebaseUtil.hideProgressDialog(mProgressDialog);
-                            Toast.makeText(UserProfile.this, "The upload is failed", Toast.LENGTH_LONG).show();
+                            Toast.makeText(UserProfile.this, getResources().getString(R.string.upload_failed), Toast.LENGTH_LONG).show();
                             end();
                         }
                     })
@@ -486,7 +486,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                                     public void onFailure(@NotNull Exception e) {
                                         e.printStackTrace();
                                         FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                        Toast.makeText(UserProfile.this, "The thumbnail upload is failed", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(UserProfile.this, getResources().getString(R.string.thumbnail_upload_failed), Toast.LENGTH_LONG).show();
                                         end();
                                     }
                                 }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -498,13 +498,13 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                                         ref2.setValue(current_user);
 
                                         FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                        Toast.makeText(UserProfile.this, "Information saved", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(UserProfile.this, getResources().getString(R.string.information_saved), Toast.LENGTH_SHORT).show();
                                         end();
                                     }
                                 });
                             } catch (IOException e) {
                                 FirebaseUtil.hideProgressDialog(mProgressDialog);
-                                Toast.makeText(UserProfile.this, "The thumbnail creation failed", Toast.LENGTH_LONG).show();
+                                Toast.makeText(UserProfile.this, getResources().getString(R.string.thumbnail_creation_failed), Toast.LENGTH_LONG).show();
                                 e.printStackTrace();
                                 end();
                             }
