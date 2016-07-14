@@ -168,22 +168,22 @@ public class MyOrdersActivity extends AppCompatActivity
 
         TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
         TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-        ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
-
-        if (user.getOwnerUser())
-            ownerItem.setVisible(true);
+        TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
+        ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
 
         nav_username.setText(user.getUser_full_name());
         nav_email.setText(user.getUser_email());
-        String photoUri = user.getUser_photo_firebase_URL();
+        nav_points.setText(user.getUser_fidelity_points());
 
+        String photoUri = user.getUser_photo_firebase_URL();
         if(photoUri == null || photoUri.equals("")) {
             Glide
                     .with(MyOrdersActivity.this)
                     .load(R.drawable.blank_profile_nav)
                     .centerCrop()
                     .into(nav_picture);
-        } else {
+        }
+        else{
             Glide
                     .with(MyOrdersActivity.this)
                     .load(photoUri)

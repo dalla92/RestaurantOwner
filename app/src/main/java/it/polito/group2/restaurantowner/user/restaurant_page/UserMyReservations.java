@@ -51,6 +51,7 @@ import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
 import it.polito.group2.restaurantowner.owner.SimpleItemTouchHelperCallback;
+import it.polito.group2.restaurantowner.user.my_favourites.UserMyFavourites;
 import it.polito.group2.restaurantowner.user.my_orders.MyOrdersActivity;
 import it.polito.group2.restaurantowner.user.my_reviews.MyReviewsActivity;
 import it.polito.group2.restaurantowner.user.restaurant_list.UserRestaurantList;
@@ -135,6 +136,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
                     TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
                     ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
                     User target = dataSnapshot.getValue(User.class);
 
@@ -143,21 +145,23 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
 
                     nav_username.setText(target.getUser_full_name());
                     nav_email.setText(target.getUser_email());
+                    nav_points.setText(target.getUser_fidelity_points());
 
                     String photoUri = target.getUser_photo_firebase_URL();
-                    if(photoUri == null || photoUri.equals("")) {
-                        Glide
-                                .with(UserMyReservations.this)
-                                .load(R.drawable.blank_profile_nav)
-                                .centerCrop()
-                                .into(nav_picture);
-                    }
-                    else{
-                        Glide
-                                .with(UserMyReservations.this)
-                                .load(photoUri)
-                                .centerCrop()
-                                .into(nav_picture);
+                    if (!isFinishing()) {
+                        if (photoUri == null || photoUri.equals("")) {
+                            Glide
+                                    .with(UserMyReservations.this)
+                                    .load(R.drawable.blank_profile_nav)
+                                    .centerCrop()
+                                    .into(nav_picture);
+                        } else {
+                            Glide
+                                    .with(UserMyReservations.this)
+                                    .load(photoUri)
+                                    .centerCrop()
+                                    .into(nav_picture);
+                        }
                     }
                 }
 
