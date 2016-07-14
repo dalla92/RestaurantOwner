@@ -12,9 +12,8 @@ import android.support.v4.content.ContextCompat;
  */
 public class PermissionUtil {
 
-    private static final int REQUEST_WRITE_STORAGE = 112;
+    public static void checkWritePermission(Activity activity, final int REQUEST_WRITE_STORAGE) {
 
-    public static void checkWritePermission(Activity activity) {
         boolean hasPermission = (ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);
         if (!hasPermission) {

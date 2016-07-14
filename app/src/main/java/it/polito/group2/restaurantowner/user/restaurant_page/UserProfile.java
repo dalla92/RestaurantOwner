@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
@@ -39,6 +40,7 @@ import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.ImageUtils;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.PermissionUtil;
 import it.polito.group2.restaurantowner.firebasedata.User;
 import it.polito.group2.restaurantowner.login.LoginManagerActivity;
 import it.polito.group2.restaurantowner.owner.MainActivity;
@@ -86,6 +88,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
     private String user_id;
     static final int PICK_IMAGE = 2;
     static final int REQUEST_TAKE_PHOTO = 3;
+    private static final int REQUEST_WRITE_STORAGE = 112;
     public String photouri=null;
     private ProgressDialog progressDialog;
     private Toolbar toolbar;
@@ -120,6 +123,26 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         setDrawerAndGetUser();
 		
     }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case REQUEST_WRITE_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    //reload my activity with permission granted or use the features what required the permission
+                } else
+                {
+                    Toast.makeText(UserProfile.this, "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
+    }
+
 
     private void setDrawerAndGetUser() {
         //navigation drawer
@@ -271,6 +294,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                PermissionUtil.checkWritePermission(UserProfile.this, REQUEST_WRITE_STORAGE);
                 dispatchTakePictureIntent();
             }
         });

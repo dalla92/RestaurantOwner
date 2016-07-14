@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -33,6 +35,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -41,6 +44,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
 import it.polito.group2.restaurantowner.R;
+import it.polito.group2.restaurantowner.Utils.PermissionUtil;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
 
 /**
@@ -62,6 +66,7 @@ public class FragmentMainInfo extends Fragment {
     private boolean is_take_away;
     public int PICK_IMAGE = 0;
     public int REQUEST_TAKE_PHOTO = 1;
+    private static final int REQUEST_WRITE_STORAGE = 112;
     public View rootView = null;
     public static FragmentMainInfo fragment;
     private boolean photoUploaded;
@@ -321,11 +326,30 @@ public class FragmentMainInfo extends Fragment {
             @Override
             public void onClick(View v) {
                 //take the photo
+                PermissionUtil.checkWritePermission(getActivity(), REQUEST_WRITE_STORAGE);
                 dispatchTakePictureIntent();
             }
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case REQUEST_WRITE_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    //reload my activity with permission granted or use the features what required the permission
+                } else
+                {
+                    Toast.makeText(getActivity(), "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
     }
 
     @Override

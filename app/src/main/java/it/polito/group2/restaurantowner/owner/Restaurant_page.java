@@ -4,11 +4,13 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.NavigationView;
@@ -67,6 +69,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.DrawerUtil;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.PermissionUtil;
 import it.polito.group2.restaurantowner.Utils.RemoveListenerUtil;
 import it.polito.group2.restaurantowner.firebasedata.Review;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
@@ -85,6 +88,7 @@ public class Restaurant_page extends AppCompatActivity
     public int PICK_IMAGE = 0;
     public int REQUEST_TAKE_PHOTO = 1;
     public int MODIFY_INFO = 4;
+    private static final int REQUEST_WRITE_STORAGE = 112;
     public String photouri = null;
     public ArrayList<Review> reviews = new ArrayList<>();
     public Restaurant my_restaurant = null;
@@ -195,6 +199,24 @@ public class Restaurant_page extends AppCompatActivity
         });
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case REQUEST_WRITE_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    //reload my activity with permission granted or use the features what required the permission
+                } else
+                {
+                    Toast.makeText(Restaurant_page.this, "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
+    }
+
     private void get_data_from_firebase(){
         firebase = FirebaseDatabase.getInstance();
         setDrawer();
@@ -281,6 +303,7 @@ public class Restaurant_page extends AppCompatActivity
                             int id = item.getItemId();
 
                             if (id == R.id.camera) {
+                                PermissionUtil.checkWritePermission(Restaurant_page.this, REQUEST_WRITE_STORAGE);
                                 dispatchTakePictureIntent();
                                 return true;
                             }

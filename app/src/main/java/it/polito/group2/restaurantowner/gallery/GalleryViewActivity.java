@@ -3,6 +3,7 @@ package it.polito.group2.restaurantowner.gallery;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -43,6 +44,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.IOException;
+import java.security.Permission;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -53,6 +55,7 @@ import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.Utils.FirebaseUtil;
 import it.polito.group2.restaurantowner.Utils.ImageUtils;
 import it.polito.group2.restaurantowner.Utils.OnBackUtil;
+import it.polito.group2.restaurantowner.Utils.PermissionUtil;
 import it.polito.group2.restaurantowner.firebasedata.Restaurant;
 import it.polito.group2.restaurantowner.firebasedata.RestaurantGallery;
 
@@ -66,15 +69,15 @@ public class GalleryViewActivity extends AppCompatActivity {
     private HashMap<String, String> mGridData;
     private String restaurantID;
     private GridView mGridView;
-    public int PICK_IMAGE = 0;
-    public int REQUEST_TAKE_PHOTO = 1;
+    private final int PICK_IMAGE = 0;
+    private final int REQUEST_TAKE_PHOTO = 1;
+    private static final int REQUEST_WRITE_STORAGE = 112;
     private StorageReference storageRef;
     private FirebaseDatabase firebase;
     private String mCurrentPhotoPath;
     private ProgressDialog mProgressDialog;
     private Boolean isOwner = false;
     private String userID;
-    private DatabaseReference userRef;
     private boolean coming_from_user;
 
     @Override
@@ -291,6 +294,24 @@ public class GalleryViewActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case REQUEST_WRITE_STORAGE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    //reload my activity with permission granted or use the features what required the permission
+                } else
+                {
+                    Toast.makeText(GalleryViewActivity.this, "The app was not allowed to write to your storage. Hence, it cannot function properly. Please consider granting it this permission", Toast.LENGTH_LONG).show();
+                }
+            }
+        }
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         userID = FirebaseUtil.getCurrentUserId();
@@ -357,6 +378,7 @@ public class GalleryViewActivity extends AppCompatActivity {
                         int id = item.getItemId();
 
                         if (id == R.id.camera) {
+                            PermissionUtil.checkWritePermission(GalleryViewActivity.this, REQUEST_WRITE_STORAGE);
                             dispatchTakePictureIntent();
                             return true;
                         }
