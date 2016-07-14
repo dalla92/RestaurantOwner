@@ -113,13 +113,15 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
         int id = item.getItemId();
 
         if (id == R.id.action_save) {
-            FirebaseUtil.showProgressDialog(mProssesDialog);
             saveData();
-            if (res.getRestaurant_name().equals(""))
+            if (res.getRestaurant_name().equals("")) {
                 Toast.makeText(this, getResources().getString(R.string.insert_restaurant_name), Toast.LENGTH_SHORT).show();
-            else if(alwaysClosed(res))
+            }
+            else if(alwaysClosed(res)) {
                 Toast.makeText(this, getResources().getString(R.string.insert_category_name), Toast.LENGTH_SHORT).show();
+            }
             else {
+                FirebaseUtil.showProgressDialog(mProssesDialog);
                 final String userID = FirebaseUtil.getCurrentUserId();
                 if (userID != null) {
                     DatabaseReference restaurantRef;
@@ -128,7 +130,6 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                     }
                     else {
                         res.setUser_id(userID);
-
                         //resList.add(0,res);
                         //mAdapter.addItem(0, res);
                         DatabaseReference restaurantsReference = firebase.getReference("restaurants");

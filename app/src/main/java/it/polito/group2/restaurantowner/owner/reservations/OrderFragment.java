@@ -33,13 +33,12 @@ public class OrderFragment extends Fragment {
     private ValueEventListener l;
     private ProgressDialog mProgressDialog = null;
 
-    private View rootView;
     private Calendar targetDate;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.owner_reservations_fragment_order, container, false);
+        View rootView = inflater.inflate(R.layout.owner_reservations_fragment_order, container, false);
 
         Bundle bundle = getArguments();
         restaurantID = bundle.getString("restaurant_id");
@@ -91,7 +90,6 @@ public class OrderFragment extends Fragment {
         RemoveListenerUtil.remove_value_event_listener(q, l);
     }
 
-    //TODO capire quando viene chiamato
     public void changeData(Calendar date){
         targetDate = date;
         orderListDate = new ArrayList<>();

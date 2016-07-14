@@ -181,6 +181,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
                     TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
                     ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
                     User target = dataSnapshot.getValue(User.class);
 
@@ -195,22 +196,25 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
 
                     nav_username.setText(target.getUser_full_name());
                     nav_email.setText(target.getUser_email());
+                    nav_points.setText(target.getUser_fidelity_points());
 
                     String photoUri = target.getUser_photo_firebase_URL();
-                    if(photoUri == null || photoUri.equals("")) {
-                        Glide
-                                .with(UserProfile.this)
-                                .load(R.drawable.blank_profile_nav)
-                                .centerCrop()
-                                .into(nav_picture);
+                    if (!isFinishing()) {
+                        if (photoUri == null || photoUri.equals("")) {
+                            Glide
+                                    .with(UserProfile.this)
+                                    .load(R.drawable.blank_profile_nav)
+                                    .centerCrop()
+                                    .into(nav_picture);
+                        } else {
+                            Glide
+                                    .with(UserProfile.this)
+                                    .load(photoUri)
+                                    .centerCrop()
+                                    .into(nav_picture);
+                        }
                     }
-                    else{
-                        Glide
-                                .with(UserProfile.this)
-                                .load(photoUri)
-                                .centerCrop()
-                                .into(nav_picture);
-                    }
+                    FirebaseUtil.hideProgressDialog(progressDialog);
                 }
 
                 @Override

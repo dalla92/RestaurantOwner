@@ -56,9 +56,6 @@ public class MyOffersActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //mProgressDialog = FirebaseUtil.initProgressDialog(this);
-        //FirebaseUtil.showProgressDialog(mProgressDialog);
-
         //User object
         DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
         if (userRef != null) {
@@ -128,7 +125,7 @@ public class MyOffersActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseUtil.initProgressDialog(this);
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
         q.addValueEventListener(l);
     }

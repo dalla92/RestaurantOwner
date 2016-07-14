@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import it.polito.group2.restaurantowner.R;
 import it.polito.group2.restaurantowner.firebasedata.Meal;
@@ -67,7 +68,7 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
             holder.additionResumePrice.setText(formatEuro(totalAdd));
             holder.additionList.setLayoutManager(new LinearLayoutManager(context.getApplicationContext()));
             holder.additionList.setNestedScrollingEnabled(false);
-            AdditionAdapter adapter = new AdditionAdapter(context, (ArrayList<MealAddition>) mealList.get(position).getMeal_additions().values());
+            AdditionAdapter adapter = new AdditionAdapter(context, getMealAdditionList(mealList.get(position).getMeal_additions()));
             holder.additionList.setAdapter(adapter);
             holder.additionList.setVisibility(View.GONE);
             holder.additionResume.setOnClickListener(new View.OnClickListener() {
@@ -93,5 +94,13 @@ public class MealAdapter extends RecyclerView.Adapter<MealAdapter.MealViewHolder
 
     private String formatEuro(double number) {
         return "€ "+String.format("%2.2f", number);
+    }
+
+    public ArrayList<MealAddition> getMealAdditionList(HashMap<String, MealAddition> addMap) {
+        ArrayList<MealAddition> list = new ArrayList<>();
+        for(MealAddition a : addMap.values()) {
+            list.add(a);
+        }
+        return list;
     }
 }

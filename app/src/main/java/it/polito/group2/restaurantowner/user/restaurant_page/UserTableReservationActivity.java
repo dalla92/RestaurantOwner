@@ -88,6 +88,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
     private Query q;
     private ValueEventListener l;
     private ProgressDialog mProgressDialog;
+    private final Calendar today = Calendar.getInstance();;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,11 +165,10 @@ public class UserTableReservationActivity extends AppCompatActivity {
 
                     //timepicker
                     // Get Current Time
-                    final Calendar today = Calendar.getInstance();
                     current_hour = Integer.toString(today.get(Calendar.HOUR_OF_DAY));
                     current_minute = Integer.toString(today.get(Calendar.MINUTE));
-                    chosen_hour = null; //current_hour;
-                    chosen_minute = null; //current_minute;
+                    chosen_hour = current_hour;
+                    chosen_minute = current_minute;
                     timepicker_button = (Button) findViewById(R.id.table_reservation_time);
                     timepicker_button.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -183,10 +183,10 @@ public class UserTableReservationActivity extends AppCompatActivity {
                     current_year = Integer.toString(c.get(Calendar.YEAR));
                     current_month = Integer.toString(c.get(Calendar.MONTH));
                     current_day = Integer.toString(c.get(Calendar.DAY_OF_MONTH));
-                    chosen_year = null; //current_year;
-                    chosen_month = null; //current_month;
-                    chosen_day = null; //current_day;
-                    chosen_weekday = null; //current_day;
+                    chosen_year = Integer.valueOf(current_year);
+                    chosen_month = Integer.valueOf(current_month);
+                    chosen_day = Integer.valueOf(current_day);
+                    chosen_weekday = c.get(Calendar.DAY_OF_WEEK);
                     datepicker_button = (Button) findViewById(R.id.table_reservation_date);
                     datepicker_button.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -223,11 +223,11 @@ public class UserTableReservationActivity extends AppCompatActivity {
         Calendar next_month = Calendar.getInstance();
         next_month.add(Calendar.MONTH, 1); //he can book just for this month and the next one
         calendar = (CalendarPickerView) dialog.findViewById(R.id.calendar_view);
-        Date today = new Date();
-        calendar.init(today, next_month.getTime()).withSelectedDate(today);
+        Date today2 = new Date();
+        calendar.init(today2, next_month.getTime()).withSelectedDate(today2);
         //decorate calendar
         decoratorList = new ArrayList<>();
-        decoratorList.add(new MonthDecorator_CalendarPicker(closing_days, today));
+        decoratorList.add(new MonthDecorator_CalendarPicker(closing_days, today2));
         calendar.setDecorators(decoratorList);
         calendar.setBackgroundColor(Color.WHITE);
         calendar.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -262,10 +262,10 @@ public class UserTableReservationActivity extends AppCompatActivity {
 
             @Override
             public void onDateUnselected(Date date) {
-                chosen_day = null;
-                chosen_month = null;
-                chosen_year = null;
-                chosen_weekday = null;
+                chosen_year = Integer.valueOf(current_year);
+                chosen_month = Integer.valueOf(current_month);
+                chosen_day = Integer.valueOf(current_day);
+                chosen_weekday = today.get(Calendar.DAY_OF_WEEK);
             }
         });
         dialog.getWindow().setBackgroundDrawableResource(R.color.colorPrimary);

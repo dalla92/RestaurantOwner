@@ -269,10 +269,12 @@ public class Restaurant_page extends AppCompatActivity
 
     private void fill_data(){
         ImageView image = (ImageView) findViewById(R.id.image_to_enlarge);
-        if (my_restaurant.getRestaurant_photo_firebase_URL()!= null) {
-            Glide.with(context)
-                    .load(my_restaurant.getRestaurant_photo_firebase_URL())
-                    .into(image);
+        if (!isFinishing()) {
+            if (my_restaurant.getRestaurant_photo_firebase_URL() != null) {
+                Glide.with(context)
+                        .load(my_restaurant.getRestaurant_photo_firebase_URL())
+                        .into(image);
+            }
         }
         EditText edit_restaurant_name = (EditText) findViewById(R.id.edit_restaurant_name);
         EditText edit_restaurant_address = (EditText) findViewById(R.id.edit_restaurant_address);
