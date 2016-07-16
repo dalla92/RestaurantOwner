@@ -128,7 +128,8 @@ public class Filter extends AppCompatActivity {
             intent.putExtra("TwoEuro", CBTwoEuro.isChecked());
             intent.putExtra("ThreeEuro", CBThreeEuro.isChecked());
             intent.putExtra("FourEuro", CBFourEuro.isChecked());
-            intent.putExtra("range", range);
+            double rangeDouble = range;
+            intent.putExtra("range", rangeDouble);
             intent.putExtra("Lunch", CBlunch.isChecked());
             intent.putExtra("Dinner", CBdinner.isChecked());
             if(category.getSelectedItemPosition()==0)

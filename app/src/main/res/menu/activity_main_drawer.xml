@@ -6,11 +6,11 @@
         <item
             android:id="@+id/action_user_part"
             android:title="@string/action_user_part"
-            android:icon="@drawable/blank_profile" />
+            android:icon="@mipmap/ic_user_profile" />
 
         <item
             android:id="@+id/nav_logout"
-            android:icon="@drawable/ic_menu_share"
+            android:icon="@mipmap/ic_login"
             android:title="Logout" />
 
     </group>

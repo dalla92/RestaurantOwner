@@ -105,7 +105,7 @@ public class Offer implements Serializable {
             int timeOfDay = day.get(Calendar.HOUR_OF_DAY);
             if(timeOfDay >= 6 && timeOfDay < 16){
                 return offerAtLunch;
-            } else if(timeOfDay >= 16 && timeOfDay < 6){
+            } else if(timeOfDay >= 16 || timeOfDay < 6){
                 return offerAtDinner;
             }
         }
