@@ -470,9 +470,9 @@
     <string name="review_rating">Non puoi aggiungere un commento senza voto!</string>
     <string name="signed_as">Loggato come:</string>
     <string name="signed_out">Non loggato</string>
-    <string name="sure_delete_offer">Sei sicuro di cancellare questa offerta?</string>
-    <string name="sure_delete_reservation">Sei sicuro di cancellare questa prenotazione?</string>
-    <string name="sure_delete_restaurant">Sei sicuro di cancellare questo ristorante?</string>
+    <string name="sure_delete_offer">Sei sicuro di cancellare questa offerta? L\'operazione non può essere annullata</string>
+    <string name="sure_delete_reservation">Sei sicuro di cancellare questa prenotazione? L\'operazione non può essere annullata</string>
+    <string name="sure_delete_restaurant">Sei sicuro di cancellare questo ristorante? L\'operazione non può essere annullata</string>
     <string name="technical_problem">Problema tecnico, prova di nuovo o riavvia l\'applicazione!</string>
     <string name="thumbnail_creation_failed">Creazione thumbnail fallita</string>
     <string name="thumbnail_upload_failed">Upload thumbnail fallita</string>
@@ -484,4 +484,5 @@
     <string name="new_offer_notification">Nuova offerta da un tuo ristorante preferito!</string>
     <string name="new_order_notification">Un utente ha effettuato un ordine!</string>
     <string name="new_table_reservation_notification">Un utente ha prenotato un tavolo!</string>
+    <string name="sure_delete_meal">Sei sicuro di cancellare questo piatto? L\'operazione non può essere annullata</string>
 </resources>

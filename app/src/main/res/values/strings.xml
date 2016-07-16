@@ -525,9 +525,10 @@
 
     <string name="new_offer_notification">New offer from your favourite restaurant!</string>
     <string name="new_order_notification">An user has ordered!</string>
-    <string name="new_table_reservation_notification">An user hhas booked a table!</string>
+    <string name="new_table_reservation_notification">An user has booked a table!</string>
 
     <string name="owner_reservations_fragment_order_title">Orders</string>
     <string name="owner_reservations_fragment_order_empty_label">No order in this date</string>
+    <string name="sure_delete_meal">Are you sure you want to delete the meal?The operation cannot be undone!</string>
 
 </resources>

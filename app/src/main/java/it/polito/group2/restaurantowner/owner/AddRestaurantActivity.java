@@ -118,7 +118,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                 Toast.makeText(this, getResources().getString(R.string.insert_restaurant_name), Toast.LENGTH_SHORT).show();
             }
             else if(alwaysClosed(res)) {
-                Toast.makeText(this, getResources().getString(R.string.insert_category_name), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getResources().getString(R.string.insert_time_slot), Toast.LENGTH_SHORT).show();
             }
             else {
                 FirebaseUtil.showProgressDialog(mProssesDialog);
@@ -191,7 +191,7 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                             //saving the names of the restaurant with the id in restaurant_names for search purpose
                             firebase.getReference("restaurant_names/" + finalRes.getRestaurant_name().toLowerCase() + "/" + finalRes.getRestaurant_id()).setValue(true);
                             FirebaseUtil.hideProgressDialog(mProssesDialog);
-                            Toast.makeText(AddRestaurantActivity.this, getResources().getString(R.string.insert_restaurant_name), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddRestaurantActivity.this, getResources().getString(R.string.restaurant_added_successfully), Toast.LENGTH_SHORT).show();
                             OnBackUtil.clean_stack_and_go_to_restaurant_page(AddRestaurantActivity.this, res.getRestaurant_id());
                         }
                     });

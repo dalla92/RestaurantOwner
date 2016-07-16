@@ -145,7 +145,7 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
 
                     nav_username.setText(target.getUser_full_name());
                     nav_email.setText(target.getUser_email());
-                    nav_points.setText(target.getUser_fidelity_points());
+                    nav_points.setText(String.valueOf(target.getUser_fidelity_points()));
 
                     String photoUri = target.getUser_photo_firebase_URL();
                     if (!isFinishing()) {

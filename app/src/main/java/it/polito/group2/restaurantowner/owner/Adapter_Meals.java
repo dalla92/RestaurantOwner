@@ -199,7 +199,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     public void onItemDismiss(final int position) {
         AlertDialog.Builder alert = new AlertDialog.Builder(activity);
         alert.setTitle(activity.getResources().getString(R.string.action_confirm));
-        alert.setMessage(activity.getResources().getString(R.string.sure_delete_restaurant));
+        alert.setMessage(activity.getResources().getString(R.string.sure_delete_meal));
         alert.setPositiveButton(activity.getResources().getString(R.string.yes), new DialogInterface.OnClickListener() {
 
             @Override

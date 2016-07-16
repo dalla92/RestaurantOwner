@@ -116,6 +116,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_save) {
+            mSectionsPagerAdapter.saveDataFromFragments();
             if (current_meal.getMeal_name().equals("") || current_meal.getMeal_name() == null)
                 Toast.makeText(this, getResources().getString(R.string.insert_meal_name), Toast.LENGTH_SHORT).show();
             else {
@@ -123,7 +124,7 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                     Toast.makeText(this, getResources().getString(R.string.insert_category_name), Toast.LENGTH_SHORT).show();
                 else {
                     FirebaseUtil.showProgressDialog(mProsessDialog);
-                    mSectionsPagerAdapter.saveDataFromFragments();
+                    firebaseOperationsAfterChecking();
                     return true;
                 }
             }
@@ -151,6 +152,10 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
         current_meal.setMeal_category(category);
         current_meal.setMealTakeAway(take_away);
 
+
+    }
+
+    public void firebaseOperationsAfterChecking(){
         //update restaurant price range
         firebase = FirebaseDatabase.getInstance();
         DatabaseReference ref = firebase.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + current_meal.getRestaurant_id());
@@ -173,39 +178,12 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
             public void onCancelled(DatabaseError firebaseError) {
             }
         });
-    }
-
-    public static int calculate_range(long total_meals_number, double total_meals_price) {
-        if (total_meals_number == 0 || total_meals_price == 0)
-            return 1;
-
-        double ratio = 0;
-
-        ratio = total_meals_price / total_meals_number;
-
-        if (ratio <= PRICE_BOUNDARY_1)
-            return 1;
-        if (ratio > PRICE_BOUNDARY_1 && ratio < PRICE_BOUNDARY_2)
-            return 2;
-        if (ratio > PRICE_BOUNDARY_2 && ratio < PRICE_BOUNDARY_3)
-            return 3;
-        return 4;
-    }
-
-
-    @Override
-    public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealCategory> tags) {
-        current_meal.setMeal_description(meal_description);
-        current_meal.setMeal_cooking_time(cooking_time);
-        current_meal.addManyAdditions(mealAdditions);
-        current_meal.addManyTags(tags);
-
 
         if(photouri == null || photouri.equals("") || !photoUploaded){
             Log.d("null", "" + photouri + " " + photoUploaded);
             String meal_key = current_meal.getMeal_id();
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + current_meal.getRestaurant_id() + "/" + meal_key);
-            ref.setValue(current_meal);
+            DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + current_meal.getRestaurant_id() + "/" + meal_key);
+            ref2.setValue(current_meal);
             Intent intent = new Intent();
             intent.putExtra("meal", current_meal);
             setResult(RESULT_OK, intent);
@@ -257,6 +235,36 @@ public class MenuRestaurant_edit extends AppCompatActivity implements FragmentMa
                 }
             });
         }
+
+    }
+
+    public static int calculate_range(long total_meals_number, double total_meals_price) {
+        if (total_meals_number == 0 || total_meals_price == 0)
+            return 1;
+
+        double ratio = 0;
+
+        ratio = total_meals_price / total_meals_number;
+
+        if (ratio <= PRICE_BOUNDARY_1)
+            return 1;
+        if (ratio > PRICE_BOUNDARY_1 && ratio < PRICE_BOUNDARY_2)
+            return 2;
+        if (ratio > PRICE_BOUNDARY_2 && ratio < PRICE_BOUNDARY_3)
+            return 3;
+        return 4;
+    }
+
+
+    @Override
+    public void onOtherInfoPass(String meal_description, int cooking_time, ArrayList<MealAddition> mealAdditions, ArrayList<MealCategory> tags) {
+        current_meal.setMeal_description(meal_description);
+        current_meal.setMeal_cooking_time(cooking_time);
+        current_meal.addManyAdditions(mealAdditions);
+        current_meal.addManyTags(tags);
+
+
+
     }
 
     /*@Override

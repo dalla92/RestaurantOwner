@@ -173,7 +173,7 @@ public class MyOrdersActivity extends AppCompatActivity
 
         nav_username.setText(user.getUser_full_name());
         nav_email.setText(user.getUser_email());
-        nav_points.setText(user.getUser_fidelity_points());
+        nav_points.setText(String.valueOf(user.getUser_fidelity_points()));
 
         String photoUri = user.getUser_photo_firebase_URL();
         if(photoUri == null || photoUri.equals("")) {

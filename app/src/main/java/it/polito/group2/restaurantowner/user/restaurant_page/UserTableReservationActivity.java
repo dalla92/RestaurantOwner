@@ -429,7 +429,7 @@ public class UserTableReservationActivity extends AppCompatActivity {
                                     @Override
                                     public void onSuccess(Void aVoid) {
                                         String title = getResources().getString(R.string.new_table_reservation_notification);
-                                        new SendNotificationAsync().execute(temp.getRestaurant_name(), restaurant_id + "reservation");
+                                        new SendNotificationAsync().execute(temp.getRestaurant_name(), restaurant_id + "reservation",title);
                                     }
                                 });
 

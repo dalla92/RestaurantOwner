@@ -51,7 +51,8 @@
                     android:textSize="18dp"
                     android:textStyle="bold"
                     android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:gravity="right" />
+                    android:gravity="right"
+                    android:layout_marginLeft="2dp" />
             </LinearLayout>
 
             <TextView

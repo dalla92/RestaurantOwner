@@ -42,7 +42,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:paddingStart="4dp"
                 android:text="@string/name"
-                android:textColor="@color/colorPrimary"
+                android:textColor="#FFFFFF"
                 android:id="@+id/textViewName"
                 android:textStyle="bold"
                 android:layout_above="@+id/textViewReservationNumber"

@@ -323,7 +323,7 @@ public class OrderActivity extends AppCompatActivity
             @Override
             public void onSuccess(Void aVoid) {
                 String title = getResources().getString(R.string.new_order_notification);
-                new SendNotificationAsync().execute(temp.getRestaurant_name(),restaurantID + "order");
+                new SendNotificationAsync().execute(temp.getRestaurant_name(),restaurantID + "order",title);
             }
         });
         if(this.order.getFidelity_applied() || this.restaurant.getFidelityProgramAccepted()) {
