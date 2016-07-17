@@ -59,6 +59,7 @@
             android:name=".owner.Restaurant_page"
             android:label="@string/restaurant_page_name"
             android:parentActivityName=".owner.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" >
             </activity>
         <activity
@@ -107,6 +108,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.UserRestaurantActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
