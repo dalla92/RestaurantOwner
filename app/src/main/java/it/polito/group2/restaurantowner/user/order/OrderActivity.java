@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -449,9 +450,12 @@ public class OrderActivity extends AppCompatActivity
         Boolean bo;
         Calendar c = Calendar.getInstance();
         if (offerList.size() > 0) {
+            Log.d("FILIPPO", "trovate offerte: "+offerList.size());
             for (Offer o : offerList) {
                 bo = o.isNowInOffer(c);
+                Log.d("FILIPPO", "oggi: "+c.toString()+" offerta il: "+o.getOfferStart());
                 if (bo) {
+                    Log.d("FILIPPO", "offerta attiva per quest'ordine");
                     return o;
                 }
             }
@@ -462,6 +466,7 @@ public class OrderActivity extends AppCompatActivity
     private ArrayList<String> getCategoryList() {
         ArrayList<String> categoryList = new ArrayList<>();
         for (Meal m : mealList) {
+
             if (categoryList.indexOf(m.getMeal_category()) == -1)
                 categoryList.add(m.getMeal_category());
         }

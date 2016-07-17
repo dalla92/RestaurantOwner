@@ -102,10 +102,13 @@ public class Offer implements Serializable {
 
     public Boolean isNowInOffer(Calendar day) {
         if(isDayInOffer(day)) {
+            Log.d("FILIPPO", "il giorno e' in offerta "+day.getTime().toString());
             int timeOfDay = day.get(Calendar.HOUR_OF_DAY);
             if(timeOfDay >= 6 && timeOfDay < 16){
+                Log.d("FILIPPO", "offerta attiva a pranzo");
                 return offerAtLunch;
             } else if(timeOfDay >= 16 || timeOfDay < 6){
+                Log.d("FILIPPO", "offerta attiva a cena");
                 return offerAtDinner;
             }
         }
