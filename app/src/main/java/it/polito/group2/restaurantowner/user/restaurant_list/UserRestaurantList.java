@@ -964,7 +964,7 @@ public class UserRestaurantList extends AppCompatActivity
                     RestaurantPreview rp = getRestaurantPreviewFromId(resId);
                     for (DataSnapshot snap_slot : snapshot.getChildren()) {
                         RestaurantTimeSlot timeSlot = snap_slot.getValue(RestaurantTimeSlot.class);
-                        if (timeSlot.getDay_of_week() == today.get(Calendar.DAY_OF_WEEK) - 2) {
+                        if (timeSlot.getDay_of_week() == (today.get(Calendar.DAY_OF_WEEK)-1)) {
                             boolean addRes = false;
                             if (lunch && timeSlot.getLunch())
                                 addRes = true;
@@ -975,13 +975,22 @@ public class UserRestaurantList extends AppCompatActivity
                                     if (price1 && rp.getRestaurant_price_range() == 1 ||
                                             price2 && rp.getRestaurant_price_range() == 2 ||
                                             price3 && rp.getRestaurant_price_range() == 3 ||
-                                            price4 && rp.getRestaurant_price_range() == 4 )
-                                        if (is_restaurant_near(new LatLng(rp.getPosition().latitude, rp.getPosition().longitude), mLastUserMarker, range)) {
+                                            price4 && rp.getRestaurant_price_range() == 4 ) {
+                                        if(mLastUserMarker!=null) {
+                                            if (is_restaurant_near(new LatLng(rp.getPosition().latitude, rp.getPosition().longitude), mLastUserMarker, range)) {
+                                                mClusterManager.addItem(new MyItem(rp.getLat(), rp.getLon()));
+                                                mClusterManager.cluster();
+                                                mAdapter.addItem(rp);
+                                                mAdapter.notifyDataSetChanged();
+                                            }
+                                        }
+                                        else{
                                             mClusterManager.addItem(new MyItem(rp.getLat(), rp.getLon()));
                                             mClusterManager.cluster();
                                             mAdapter.addItem(rp);
                                             mAdapter.notifyDataSetChanged();
                                         }
+                                    }
                                     }
                                 }
 

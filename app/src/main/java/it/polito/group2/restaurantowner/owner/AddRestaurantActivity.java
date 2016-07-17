@@ -131,6 +131,8 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                     }
                     else {
                         res.setUser_id(userID);
+                        res.setRestaurant_price_range(1);
+                        res.setRestaurant_rating(1);
                         //resList.add(0,res);
                         //mAdapter.addItem(0, res);
                         DatabaseReference restaurantsReference = firebase.getReference("restaurants");
