@@ -200,7 +200,7 @@ public class StatisticsActivity extends AppCompatActivity
                     bookingCounter[i] = 0;
                     if(orderList.size() > 0) {
                         for (Order o : orderList) {
-                            if (o.orderDateToCalendar().after(start) && o.orderDateToCalendar().after(stop))
+                            if (o.orderDateToCalendar().after(start) && o.orderDateToCalendar().before(stop))
                                 orderCounter[i]++;
                         }
                     }
@@ -208,7 +208,7 @@ public class StatisticsActivity extends AppCompatActivity
                         for (TableReservation r : reservationList) {
                             Calendar c = Calendar.getInstance();
                             c.setTimeInMillis(r.getTable_reservation_date());
-                            if (c.after(start) && c.after(stop))
+                            if (c.after(start) && c.before(stop))
                                 bookingCounter[i]++;
                         }
                     }
@@ -230,16 +230,18 @@ public class StatisticsActivity extends AppCompatActivity
                 stop.set(Calendar.MINUTE, 59);
                 stop.set(Calendar.SECOND, 59);
                 for(int i=0; i<bookingCounter.length; i++) {
+
                     orderCounter[i] = 0;
                     bookingCounter[i] = 0;
                     for(Order o : orderList) {
-                        if(o.orderDateToCalendar().after(start) && o.orderDateToCalendar().after(stop))
+                        if(o.orderDateToCalendar().after(start) && o.orderDateToCalendar().before(stop)) {
                             orderCounter[i]++;
+                        }
                     }
                     for(TableReservation r : reservationList) {
                         Calendar c = Calendar.getInstance();
                         c.setTimeInMillis(r.getTable_reservation_date());
-                        if(c.after(start) && c.after(stop))
+                        if(c.after(start) && c.before(stop))
                             bookingCounter[i]++;
                     }
                     start.setTimeInMillis(start.getTimeInMillis()+(24*60*60*1000));
@@ -253,27 +255,37 @@ public class StatisticsActivity extends AppCompatActivity
                 start.set(Calendar.HOUR_OF_DAY, 0);
                 start.set(Calendar.MINUTE, 0);
                 start.set(Calendar.SECOND, 0);
+                start.set(Calendar.MONTH, Calendar.JANUARY);
+                start.set(Calendar.DAY_OF_MONTH, 1);
+
                 stop = Calendar.getInstance();
-                stop.set(Calendar.HOUR_OF_DAY, 23);
-                stop.set(Calendar.MINUTE, 59);
-                stop.set(Calendar.SECOND, 59);
+                stop.set(Calendar.HOUR_OF_DAY, 0);
+                stop.set(Calendar.MINUTE, 0);
+                stop.set(Calendar.SECOND, 0);
+                stop.set(Calendar.MONTH, Calendar.FEBRUARY);
+                stop.set(Calendar.DAY_OF_MONTH, 1);
 
                 for(int i=0; i<12; i++) {
                     orderCounter[i] = 0;
                     bookingCounter[i] = 0;
-                    start.set(Calendar.MONTH, i);
-                    start.set(Calendar.DAY_OF_MONTH, 1);
-                    stop.set(Calendar.MONTH, i);
-                    stop.set(Calendar.DAY_OF_MONTH, stop.getActualMaximum(Calendar.DAY_OF_MONTH));
                     for(Order o : orderList) {
-                        if(o.orderDateToCalendar().after(start) && o.orderDateToCalendar().after(stop))
+                        if(o.orderDateToCalendar().after(start) && o.orderDateToCalendar().before(stop)) {
                             orderCounter[i]++;
+                        }
                     }
                     for(TableReservation r : reservationList) {
                         Calendar c = Calendar.getInstance();
                         c.setTimeInMillis(r.getTable_reservation_date());
-                        if(c.after(start) && c.after(stop))
+                        if(c.after(start) && c.before(stop))
                             bookingCounter[i]++;
+                    }
+                    start.set(Calendar.MONTH, start.get(Calendar.MONTH)+1);
+                    if(i<11)
+                        stop.set(Calendar.MONTH, stop.get(Calendar.MONTH)+1);
+                    else {
+                        stop.set(Calendar.MONTH, Calendar.JANUARY);
+                        stop.set(Calendar.DAY_OF_MONTH, 1);
+                        stop.set(Calendar.YEAR, stop.get(Calendar.YEAR)+1);
                     }
                 }
                 break;
