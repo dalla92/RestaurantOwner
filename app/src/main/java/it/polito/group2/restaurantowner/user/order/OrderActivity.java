@@ -450,12 +450,9 @@ public class OrderActivity extends AppCompatActivity
         Boolean bo;
         Calendar c = Calendar.getInstance();
         if (offerList.size() > 0) {
-            Log.d("FILIPPO", "trovate offerte: "+offerList.size());
             for (Offer o : offerList) {
                 bo = o.isNowInOffer(c);
-                Log.d("FILIPPO", "oggi: "+c.toString()+" offerta il: "+o.getOfferStart());
                 if (bo) {
-                    Log.d("FILIPPO", "offerta attiva per quest'ordine");
                     return o;
                 }
             }

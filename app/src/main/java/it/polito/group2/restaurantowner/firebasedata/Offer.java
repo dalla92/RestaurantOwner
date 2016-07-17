@@ -45,7 +45,7 @@ public class Offer implements Serializable {
     }
 
     public Boolean isWeekDayInOffer(Integer weekDay) {
-        if(isCorrectWeekday(weekDay))
+        if (isCorrectWeekday(weekDay))
             return offerOnWeekDays.get(weekDay);
 
         return false;
@@ -67,33 +67,33 @@ public class Offer implements Serializable {
     }
 
     public void addWeekDayInOffer(Integer weekDay) {
-        if(isCorrectWeekday(weekDay))
-        offerOnWeekDays.set(weekDay, true);
+        if (isCorrectWeekday(weekDay))
+            offerOnWeekDays.set(weekDay, true);
     }
 
     public void delWeekDayInOffer(Integer weekDay) {
-        if(isCorrectWeekday(weekDay))
-        offerOnWeekDays.set(weekDay, false);
+        if (isCorrectWeekday(weekDay))
+            offerOnWeekDays.set(weekDay, false);
     }
 
     //TODO cambiare il nome
     public Double getNewMealPrice(Meal meal, Calendar day) {
         Double price = meal.getMeal_price();
-        if(isNowInOffer(day)) {
-            if(isMealInOffer(meal)) {
-                price = (meal.getMeal_price()*offerPercentage)/100;
+        if (isNowInOffer(day)) {
+            if (offerForTotal || isMealInOffer(meal)) {
+                price = (meal.getMeal_price() * offerPercentage) / 100;
             }
         }
         return price;
     }
 
     public Boolean isDayInOffer(Calendar day) {
-        if(offerEnabled) {
+        if (offerEnabled) {
             Calendar start = Calendar.getInstance();
             start.setTimeInMillis(offerStart - 60000);
             Calendar stop = Calendar.getInstance();
-            stop.setTimeInMillis(offerStop + 60000);
-            if(day.after(start) && day.before(stop)) {
+            stop.setTimeInMillis(offerStop + 24 * 60 * 60 * 1000 + 60000);
+            if (day.after(start) && day.before(stop)) {
                 return isWeekDayInOffer(day.get(Calendar.DAY_OF_WEEK));
             }
         }
@@ -101,14 +101,11 @@ public class Offer implements Serializable {
     }
 
     public Boolean isNowInOffer(Calendar day) {
-        if(isDayInOffer(day)) {
-            Log.d("FILIPPO", "il giorno e' in offerta "+day.getTime().toString());
+        if (isDayInOffer(day)) {
             int timeOfDay = day.get(Calendar.HOUR_OF_DAY);
-            if(timeOfDay >= 6 && timeOfDay < 16){
-                Log.d("FILIPPO", "offerta attiva a pranzo");
+            if (timeOfDay >= 6 && timeOfDay < 16) {
                 return offerAtLunch;
-            } else if(timeOfDay >= 16 || timeOfDay < 6){
-                Log.d("FILIPPO", "offerta attiva a cena");
+            } else if (timeOfDay >= 16 || timeOfDay < 6) {
                 return offerAtDinner;
             }
         }
@@ -116,15 +113,22 @@ public class Offer implements Serializable {
     }
 
     public Boolean isMealInOffer(Meal meal) {
-        if(offerForMeal && offerEnabled) {
-            return isInMealList(meal);
+        if (offerEnabled) {
+            if (offerForTotal)
+                return true;
+            if (offerForMeal)
+                return isInMealList(meal);
+            return isInCategoryList(meal.getMeal_category());
         }
-        return isInCategoryList(meal.getMeal_category());
+        return false;
     }
 
     public Boolean isCategoryInOffer(String categoryName) {
-        if(offerForCategory && offerEnabled) {
-            return isInCategoryList(categoryName);
+        if (offerEnabled) {
+            if (offerForTotal)
+                return true;
+            if (offerForCategory)
+                return isInCategoryList(categoryName);
         }
         return false;
     }
@@ -138,30 +142,30 @@ public class Offer implements Serializable {
     }
 
     public void addCategoryInOffer(String categoryName) {
-        if(!isInCategoryList(categoryName))
+        if (!isInCategoryList(categoryName))
             offerOnCategories.put(categoryName, true);
     }
 
     public void delCategoryInOffer(String categoryName) {
-        if(isInCategoryList(categoryName))
+        if (isInCategoryList(categoryName))
             offerOnCategories.remove(categoryName);
     }
 
     public void addMealInOffer(Meal meal) {
-        if(!isInMealList(meal))
+        if (!isInMealList(meal))
             offerOnMeals.put(meal.getMeal_id(), true);
     }
 
     public void delMealInOffer(Meal meal) {
-        if(isInMealList(meal))
+        if (isInMealList(meal))
             offerOnMeals.remove(meal.getMeal_id());
     }
 
     //TODO cambiare il nome
     public ArrayList<String> getCategoryList() {
         ArrayList<String> list = new ArrayList<>();
-        for(String key : offerOnCategories.keySet()) {
-            if(offerOnCategories.get(key)) {
+        for (String key : offerOnCategories.keySet()) {
+            if (offerOnCategories.get(key)) {
                 list.add(key);
             }
         }
@@ -171,8 +175,8 @@ public class Offer implements Serializable {
     //TODO cambiare il nome
     public ArrayList<String> getMealList() {
         ArrayList<String> list = new ArrayList<>();
-        for(String key : offerOnMeals.keySet()) {
-            if(offerOnMeals.get(key)) {
+        for (String key : offerOnMeals.keySet()) {
+            if (offerOnMeals.get(key)) {
                 list.add(key);
             }
         }
