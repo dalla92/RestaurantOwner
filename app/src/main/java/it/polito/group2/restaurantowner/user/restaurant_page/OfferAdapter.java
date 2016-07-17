@@ -86,7 +86,7 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
     public void onBindViewHolder(final OfferViewHolder holder, int position) {
 
         holder.name.setText(offerList.get(position).getOfferName());
-        holder.name.setOnClickListener(new View.OnClickListener() {
+        /*holder.name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (holder.details.getVisibility() == View.GONE)
@@ -100,7 +100,7 @@ public class OfferAdapter extends RecyclerView.Adapter<OfferAdapter.OfferViewHol
             public void onClick(View v) {
                 holder.details.setVisibility(View.GONE);
             }
-        });
+        });*/
 
         holder.description.setText(offerList.get(position).getOfferDescription());
 
