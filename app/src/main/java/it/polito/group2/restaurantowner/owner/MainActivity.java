@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity
                 mAdapter.clear();
                 for(DataSnapshot data: dataSnapshot.getChildren()){
                     RestaurantPreview snap_res = data.getValue(RestaurantPreview.class);
-                    mAdapter.addItem(0, snap_res);
+                    mAdapter.addItem(snap_res);
                     resList.add(snap_res);
                 }
                 FirebaseUtil.hideProgressDialog(mProgressDialog);

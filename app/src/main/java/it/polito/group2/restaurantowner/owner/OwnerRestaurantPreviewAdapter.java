@@ -86,6 +86,11 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
             notifyItemRangeChanged(position, mDataset.size());
         }
 
+        public void addItem(RestaurantPreview res) {
+            mDataset.add(res);
+            notifyDataSetChanged();
+        }
+
         public void clear(){
             mDataset = new ArrayList<>();
             notifyDataSetChanged();

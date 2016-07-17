@@ -71,7 +71,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
         FragmentServices fragment = new FragmentServices();
         Bundle args = new Bundle();
         if(res.getRestaurant_id()!=null) {
-            args.putBoolean("Fidelity Program", res.getFidelityProgramAccepted());
+            args.putBoolean("Fidelity", res.getFidelityProgramAccepted());
             args.putBoolean("Table Reservation", res.getTableReservationAllowed());
             args.putString("Table Number", String.valueOf(res.getRestaurant_total_tables_number()));
             args.putBoolean("Take Away", res.getTakeAwayAllowed());
@@ -146,7 +146,6 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
         final CheckBox cbLunchClosed = (CheckBox) rootView.findViewById(R.id.checkBoxLunchClose);
         final CheckBox cbDinnerClosed = (CheckBox) rootView.findViewById(R.id.checkBoxDinnerClose);
 
-        if(getArguments().isEmpty()) {
             if (savedInstanceState != null) {
                 // Restore value of members from saved state
                 lunchOpenTime = savedInstanceState.getStringArrayList("lunchOpenTime");
@@ -155,29 +154,22 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                 dinnerCloseTime = savedInstanceState.getStringArrayList("dinnerCloseTime");
                 listLunchClose = savedInstanceState.getBooleanArray("listLunchClose");
                 listDinnerClose = savedInstanceState.getBooleanArray("listDinnerClose");
-            } else {
-                for (int i = 0; i < 8; i++) {
-                    lunchOpenTime.add(i, "CLOSED");
-                    lunchCloseTime.add(i, "CLOSED");
-                    dinnerOpenTime.add(i, "CLOSED");
-                    dinnerCloseTime.add(i, "CLOSED");
+            }
+            else {
+                for(int i=0;i<8;i++){
+                    lunchOpenTime.add(getArguments().getString("lunchOpenTime" + i, ""));
+                    lunchCloseTime.add(getArguments().getString("lunchCloseTime" + i, ""));
+                    dinnerOpenTime.add(getArguments().getString("dinnerOpenTime" + i, ""));
+                    dinnerCloseTime.add(getArguments().getString("dinnerCloseTime"+i,""));
+                    listLunchClose[i] = getArguments().getBoolean("ClosedLunch"+i,false);
+                    listDinnerClose[i] = getArguments().getBoolean("ClosedDinner"+i,false);
                 }
+                fidelity.setChecked(getArguments().getBoolean("Fidelity Program",false));
+                tableRes.setChecked(getArguments().getBoolean("Table Reservation",false));
+                takeAway.setChecked(getArguments().getBoolean("Take Away", false));
+                tableResEdit.setText(getArguments().getString("Table Number", ""));
+                takeAwayEdit.setText(getArguments().getString("Orders Hour", ""));
             }
-        } else{
-            for(int i=0;i<8;i++){
-                lunchOpenTime.add(getArguments().getString("lunchOpenTime" + i, ""));
-                lunchCloseTime.add(getArguments().getString("lunchCloseTime" + i, ""));
-                dinnerOpenTime.add(getArguments().getString("dinnerOpenTime" + i, ""));
-                dinnerCloseTime.add(getArguments().getString("dinnerCloseTime"+i,""));
-                listLunchClose[i] = getArguments().getBoolean("ClosedLunch"+i,false);
-                listDinnerClose[i] = getArguments().getBoolean("ClosedDinner"+i,false);
-            }
-            fidelity.setChecked(getArguments().getBoolean("Fidelity Program",false));
-            tableRes.setChecked(getArguments().getBoolean("Table Reservation",false));
-            takeAway.setChecked(getArguments().getBoolean("Take Away", false));
-            tableResEdit.setText(getArguments().getString("Table Number", ""));
-            takeAwayEdit.setText(getArguments().getString("Orders Hour", ""));
-        }
 
 
         buttonLunchOpen = (Button) rootView.findViewById(R.id.buttonLunchOpen);
