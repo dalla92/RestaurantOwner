@@ -113,6 +113,7 @@ public class GalleryViewActivity extends AppCompatActivity {
                         isOwner = false;
 
                     if(isOwner){
+                        PermissionUtil.checkWritePermission(GalleryViewActivity.this, REQUEST_WRITE_STORAGE);
                         mGridView.setChoiceMode(GridView.CHOICE_MODE_MULTIPLE_MODAL);
                         mGridView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
 
@@ -378,7 +379,6 @@ public class GalleryViewActivity extends AppCompatActivity {
                         int id = item.getItemId();
 
                         if (id == R.id.camera) {
-                            PermissionUtil.checkWritePermission(GalleryViewActivity.this, REQUEST_WRITE_STORAGE);
                             dispatchTakePictureIntent();
                             return true;
                         }

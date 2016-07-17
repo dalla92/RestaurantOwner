@@ -114,6 +114,8 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
             finish();
         }
 
+        PermissionUtil.checkWritePermission(UserProfile.this, REQUEST_WRITE_STORAGE);
+
         storageRef = FirebaseStorage.getInstance().getReferenceFromUrl("gs://have-break-9713d.appspot.com");
         firebase = FirebaseDatabase.getInstance();
 
@@ -298,7 +300,6 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
         button1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PermissionUtil.checkWritePermission(UserProfile.this, REQUEST_WRITE_STORAGE);
                 dispatchTakePictureIntent();
             }
         });

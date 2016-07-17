@@ -155,6 +155,8 @@ public class FragmentMainInfo extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_main_info_meal, container, false);
 
+        PermissionUtil.checkWritePermission(getActivity(), REQUEST_WRITE_STORAGE);
+
         final ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.progress_bar);
         //feed already present data and set behaviour
         ImageView image = (ImageView) rootView.findViewById(R.id.meal_photo);
@@ -326,7 +328,6 @@ public class FragmentMainInfo extends Fragment {
             @Override
             public void onClick(View v) {
                 //take the photo
-                PermissionUtil.checkWritePermission(getActivity(), REQUEST_WRITE_STORAGE);
                 dispatchTakePictureIntent();
             }
         });

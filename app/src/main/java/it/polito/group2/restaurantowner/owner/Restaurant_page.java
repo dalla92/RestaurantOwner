@@ -121,6 +121,8 @@ public class Restaurant_page extends AppCompatActivity
         if(b!=null)
             restaurant_id = b.getString("RestaurantId");
 
+        PermissionUtil.checkWritePermission(Restaurant_page.this, REQUEST_WRITE_STORAGE);
+
         mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
@@ -305,7 +307,6 @@ public class Restaurant_page extends AppCompatActivity
                             int id = item.getItemId();
 
                             if (id == R.id.camera) {
-                                PermissionUtil.checkWritePermission(Restaurant_page.this, REQUEST_WRITE_STORAGE);
                                 dispatchTakePictureIntent();
                                 return true;
                             }
