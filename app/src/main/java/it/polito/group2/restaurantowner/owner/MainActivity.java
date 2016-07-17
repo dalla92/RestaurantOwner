@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
     private FirebaseDatabase firebase;
     private ProgressDialog mProgressDialog;
     private Query resPreviewQuery;
-    private ChildEventListener resPreviewValueListener;
+    private ValueEventListener resPreviewValueListener;
     Toolbar toolbar;
 
 
@@ -121,7 +121,27 @@ public class MainActivity extends AppCompatActivity
 
 
         resPreviewQuery = firebase.getReference("restaurants_previews").orderByChild("user_id").equalTo(userID);
-        resPreviewValueListener = new ChildEventListener() {
+        resPreviewValueListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mAdapter.clear();
+                for(DataSnapshot data: dataSnapshot.getChildren()){
+                    RestaurantPreview snap_res = data.getValue(RestaurantPreview.class);
+                    mAdapter.addItem(0, snap_res);
+                    resList.add(snap_res);
+                }
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
+                if(mAdapter.getItemCount() == 0)
+                    Toast.makeText(MainActivity.this, "You don't own any restaurants", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
+            }
+        };
+        /*resPreviewValueListener = new ValueEventListener(){
 
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -158,7 +178,7 @@ public class MainActivity extends AppCompatActivity
             public void onCancelled(DatabaseError firebaseError) {
                 System.out.println("The read failed: " + firebaseError.getMessage());
             }
-        };
+        };*/
 
     }
 
@@ -166,13 +186,13 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         FirebaseUtil.showProgressDialog(mProgressDialog);
-        resPreviewQuery.addChildEventListener(resPreviewValueListener);
+        resPreviewQuery.addValueEventListener(resPreviewValueListener);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        RemoveListenerUtil.remove_child_event_listener(resPreviewQuery, resPreviewValueListener);
+        RemoveListenerUtil.remove_value_event_listener(resPreviewQuery, resPreviewValueListener);
         resList.clear();
         mAdapter.notifyDataSetChanged();
     }
@@ -207,6 +227,8 @@ public class MainActivity extends AppCompatActivity
                     TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
                     ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
                     User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
+                    TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
+                    nav_points.setText(target.getUser_fidelity_points() + " " + getString(R.string.points));
 
                     nav_username.setText(target.getUser_full_name());
                     nav_email.setText(target.getUser_email());

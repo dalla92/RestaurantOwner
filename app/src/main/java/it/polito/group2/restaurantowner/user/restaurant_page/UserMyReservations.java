@@ -136,16 +136,17 @@ public class UserMyReservations extends AppCompatActivity implements NavigationV
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
                     TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-                    TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
                     ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
                     User target = dataSnapshot.getValue(User.class);
+
+                    TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
+                    nav_points.setText(target.getUser_fidelity_points() + " " + getString(R.string.points));
 
                     if (target.getOwnerUser())
                         ownerItem.setVisible(true);
 
                     nav_username.setText(target.getUser_full_name());
                     nav_email.setText(target.getUser_email());
-                    nav_points.setText(String.valueOf(target.getUser_fidelity_points()));
 
                     String photoUri = target.getUser_photo_firebase_URL();
                     if (!isFinishing()) {

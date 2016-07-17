@@ -202,6 +202,9 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
             }
         }
 
+        if(id == android.R.id.home)
+            onBackPressed();
+
         return super.onOptionsItemSelected(item);
     }
 

@@ -23,37 +23,25 @@
             android:layout_gravity="bottom|center"
             android:layout_marginBottom="16dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/navHeaderUsername"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_gravity="bottom|center"
-                android:layout_marginBottom="16dp">
-                <TextView
-                    android:id="@+id/navHeaderUsername"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/nav_header_vertical_spacing"
-                    android:textColor="#FFFFFF"
-                    android:text="Username"
-                    android:textSize="18dp"
-                    android:textStyle="bold"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:gravity="center_horizontal" />
+                android:textColor="#FFFFFF"
+                android:text="Username"
+                android:textSize="18dp"
+                android:textStyle="bold"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-                <TextView
-                    android:id="@+id/navHeaderPoints"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/nav_header_vertical_spacing"
-                    android:textColor="#FFFFFF"
-                    android:text="Points"
-                    android:textSize="18dp"
-                    android:textStyle="bold"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                    android:gravity="right"
-                    android:layout_marginLeft="2dp" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/navHeaderPoints"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:text="Points"
+                android:textSize="13dp"
+                android:textStyle="bold"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
             <TextView
                 android:id="@+id/navHeaderEmail"

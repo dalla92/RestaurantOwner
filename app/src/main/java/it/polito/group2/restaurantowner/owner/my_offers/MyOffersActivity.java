@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -20,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -45,6 +47,7 @@ public class MyOffersActivity extends AppCompatActivity
     private ArrayList<Meal> mealList = null;
     private DatabaseReference q;
     private ValueEventListener l;
+    private FirebaseDatabase firebase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,24 +59,15 @@ public class MyOffersActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        firebase = FirebaseDatabase.getInstance();
+
         //User object
         DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
-        if (userRef != null) {
-            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    User user = dataSnapshot.getValue(User.class);
-                    //FirebaseUtil.hideProgressDialog(mProgressDialog);
-                    setDrawer(user);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            });
-        } else {
+        if (userRef == null) {
             OnBackUtil.clean_stack_and_go_to_main_activity(this);
         }
+
+        setDrawer();
 
         if (getIntent().getExtras() != null && getIntent().getExtras().getString("restaurant_id") != null) {
             restaurantID = getIntent().getExtras().getString("restaurant_id");
@@ -182,68 +176,72 @@ public class MyOffersActivity extends AppCompatActivity
 
     //ACTIVITY FUNCTIONS ===========================================================================
 
-    private void setDrawer(User user) {
+    private void setDrawer() {
+        //toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        assert drawer != null;
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
-        MenuItem i = menu.findItem(R.id.action_edit);
-        if(i!=null)
-            i.setVisible(false);
-        MenuItem i2 = menu.findItem(R.id.action_show_as);
-        if(i!=null)
-            i2.setVisible(false);
-        assert navigationView != null;
-        navigationView.setNavigationItemSelectedListener(this);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
 
-        final MenuItem ownerItem = menu.findItem(R.id.nav_owner);
-        MenuItem loginItem = menu.findItem(R.id.nav_login);
-        MenuItem logoutItem = menu.findItem(R.id.nav_logout);
-        MenuItem myProfileItem = menu.findItem(R.id.nav_my_profile);
-        MenuItem myOrdersItem = menu.findItem(R.id.nav_my_orders);
-        MenuItem mrResItem = menu.findItem(R.id.nav_my_reservations);
-        MenuItem myReviewsItem = menu.findItem(R.id.nav_my_reviews);
-        MenuItem myFavItem = menu.findItem(R.id.nav_my_favourites);
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
+                    TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
+                    nav_points.setText(target.getUser_fidelity_points() + " " + getString(R.string.points));
 
-        ownerItem.setVisible(false);
-        loginItem.setVisible(false);
-        logoutItem.setVisible(true);
-        myProfileItem.setVisible(true);
-        myOrdersItem.setVisible(true);
-        mrResItem.setVisible(true);
-        myReviewsItem.setVisible(true);
-        myFavItem.setVisible(true);
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
 
-        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-        ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if (photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(getApplicationContext())
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    } else {
+                        Glide
+                                .with(getApplicationContext())
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                }
 
-        if (user.getOwnerUser())
-            ownerItem.setVisible(true);
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
 
-        nav_username.setText(user.getUser_full_name());
-        nav_email.setText(user.getUser_email());
-        String photoUri = user.getUser_photo_firebase_URL();
-
-        if (photoUri == null || photoUri.equals("")) {
-            Glide
-                    .with(MyOffersActivity.this)
-                    .load(R.drawable.blank_profile_nav)
-                    .centerCrop()
-                    .into(nav_picture);
-        } else {
-            Glide
-                    .with(MyOffersActivity.this)
-                    .load(photoUri)
-                    .centerCrop()
-                    .into(nav_picture);
         }
 
-    }
+        Menu menu = navigationView.getMenu();
+        MenuItem i = menu.findItem(R.id.action_edit);
+        i.setVisible(false);
+        MenuItem i2 = menu.findItem(R.id.action_show_as);
+        i2.setVisible(false);
 
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @SuppressWarnings("StatementWithEmptyBody")
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                // Handle navigation view item clicks here.
+                return DrawerUtil.drawer_owner_not_restaurant_page(MyOffersActivity.this, item, restaurantID);
+            }
+        });
+    }
 }

@@ -26,6 +26,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
@@ -58,6 +59,7 @@ public class StatisticsActivity extends AppCompatActivity
     private String restaurantID;
     ArrayList<Order> orderList = null;
     ArrayList<TableReservation> reservationList = null;
+    private FirebaseDatabase firebase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,9 +73,15 @@ public class StatisticsActivity extends AppCompatActivity
         mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
+        firebase = FirebaseDatabase.getInstance();
+
+        //User object
         DatabaseReference userRef = FirebaseUtil.getCurrentUserRef();
-        if (userRef == null)
+        if (userRef == null) {
             abortActivity();
+        }
+
+        setDrawer();
 
         if (getIntent().getExtras() == null || getIntent().getExtras().getString("restaurant_id") == null)
             abortActivity();
@@ -84,20 +92,6 @@ public class StatisticsActivity extends AppCompatActivity
         q_reservations = FirebaseUtil.getReservationsByRestaurantRef(restaurantID);
         if (q_reservations == null)
             abortActivity();
-
-        assert userRef != null;
-
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                User user = dataSnapshot.getValue(User.class);
-                setDrawer(user);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        });
 
         if (q_orders != null) {
             l_orders = new ValueEventListener() {
@@ -394,62 +388,74 @@ public class StatisticsActivity extends AppCompatActivity
         return DrawerUtil.drawer_owner_not_restaurant_page(this, item, restaurantID);
     }
 
-    private void setDrawer(User user) {
+    private void setDrawer() {
+        //toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //navigation drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        assert drawer != null;
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        assert navigationView != null;
-        navigationView.setNavigationItemSelectedListener(this);
+        String userID = FirebaseUtil.getCurrentUserId();
+        if (userID != null) {
 
-        Menu menu = navigationView.getMenu();
-        final MenuItem ownerItem = menu.findItem(R.id.nav_owner);
-        MenuItem loginItem = menu.findItem(R.id.nav_login);
-        MenuItem logoutItem = menu.findItem(R.id.nav_logout);
-        MenuItem myProfileItem = menu.findItem(R.id.nav_my_profile);
-        MenuItem myOrdersItem = menu.findItem(R.id.nav_my_orders);
-        MenuItem mrResItem = menu.findItem(R.id.nav_my_reservations);
-        MenuItem myReviewsItem = menu.findItem(R.id.nav_my_reviews);
-        MenuItem myFavItem = menu.findItem(R.id.nav_my_favourites);
+            DatabaseReference userRef = firebase.getReference("users/" + userID);
+            userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
+                    TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
+                    ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
+                    TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
+                    nav_points.setText(target.getUser_fidelity_points() + " " + getString(R.string.points));
 
-        ownerItem.setVisible(false);
-        loginItem.setVisible(false);
-        logoutItem.setVisible(true);
-        myProfileItem.setVisible(true);
-        myOrdersItem.setVisible(true);
-        mrResItem.setVisible(true);
-        myReviewsItem.setVisible(true);
-        myFavItem.setVisible(true);
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
 
-        TextView nav_username = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderUsername);
-        TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
-        ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(getApplicationContext())
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                    else{
+                        Glide
+                                .with(getApplicationContext())
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                }
 
-        if (user.getOwnerUser())
-            ownerItem.setVisible(true);
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("prova", "cancelled");
+                }
+            });
 
-        nav_username.setText(user.getUser_full_name());
-        nav_email.setText(user.getUser_email());
-        String photoUri = user.getUser_photo_firebase_URL();
-
-        if (photoUri == null || photoUri.equals("")) {
-            Glide
-                    .with(StatisticsActivity.this)
-                    .load(R.drawable.blank_profile_nav)
-                    .centerCrop()
-                    .into(nav_picture);
-        } else {
-            Glide
-                    .with(StatisticsActivity.this)
-                    .load(photoUri)
-                    .centerCrop()
-                    .into(nav_picture);
         }
 
+        Menu menu = navigationView.getMenu();
+        MenuItem i = menu.findItem(R.id.action_edit);
+        i.setVisible(false);
+        MenuItem i2 = menu.findItem(R.id.action_show_as);
+        i2.setVisible(false);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @SuppressWarnings("StatementWithEmptyBody")
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                // Handle navigation view item clicks here.
+                return DrawerUtil.drawer_owner_not_restaurant_page(StatisticsActivity.this, item, restaurantID);
+            }
+        });
     }
 
     private void abortActivity() {

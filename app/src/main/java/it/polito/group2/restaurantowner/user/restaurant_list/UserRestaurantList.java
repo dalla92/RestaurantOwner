@@ -719,27 +719,29 @@ public class UserRestaurantList extends AppCompatActivity
                     TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
                     ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
                     User target = dataSnapshot.getValue(it.polito.group2.restaurantowner.firebasedata.User.class);
-                    if (target != null) {
-                        if (target.getOwnerUser() != null && target.getOwnerUser())
-                            ownerItem.setVisible(true);
 
-                        nav_username.setText(target.getUser_full_name());
-                        nav_email.setText(target.getUser_email());
+                    TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
+                    nav_points.setText(target.getUser_fidelity_points() + " " + getString(R.string.points));
 
-                        String photoUri = target.getUser_photo_firebase_URL();
-                        if (photoUri == null || photoUri.equals("")) {
-                            Glide
-                                    .with(getApplicationContext())
-                                    .load(R.drawable.blank_profile_nav)
-                                    .centerCrop()
-                                    .into(nav_picture);
-                        } else {
-                            Glide
-                                    .with(getApplicationContext())
-                                    .load(photoUri)
-                                    .centerCrop()
-                                    .into(nav_picture);
-                        }
+                    if (target.getOwnerUser())
+                        ownerItem.setVisible(true);
+
+                    nav_username.setText(target.getUser_full_name());
+                    nav_email.setText(target.getUser_email());
+                    String photoUri = target.getUser_photo_firebase_URL();
+                    if(photoUri == null || photoUri.equals("")) {
+                        Glide
+                                .with(getApplicationContext())
+                                .load(R.drawable.blank_profile_nav)
+                                .centerCrop()
+                                .into(nav_picture);
+                    }
+                    else{
+                        Glide
+                                .with(getApplicationContext())
+                                .load(photoUri)
+                                .centerCrop()
+                                .into(nav_picture);
                     }
                 }
 

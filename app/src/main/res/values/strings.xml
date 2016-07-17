@@ -324,6 +324,7 @@
 
 
     <!-- Strings related to user.order -->
+    <string name="points">points</string>
     <string name="user_order_nextstep">Next</string>
     <string name="user_order_addtocart">Add</string>
     <string name="user_order_mealquantity">Add quantity</string>

@@ -181,7 +181,7 @@ public class ReviewsActivity extends AppCompatActivity implements NavigationView
         MenuItem i = menu.findItem(R.id.action_edit);
         i.setVisible(false);
         MenuItem i2 = menu.findItem(R.id.action_show_as);
-        i.setVisible(false);
+        i2.setVisible(false);
         DatabaseReference userRef = firebase.getReference("users/" + userID);
         userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -190,6 +190,9 @@ public class ReviewsActivity extends AppCompatActivity implements NavigationView
                 TextView nav_email = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderEmail);
                 ImageView nav_picture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPicture);
                 User target = dataSnapshot.getValue(User.class);
+
+                TextView nav_points = (TextView) navigationView.getHeaderView(0).findViewById(R.id.navHeaderPoints);
+                nav_points.setText(target.getUser_fidelity_points() + " " + getString(R.string.points));
 
                 nav_username.setText(target.getUser_full_name());
                 nav_email.setText(target.getUser_email());
