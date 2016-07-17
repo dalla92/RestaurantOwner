@@ -212,9 +212,10 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
 
         public void setData(RestaurantPreview obj, int position) {
             if (obj.getRestaurant_cover_firebase_URL() == null || obj.getRestaurant_cover_firebase_URL().equals("")) {
+                Log.d("prova", "ciao " + obj.getRestaurant_cover_firebase_URL());
                 Glide.with(mContext).load(R.drawable.no_image).into(this.image);
-                progressBar.setVisibility(View.GONE);
             } else
+                progressBar.setVisibility(View.VISIBLE);
                 Glide
                         .with(mContext)
                         .load(obj.getRestaurant_cover_firebase_URL())
@@ -231,6 +232,7 @@ public class OwnerRestaurantPreviewAdapter extends RecyclerView.Adapter<OwnerRes
                                 return false;
                             }
                         })
+                        .error(R.drawable.no_image)
                         .into(this.image);
 
             this.resName.setText(obj.getRestaurant_name());

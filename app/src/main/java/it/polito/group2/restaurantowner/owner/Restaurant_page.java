@@ -126,6 +126,7 @@ public class Restaurant_page extends AppCompatActivity
         mProgressDialog = FirebaseUtil.initProgressDialog(this);
         FirebaseUtil.showProgressDialog(mProgressDialog);
 
+        firebase = FirebaseDatabase.getInstance();
         //get and fill related data
         get_data_from_firebase();
 
@@ -590,10 +591,10 @@ public class Restaurant_page extends AppCompatActivity
                         // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                         Uri downloadUrl = taskSnapshot.getDownloadUrl();
                         my_restaurant.setRestaurant_photo_firebase_URL(downloadUrl.toString());
-                        DatabaseReference ref = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants/" + restaurant_id + "/restaurant_photo_firebase_URL");
+                        DatabaseReference ref = firebase.getReference("restaurants/" + restaurant_id + "/restaurant_photo_firebase_URL");
                         ref.setValue(downloadUrl.toString());
 
-                        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReferenceFromUrl("https://have-break-9713d.firebaseio.com/restaurants_previews/" + restaurant_id + "/restaurant_cover_firebase_URL");
+                        DatabaseReference ref2 = firebase.getReference("restaurants_previews/" + restaurant_id + "/restaurant_cover_firebase_URL");
                         ref2.setValue(downloadUrl.toString());
                     }
                 });

@@ -455,76 +455,81 @@ public class UserRestaurantActivity extends AppCompatActivity implements Navigat
         MenuAdapter adapter = new MenuAdapter(categories, meals, this);
         menu.setAdapter(adapter);
 
-        menu.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        final int targetHeight = menu.getMeasuredHeight();
-
         final ImageView iconExpand = (ImageView) findViewById(R.id.user_restaurant_menu_icon_expand);
-        assert iconExpand != null;
-        CardView menuLayout = (CardView) findViewById(R.id.user_restaurant_menu_layout);
-        assert menuLayout != null;
-        menuLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int currentHeight, newHeight;
 
-                if (iconExpand.getVisibility() == View.VISIBLE) {
-                    currentHeight = 0;
-                    newHeight = targetHeight;
-                } else {
-                    currentHeight = targetHeight;
-                    newHeight = 0;
+        if(categories.isEmpty())
+            iconExpand.setVisibility(View.GONE);
+
+        else {
+            menu.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            final int targetHeight = menu.getMeasuredHeight();
+
+            assert iconExpand != null;
+            CardView menuLayout = (CardView) findViewById(R.id.user_restaurant_menu_layout);
+            assert menuLayout != null;
+            menuLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int currentHeight, newHeight;
+
+                    if (iconExpand.getVisibility() == View.VISIBLE) {
+                        currentHeight = 0;
+                        newHeight = targetHeight;
+                    } else {
+                        currentHeight = targetHeight;
+                        newHeight = 0;
+                    }
+
+                    ValueAnimator slideAnimator = ValueAnimator.ofInt(currentHeight, newHeight).setDuration(300);
+                    slideAnimator.addListener(new Animator.AnimatorListener() {
+                        boolean modified = false;
+
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            if (iconExpand.getVisibility() == View.VISIBLE) {
+                                iconExpand.setVisibility(View.GONE);
+                                modified = true;
+                            }
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            if (iconExpand.getVisibility() == View.GONE && !modified) {
+                                iconExpand.setVisibility(View.VISIBLE);
+                                modified = false;
+                            }
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    });
+
+                    slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            // get the value the interpolator is at
+                            Integer value = (Integer) animation.getAnimatedValue();
+                            // I'm going to set the layout's height 1:1 to the tick
+                            menu.getLayoutParams().height = value.intValue();
+                            // force all layouts to see which ones are affected by
+                            // this layouts height change
+                            menu.requestLayout();
+                        }
+                    });
+                    AnimatorSet set = new AnimatorSet();
+                    set.play(slideAnimator);
+                    set.setInterpolator(new AccelerateDecelerateInterpolator());
+                    set.start();
                 }
-
-                ValueAnimator slideAnimator = ValueAnimator.ofInt(currentHeight, newHeight).setDuration(300);
-                slideAnimator.addListener(new Animator.AnimatorListener() {
-                    boolean modified = false;
-
-                    @Override
-                    public void onAnimationStart(Animator animation) {
-                        if (iconExpand.getVisibility() == View.VISIBLE) {
-                            iconExpand.setVisibility(View.GONE);
-                            modified = true;
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        if (iconExpand.getVisibility() == View.GONE && !modified) {
-                            iconExpand.setVisibility(View.VISIBLE);
-                            modified = false;
-                        }
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationRepeat(Animator animation) {
-
-                    }
-                });
-
-                slideAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        // get the value the interpolator is at
-                        Integer value = (Integer) animation.getAnimatedValue();
-                        // I'm going to set the layout's height 1:1 to the tick
-                        menu.getLayoutParams().height = value.intValue();
-                        // force all layouts to see which ones are affected by
-                        // this layouts height change
-                        menu.requestLayout();
-                    }
-                });
-                AnimatorSet set = new AnimatorSet();
-                set.play(slideAnimator);
-                set.setInterpolator(new AccelerateDecelerateInterpolator());
-                set.start();
-            }
-        });
-
+            });
+        }
     }
 
     private ArrayList<String> getCategoryList() {
