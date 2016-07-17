@@ -23,6 +23,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -30,7 +31,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -146,6 +149,19 @@ public class UserRestaurantList extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.my_layout);
+        appBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {
+            @Override
+            public void onStateChanged(AppBarLayout appBarLayout, State state) {
+                Log.d("STATE", state.name());
+                if(state.name().equals("EXPANDED")){
+                    fab.setVisibility(View.VISIBLE);
+                }
+                else{
+                    fab.setVisibility(View.GONE);
+                }
+            }
+        });
         PermissionUtil.checkLocationPermission(UserRestaurantList.this, REQUEST_LOCATION);
 
         fab = (FloatingActionButton) findViewById(R.id.gps_fab);
@@ -232,11 +248,15 @@ public class UserRestaurantList extends AppCompatActivity
                     })
             );
 
-            mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            //mRecyclerView.clearOnScrollListeners();
+
+            /*
+            mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
                 @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                     super.onScrolled(recyclerView, dx, dy);
+                    Log.d("prova", "scrolla "+ dy);
                     if (dy > 0) {
                         Log.d("prova", "scrolling up");
                         fab.setVisibility(View.INVISIBLE);
@@ -251,14 +271,18 @@ public class UserRestaurantList extends AppCompatActivity
                     super.onScrollStateChanged(recyclerView, newState);
 
                     if (newState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {
+                        Log.d("prova", "state 1");
                         // Do something
                     } else if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                        Log.d("prova", "state 2");
                         // Do something
                     } else {
+                        Log.d("prova", "state 3");
                         // Do something
                     }
                 }
             });
+            */
 
             mAdapter = new UserRestaurantPreviewAdapter(restaurants_previews_list, this, mLastUserMarker);
             mRecyclerView.setAdapter(mAdapter);

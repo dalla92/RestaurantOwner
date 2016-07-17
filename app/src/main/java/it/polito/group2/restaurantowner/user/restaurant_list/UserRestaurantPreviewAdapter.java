@@ -2,7 +2,10 @@ package it.polito.group2.restaurantowner.user.restaurant_list;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -41,7 +44,7 @@ import it.polito.group2.restaurantowner.firebasedata.TableReservation;
 /**
  * Created by Daniele on 05/04/2016.
  */
-public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder> {
+public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserRestaurantPreviewAdapter.ViewHolder> implements View.OnTouchListener, View.OnGenericMotionListener, View.OnClickListener, View.OnDragListener, View.OnHoverListener{
     private ArrayList<RestaurantPreview> mDataset;
     public static Context mContext;
     private static float PRICE_BOUNDARY_1 = 5;
@@ -127,6 +130,35 @@ public class UserRestaurantPreviewAdapter extends RecyclerView.Adapter<UserResta
     public double calculate_distance2(LatLng a, Marker b) {
         double distance = SphericalUtil.computeDistanceBetween(a, b.getPosition());
         return distance;
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        Log.d("prova", "eccolo ");
+        return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        Log.d("prova", "eccolo ");
+    }
+
+    @Override
+    public boolean onDrag(View v, DragEvent event) {
+        Log.d("prova", "eccolo ");
+        return false;
+    }
+
+    @Override
+    public boolean onGenericMotion(View v, MotionEvent event) {
+        Log.d("prova", "eccolo ");
+        return false;
+    }
+
+    @Override
+    public boolean onHover(View v, MotionEvent event) {
+        Log.d("prova", "eccolo ");
+        return false;
     }
 
 

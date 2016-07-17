@@ -8,4 +8,10 @@
         android:icon="@drawable/ic_filter_list_24dp"
         app:showAsAction="ifRoom"
         />
+    <item
+        android:id="@+id/position_btn"
+        android:title="@string/your_position"
+        android:icon="@mipmap/ic_position"
+        app:showAsAction="ifRoom"
+        />
 </menu>
