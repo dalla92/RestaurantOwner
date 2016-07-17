@@ -219,7 +219,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                notifyDataSetChanged();
 
                 dialog.dismiss();
             }
