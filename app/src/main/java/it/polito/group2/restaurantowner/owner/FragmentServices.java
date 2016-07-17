@@ -172,7 +172,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                 listLunchClose[i] = getArguments().getBoolean("ClosedLunch"+i,false);
                 listDinnerClose[i] = getArguments().getBoolean("ClosedDinner"+i,false);
             }
-            fidelity.setChecked(getArguments().getBoolean("Fidelity",false));
+            fidelity.setChecked(getArguments().getBoolean("Fidelity Program",false));
             tableRes.setChecked(getArguments().getBoolean("Table Reservation",false));
             takeAway.setChecked(getArguments().getBoolean("Take Away", false));
             tableResEdit.setText(getArguments().getString("Table Number", ""));

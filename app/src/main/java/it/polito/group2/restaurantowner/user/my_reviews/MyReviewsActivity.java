@@ -1,5 +1,6 @@
 package it.polito.group2.restaurantowner.user.my_reviews;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,6 +52,7 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
     private String lastKnownKey;
     private boolean moreReviews;
     private RecyclerView mRecyclerView;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,8 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
             finish();
         }
 
+        mProgressDialog = FirebaseUtil.initProgressDialog(this);
+
         moreReviews = false;
         reviews = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.user_review_list);
@@ -81,6 +85,7 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
 
         firebase = FirebaseDatabase.getInstance();
 
+        FirebaseUtil.showProgressDialog(mProgressDialog);
         Query reviewsQuery = firebase.getReference("reviews/" + userID).orderByPriority().limitToFirst(10);
         reviewsQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -91,6 +96,8 @@ public class MyReviewsActivity extends AppCompatActivity implements NavigationVi
                     mAdapter.notifyItemInserted(reviews.size());
                     lastKnownKey = data.getKey();
                 }
+
+                FirebaseUtil.hideProgressDialog(mProgressDialog);
 
                 moreReviews = reviews.size() == 10;
                 mAdapter.updateScrollListener(moreReviews);

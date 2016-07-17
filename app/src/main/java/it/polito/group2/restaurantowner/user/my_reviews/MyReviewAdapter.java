@@ -19,9 +19,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -161,11 +164,25 @@ public class MyReviewAdapter extends RecyclerView.Adapter implements ItemTouchHe
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         if (holder instanceof ReviewViewHolder) {
 
-            ReviewViewHolder reviewHolder = (ReviewViewHolder) holder;
-            reviewHolder.username.setText(reviews.get(position).getUser_full_name());
+            final ReviewViewHolder reviewHolder = (ReviewViewHolder) holder;
+            String resID = reviews.get(position).getRestaurant_id();
+
+            DatabaseReference resRef = firebase.getReference("restaurants_previews/" + resID + "/restaurant_name");
+            resRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    reviewHolder.username.setText(dataSnapshot.getValue(String.class));
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
             reviewHolder.stars.setRating(reviews.get(position).getReview_rating());
 
             SimpleDateFormat format = new SimpleDateFormat("EEE dd MMM yyyy 'at' HH:mm");
