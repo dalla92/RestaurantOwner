@@ -270,9 +270,14 @@ public class OrderActivity extends AppCompatActivity
         this.meal.setMealGlutenFree(meal.getMealGlutenFree());
         this.meal.setMealVegan(meal.getMealVegan());
         this.meal.setMealVegetarian(meal.getMealVegetarian());
-        AdditionFragment additionFragment = AdditionFragment.newInstance(meal.allAdditions());
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.fragment_container, additionFragment, "ADDITION");
+        if(meal.allAdditions().size() > 0) {
+            AdditionFragment additionFragment = AdditionFragment.newInstance(meal.allAdditions());
+            transaction.replace(R.id.fragment_container, additionFragment, "ADDITION");
+        } else {
+            QuantityFragment quantityFragment = new QuantityFragment();
+            transaction.replace(R.id.fragment_container, quantityFragment, "QUANTITY");
+        }
         transaction.addToBackStack(null);
         transaction.commit();
     }
