@@ -90,7 +90,6 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
     static final int REQUEST_TAKE_PHOTO = 3;
     private static final int REQUEST_WRITE_STORAGE = 112;
     public String photouri=null;
-    private ProgressDialog progressDialog;
     private Toolbar toolbar;
     private FirebaseDatabase firebase;
     private User current_user;
@@ -216,7 +215,7 @@ public class UserProfile extends AppCompatActivity implements NavigationView.OnN
                                     .into(nav_picture);
                         }
                     }
-                    FirebaseUtil.hideProgressDialog(progressDialog);
+                    FirebaseUtil.hideProgressDialog(mProgressDialog);
                 }
 
                 @Override

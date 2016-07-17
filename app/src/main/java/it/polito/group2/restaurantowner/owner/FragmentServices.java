@@ -194,7 +194,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
 
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
+                        String time = (hourOfDay<10?"0":"")+hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
                             for(int i=0;i<8;i++)
                                 lunchOpenTime.set(i,time);
@@ -230,7 +230,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                     }
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
+                        String time = (hourOfDay<10?"0":"")+hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
                             for(int i=0;i<8;i++)
                                 lunchCloseTime.set(i,time);
@@ -267,7 +267,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 
-                        String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
+                        String time = (hourOfDay<10?"0":"")+hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
                             for(int i=0;i<8;i++)
                                 dinnerOpenTime.set(i,time);
@@ -303,7 +303,7 @@ public class FragmentServices extends Fragment implements TimePickerDialog.OnTim
                     }
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String time = hourOfDay + ":" + new DecimalFormat("00").format(minute);
+                        String time = (hourOfDay<10?"0":"")+hourOfDay + ":" + new DecimalFormat("00").format(minute);
                         if(allDays)
                             for(int i=0;i<8;i++)
                                 dinnerCloseTime.set(i,time);

@@ -184,6 +184,8 @@ public class AddRestaurantActivity extends AppCompatActivity implements Fragment
                             r_p.setRestaurant_name(finalRes.getRestaurant_name());
                             r_p.setRestaurant_price_range(1);
                             r_p.setRestaurant_rating(1);
+                            if(finalRes.getRestaurant_photo_firebase_URL()!=null)
+                                r_p.setRestaurant_cover_firebase_URL(finalRes.getRestaurant_photo_firebase_URL());
                             r_p.setUser_id(userID);
                             r_p.setTables_number(finalRes.getRestaurant_total_tables_number());
                             r_p.setRestaurant_category(finalRes.getRestaurant_category());
