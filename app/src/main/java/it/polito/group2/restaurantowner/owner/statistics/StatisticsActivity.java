@@ -319,13 +319,14 @@ public class StatisticsActivity extends AppCompatActivity
 
         switch (timeFilterSelected()) {
             case 0:
-                xAxis.add(getString(R.string.statistics_Sun));
+
                 xAxis.add(getString(R.string.statistics_Mon));
                 xAxis.add(getString(R.string.statistics_Tue));
                 xAxis.add(getString(R.string.statistics_Wed));
                 xAxis.add(getString(R.string.statistics_Thu));
                 xAxis.add(getString(R.string.statistics_Fri));
                 xAxis.add(getString(R.string.statistics_Sat));
+                xAxis.add(getString(R.string.statistics_Sun));
                 break;
             case 1:
                 for (int i = 1; i <= Calendar.getInstance().getActualMaximum(Calendar.DAY_OF_MONTH); i++) {

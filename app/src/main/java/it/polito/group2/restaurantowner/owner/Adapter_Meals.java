@@ -78,7 +78,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
     }
 
     @Override
-    public void onBindViewHolder(final MealViewHolder MealViewHolder, int i) {
+    public void onBindViewHolder(final MealViewHolder MealViewHolder, final int i) {
         index = i;
 
         String url = meals.get(i).getMeal_photo_firebase_URL();
@@ -123,7 +123,7 @@ public class Adapter_Meals extends RecyclerView.Adapter<Adapter_Meals.MealViewHo
             @Override
             public void onClick(View v) {
                 boolean checked = ((Switch)v).isChecked();
-                String meal_key = meals.get(index).getMeal_id();
+                String meal_key = meals.get(i).getMeal_id();
                 FirebaseDatabase ref = FirebaseDatabase.getInstance();
                 DatabaseReference ref2 = ref.getReferenceFromUrl("https://have-break-9713d.firebaseio.com/meals/" + restaurant_id + "/" + meal_key + "/mealAvailable");
                 ref2.setValue(checked);

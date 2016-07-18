@@ -125,7 +125,7 @@ public class FirebaseUtil {
 
     public static Query getReservationsByRestaurantRef(String restaurantID) {
         FirebaseDatabase firebase = FirebaseDatabase.getInstance();
-        return firebase.getReference("reservations").orderByChild("restaurant_id").equalTo(restaurantID);
+        return firebase.getReference("table_reservations").orderByChild("restaurant_id").equalTo(restaurantID);
     }
 
     public static Query getOrdersByUserRef(String userID) {

@@ -125,6 +125,7 @@
         <activity
             android:name=".user.restaurant_page.UserTableReservationActivity"
             android:label="@string/title_table_reservation_activity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".user.restaurant_page.UserMyReservations"
