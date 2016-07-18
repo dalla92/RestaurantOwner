@@ -112,7 +112,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Set"
+            android:text="10:00"
             android:textColor="@android:color/white"
             android:background="@drawable/custom_button"
             android:id="@+id/buttonLunchOpen"
@@ -132,7 +132,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Set"
+            android:text="13:00"
             android:textColor="@android:color/white"
             android:id="@+id/buttonLunchClose"
             android:background="@drawable/custom_button"
@@ -162,7 +162,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Set"
+            android:text="19:00"
             android:textColor="@android:color/white"
             android:background="@drawable/custom_button"
             android:id="@+id/buttonDinnerOpen"
@@ -182,7 +182,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Set"
+            android:text="23:00"
             android:textColor="@android:color/white"
             android:background="@drawable/custom_button"
             android:id="@+id/buttonDinnerClose"

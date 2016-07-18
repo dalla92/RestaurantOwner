@@ -8,5 +8,6 @@
         <item>Thursday</item>
         <item>Friday</item>
         <item>Saturday</item>
+        <item>Every day</item>
     </string-array>
 </resources>
